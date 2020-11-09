@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.6.9"></a>
+## [0.6.9](https://gitlab.coko.foundation/editoria/editoria/compare/editoria-api@0.6.8...editoria-api@0.6.9) (2020-11-09)
+
+
+### Bug Fixes
+
+* **api:** find user with empty search term returns [] ([27d2f6e](https://gitlab.coko.foundation/editoria/editoria/commit/27d2f6e))
+
+
+
+
 <a name="0.6.8"></a>
 ## [0.6.8](https://gitlab.coko.foundation/editoria/editoria/compare/editoria-api@0.6.7...editoria-api@0.6.8) (2020-10-06)
 
