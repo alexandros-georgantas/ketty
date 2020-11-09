@@ -6,6 +6,9 @@ const startsWith = require('lodash/startsWith')
 const { User } = require('@pubsweet/models')
 
 const findUser = async (_, { search, exclude }, ctx, info) => {
+  if (!search) {
+    return []
+  }
   const allUsers = await ctx.connectors.User.model.all()
   const searchLow = search.toLowerCase()
   const res = []
