@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.4.2"></a>
+## [0.4.2](https://gitlab.coko.foundation/editoria/editoria/compare/editoria-data-model@0.4.0...editoria-data-model@0.4.2) (2020-11-11)
+
+
+
+
+**Note:** Version bump only for package editoria-data-model
+
 <a name="0.4.1"></a>
 ## [0.4.1](https://gitlab.coko.foundation/editoria/editoria/compare/editoria-data-model@0.4.0...editoria-data-model@0.4.1) (2020-11-09)
 
