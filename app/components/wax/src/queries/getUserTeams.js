@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { Query } from '@apollo/react-components'
-import gql from 'graphql-tag'
+import { Query } from '@apollo/client/react/components'
+import { gql } from '@apollo/client'
 
 const CURRENT_USER_TEAM = gql`
   query($where: TeamWhereInput) {

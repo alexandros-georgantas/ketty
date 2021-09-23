@@ -6,6 +6,7 @@ import Select from 'react-select'
 import sortBy from 'lodash/sortBy'
 import keys from 'lodash/keys'
 import omit from 'lodash/omit'
+import cloneDeep from 'lodash/cloneDeep'
 import { th } from '@pubsweet/ui-toolkit'
 import { H3 } from '@pubsweet/ui'
 import { Loading, Button } from '../../../ui'
@@ -118,17 +119,18 @@ const TeamSection = props => {
         id: user.id,
       }))
     : []
-
-  const selectValue = value.map(usr => {
-    const user = users.find(u => u.id === usr)
-    if (user) {
-      return {
-        label: user.username,
-        id: usr,
-      }
-    }
-    return usr
-  })
+  const selectValue = value
+    ? value.map(usr => {
+        const user = users.find(u => u.id === usr)
+        if (user) {
+          return {
+            label: user.username,
+            id: usr,
+          }
+        }
+        return usr
+      })
+    : []
 
   const handleChange = newValue => {
     setFieldValue(type, newValue)
@@ -190,11 +192,13 @@ class GlobalTeamsManager extends Component {
 
   handleSubmit = (formValues, formikBag) => {
     const { teams, updateGlobalTeam } = this.props
-
     const data = keys(formValues).map(role => {
       const team = teams.find(t => t.role === role)
-      team.members = formValues[role].map(item => ({ user: { id: item.id } }))
-      return team
+      const clonedTeam = cloneDeep(team)
+      clonedTeam.members = formValues[role]
+        ? formValues[role].map(item => ({ user: { id: item.id } }))
+        : []
+      return clonedTeam
     })
 
     const promises = data.map(team =>

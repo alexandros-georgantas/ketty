@@ -296,27 +296,30 @@ const updateWorkflowState = async (_, { input }, ctx) => {
 const unlockBookComponent = async (_, { input }, ctx) => {
   try {
     const pubsub = await pubsubManager.getPubsub()
-    const { id } = input
-    const lock = await Lock.query()
-      .where('foreignId', id)
+    const { id: bookComponentId } = input
+    const locks = await Lock.query()
+      .where('foreignId', bookComponentId)
       .andWhere('deleted', false)
-    await useCaseUnlockBookComponent(id)
+    await useCaseUnlockBookComponent(bookComponentId, locks)
 
-    const updatedBookComponent = await BookComponent.findById(id)
+    const updatedBookComponent = await BookComponent.findById(bookComponentId)
 
     const user = await User.findById(ctx.user)
 
-    if (user.admin && lock[0].userId !== ctx.user) {
+    if (user.admin && locks[0].userId !== ctx.user) {
+      console.log('here1')
       await pubsub.publish(BOOK_COMPONENT_UNLOCKED_BY_ADMIN, {
         bookComponentUnlockedByAdmin: {
-          bookComponentId: id,
+          bookComponentId,
           unlocked: true,
         },
       })
+      console.log('here2')
       await pubsub.publish(BOOK_COMPONENT_LOCK_UPDATED, {
         bookComponentLockUpdated: updatedBookComponent,
       })
     } else {
+      console.log('here3')
       await pubsub.publish(BOOK_COMPONENT_LOCK_UPDATED, {
         bookComponentLockUpdated: updatedBookComponent,
       })
@@ -659,6 +662,7 @@ module.exports = {
       const lock = await Lock.query()
         .where('foreignId', bookComponent.id)
         .andWhere('deleted', false)
+      console.log('custom1', lock)
       if (lock.length > 0) {
         const user = await User.findById(lock[0].userId)
         locked = {
@@ -671,6 +675,7 @@ module.exports = {
           id: lock[0].id,
         }
       }
+      console.log('custom2', locked)
       return locked
     },
     async componentTypeOrder(bookComponent, _, ctx) {

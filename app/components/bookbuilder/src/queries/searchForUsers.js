@@ -1,6 +1,6 @@
 import React from 'react'
-import { Mutation } from '@apollo/react-components'
-import gql from 'graphql-tag'
+import { Mutation } from '@apollo/client/react/components'
+import { gql } from '@apollo/client'
 
 const SEARCH_FOR_USERS = gql`
   mutation SearchForUsers($search: String!, $exclude: [ID]!) {

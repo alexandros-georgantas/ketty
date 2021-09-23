@@ -1,69 +1,30 @@
-version: '2'
+version: '3'
 
 services:
-  client:
-    build:
-      context: .
-      dockerfile: ./Dockerfile-development
-    depends_on:
-      - server
-    command:
-      [
-        'node_modules/.bin/webpack-dev-server',
-        '--config',
-        './webpack/webpack.development.config.js',
-      ]
-    ports:
-      - ${CLIENT_PORT:-4000}:8080
-    environment:
-      - NODE_ENV=development
-      - CLIENT_HOST=0.0.0.0
-      - SERVER_PROTOCOL=${SERVER_PROTOCOL:-http}
-      - SERVER_HOST=${SERVER_HOST:-server}
-      - SERVER_PORT=${SERVER_PORT:-3000}
-      - CLIENT_WS_MIN_TIMEOUT=3000
-      - CLIENT_WS_TIMEOUT=30000
-    volumes:
-      - ./app:/home/node/editoria/app
-      - ./config:/home/node/editoria/config
-
   server:
     build:
       context: .
-      dockerfile: ./Dockerfile-development
-    depends_on:
-      - db
-    entrypoint:
-      [
-        'node_modules/.bin/wait-for-it',
-        'db:5432',
-        '--',
-        'sh',
-        'scripts/setupDevServer.sh',
-      ]
-    command:
-      [
-        'node_modules/.bin/nodemon',
-        'server/startServer.js',
-        '--watch',
-        'server',
-        '--watch',
-        'config',
-        '--ext',
-        'js,graphql',
-      ]
+      dockerfile: ./Dockerfile-production
+      args:
+        - node_env=${NODE_ENV:-production}
+        - server_protocol=http
+        - server_host=server
+        - server_port=3000
+        - client_ws_min_timeout=${CLIENT_WS_MIN_TIMEOUT:-3000}
+        - client_ws_timeout=${CLIENT_WS_TIMEOUT:-30000}
     ports:
       - ${SERVER_PORT:-3000}:${SERVER_PORT:-3000}
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - EDITORIA_FLAVOUR=${EDITORIA_FLAVOUR:-VANILLA}
       - PUBSWEET_SECRET=${PUBSWEET_SECRET:-dev_secret}
       - EXTERNAL_SERVER_URL=${EXTERNAL_SERVER_URL:-null}
-      - POSTGRES_HOST=db
+      - SERVE_CLIENT=true
+      - POSTGRES_HOST=159.69.144.208
       - POSTGRES_PORT=5432
-      - POSTGRES_DB=${POSTGRES_DB:-editoria_dev}
-      - POSTGRES_USER=${POSTGRES_USER:-dev_user}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_user_password}
+      - POSTGRES_DB=editoria_production_test
+      - POSTGRES_USER=editoria_user
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-otPo9$9peYX7!b}
       - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:-password}
       - ADMIN_GIVEN_NAME=${ADMIN_GIVEN_NAME:-Admin}
@@ -71,9 +32,6 @@ services:
       - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@example.com}
       - SERVER_PORT=${SERVER_PORT:-3000}
       - SERVER_HOST=${SERVER_HOST:-server}
-      - CLIENT_PROTOCOL=${CLIENT_PROTOCOL:-http}
-      - CLIENT_HOST=${CLIENT_HOST:-0.0.0.0}
-      - CLIENT_PORT=${CLIENT_PORT:-4000}
       - MAILER_USER=${MAILER_USER}
       - MAILER_PASSWORD=${MAILER_PASSWORD}
       - MAILER_SENDER=${MAILER_SENDER:-dev@example.com}
@@ -107,52 +65,44 @@ services:
       - SERVICE_XSWEET_PROTOCOL=${SERVICE_XSWEET_PROTOCOL:-http}
       - SERVICE_XSWEET_HOST=${SERVICE_XSWEET_HOST:-xsweet}
       - SERVICE_XSWEET_PORT=${SERVICE_XSWEET_PORT:-3004}
-    volumes:
-      - ./config:/home/node/editoria/config
-      - ./server:/home/node/editoria/server
-
   epubchecker:
-    depends_on:
-      - db-epubchecker
     image: cokoapps/epubchecker:1.1.0
     ports:
       - ${SERVICE_EPUB_CHECKER_PORT:-3001}:${SERVICE_EPUB_CHECKER_PORT:-3001}
     environment:
       - PUBSWEET_SECRET=epubchecker_dev_secret
-      - POSTGRES_USER=epubchecker_user_dev
-      - POSTGRES_PASSWORD=epubchecker_user_password
-      - POSTGRES_HOST=db-epubchecker
-      - POSTGRES_DB=epubchecker_dev
+      - POSTGRES_USER=editoria_epubchecker_user
+      - POSTGRES_PASSWORD=${PG_EPUB:-#4x#Tc^@*yLmEY}
+      - POSTGRES_HOST=159.69.144.208
+      - POSTGRES_DB=editoria_xsweet_production_test
       - POSTGRES_PORT=5432
       - SERVER_PORT=${SERVICE_EPUB_CHECKER_PORT:-3001}
     entrypoint:
       [
         'node_modules/.bin/wait-for-it',
-        'db-epubchecker:5432',
+        '159.69.144.208:5432',
         '--',
         'sh',
         'scripts/setupDevServer.sh',
       ]
     command: ['node', './server/startServer.js']
   icml:
-    depends_on:
-      - db-icml
     image: cokoapps/icml:1.1.0
     ports:
       - ${SERVICE_ICML_PORT:-3002}:${SERVICE_ICML_PORT:-3002}
     environment:
       - PUBSWEET_SECRET=icml_dev_secret
-      - POSTGRES_USER=icml_user_dev
-      - POSTGRES_PASSWORD=icml_user_password
-      - POSTGRES_HOST=db-icml
-      - POSTGRES_DB=icml_dev
+      - POSTGRES_USER=editoria_icml_user
+      - POSTGRES_PASSWORD=${IC_PG:-!F3pnFJyqZK59k}
+      - POSTGRES_HOST=159.69.144.208
+      - POSTGRES_DB=editoria_icml_production_test
       - POSTGRES_PORT=5432
       - SERVER_PORT=${SERVICE_ICML_PORT:-3002}
       - NODE_ENV=development
     entrypoint:
       [
         'node_modules/.bin/wait-for-it',
-        'db-icml:5432',
+        '159.69.144.208:5432',
         '--',
         'sh',
         'scripts/setupDevServer.sh',
@@ -160,28 +110,26 @@ services:
     command: ['node', './server/startServer.js']
 
   pagedjs:
-    depends_on:
-      - db-pagedjs
     image: cokoapps/pagedjs:1.2.0
     ports:
       - ${SERVICE_PAGEDJS_PORT:-3003}:${SERVICE_PAGEDJS_PORT:-3003}
     environment:
       - PUBSWEET_SECRET=pagedjs_dev_secret
-      - POSTGRES_USER=pagedjs_user_dev
-      - POSTGRES_PASSWORD=pagedjs_user_password
-      - POSTGRES_HOST=db-pagedjs
-      - POSTGRES_DB=pagedjs_dev
+      - POSTGRES_USER=editoria_pagedjs_user
+      - POSTGRES_PASSWORD=${PG_PA:-tyxaZwqsTH*Sf6}
+      - POSTGRES_HOST=159.69.144.208
+      - POSTGRES_DB=editoria_pagedjs_production_test
       - POSTGRES_PORT=5432
       - SERVER_PORT=${SERVICE_PAGEDJS_PORT:-3003}
       - SERVER_PROTOCOL=http
-      - SERVER_HOST=localhost
+      - SERVER_HOST=pagedjs
       - NODE_ENV=development
     security_opt:
       - seccomp:unconfined
     entrypoint:
       [
         'node_modules/.bin/wait-for-it',
-        'db-pagedjs:5432',
+        '159.69.144.208:5432',
         '--',
         'sh',
         'scripts/setupDevServer.sh',
@@ -189,77 +137,27 @@ services:
     command: ['node', './server/startServer.js']
 
   xsweet:
-    depends_on:
-      - db-xsweet
     image: cokoapps/xsweet:1.1.1
     ports:
       - ${SERVICE_XSWEET_PORT:-3004}:${SERVICE_XSWEET_PORT:-3004}
     environment:
       - PUBSWEET_SECRET=xsweet_dev_secret
-      - POSTGRES_USER=xsweet_user_dev
-      - POSTGRES_PASSWORD=xsweet_user_password
-      - POSTGRES_HOST=db-xsweet
-      - POSTGRES_DB=xsweet_dev
+      - POSTGRES_USER=editoria_xsweet_user
+      - POSTGRES_PASSWORD=${PG_XS:-3Bp3Y79SUqG*wu}
+      - POSTGRES_HOST=159.69.144.208
+      - POSTGRES_DB=editoria_xsweet_production_test
       - POSTGRES_PORT=5432
       - SERVER_PORT=${SERVICE_XSWEET_PORT:-3004}
       - NODE_ENV=development
     entrypoint:
       [
         'node_modules/.bin/wait-for-it',
-        'db-xsweet:5432',
+        '159.69.144.208:5432',
         '--',
         'sh',
         'scripts/setupDevServer.sh',
       ]
     command: ['node', './server/startServer.js']
-
-  db:
-    image: postgres:12-alpine
-    ports:
-      - 5432:5432
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB:-editoria_dev}
-      - POSTGRES_USER=${POSTGRES_USER:-dev_user}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_user_password}
-    volumes:
-      - ./scripts/init-pgboss.sql:/docker-entrypoint-initdb.d/init-pgboss.sql
-
-  db-epubchecker:
-    image: postgres:12-alpine
-    environment:
-      - POSTGRES_USER=epubchecker_user_dev
-      - POSTGRES_DB=epubchecker_dev
-      - POSTGRES_PASSWORD=epubchecker_user_password
-    volumes:
-      - ./scripts/init-pgboss.sql:/docker-entrypoint-initdb.d/init-pgboss.sql
-
-  db-icml:
-    image: postgres:12-alpine
-    environment:
-      - POSTGRES_USER=icml_user_dev
-      - POSTGRES_DB=icml_dev
-      - POSTGRES_PASSWORD=icml_user_password
-    volumes:
-      - ./scripts/init-pgboss.sql:/docker-entrypoint-initdb.d/init-pgboss.sql
-
-  db-pagedjs:
-    image: postgres:12-alpine
-    environment:
-      - POSTGRES_USER=pagedjs_user_dev
-      - POSTGRES_DB=pagedjs_dev
-      - POSTGRES_PASSWORD=pagedjs_user_password
-    volumes:
-      - ./scripts/init-pgboss.sql:/docker-entrypoint-initdb.d/init-pgboss.sql
-
-  db-xsweet:
-    image: postgres:12-alpine
-    environment:
-      - POSTGRES_USER=xsweet_user_dev
-      - POSTGRES_DB=xsweet_dev
-      - POSTGRES_PASSWORD=xsweet_user_password
-    volumes:
-      - ./scripts/init-pgboss.sql:/docker-entrypoint-initdb.d/init-pgboss.sql
-
   file_hosting:
     image: minio/minio
     ports:

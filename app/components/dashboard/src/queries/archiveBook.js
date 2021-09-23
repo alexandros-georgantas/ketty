@@ -1,6 +1,6 @@
 import React from 'react'
-import { Mutation } from '@apollo/react-components'
-import gql from 'graphql-tag'
+import { Mutation } from '@apollo/client/react/components'
+import { gql } from '@apollo/client'
 
 const ARCHIVE_BOOK = gql`
   mutation ArchiveBook($id: ID!, $archive: Boolean!) {

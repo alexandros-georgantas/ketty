@@ -55,11 +55,10 @@ export class Member extends React.Component {
 
   _remove() {
     const { user, team, update } = this.props
-
     const memberIndex = findIndex(team.members, { user: { id: user.id } })
-    team.members.splice(memberIndex, 1)
-
-    const withoutMember = map(team.members, member => {
+    const clonedMembers = [...team.members]
+    clonedMembers.splice(memberIndex, 1)
+    const withoutMember = map(clonedMembers, member => {
       const { user } = member
       return { user: { id: user.id } }
     })

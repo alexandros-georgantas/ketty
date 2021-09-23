@@ -1,6 +1,6 @@
 import React from 'react'
-import { Subscription } from '@apollo/react-components'
-import gql from 'graphql-tag'
+import { Subscription } from '@apollo/client/react/components'
+import { gql } from '@apollo/client'
 
 const BOOK_COMPONENT_ORDER_UPDATED_SUBSCRIPTION = gql`
   subscription BookComponentOrderUpdated {
@@ -286,6 +286,7 @@ const lockChangeSubscription = props => {
   const { refetch } = getBookQuery
   const triggerRefetch = () => {
     if (pauseUpdates) return
+    console.log('subscr')
     refetch()
   }
 

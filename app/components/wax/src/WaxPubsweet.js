@@ -227,6 +227,7 @@ const Editoria = ({
     }
 
     return () => {
+      console.log('unloooooooooad')
       window.removeEventListener('beforeunload', onUnload)
       updateTitle.cancel()
       onChangeHandler.cancel()

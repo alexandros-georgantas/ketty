@@ -1,6 +1,6 @@
 import React from 'react'
-import { Subscription } from '@apollo/react-components'
-import gql from 'graphql-tag'
+import { Subscription } from '@apollo/client/react/components'
+import { gql } from '@apollo/client'
 
 const UPDATE_APPLICATION_PARAMETERS_SUBSCRIPTION = gql`
   subscription UpdateApplicationParameters {

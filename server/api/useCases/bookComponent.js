@@ -382,11 +382,11 @@ const updatePagination = async (bookComponentId, pagination) => {
   }
 }
 
-const unlockBookComponent = async bookComponentId => {
+const unlockBookComponent = async (bookComponentId, locks) => {
   try {
-    const locks = await Lock.query()
-      .where('foreignId', bookComponentId)
-      .andWhere('deleted', false)
+    // const locks = await Lock.query()
+    //   .where('foreignId', bookComponentId)
+    //   .andWhere('deleted', false)
 
     if (!locks || locks.length === 0) {
       throw new Error(
