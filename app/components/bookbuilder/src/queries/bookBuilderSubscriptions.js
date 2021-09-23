@@ -286,7 +286,6 @@ const lockChangeSubscription = props => {
   const { refetch } = getBookQuery
   const triggerRefetch = () => {
     if (pauseUpdates) return
-    console.log('subscr')
     refetch()
   }
 
