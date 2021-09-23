@@ -39,6 +39,8 @@ module.exports = (opts = {}) => {
   plugins.push(
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': `"${opts.env}"`,
+      'process.env.CLIENT_WS_MIN_TIMEOUT': `"${opts.clientWS.minTimeout}"`,
+      'process.env.CLIENT_WS_TIMEOUT': `"${opts.clientWS.timeout}"`,
     }),
   )
 

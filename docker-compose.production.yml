@@ -10,6 +10,8 @@ services:
         - server_protocol=${SERVER_PROTOCOL}
         - server_host=${SERVER_HOST}
         - server_port=${SERVER_PORT}
+        - client_ws_min_timeout=${CLIENT_WS_MIN_TIMEOUT:-3000}
+        - client_ws_timeout=${CLIENT_WS_TIMEOUT:-30000}
     ports:
       - ${SERVER_PORT}:${SERVER_PORT}
     environment:

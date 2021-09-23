@@ -272,10 +272,11 @@ const getFile = async (id, options = {}) => {
     logger.info(`>>> fetching the file with id ${id}`)
     const file = await useTransaction(
       async tr => {
-        File.query(tr).findById()
-        if (file.deleted) {
+        const item = await File.query(tr).findById(id)
+        if (item.deleted) {
           throw new Error('this file is deleted')
         }
+        return item
       },
       { trx, passedTrxOnly: true },
     )
@@ -292,10 +293,11 @@ const getFileURL = async (id, size = undefined, options = {}) => {
     logger.info(`>>> fetching the file with id ${id}`)
     const file = await useTransaction(
       async tr => {
-        File.query(tr).findById()
-        if (file.deleted) {
+        const item = await File.query(tr).findById(id)
+        if (item.deleted) {
           throw new Error('this file is deleted')
         }
+        return item
       },
       { trx, passedTrxOnly: true },
     )

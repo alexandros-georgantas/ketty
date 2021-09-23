@@ -1,6 +1,6 @@
 import React from 'react'
-import { Subscription } from '@apollo/react-components'
-import gql from 'graphql-tag'
+import { Subscription } from '@apollo/client/react/components'
+import { gql } from '@apollo/client'
 
 const TEMPLATE_UPDATED_SUBSCRIPTION = gql`
   subscription TemplateUpdated {

@@ -1,6 +1,6 @@
 import React from 'react'
-import { Query } from '@apollo/react-components'
-import gql from 'graphql-tag'
+import { Query } from '@apollo/client/react/components'
+import { gql } from '@apollo/client'
 
 const GET_BOOK_TEAMS = gql`
   query GetBookTeams($bookId: ID!) {

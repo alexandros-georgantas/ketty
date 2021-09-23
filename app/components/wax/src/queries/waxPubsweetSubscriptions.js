@@ -1,6 +1,6 @@
-import gql from 'graphql-tag'
 import React from 'react'
-import { Subscription } from '@apollo/react-components'
+import { Subscription } from '@apollo/client/react/components'
+import { gql } from '@apollo/client'
 
 const BOOK_COMPONENT_TRACK_CHANGES_UPDATED_SUBSCRIPTION = gql`
   subscription BookComponentTrackChangesUpdated {

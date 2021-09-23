@@ -187,7 +187,7 @@ class TemplateModal extends React.Component {
         trimSize,
         thumbnail,
         thumbnailPreview: thumbnail ? thumbnail.source : undefined,
-        files,
+        files: cloneDeep(files),
         mode,
         target: target ? find(selectOptions, { value: target }) : undefined,
         notes: notes ? find(noteSelectOptions, { value: notes }) : undefined,
@@ -259,6 +259,7 @@ class TemplateModal extends React.Component {
   removeFile(filename, setFieldValue, setFieldTouched) {
     const { files, mode, deleteFiles } = this.state
     let newState
+    const originalClonedFiles = cloneDeep(files)
     const tempFiles = cloneDeep(files)
     const tempDeleted = cloneDeep(deleteFiles)
     const fileIndex = findIndex(tempFiles, { name: filename })
@@ -266,20 +267,20 @@ class TemplateModal extends React.Component {
     if (mode === 'update' && tempFiles[fileIndex].id) {
       const { id } = tempFiles[fileIndex]
       tempDeleted.push(id)
-      files.splice(fileIndex, 1)
+      originalClonedFiles.splice(fileIndex, 1)
 
       newState = {
         deleteFiles: tempDeleted,
-        files,
+        files: originalClonedFiles,
       }
     } else {
-      files.splice(fileIndex, 1)
+      originalClonedFiles.splice(fileIndex, 1)
       newState = {
-        files,
+        files: originalClonedFiles,
       }
     }
 
-    setFieldValue('files', files)
+    setFieldValue('files', originalClonedFiles)
     this.setState(newState)
     setFieldTouched('files', true)
   }

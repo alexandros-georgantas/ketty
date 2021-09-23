@@ -1,6 +1,5 @@
 import React from 'react'
-import { ApolloConsumer } from '@apollo/react-components'
-import gql from 'graphql-tag'
+import { ApolloConsumer, gql } from '@apollo/client'
 
 const GET_TEMPLATES = gql`
   query GetTemplates($target: String, $notes: String) {

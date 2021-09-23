@@ -29,6 +29,8 @@ module.exports = webpackEnv => {
 
   const devServerHost = process.env.CLIENT_HOST
   const devServerPort = process.env.CLIENT_PORT
+  const clientWSMinTimeout = process.env.CLIENT_WS_MIN_TIMEOUT || 1000
+  const clientWSTimeout = process.env.CLIENT_WS_TIMEOUT || 30000
 
   return {
     devServer: {
@@ -89,6 +91,10 @@ module.exports = webpackEnv => {
       noEmitOnErrors: true,
       extractText: isEnvProduction,
       env: webpackEnv,
+      clientWS: {
+        minTimeout: clientWSMinTimeout,
+        timeout: clientWSTimeout,
+      },
     }),
   }
 }

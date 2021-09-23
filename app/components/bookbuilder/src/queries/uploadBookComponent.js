@@ -1,6 +1,6 @@
 import React from 'react'
-import { Mutation } from '@apollo/react-components'
-import gql from 'graphql-tag'
+import { Mutation } from '@apollo/client/react/components'
+import { gql } from '@apollo/client'
 
 const UPLOAD_BOOK_COMPONENT = gql`
   mutation CreateDocxToHTMLJob($file: Upload!) {

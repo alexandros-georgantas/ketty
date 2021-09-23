@@ -1,6 +1,7 @@
 const { useTransaction, logger } = require('@coko/server')
 const keys = require('lodash/keys')
 const map = require('lodash/map')
+const find = require('lodash/find')
 const assign = require('lodash/assign')
 const omitBy = require('lodash/omitBy')
 const isNil = require('lodash/isNil')
@@ -15,6 +16,8 @@ const {
   Division,
   BookComponentTranslation,
   User,
+  Team,
+  TeamMember,
 } = require('../../data-model/src').models
 
 const { getApplicationParameters } = require('./applicationParameters')
@@ -48,12 +51,28 @@ const getBooks = async (collectionId, archived, userId, options = {}) => {
     return useTransaction(
       async tr => {
         const user = await User.query(tr).findById(userId)
+        const globalProductionEditorsTeam = await Team.query(tr).where({
+          global: true,
+          role: 'productionEditor',
+        })
+        const teamMembers = await TeamMember.query(tr).where({
+          teamId: globalProductionEditorsTeam[0].id,
+          deleted: false,
+        })
+        const isGlobalProductionEditor = find(teamMembers, { userId })
         const isAdmin = user.admin
-        if (isAdmin) {
+
+        if (isAdmin || isGlobalProductionEditor) {
+          if (!archived) {
+            return Book.query(tr).where({
+              collectionId,
+              deleted: false,
+              archived: false,
+            })
+          }
           return Book.query(tr).where({
             collectionId,
             deleted: false,
-            archived: false,
           })
         }
         if (!archived) {
@@ -67,20 +86,16 @@ const getBooks = async (collectionId, archived, userId, options = {}) => {
               'book.archived': false,
               'users.id': userId,
             })
-        }
-        if (isAdmin) {
-          return Book.query(tr).where({
-            collectionId,
-            deleted: false,
-          })
+            .andWhere({ 'users.id': userId })
         }
         return Book.query(tr)
           .leftJoin('teams', 'book.id', 'teams.object_id')
           .leftJoin('team_members', 'teams.id', 'team_members.team_id')
           .leftJoin('users', 'team_members.user_id', 'users.id')
           .where({
-            'book.id': collectionId,
+            'book.collection_id': collectionId,
             'book.deleted': false,
+            'users.id': userId,
           })
           .andWhere({ 'users.id': userId })
       },

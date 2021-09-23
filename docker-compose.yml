@@ -21,6 +21,8 @@ services:
       - SERVER_PROTOCOL=${SERVER_PROTOCOL:-http}
       - SERVER_HOST=${SERVER_HOST:-server}
       - SERVER_PORT=${SERVER_PORT:-3000}
+      - CLIENT_WS_MIN_TIMEOUT=3000
+      - CLIENT_WS_TIMEOUT=30000
     volumes:
       - ./app:/home/node/editoria/app
       - ./config:/home/node/editoria/config

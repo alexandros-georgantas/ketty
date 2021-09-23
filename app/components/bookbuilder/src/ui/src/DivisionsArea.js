@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
-import { map, clone, find, findIndex } from 'lodash'
+import { map, clone, find, findIndex, cloneDeep } from 'lodash'
 import { DragDropContext } from 'react-beautiful-dnd'
 import Division from './Division'
 
@@ -14,12 +14,12 @@ class DivisionsArea extends Component {
     super(props)
 
     this.state = {
-      divisions: props.divisions,
+      divisions: cloneDeep(props.divisions),
     }
   }
   componentWillReceiveProps(nextProps) {
     this.setState({
-      divisions: nextProps.divisions,
+      divisions: cloneDeep(nextProps.divisions),
     })
   }
   reorder = (array, item, to, from = undefined) => {

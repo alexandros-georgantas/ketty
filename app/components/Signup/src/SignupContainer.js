@@ -1,6 +1,6 @@
 import { compose } from 'recompose'
 import { withFormik } from 'formik'
-import { graphql } from '@apollo/react-hoc'
+import { graphql } from '@apollo/client/react/hoc'
 import { SIGNUP_USER } from './graphql/mutations'
 
 import Signup from './Signup'
@@ -19,9 +19,7 @@ const handleSubmit = (
     })
     .catch(res => {
       if (res.graphQLErrors) {
-        const errors = res.graphQLErrors.map(error => {
-          return error.message
-        })
+        const errors = res.graphQLErrors.map(error => error.message)
         setError(errors[0])
       }
     })
