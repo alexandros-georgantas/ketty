@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.8](https://gitlab.coko.foundation///compare/v1.5.7...v1.5.8) (2021-09-29)
+
+
+### Bug Fixes
+
+* **client:** pass required env for client build ([7b3cd57](https://gitlab.coko.foundation///commit/7b3cd5717d485f862f9f85da137ca2f323e5127a))
+
 ### [1.5.7](https://gitlab.coko.foundation///compare/v1.5.6...v1.5.7) (2021-09-23)
 
 ### [1.5.5](https://gitlab.coko.foundation///compare/v1.5.4...v1.5.5) (2021-07-13)
