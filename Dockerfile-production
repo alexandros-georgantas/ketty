@@ -29,6 +29,7 @@ ARG client_ws_timeout
 ENV NODE_ENV=$node_env
 ENV SERVER_PROTOCOL=$server_protocol
 ENV SERVER_HOST=$server_host
+ENV SERVER_PORT=$server_port
 ENV CLIENT_WS_MIN_TIMEOUT=$client_ws_min_timeout
 ENV CLIENT_WS_TIMEOUT=$client_ws_timeout
 

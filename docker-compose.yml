@@ -71,6 +71,7 @@ services:
       - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@example.com}
       - SERVER_PORT=${SERVER_PORT:-3000}
       - SERVER_HOST=${SERVER_HOST:-server}
+      - SERVER_PROTOCOL=${SERVER_PROTOCOL:-http}
       - CLIENT_PROTOCOL=${CLIENT_PROTOCOL:-http}
       - CLIENT_HOST=${CLIENT_HOST:-0.0.0.0}
       - CLIENT_PORT=${CLIENT_PORT:-4000}
@@ -160,9 +161,12 @@ services:
     command: ['node', './server/startServer.js']
 
   pagedjs:
+    build:
+      context: ../pagedjs
+      dockerfile: ./Dockerfile-development
     depends_on:
       - db-pagedjs
-    image: cokoapps/pagedjs:1.2.0
+    # image: cokoapps/pagedjs:1.2.0
     ports:
       - ${SERVICE_PAGEDJS_PORT:-3003}:${SERVICE_PAGEDJS_PORT:-3003}
     environment:

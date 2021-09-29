@@ -95,6 +95,11 @@ module.exports = webpackEnv => {
         minTimeout: clientWSMinTimeout,
         timeout: clientWSTimeout,
       },
+      clientEnv: {
+        serverProtocol,
+        serverHost,
+        serverPort,
+      },
     }),
   }
 }

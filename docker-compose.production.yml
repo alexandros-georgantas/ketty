@@ -7,9 +7,9 @@ services:
       dockerfile: ./Dockerfile-production
       args:
         - node_env=${NODE_ENV:-production}
-        - server_protocol=${SERVER_PROTOCOL}
-        - server_host=${SERVER_HOST}
-        - server_port=${SERVER_PORT}
+        - server_protocol=${PUBLIC_SERVER_PROTOCOL}
+        - server_host=${PUBLIC_SERVER_HOST}
+        - server_port=${PUBLIC_SERVER_PORT}
         - client_ws_min_timeout=${CLIENT_WS_MIN_TIMEOUT:-3000}
         - client_ws_timeout=${CLIENT_WS_TIMEOUT:-30000}
     ports:
