@@ -7,9 +7,9 @@ services:
       dockerfile: ./Dockerfile-production
       args:
         - node_env=${NODE_ENV:-production}
-        - server_protocol=${SERVER_PROTOCOL}
-        - server_host=${SERVER_HOST}
-        - server_port=${SERVER_PORT}
+        - server_protocol=${PUBLIC_SERVER_PROTOCOL}
+        - server_host=${PUBLIC_SERVER_HOST}
+        - server_port=${PUBLIC_SERVER_PORT}
         - client_ws_min_timeout=${CLIENT_WS_MIN_TIMEOUT:-3000}
         - client_ws_timeout=${CLIENT_WS_TIMEOUT:-30000}
     ports:
@@ -19,6 +19,10 @@ services:
       - EDITORIA_FLAVOUR=${EDITORIA_FLAVOUR:-VANILLA}
       - PUBSWEET_SECRET=${PUBSWEET_SECRET}
       - SERVE_CLIENT=${SERVE_CLIENT:-true}
+      - SERVER_PROTOCOL=${SERVER_PROTOCOL}
+      - SERVER_HOST=${SERVER_HOST}
+      - SERVER_PORT=${SERVER_PORT}
+      - EXTERNAL_SERVER_URL=${EXTERNAL_SERVER_URL:-null}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
@@ -29,8 +33,6 @@ services:
       - ADMIN_GIVEN_NAME=${ADMIN_GIVEN_NAME:-Admin}
       - ADMIN_SURNAME=${ADMIN_SURNAME:-Adminius}
       - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@example.com}
-      - SERVER_PORT=${SERVER_PORT}
-      - EXTERNAL_SERVER_URL=${EXTERNAL_SERVER_URL:-null}
       - CLIENT_PROTOCOL=${CLIENT_PROTOCOL}
       - CLIENT_HOST=${CLIENT_HOST}
       - CLIENT_PORT=${CLIENT_PORT}

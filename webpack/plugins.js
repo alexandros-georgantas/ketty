@@ -41,6 +41,9 @@ module.exports = (opts = {}) => {
       'process.env.NODE_ENV': `"${opts.env}"`,
       'process.env.CLIENT_WS_MIN_TIMEOUT': `"${opts.clientWS.minTimeout}"`,
       'process.env.CLIENT_WS_TIMEOUT': `"${opts.clientWS.timeout}"`,
+      'process.env.SERVER_PROTOCOL': `"${opts.clientEnv.serverProtocol}"`,
+      'process.env.SERVER_HOST': `"${opts.clientEnv.serverHost}"`,
+      'process.env.SERVER_PORT': `"${opts.clientEnv.serverPort}"`,
     }),
   )
 
