@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.9](https://gitlab.coko.foundation///compare/v1.5.8...v1.5.9) (2022-04-04)
+
 ### [1.5.8](https://gitlab.coko.foundation///compare/v1.5.7...v1.5.8) (2021-09-29)
 
 
