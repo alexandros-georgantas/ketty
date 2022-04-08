@@ -3,7 +3,7 @@
 Editoria is an online production tool for open publishing.
 
 This application is being developed by the [Coko Foundation](https://coko.foundation/) for the Editoria Community.  
-For more information, visit the project's [website](https://editoria.pub/) or our [chat channel](https://mattermost.coko.foundation/coko/channels/editoria).  
+For more information, visit the project's [website](https://editoria.community/) or our [chat channel](https://mattermost.coko.foundation/coko/channels/editoria).  
 The project has been built on top of [Pubsweet](https://gitlab.coko.foundation/pubsweet).
 For the editor that Editoria uses, see its related project [Wax](https://gitlab.coko.foundation/wax).
 
