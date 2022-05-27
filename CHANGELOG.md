@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.10](https://gitlab.coko.foundation///compare/v1.5.9...v1.5.10) (2022-05-27)
+
+
+### Bug Fixes
+
+* **app:** possible communication fix ([cf5120b](https://gitlab.coko.foundation///commit/cf5120bc2d208c844b42e91d414a86e493832afe))
+* **config:** remove defaults from dev profile ([abc19c5](https://gitlab.coko.foundation///commit/abc19c5787384349cc00bc4ccb07d5019a08ec52))
+
 ### [1.5.9](https://gitlab.coko.foundation///compare/v1.5.8...v1.5.9) (2022-04-04)
 
 ### [1.5.8](https://gitlab.coko.foundation///compare/v1.5.7...v1.5.8) (2021-09-29)
