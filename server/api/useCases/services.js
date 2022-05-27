@@ -208,6 +208,8 @@ const pdfHandler = async (zipPath, outputPath, filename) => {
 
   const form = new FormData()
   form.append('zip', fs.createReadStream(`${zipPath}`))
+  form.append('onlySourceStylesheet', 'true')
+  form.append('imagesForm', 'url')
 
   return new Promise((resolve, reject) => {
     axios({
