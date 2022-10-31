@@ -60,7 +60,7 @@ Within your environment files, export the variables you want:
 export EDITORIA_FLAVOUR=VANILLA (proper values are VANILLA or BOOKSPRINTS)
 export PUBSWEET_SECRET=
 export POSTGRES_USER=
-export SERVES_CLIENT=true
+export SERVE_CLIENT=true
 export ADMIN_USERNAME=
 export ADMIN_PASSWORD=
 export ADMIN_GIVEN_NAME=

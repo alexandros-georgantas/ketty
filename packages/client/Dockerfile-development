@@ -1,0 +1,17 @@
+FROM node:12.22-bullseye
+
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y ranger vim python
+
+WORKDIR /home/node/app
+
+COPY package.json .
+COPY ./public ./public
+RUN chown -R node:node .
+USER node
+
+RUN yarn install
+COPY yarn.lock .
+
+COPY --chown=node:node . .

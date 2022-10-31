@@ -1,26 +1,87 @@
-*.env*
-.vscode
-coverage/
-lerna-debug.log
-node_modules/
-npm-debug.log
-database
-storage
-yarn-error.log
+# logs
 logs
+*.log
+
+# npm & yarn
+.npm
+npm-debug.log*
+package-lock.json
+
+.yarn-integrity
+yarn-debug.log*
+yarn-error.log*
+.yarn/
+.husky/
+
 node_modules/
-npm-debug.log
-_build/*
-config/local*
-logs/*
-pubsweet.log
+
+# Lerna
+lerna-debug.log*
+
+# Output of 'npm pack'
+*.tgz 
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Generated test directories
+coverage
+*.lcov
+lib-cov
+
+# TypeScript
+typings/
+*.tsbuildinfo
+
+# Lint directories
+.eslintcache
+.stylelintcache
+
+# env & config
+*.env*
+packages/server/config/local*
+
+# Storybook build outputs
+.out
+.storybook-out
+storybook-static
+_build-storybook
+
+# Bundles
+_build/
+dist/
+.cache
+.parcel-cache
+
+# Temporary folders
 tmp/
-uploads/*
-yarn-error.log
-scripts/link.sh
-epubcheck_data/*
-epubcheck_log/*
-epubchecker_data/*
-epubchecker_log/*
-config/exportScripts/*
-!config/exportScripts/.gitkeep
+temp/
+
+# Local folders
+packages/server/scripts/local
+
+# Container data
+data/
+minio/
+
+# Pubsweet
+uploads/
+
+# IDE
+.idea
+.vscode
+.vscode-test
+.devcontainer
+
+# Misc
+.cache/
+.DS_Store
+
+packages/server/config/exportScripts/*
+!packages/server/config/exportScripts/.gitkeep

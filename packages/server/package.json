@@ -1,0 +1,63 @@
+{
+  "name": "server",
+  "version": "0.0.1",
+  "private": false,
+  "description": "Editoria Platform backend",
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.coko.foundation:editoria/editoria.git"
+  },
+  "license": "MIT",
+  "author": "Yannis Barlas, Alexandros Georgantas, Kuldeep Upreti",
+  "scripts": {
+    "migrate": "pubsweet migrate",
+    "resetdb": "node ./packages/server/scripts/truncateDB.js && npm run seed",
+    "seed": "node ./packages/server/scripts/seedsRunner.js",
+    "server": "pubsweet start",
+    "setupdb": "pubsweet migrate && npm run seed",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "resolutions": {
+    "@pubsweet/model-team": "^3.0.3",
+    "@pubsweet/model-user": "^5.1.10",
+    "@pubsweet/base-model": "^4.0.8",
+    "objection": "^2.2.15",
+    "pg-boss": "5.2.1",
+    "sharp": "0.29.3"
+  },
+  "dependencies": {
+    "@coko/server": "https://gitlab.coko.foundation/cokoapps/server.git#048144d06e5dec6c295ac265a449de3fde21e704",
+    "@pubsweet/component-password-reset-server": "^2.2.26",
+    "@pubsweet/db-manager": "^3.1.5",
+    "@pubsweet/model-team": "^3.0.3",
+    "@pubsweet/model-user": "^5.1.10",
+    "archiver": "^3.1.1",
+    "authsome": "^0.1.0",
+    "aws-sdk": "^2.610.0",
+    "axios": "^0.17.1",
+    "bluebird": "^3.7.2",
+    "cheerio": "^1.0.0-rc.2",
+    "config": "^3.2.5",
+    "css-tree": "^1.1.2",
+    "express": "^4.15.5",
+    "extract-zip": "1.6.6",
+    "form-data": "^3.0.0",
+    "fs-extra": "^9.0.1",
+    "highlight.js": "^10.7.1",
+    "js-beautify": "^1.11.0",
+    "katex": "^0.15.3",
+    "knex": "^0.15.2",
+    "libtidy-updated": "0.4.1",
+    "list-contents": "^4.0.2",
+    "lodash": "4.17.21",
+    "mime-types": "^2.1.24",
+    "pubsweet": "^5.1.31",
+    "sharp": "0.29.3",
+    "uuid": "^3.3.2",
+    "xmlbuilder": "^13.0.2"
+  },
+  "devDependencies": {
+    "node-wait-for-it": "^0.2.0",
+    "nodemon": "^1.19.1"
+  }
+}

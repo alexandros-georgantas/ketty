@@ -2,8 +2,9 @@ version: '2'
 
 services:
   client:
+    restart: always
     build:
-      context: .
+      context: ./packages/client
       dockerfile: ./Dockerfile-development
     depends_on:
       - server
@@ -11,46 +12,87 @@ services:
       [
         'node_modules/.bin/webpack-dev-server',
         '--config',
-        './webpack/webpack.development.config.js',
+        './webpack/webpack.development.config.js'
       ]
     ports:
-      - ${CLIENT_PORT:-4000}:8080
+      - ${CLIENT_PORT:-4000}:${CLIENT_PORT:-4000}
     environment:
       - NODE_ENV=development
+      - CLIENT_PORT=${CLIENT_PORT:-4000}
+      - FEATURE_UPLOAD_DOCX_FILES=${FEATURE_UPLOAD_DOCX_FILES:-true}
+      - FEATURE_BOOK_STRUCTURE=${FEATURE_BOOK_STRUCTURE:-false}
       - CLIENT_HOST=0.0.0.0
       - SERVER_PROTOCOL=${SERVER_PROTOCOL:-http}
-      - SERVER_HOST=${SERVER_HOST:-server}
+      - SERVER_HOST=${SERVER_HOST:-localhost}
       - SERVER_PORT=${SERVER_PORT:-3000}
+      - SERVER_SERVE_CLIENT=true
       - CLIENT_WS_MIN_TIMEOUT=3000
       - CLIENT_WS_TIMEOUT=30000
     volumes:
-      - ./app:/home/node/editoria/app
-      - ./config:/home/node/editoria/config
+      - ./packages/client/app:/home/node/app/app
+      - ./packages/client/config:/home/node/app/config
 
   server:
+    restart: always
     build:
-      context: .
+      context: ./packages/server
       dockerfile: ./Dockerfile-development
     depends_on:
       - db
+      - s3
+      - xsweet
+      - epubchecker
+      - pagedjs
+      - icml
     entrypoint:
       [
-        'node_modules/.bin/wait-for-it',
+        'sh',
+        'scripts/wait-for-it',
         'db:5432',
         '--',
         'sh',
-        'scripts/setupDevServer.sh',
+        'scripts/wait-for-it',
+        'http://epubchecker:3001/healthcheck',
+        '--',
+        'sh',
+        'scripts/wait-for-it',
+        'http://icml:3002/healthcheck',
+        '--',
+        'sh',
+        'scripts/wait-for-it',
+        'http://pagedjs:3003/healthcheck',
+        '--',
+        'sh',
+        'scripts/wait-for-it',
+        'http://xsweet:3004/healthcheck',
+        '--',
+        'sh',
+        'scripts/wait-for-it',
+        'http://s3:9001',
+        '--',
+        'sh',
+        'scripts/setupDevServer.sh'
       ]
     command:
       [
         'node_modules/.bin/nodemon',
-        'server/startServer.js',
-        '--watch',
-        'server',
-        '--watch',
+        'startServer.js',
+        '--',
         'config',
+        '--',
+        'api',
+        '--',
+        'data-model',
+        '--',
+        'file-server',
+        '--',
+        'scripts',
+        '--',
+        'startServer.js',
+        '--',
+        'app.js',
         '--ext',
-        'js,graphql',
+        'js,graphql'
       ]
     ports:
       - ${SERVER_PORT:-3000}:${SERVER_PORT:-3000}
@@ -58,7 +100,8 @@ services:
       - NODE_ENV=development
       - EDITORIA_FLAVOUR=${EDITORIA_FLAVOUR:-VANILLA}
       - PUBSWEET_SECRET=${PUBSWEET_SECRET:-dev_secret}
-      - EXTERNAL_SERVER_URL=${EXTERNAL_SERVER_URL:-null}
+      - EXTERNAL_SERVER_URL=${EXTERNAL_SERVER_URL:-http://server:3000}
+      - SERVER_SERVE_CLIENT=true
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
       - POSTGRES_DB=${POSTGRES_DB:-editoria_dev}
@@ -70,7 +113,7 @@ services:
       - ADMIN_SURNAME=${ADMIN_SURNAME:-Adminius}
       - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@example.com}
       - SERVER_PORT=${SERVER_PORT:-3000}
-      - SERVER_HOST=${SERVER_HOST:-server}
+      - SERVER_HOST=${SERVER_HOST:-localhost}
       - SERVER_PROTOCOL=${SERVER_PROTOCOL:-http}
       - CLIENT_PROTOCOL=${CLIENT_PROTOCOL:-http}
       - CLIENT_HOST=${CLIENT_HOST:-0.0.0.0}
@@ -81,7 +124,7 @@ services:
       - MAILER_HOSTNAME=${MAILER_HOSTNAME}
       - PASSWORD_RESET_PATH=${PASSWORD_RESET_PATH:-password-reset}
       - S3_PROTOCOL=${S3_PROTOCOL:-http}
-      - S3_HOST=${S3_HOST:-file_hosting}
+      - S3_HOST=${S3_HOST:-s3}
       - S3_PORT=${S3_PORT:-9000}
       - S3_ACCESS_KEY_ID_ADMIN=${S3_ACCESS_KEY_ID_ADMIN:-admin}
       - S3_SECRET_ACCESS_KEY_ADMIN=${S3_SECRET_ACCESS_KEY_ADMIN:-superSecretAdminPassword}
@@ -108,14 +151,15 @@ services:
       - SERVICE_XSWEET_PROTOCOL=${SERVICE_XSWEET_PROTOCOL:-http}
       - SERVICE_XSWEET_HOST=${SERVICE_XSWEET_HOST:-xsweet}
       - SERVICE_XSWEET_PORT=${SERVICE_XSWEET_PORT:-3004}
+      - FEATURE_BOOK_STRUCTURE=${FEATURE_BOOK_STRUCTURE:-false}
+      - FEATURE_UPLOAD_DOCX_FILES=${FEATURE_UPLOAD_DOCX_FILES:-true}
     volumes:
-      - ./config:/home/node/editoria/config
-      - ./server:/home/node/editoria/server
+      - ./packages/server/config:/home/node/editoria/config
 
   epubchecker:
     depends_on:
       - db-epubchecker
-    image: cokoapps/epubchecker:1.1.0
+    image: cokoapps/epubchecker:1.1.2
     ports:
       - ${SERVICE_EPUB_CHECKER_PORT:-3001}:${SERVICE_EPUB_CHECKER_PORT:-3001}
     environment:
@@ -128,17 +172,18 @@ services:
       - SERVER_PORT=${SERVICE_EPUB_CHECKER_PORT:-3001}
     entrypoint:
       [
-        'node_modules/.bin/wait-for-it',
+        'sh',
+        'scripts/wait-for-it',
         'db-epubchecker:5432',
         '--',
         'sh',
-        'scripts/setupDevServer.sh',
+        'scripts/setupDevServer.sh'
       ]
-    command: ['node', './server/startServer.js']
+    command: [ 'node', 'server/startServer.js' ]
   icml:
     depends_on:
       - db-icml
-    image: cokoapps/icml:1.1.0
+    image: cokoapps/icml:1.2.0
     ports:
       - ${SERVICE_ICML_PORT:-3002}:${SERVICE_ICML_PORT:-3002}
     environment:
@@ -152,18 +197,19 @@ services:
       - NODE_ENV=development
     entrypoint:
       [
-        'node_modules/.bin/wait-for-it',
+        'sh',
+        'scripts/wait-for-it',
         'db-icml:5432',
         '--',
         'sh',
-        'scripts/setupDevServer.sh',
+        'scripts/setupDevServer.sh'
       ]
-    command: ['node', './server/startServer.js']
+    command: [ 'node', 'server/startServer.js' ]
 
   pagedjs:
     depends_on:
       - db-pagedjs
-    image: cokoapps/pagedjs:1.2.0
+    image: cokoapps/pagedjs:1.4.6
     ports:
       - ${SERVICE_PAGEDJS_PORT:-3003}:${SERVICE_PAGEDJS_PORT:-3003}
     environment:
@@ -174,25 +220,27 @@ services:
       - POSTGRES_DB=pagedjs_dev
       - POSTGRES_PORT=5432
       - SERVER_PORT=${SERVICE_PAGEDJS_PORT:-3003}
-      - SERVER_PROTOCOL=http
-      - SERVER_HOST=localhost
       - NODE_ENV=development
+      - PUBLIC_URL=${PAGEDJS_PUBLIC_URL:-http://localhost:3003}
     security_opt:
       - seccomp:unconfined
     entrypoint:
       [
-        'node_modules/.bin/wait-for-it',
+        'dumb-init',
+        '--',
+        'sh',
+        'scripts/wait-for-it',
         'db-pagedjs:5432',
         '--',
         'sh',
-        'scripts/setupDevServer.sh',
+        'scripts/setupDevServer.sh'
       ]
-    command: ['node', './server/startServer.js']
+    command: [ 'node', 'server/startServer.js' ]
 
   xsweet:
     depends_on:
       - db-xsweet
-    image: cokoapps/xsweet:1.1.1
+    image: cokoapps/xsweet:1.1.3
     ports:
       - ${SERVICE_XSWEET_PORT:-3004}:${SERVICE_XSWEET_PORT:-3004}
     environment:
@@ -206,16 +254,17 @@ services:
       - NODE_ENV=development
     entrypoint:
       [
-        'node_modules/.bin/wait-for-it',
+        'sh',
+        'scripts/wait-for-it',
         'db-xsweet:5432',
         '--',
         'sh',
-        'scripts/setupDevServer.sh',
+        'scripts/setupDevServer.sh'
       ]
-    command: ['node', './server/startServer.js']
+    command: [ 'node', 'server/startServer.js' ]
 
   db:
-    image: postgres:12-alpine
+    image: postgres:14-alpine
     ports:
       - 5432:5432
     environment:
@@ -226,7 +275,7 @@ services:
       - ./scripts/init-pgboss.sql:/docker-entrypoint-initdb.d/init-pgboss.sql
 
   db-epubchecker:
-    image: postgres:12-alpine
+    image: postgres:14-alpine
     environment:
       - POSTGRES_USER=epubchecker_user_dev
       - POSTGRES_DB=epubchecker_dev
@@ -235,7 +284,7 @@ services:
       - ./scripts/init-pgboss.sql:/docker-entrypoint-initdb.d/init-pgboss.sql
 
   db-icml:
-    image: postgres:12-alpine
+    image: postgres:14-alpine
     environment:
       - POSTGRES_USER=icml_user_dev
       - POSTGRES_DB=icml_dev
@@ -244,7 +293,7 @@ services:
       - ./scripts/init-pgboss.sql:/docker-entrypoint-initdb.d/init-pgboss.sql
 
   db-pagedjs:
-    image: postgres:12-alpine
+    image: postgres:14-alpine
     environment:
       - POSTGRES_USER=pagedjs_user_dev
       - POSTGRES_DB=pagedjs_dev
@@ -253,7 +302,7 @@ services:
       - ./scripts/init-pgboss.sql:/docker-entrypoint-initdb.d/init-pgboss.sql
 
   db-xsweet:
-    image: postgres:12-alpine
+    image: postgres:14-alpine
     environment:
       - POSTGRES_USER=xsweet_user_dev
       - POSTGRES_DB=xsweet_dev
@@ -261,35 +310,35 @@ services:
     volumes:
       - ./scripts/init-pgboss.sql:/docker-entrypoint-initdb.d/init-pgboss.sql
 
-  file_hosting:
-    image: minio/minio
+  s3:
+    image: minio/minio:RELEASE.2022-05-26T05-48-41Z
     ports:
       - ${S3_PORT:-9000}:9000
+      - ${MINIO_CONSOLE_PORT:-9001}:9001
     volumes:
       - minio_storage:/data
     environment:
-      - MINIO_ACCESS_KEY=${S3_ACCESS_KEY_ID_ADMIN:-admin}
-      - MINIO_SECRET_KEY=${S3_SECRET_ACCESS_KEY_ADMIN:-superSecretAdminPassword}
-    command: server /data
+      - MINIO_ROOT_USER=${S3_ACCESS_KEY_ID_ADMIN:-admin}
+      - MINIO_ROOT_PASSWORD=${S3_SECRET_ACCESS_KEY_ADMIN:-superSecretAdminPassword}
+    command: server --console-address ":9001" /data
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      test:
+        [
+          'CMD',
+          'curl',
+          '-f',
+          'http://localhost:9000/minio/health/live'
+        ]
       interval: 30s
       timeout: 20s
       retries: 10
 
   createbucket:
-    image: minio/mc
+    image: minio/mc:RELEASE.2022-05-09T04-08-26Z
     depends_on:
-      file_hosting:
+      s3:
         condition: service_healthy
     entrypoint: >
-      /bin/sh -c "
-      /usr/bin/mc config host add editoria ${S3_PROTOCOL:-http}://${S3_HOST:-file_hosting}:${S3_PORT:-9000} ${S3_ACCESS_KEY_ID_ADMIN:-admin} ${S3_SECRET_ACCESS_KEY_ADMIN:-superSecretAdminPassword};
-      /usr/bin/mc admin user add editoria/ ${S3_ACCESS_KEY_ID_USER:-editoria} ${S3_SECRET_ACCESS_KEY_USER:-superSecretUserPassword};
-      /usr/bin/mc admin user enable editoria/ ${S3_ACCESS_KEY_ID_USER:-editoria};
-      /usr/bin/mc mb editoria/${S3_BUCKET:-uploads};
-      /usr/bin/mc admin policy set editoria/ readwrite user=${S3_ACCESS_KEY_ID_USER:-editoria};
-      exit 0;
-      "
+      /bin/sh -c " /usr/bin/mc config host add editoria ${S3_PROTOCOL:-http}://${S3_HOST:-s3}:${S3_PORT:-9000} ${S3_ACCESS_KEY_ID_ADMIN:-admin} ${S3_SECRET_ACCESS_KEY_ADMIN:-superSecretAdminPassword}; /usr/bin/mc admin user add editoria/ ${S3_ACCESS_KEY_ID_USER:-editoria} ${S3_SECRET_ACCESS_KEY_USER:-superSecretUserPassword}; /usr/bin/mc admin user enable editoria/ ${S3_ACCESS_KEY_ID_USER:-editoria}; /usr/bin/mc mb editoria/${S3_BUCKET:-uploads}; /usr/bin/mc admin policy set editoria/ readwrite user=${S3_ACCESS_KEY_ID_USER:-editoria}; exit 0; "
 volumes:
   minio_storage:
