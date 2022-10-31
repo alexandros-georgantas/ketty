@@ -32,7 +32,7 @@ module.exports = webpackEnv => {
     (process.env.FEATURE_UPLOAD_DOCX_FILES &&
       JSON.parse(process.env.FEATURE_UPLOAD_DOCX_FILES)) ||
     false
-  console.log('e', featureUploadDOCXFiles, process.env.FEATURE_BOOK_STRUCTURE)
+
   const serverHost = process.env.SERVER_HOST
   const serverPort = process.env.SERVER_PORT
   const serverUrl = `${serverHost}${serverPort ? `:${serverPort}` : ''}`
