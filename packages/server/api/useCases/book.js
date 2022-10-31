@@ -140,6 +140,7 @@ const getBooks = async (collectionId, archived, userId, options = {}) => {
             .leftJoin('teams', 'book.id', 'teams.object_id')
             .leftJoin('team_members', 'teams.id', 'team_members.team_id')
             .leftJoin('users', 'team_members.user_id', 'users.id')
+            .distinctOn('book.id')
             .where({
               'book.collection_id': collectionId,
               'book.deleted': false,
@@ -152,6 +153,7 @@ const getBooks = async (collectionId, archived, userId, options = {}) => {
           .leftJoin('teams', 'book.id', 'teams.object_id')
           .leftJoin('team_members', 'teams.id', 'team_members.team_id')
           .leftJoin('users', 'team_members.user_id', 'users.id')
+          .distinctOn('book.id')
           .where({
             'book.collection_id': collectionId,
             'book.deleted': false,
