@@ -151,6 +151,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
         const isLevelTwoCloser =
           draggableId.split('_')[1] &&
           draggableId.split('_')[1].includes('Closer')
+        console.log('e', draggableId)
         const isLevelTwoItem =
           findIndex(bookStructure.levels, {
             type: draggableId.split('_')[1],
@@ -198,7 +199,21 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
             }
           }
         }
-
+        if (
+          levelsInternal.length === 3 &&
+          findIndex(bookStructure.levels, {
+            type: draggableId.split('_')[1],
+          }) === 0
+        ) {
+          return setState({
+            showDropIndicators: {
+              levelOne: true,
+              levelTwo: false,
+              levelThree: true,
+              levelFour: false,
+            },
+          })
+        }
         if (isLevelTwoCloser) {
           if (levelsInternal.length === 3) {
             return setState({
@@ -626,7 +641,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                       </DraggableItem>
                     </Padder>
                   )}
-                  {levelsInternal[2] && expandedLevels[0] && expandedLevels[1] && (
+                  {levelsInternal[2] && expandedLevels[0] && (
                     <Padder level={levelsInternal.length === 3 ? 1 : 3}>
                       {levelsInternal.length === 3 ? (
                         <Droppable

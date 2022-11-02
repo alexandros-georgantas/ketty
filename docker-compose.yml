@@ -155,6 +155,13 @@ services:
       - FEATURE_UPLOAD_DOCX_FILES=${FEATURE_UPLOAD_DOCX_FILES:-true}
     volumes:
       - ./packages/server/config:/home/node/editoria/config
+      - ./packages/server/api:/home/node/editoria/api
+      - ./packages/server/data-model:/home/node/editoria/data-model
+      - ./packages/server/file-server:/home/node/editoria/file-server
+      - ./packages/server/scripts:/home/node/editoria/scripts
+      - ./packages/server/common:/home/node/editoria/common
+      - ./packages/server/app.js:/home/node/editoria/app.js
+      - ./packages/server/startServer.js:/home/node/editoria/startServer.js
 
   epubchecker:
     depends_on:

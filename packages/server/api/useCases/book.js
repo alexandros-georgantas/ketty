@@ -68,13 +68,14 @@ const defaultLevelCloserItem = {
 }
 
 const defaultBookStructure = {
-  levels: [defaultLevelTwoItem, defaultLevelThreeItem, defaultLevelCloserItem],
+  // levels: [defaultLevelTwoItem, defaultLevelThreeItem, defaultLevelCloserItem],
+  levels: [],
   outline: [
-    {
-      title: undefined,
-      type: 'chapter',
-      children: [{ title: undefined, type: 'section', children: [] }],
-    },
+    // {
+    //   title: undefined,
+    //   type: 'chapter',
+    //   children: [{ title: undefined, type: 'section', children: [] }],
+    // },
   ],
   finalized: false,
 }
@@ -589,6 +590,7 @@ const updateRunningHeaders = async (bookComponents, bookId, options = {}) => {
   }
 }
 
+// should be removed as functionality omitted
 const changeLevelLabel = async (bookId, levelId, label, options = {}) => {
   try {
     const { trx } = options
@@ -655,14 +657,18 @@ const changeNumberOfLevels = async (bookId, levelsNumber, options = {}) => {
       async tr => {
         const book = await Book.query(tr).findById(bookId)
         const clonedBookStructure = { ...book.bookStructure }
-        const currentBookLevels = clonedBookStructure.levels.length - 2 // minus 2 because section will always be present as well as closers
+
+        const currentBookLevels =
+          clonedBookStructure.levels.length === 0
+            ? 0
+            : clonedBookStructure.levels.length - 2 // minus 2 because section will always be present as well as closers
 
         if (currentBookLevels === levelsNumber) {
           return clonedBookStructure.levels
         }
 
-        // CASE DECREASE NUMBER OF LEVELS (2 TO 1)
-        if (currentBookLevels > levelsNumber) {
+        // if (currentBookLevels === 0) {
+        if (levelsNumber === 1) {
           clonedBookStructure.levels = []
           clonedBookStructure.levels.push(
             defaultLevelTwoItem,
@@ -670,30 +676,18 @@ const changeNumberOfLevels = async (bookId, levelsNumber, options = {}) => {
             defaultLevelCloserItem,
           )
 
-          // clonedBookStructure.levels[1].contentStructure = [
-          //   ...clonedBookStructure.levels[1].contentStructure,
-          //   { type: 'mainContent', displayName: 'Main Content' },
-          // ]
-          // clonedBookStructure.levels.push(defaultLevelCloserItem)
-          // CLEAR ALL LEVEL THREE CHILDREN FROM OUTLINE
-          if (clonedBookStructure.outline.length > 0) {
-            clonedBookStructure.outline = [
-              {
-                title: undefined,
-                type: 'chapter',
-                children: [{ title: undefined, type: 'section', children: [] }],
-              },
-            ]
-          }
-        } else {
-          // CASE INCREASE NUMBER OF LEVELS (1 TO 2)
+          // if (clonedBookStructure.outline.length > 0) {
+          clonedBookStructure.outline = [
+            {
+              title: undefined,
+              type: 'chapter',
+              children: [{ title: undefined, type: 'section', children: [] }],
+            },
+          ]
+          // }
+        }
 
-          // REMOVE DEFAULT MAIN CONTENT ELEMENT FROM LEVEL 2
-          // clonedBookStructure.levels[1].contentStructure = clonedBookStructure.levels[1].contentStructure.filter(
-          //   item => item.type !== 'mainContent',
-          // )
-
-          // For the case of level two closers
+        if (levelsNumber === 2) {
           clonedBookStructure.levels = []
           clonedBookStructure.levels.push(
             defaultLevelOneItem,
@@ -703,32 +697,96 @@ const changeNumberOfLevels = async (bookId, levelsNumber, options = {}) => {
           )
 
           // ADD LEVEL THREE OUTLINE ITEMS
-          if (clonedBookStructure.outline.length > 0) {
-            // clonedBookStructure.outline.forEach(levelOneComponent => {
-            //   levelOneComponent.children.forEach(levelTwoComponent => {
-            //     levelTwoComponent.children.push({
-            //       title: undefined,
-            //       type: clonedBookStructure.levels[2].type,
-            //     })
-            //   })
-            // })
-            clonedBookStructure.outline = [
-              {
-                title: undefined,
-                type: 'part',
-                children: [
-                  {
-                    title: undefined,
-                    type: 'chapter',
-                    children: [
-                      { title: undefined, type: 'section', children: [] },
-                    ],
-                  },
-                ],
-              },
-            ]
-          }
+          // if (clonedBookStructure.outline.length > 0) {
+          clonedBookStructure.outline = [
+            {
+              title: undefined,
+              type: 'part',
+              children: [
+                {
+                  title: undefined,
+                  type: 'chapter',
+                  children: [
+                    { title: undefined, type: 'section', children: [] },
+                  ],
+                },
+              ],
+            },
+          ]
+          // }
         }
+        // } else {
+        //   // CASE DECREASE NUMBER OF LEVELS (2 TO 1)
+        //   if (currentBookLevels > levelsNumber) {
+        //     clonedBookStructure.levels = []
+        //     clonedBookStructure.levels.push(
+        //       defaultLevelTwoItem,
+        //       defaultLevelThreeItem,
+        //       defaultLevelCloserItem,
+        //     )
+
+        //     // clonedBookStructure.levels[1].contentStructure = [
+        //     //   ...clonedBookStructure.levels[1].contentStructure,
+        //     //   { type: 'mainContent', displayName: 'Main Content' },
+        //     // ]
+        //     // clonedBookStructure.levels.push(defaultLevelCloserItem)
+        //     // CLEAR ALL LEVEL THREE CHILDREN FROM OUTLINE
+        //     if (clonedBookStructure.outline.length > 0) {
+        //       clonedBookStructure.outline = [
+        //         {
+        //           title: undefined,
+        //           type: 'chapter',
+        //           children: [
+        //             { title: undefined, type: 'section', children: [] },
+        //           ],
+        //         },
+        //       ]
+        //     }
+        //   } else {
+        //     // CASE INCREASE NUMBER OF LEVELS (1 TO 2)
+
+        //     // REMOVE DEFAULT MAIN CONTENT ELEMENT FROM LEVEL 2
+        //     // clonedBookStructure.levels[1].contentStructure = clonedBookStructure.levels[1].contentStructure.filter(
+        //     //   item => item.type !== 'mainContent',
+        //     // )
+
+        //     // For the case of level two closers
+        //     clonedBookStructure.levels = []
+        //     clonedBookStructure.levels.push(
+        //       defaultLevelOneItem,
+        //       defaultLevelTwoItem,
+        //       defaultLevelThreeItem,
+        //       defaultLevelCloserItem,
+        //     )
+
+        //     // ADD LEVEL THREE OUTLINE ITEMS
+        //     if (clonedBookStructure.outline.length > 0) {
+        //       // clonedBookStructure.outline.forEach(levelOneComponent => {
+        //       //   levelOneComponent.children.forEach(levelTwoComponent => {
+        //       //     levelTwoComponent.children.push({
+        //       //       title: undefined,
+        //       //       type: clonedBookStructure.levels[2].type,
+        //       //     })
+        //       //   })
+        //       // })
+        //       clonedBookStructure.outline = [
+        //         {
+        //           title: undefined,
+        //           type: 'part',
+        //           children: [
+        //             {
+        //               title: undefined,
+        //               type: 'chapter',
+        //               children: [
+        //                 { title: undefined, type: 'section', children: [] },
+        //               ],
+        //             },
+        //           ],
+        //         },
+        //       ]
+        //     }
+        //   }
+        // }
 
         await Book.query(tr).patchAndFetchById(bookId, {
           bookStructure: clonedBookStructure,

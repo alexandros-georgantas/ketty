@@ -136,11 +136,36 @@ const addBookComponent = async (
 
         if (workflowStages) {
           bookComponentWorkflowStages = {
-            workflowStages: map(workflowStages, stage => ({
-              type: stage.type,
-              label: stage.title,
-              value: -1,
-            })),
+            workflowStages: map(workflowStages, stage => {
+              if (
+                config.has('featureBookStructure') &&
+                ((config.get('featureBookStructure') &&
+                  JSON.parse(config.get('featureBookStructure'))) ||
+                  false)
+              ) {
+                if (stage.type === 'upload') {
+                  return {
+                    type: stage.type,
+                    label: stage.title,
+                    value: 1,
+                  }
+                }
+
+                if (stage.type === 'file_prep') {
+                  return {
+                    type: stage.type,
+                    label: stage.title,
+                    value: 0,
+                  }
+                }
+              }
+
+              return {
+                type: stage.type,
+                label: stage.title,
+                value: -1,
+              }
+            }),
           }
         }
 

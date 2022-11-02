@@ -96,6 +96,7 @@ const BookStructure = ({
           </WizardButton>
           <WizardButton
             active={stepNumber === 2}
+            disabled={bookStructure.levels.length === 0}
             // label="STEP 2:  Outline Content"
             onClick={() => changeStep(2)}
             // title="STEP 2:  Outline Content"
@@ -104,6 +105,7 @@ const BookStructure = ({
           </WizardButton>
           <WizardButton
             active={stepNumber === 3}
+            disabled={bookStructure.levels.length === 0}
             // label="STEP 3: Add Pedagogical Elements"
             onClick={() => changeStep(3)}
             // title="STEP 3: Add Pedagogical Elements"
@@ -112,6 +114,7 @@ const BookStructure = ({
           </WizardButton>
           <WizardButton
             active={stepNumber === 4}
+            disabled={bookStructure.levels.length === 0}
             // label="STEP 4: Review Textbook"
             onClick={() => changeStep(4)}
             // title="STEP 4: Review Textbook"
@@ -120,7 +123,7 @@ const BookStructure = ({
           </WizardButton>
           {stepNumber < 4 ? (
             <WizardButton
-              disabled={stepNumber === 4}
+              disabled={stepNumber === 4 || bookStructure.levels.length === 0}
               // label="Next"
               onClick={() => changeStep(100)}
               // title="Next"
@@ -129,7 +132,7 @@ const BookStructure = ({
             </WizardButton>
           ) : (
             <WizardButton
-              disabled={stepNumber < 4}
+              disabled={stepNumber < 4 || bookStructure.levels.length === 0}
               // label="Build Book"
               onClick={finalizeBookStructure}
               // title="Build Book"
