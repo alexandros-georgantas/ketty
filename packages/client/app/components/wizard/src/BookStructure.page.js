@@ -56,11 +56,27 @@ const mapProps = args => ({
       },
     })
   },
-  onChangeNumberOfLevelsHandler: (bookId, levelsNumber, bookTitle) => {
+  onChangeNumberOfLevelsHandler: (
+    bookId,
+    levelsNumber,
+    bookTitle,
+    caseFirstTime = false,
+  ) => {
     const { changeNumberOfLevelsMutation, withModal, getBookQuery } = args
     const { changeNumberOfLevels } = changeNumberOfLevelsMutation
     const { showModal, hideModal } = withModal
     const { refetch } = getBookQuery
+
+    if (caseFirstTime) {
+      return changeNumberOfLevels({
+        variables: {
+          bookId,
+          levelsNumber,
+        },
+      }).then(res => {
+        refetch({ id: bookId })
+      })
+    }
     const onConfirm = () => {
       changeNumberOfLevels({
         variables: {
@@ -130,7 +146,6 @@ const Connected = props => {
       {({
         book,
         loading,
-        refetching,
         onChangeLevelLabelHandler,
         onChangeNumberOfLevelsHandler,
         onUpdateBookOutlineHandler,
@@ -157,8 +172,17 @@ const Connected = props => {
                 if (bookStructure.levels.length === levelsNumber) {
                   return
                 }
+                if (bookStructure.levels.length === 0) {
+                  const caseFirstTime = true
+                  return onChangeNumberOfLevelsHandler(
+                    book.id,
+                    levelsNumber,
+                    book.title,
+                    caseFirstTime,
+                  )
+                }
                 if (bookStructure.levels.length - 2 !== levelsNumber) {
-                  onChangeNumberOfLevelsHandler(
+                  return onChangeNumberOfLevelsHandler(
                     book.id,
                     levelsNumber,
                     book.title,
@@ -203,7 +227,7 @@ const Connected = props => {
                 setState({ stepNumber: 1 })
               }
               const backToDashboard = () => history.push(`/books/`)
-
+              console.log('book', bookStructure)
               return (
                 <BookStructure
                   backToDashboard={backToDashboard}
