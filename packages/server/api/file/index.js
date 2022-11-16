@@ -1,6 +1,9 @@
+const resolvers = require('./file.resolvers')
+const typeDefs = require('../graphqlLoaderUtil')('file/file.graphql')
+
 module.exports = {
-  resolvers: require('./file.resolvers'),
-  typeDefs: require('../graphqlLoaderUtil')('file/file.graphql'),
+  resolvers,
+  typeDefs,
   // TODO: implement model
   // model: require('./file.model'),
 }

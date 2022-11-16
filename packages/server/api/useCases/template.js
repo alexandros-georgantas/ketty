@@ -35,9 +35,15 @@ const getTemplates = async (
       async tr => {
         if (!target) {
           const templates = await Template.query(tr).where('deleted', false)
+
           const sortable = map(templates, template => {
-            const { id, name, author, target } = template
-            return { id, name: name.toLowerCase().trim(), author, target }
+            const { id, name, author, target: innerTarget } = template
+            return {
+              id,
+              name: name.toLowerCase().trim(),
+              author,
+              target: innerTarget,
+            }
           })
 
           const order = ascending ? 'asc' : 'desc'
@@ -49,13 +55,16 @@ const getTemplates = async (
           const result = map(sorted, item => find(templates, { id: item.id }))
           return result
         }
+
         logger.info(`>>> with target ${target} and notes ${notes}`)
+
         if (notes && notes === 'endnotes') {
           return Template.query(tr)
             .where('deleted', false)
             .andWhere('target', target)
             .andWhere('notes', notes)
         }
+
         return Template.query(tr)
           .where('deleted', false)
           .andWhere('target', target)
@@ -106,18 +115,26 @@ const createTemplate = async (
           trimSize,
           exportScripts,
         })
+
         logger.info(`>>> new template created with id ${newTemplate.id}`)
+
         if (files.length > 0) {
           logger.info(
             `>> there is/are ${files.length} file/s to be uploaded for the template`,
           )
           await Promise.all(
             map(files, async file => {
-              const { createReadStream, filename, encoding } = await file
+              const {
+                createReadStream: fileReadStream,
+                filename,
+                encoding,
+              } = await file
+
               const mimetype = mime.lookup(filename)
               if (!isSupportedAsset(mimetype, 'templates'))
                 throw new Error('File extension is not allowed')
-              const fileStream = createReadStream()
+              const fileStream = fileReadStream()
+
               const { original } = await uploadFile(
                 fileStream,
                 filename,
@@ -125,6 +142,7 @@ const createTemplate = async (
                 encoding,
                 `templates/${newTemplate.id}/${filename}`,
               )
+
               const { key, location, metadata, size, extension } = original
               return createFile(
                 { name: filename, size, mimetype, metadata, extension },
@@ -136,23 +154,33 @@ const createTemplate = async (
             }),
           )
         }
+
         if (thumbnail) {
           logger.info(
             '>>> there is a thumbnail file to be uploaded for the template',
           )
-          const { createReadStream, filename, encoding } = await thumbnail
+
+          const {
+            createReadStream: fileReadStream,
+            filename,
+            encoding,
+          } = await thumbnail
+
           const mimetype = mime.lookup(filename)
           if (!isSupportedAsset(mimetype, 'templateThumbnails'))
             throw new Error('File extension is not allowed')
-          const fileStream = createReadStream()
+          const fileStream = fileReadStream()
+
           const { original } = await uploadFile(
             fileStream,
             filename,
             mimetype,
             encoding,
           )
+
           logger.info('>>> thumbnail uploaded to the server')
           const { key, location, metadata, size, extension } = original
+
           const newThumbnail = await createFile(
             { name: filename, size, mimetype, metadata, extension },
             { location, key },
@@ -160,6 +188,7 @@ const createTemplate = async (
             newTemplate.id,
             { trx: tr },
           )
+
           logger.info(
             `>>> thumbnail representation created on the db with file id ${newThumbnail.id}`,
           )
@@ -201,14 +230,15 @@ const cloneTemplate = async (id, name, cssFile, hashed, options = {}) => {
         })
 
         logger.info(`>>> new template created with id ${newTemplate.id}`)
+
         const files = await File.query(tr)
           .where('templateId', id)
           .andWhere({ deleted: false })
 
         await Promise.all(
           map(files, async file => {
-            const { objectKey, name, mimetype, extension } = file
-            const filepath = path.join(tempFolder, `${name}.${extension}`)
+            const { objectKey, name: fName, mimetype, extension } = file
+            const filepath = path.join(tempFolder, `${fName}.${extension}`)
 
             if (mimetype === 'text/css') {
               writeFileSync(filepath, cssFile)
@@ -217,17 +247,20 @@ const cloneTemplate = async (id, name, cssFile, hashed, options = {}) => {
             }
 
             const fileStream = createReadStream(filepath)
+
             const { original } = await uploadFile(
               fileStream,
-              `${name}.${extension}`,
+              `${fName}.${extension}`,
               mimetype,
               undefined,
-              `templates/${newTemplate.id}/${name}.${extension}`,
+              `templates/${newTemplate.id}/${fName}.${extension}`,
             )
+
             const { key, location, metadata, size } = original
+
             const newFile = await createFile(
               {
-                name: `${name}.${extension}`,
+                name: `${fName}.${extension}`,
                 size,
                 mimetype,
                 metadata,
@@ -238,12 +271,14 @@ const cloneTemplate = async (id, name, cssFile, hashed, options = {}) => {
               newTemplate.id,
               { trx: tr },
             )
+
             logger.info(
               `>>> the path the the files will be stored is ${filepath}`,
             )
             logger.info(
               `>>> file representation created on the db with file id ${newFile.id}`,
             )
+
             if (template.thumbnailId === file.id) {
               await Template.query(tr).patchAndFetchById(newTemplate.id, {
                 thumbnailId: newFile.id,
@@ -277,6 +312,7 @@ const updateTemplate = async (data, options = {}) => {
       deleteThumbnail,
       exportScripts,
     } = data
+
     const { trx } = options
     return useTransaction(
       async tr => {
@@ -284,15 +320,17 @@ const updateTemplate = async (data, options = {}) => {
           logger.info(
             `>>> existing thumbnail with id ${deleteThumbnail} will be patched and set to deleted true`,
           )
-          const deletedThumbnail = await File.query(
-            tr,
-          ).patchAndFetchById(deleteThumbnail, { deleted: true })
+
+          const deletedThumbnail = await File.query(tr).patchAndFetchById(
+            deleteThumbnail,
+            { deleted: true },
+          )
+
           logger.info(`>>> file with id ${deletedThumbnail.id} was patched`)
-          await Template.query(tr)
-            .patch({ thumbnailId: null })
-            .findById(id)
+          await Template.query(tr).patch({ thumbnailId: null }).findById(id)
           logger.info('>>> template thumbnailId property updated')
         }
+
         if (deleteFiles.length > 0) {
           logger.info(
             `>>> existing file/s with id/s ${deleteFiles} will be patched and set to deleted true`,
@@ -305,6 +343,7 @@ const updateTemplate = async (data, options = {}) => {
                   deleted: true,
                 },
               )
+
               logger.info(`>>> file with id ${deletedFile.id} was patched`)
             }),
           )
@@ -317,11 +356,17 @@ const updateTemplate = async (data, options = {}) => {
 
           await Promise.all(
             map(files, async file => {
-              const { createReadStream, filename, encoding } = await file
+              const {
+                createReadStream: fileReadStream,
+                filename,
+                encoding,
+              } = await file
+
               const mimetype = mime.lookup(filename)
               if (!isSupportedAsset(mimetype, 'templates'))
                 throw new Error('File extension is not allowed')
-              const fileStream = createReadStream()
+              const fileStream = fileReadStream()
+
               const { original } = await uploadFile(
                 fileStream,
                 filename,
@@ -329,6 +374,7 @@ const updateTemplate = async (data, options = {}) => {
                 encoding,
                 `templates/${id}/${filename}`,
               )
+
               const { key, location, metadata, size, extension } = original
               return createFile(
                 { name: filename, size, mimetype, metadata, extension },
@@ -346,19 +392,27 @@ const updateTemplate = async (data, options = {}) => {
             '>>> there is a new thumbnail file to be uploaded for the template',
           )
 
-          const { createReadStream, filename, encoding } = await thumbnail
+          const {
+            createReadStream: fileReadStream,
+            filename,
+            encoding,
+          } = await thumbnail
+
           const mimetype = mime.lookup(filename)
           if (!isSupportedAsset(mimetype, 'templateThumbnails'))
             throw new Error('File extension is not allowed')
-          const fileStream = createReadStream()
+          const fileStream = fileReadStream()
+
           const { original } = await uploadFile(
             fileStream,
             filename,
             mimetype,
             encoding,
           )
+
           logger.info('>>> thumbnail uploaded to the server')
           const { key, location, metadata, size, extension } = original
+
           const newThumbnail = await createFile(
             { name: filename, size, mimetype, metadata, extension },
             { location, key },
@@ -366,6 +420,7 @@ const updateTemplate = async (data, options = {}) => {
             id,
             { trx: tr },
           )
+
           logger.info(
             `>>> thumbnail representation created on the db with file id ${newThumbnail.id}`,
           )
@@ -382,6 +437,7 @@ const updateTemplate = async (data, options = {}) => {
           target,
           notes,
         })
+
         return updatedTemplate
       },
       { trx },
@@ -399,6 +455,7 @@ const deleteTemplate = async (id, options = {}) => {
         const toBeDeleted = await Template.query(tr).patchAndFetchById(id, {
           deleted: true,
         })
+
         logger.info(
           `>>> template with id ${toBeDeleted.id} patched with deleted set to true`,
         )
@@ -413,6 +470,7 @@ const deleteTemplate = async (id, options = {}) => {
               deleted: true,
             },
           )
+
           logger.info(
             `>>> thumbnail with id ${deletedThumbnail.id} patched with deleted set to true`,
           )
@@ -430,6 +488,7 @@ const deleteTemplate = async (id, options = {}) => {
                   deleted: true,
                 },
               )
+
               logger.info(
                 `>>> file with id ${deletedFile.id} patched with deleted set to true`,
               )
@@ -456,6 +515,7 @@ const updateTemplateCSSFile = async (id, data, hashed, options = {}) => {
         const oldFile = await File.query(tr).patchAndFetchById(id, {
           deleted: true,
         })
+
         const { mimetype, name, extension, templateId } = oldFile
 
         fs.writeFileSync(
@@ -466,6 +526,7 @@ const updateTemplateCSSFile = async (id, data, hashed, options = {}) => {
         const fileStream = createReadStream(
           path.join(uploadsPath, 'paged', hashed, `${name}.${extension}`),
         )
+
         const { original } = await uploadFile(
           fileStream,
           `${name}.${extension}`,
@@ -473,6 +534,7 @@ const updateTemplateCSSFile = async (id, data, hashed, options = {}) => {
           undefined,
           `templates/${templateId}/${name}.${extension}`,
         )
+
         const { key, location, metadata, size } = original
         await createFile(
           { name: `${name}.${extension}`, size, mimetype, metadata, extension },

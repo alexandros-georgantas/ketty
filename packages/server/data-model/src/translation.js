@@ -9,6 +9,7 @@ class Translation extends Base {
       if (this.languageIso.length !== 2) {
         throw new Error('Language ISOs must be two character long')
       }
+
       this.languageIso = this.languageIso.toLowerCase()
     }
   }

@@ -59,6 +59,7 @@ const levelItem = {
     },
   },
 }
+
 const bookStructure = {
   type: ['object', 'null'],
   default: null,
@@ -145,10 +146,12 @@ class Book extends Base {
       if (!this.bookStructure.id) {
         this.bookStructure.id = uuid()
       }
+
       this.bookStructure.levels.forEach((level, index) => {
         if (!level.id) {
           this.bookStructure.levels[index].id = uuid()
         }
+
         level.contentStructure.forEach((contentItem, itemIndex) => {
           if (!contentItem.id) {
             this.bookStructure.levels[index].contentStructure[
@@ -160,13 +163,16 @@ class Book extends Base {
       this.bookStructure.outline.forEach(
         (outlineItemLevelOne, levelOneIndex) => {
           const levelOneId = uuid()
+
           if (!outlineItemLevelOne.id) {
             this.bookStructure.outline[levelOneIndex].id = levelOneId
             this.bookStructure.outline[levelOneIndex].parentId = levelOneId
           }
+
           outlineItemLevelOne.children.forEach(
             (outlineItemLevelTwo, levelTwoIndex) => {
               const levelTwoId = uuid()
+
               if (!outlineItemLevelTwo.id) {
                 this.bookStructure.outline[levelOneIndex].children[
                   levelTwoIndex
@@ -175,9 +181,11 @@ class Book extends Base {
                   levelTwoIndex
                 ].parentId = levelOneId
               }
+
               outlineItemLevelTwo.children.forEach(
                 (outlineItemLevelThree, levelThreeIndex) => {
                   const levelThreeId = uuid()
+
                   if (!outlineItemLevelThree.id) {
                     this.bookStructure.outline[levelOneIndex].children[
                       levelTwoIndex
@@ -201,6 +209,7 @@ class Book extends Base {
     this.referenceId = this.referenceId || uuid()
     this.ensureIds()
   }
+
   $beforeUpdate() {
     super.$beforeUpdate()
     this.ensureIds()

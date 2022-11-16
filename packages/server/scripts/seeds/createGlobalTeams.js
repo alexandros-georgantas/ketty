@@ -1,4 +1,5 @@
 const { logger } = require('@coko/server')
+
 const {
   editoriaDataModel: {
     models: { Team },

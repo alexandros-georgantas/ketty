@@ -7,6 +7,7 @@ const {
   BookComponentTranslation,
   Division,
 } = require('@pubsweet/models')
+
 const { logger } = require('@coko/server')
 const find = require('lodash/find')
 const map = require('lodash/map')
@@ -22,18 +23,22 @@ exports.up = async knex => {
       const frontMatterDivisions = await Division.query(trx)
         .where('label', 'Frontmatter')
         .andWhere('deleted', false)
+
       await Promise.all(
         frontMatterDivisions.map(async division => {
           const { bookComponents } = division
+
           const dbBookComponents = await Promise.all(
             bookComponents.map(async bookComponentId =>
               BookComponent.query(trx).findById(bookComponentId),
             ),
           )
+
           const divisionHasTOC =
             find(dbBookComponents, {
               componentType: 'toc',
             }) || false
+
           if (!divisionHasTOC) {
             const workflowConfig = await ApplicationParameter.query().where({
               context: 'bookBuilder',
@@ -47,6 +52,7 @@ exports.up = async knex => {
             logger.info(
               `Division which will hold the book found with id ${division.id}`,
             )
+
             const newBookComponent = {
               bookId: division.bookId,
               componentType: 'toc',
@@ -58,6 +64,7 @@ exports.up = async knex => {
               archived: false,
               deleted: false,
             }
+
             const createdBookComponent = await BookComponent.query(trx).insert(
               newBookComponent,
             )
@@ -65,6 +72,7 @@ exports.up = async knex => {
             logger.info(
               `New book component created with id ${createdBookComponent.id}`,
             )
+
             const translation = await BookComponentTranslation.query(
               trx,
             ).insert({
@@ -76,6 +84,7 @@ exports.up = async knex => {
             logger.info(
               `New book component translation created with id ${translation.id}`,
             )
+
             if (workflowStages) {
               bookComponentWorkflowStages = {
                 workflowStages: map(workflowStages, stage => ({
@@ -109,6 +118,7 @@ exports.up = async knex => {
               bookComponents: newBookComponents,
             })
           }
+
           return false
         }),
       )

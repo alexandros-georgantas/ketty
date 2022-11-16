@@ -1,4 +1,3 @@
-const { createTemplate, getTemplates } = require('../utils/utils')
 const { logger } = require('@coko/server')
 const indexOf = require('lodash/indexOf')
 const map = require('lodash/map')
@@ -8,6 +7,7 @@ const get = require('lodash/get')
 const path = require('path')
 const fs = require('fs-extra')
 const config = require('config')
+const { createTemplate, getTemplates } = require('../utils/utils')
 
 const createTemplates = async () => {
   try {
@@ -31,17 +31,20 @@ const createTemplates = async () => {
             'templates',
             templateFolder,
           )
+
           const raw = fs.readFileSync(path.join(sourceRoot, 'template.json'))
           const manifest = JSON.parse(raw)
           const { name, author, target } = manifest
 
           if (indexOf(whichTemplates, name) !== -1) {
             logger.info('******* Create Templates script is starting ********')
+
             const pagedData = {
               name,
               author,
               target: 'pagedjs',
             }
+
             logger.info('PagedJS Templates')
             await Promise.all(
               map(noteTypes, async noteType =>
@@ -53,12 +56,14 @@ const createTemplates = async () => {
                 ),
               ),
             )
+
             if (get(target, 'epub.file')) {
               const epubData = {
                 name,
                 author,
                 target: 'epub',
               }
+
               logger.info('EPUB Templates')
               await Promise.all(
                 map(noteTypes, async noteType =>
@@ -71,6 +76,7 @@ const createTemplates = async () => {
                 ),
               )
             }
+
             logger.info(
               '******* Create Templates script finished successfully ********',
             )

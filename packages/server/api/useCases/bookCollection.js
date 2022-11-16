@@ -1,4 +1,5 @@
 const { logger, useTransaction } = require('@coko/server')
+
 const {
   BookCollectionTranslation,
   BookCollection,
@@ -8,6 +9,7 @@ const getBookCollection = async (id, options = {}) => {
   try {
     const { trx } = options
     logger.info(`>>> fetching book collection with id ${id}`)
+
     const bookCollection = await useTransaction(
       async tr =>
         BookCollection.query(tr).where({

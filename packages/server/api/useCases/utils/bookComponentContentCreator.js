@@ -31,6 +31,7 @@ const bookComponentContentCreator = async (
 
         if (bookStructure.levels.length === 3) {
           const { levelOneIndex } = indexes
+
           if (levelOneIndex !== undefined) {
             bookStructure.levels[level].contentStructure.forEach(
               contentItem => {
@@ -196,6 +197,7 @@ const bookComponentContentCreator = async (
 
         if (bookStructure.levels.length === 4) {
           const { levelOneIndex, levelTwoIndex } = indexes
+
           if (levelOneIndex !== undefined && levelTwoIndex !== undefined) {
             // use case of creation from book finalized
             if (level === 0) {
@@ -221,6 +223,7 @@ const bookComponentContentCreator = async (
                 },
               )
             }
+
             if (level === 1) {
               bookStructure.levels[level].contentStructure.forEach(
                 contentItem => {
@@ -329,6 +332,7 @@ const bookComponentContentCreator = async (
                 },
               )
             }
+
             if (level === 1) {
               bookStructure.levels[level].contentStructure.forEach(
                 contentItem => {
@@ -409,6 +413,7 @@ const bookComponentContentCreator = async (
               }
             }
           }
+
           content = container('body').html()
         }
 

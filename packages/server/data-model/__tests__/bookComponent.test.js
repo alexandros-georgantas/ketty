@@ -1,49 +1,51 @@
-const uuid = require('uuid/v4')
-const { dbCleaner } = require('./helpers')
-const {
-  Book,
-  BookCollection,
-  BookComponent,
-  Division,
-} = require('../src').models
+/* eslint-disable jest/no-commented-out-tests */
+// const uuid = require('uuid/v4')
+// const { dbCleaner } = require('./helpers')
 
-describe('Book Component', () => {
-  beforeEach(async () => {
-    await dbCleaner()
-  })
+// const {
+//   Book,
+//   BookCollection,
+//   BookComponent,
+//   Division,
+// } = require('../src').models
 
-  it('can add book components', async () => {
-    let book, collection, component, division
+// describe('Book Component', () => {
+//   beforeEach(async () => {
+//     await dbCleaner()
+//   })
 
-    await new BookCollection().save().then(res => (collection = res))
+//   it('can add book components', async () => {
+//     let book, collection, component, division
 
-    await new Book({
-      collectionId: collection.id,
-      divisions: [uuid()],
-    })
-      .save()
-      .then(res => (book = res))
+//     await new BookCollection().save().then(res => (collection = res))
 
-    await new Division({
-      bookId: book.id,
-      label: 'Frontmatter',
-    })
-      .save()
-      .then(res => (division = res))
+//     await new Book({
+//       collectionId: collection.id,
+//       divisions: [uuid()],
+//     })
+//       .save()
+//       .then(res => (book = res))
 
-    await new BookComponent({
-      bookId: book.id,
-      componentType: 'mytype',
-      divisionId: division.id,
-    })
-      .save()
-      .then(res => (component = res))
+//     await new Division({
+//       bookId: book.id,
+//       label: 'Frontmatter',
+//     })
+//       .save()
+//       .then(res => (division = res))
 
-    // console.log(component)
-    await component.getBook()
-    // .then(res => console.log(res))
+//     await new BookComponent({
+//       bookId: book.id,
+//       componentType: 'mytype',
+//       divisionId: division.id,
+//     })
+//       .save()
+//       .then(res => (component = res))
 
-    await component.getDivision()
-    // .then(res => console.log(res))
-  })
-})
+//     // console.log(component)
+//     await component.getBook()
+//     // .then(res => console.log(res))
+
+//     await component.getDivision()
+//     // .then(res => console.log(res))
+//   })
+// })

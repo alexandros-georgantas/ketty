@@ -1,3 +1,5 @@
+const controllers = require('./controllers')
+
 module.exports = {
-  server: () => app => require('./controllers')(app),
+  server: () => app => controllers(app),
 }

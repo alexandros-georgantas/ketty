@@ -11,13 +11,8 @@ const uuid = require('uuid/v4')
 
 const Base = require('../editoriaBase')
 
-const {
-  boolean,
-  booleanDefaultFalse,
-  id,
-  integerPositive,
-  string,
-} = require('../helpers').schema
+const { boolean, booleanDefaultFalse, id, integerPositive, string } =
+  require('../helpers').schema
 
 class BookComponent extends Base {
   constructor(properties) {
@@ -30,10 +25,11 @@ class BookComponent extends Base {
   }
 
   static get relationMappings() {
+    /* eslint-disable global-require */
     const { model: Book } = require('../book')
     const { model: Division } = require('../division')
     const { model: BookComponentState } = require('../bookComponentState')
-
+    /* eslint-enable global-require */
     return {
       book: {
         relation: Model.BelongsToOneRelation,
@@ -117,6 +113,7 @@ class BookComponent extends Base {
   getDivision() {
     return this.$relatedQuery('division')
   }
+
   getBookComponentState() {
     return this.$relatedQuery('bookComponentState')
   }

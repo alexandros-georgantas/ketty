@@ -1,6 +1,7 @@
 const { pubsubManager, logger } = require('@coko/server')
 
 const { BOOK_COMPONENT_ORDER_UPDATED } = require('./constants')
+
 const {
   useCaseUpdateDivisionBookComponentOrder,
   useCaseGetDivision,
@@ -16,6 +17,7 @@ const updateBookComponentOrder = async (
     logger.info(
       'division resolver: executing updateBookComponentOrder use case',
     )
+
     const book = await useCaseUpdateDivisionBookComponentOrder(
       targetDivisionId,
       bookComponentId,

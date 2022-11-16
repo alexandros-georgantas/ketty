@@ -47,11 +47,13 @@ const updateTeamMembers = async (_, { id, input }, ctx) => {
 
       return updatedTeam
     }
+
     if (updatedTeam.role === 'productionEditor') {
       pubsub.publish(BOOK_PRODUCTION_EDITORS_UPDATED, {
         productionEditorsUpdated: updatedTeam,
       })
     }
+
     pubsub.publish(TEAM_MEMBERS_UPDATED, {
       teamMembersUpdated: updatedTeam,
     })

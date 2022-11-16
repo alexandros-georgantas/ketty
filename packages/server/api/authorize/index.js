@@ -1,5 +1,7 @@
+const resolvers = require('./authorize.resolvers')
+const typeDefs = require('../graphqlLoaderUtil')('authorize/authorize.graphql')
+
 module.exports = {
-  resolvers: require('./authorize.resolvers'),
-  typeDefs: require('../graphqlLoaderUtil')('authorize/authorize.graphql'),
-  // model: models.book,
+  resolvers,
+  typeDefs,
 }

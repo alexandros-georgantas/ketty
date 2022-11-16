@@ -65,11 +65,14 @@ const icmlPreparation = async book => {
         $('figure').each((index, node) => {
           const $node = $(node)
           const srcExists = $node.attr('src')
+
           if (srcExists) {
             $node.removeAttr('src')
           }
         })
+        /* eslint-disable no-param-reassign */
         bookComponent.content = $.html('body')
+        /* eslint-enable no-param-reassign */
       })
     })
 

@@ -4,11 +4,8 @@ const pickBy = require('lodash/pickBy')
 const map = require('lodash/map')
 const forEach = require('lodash/forEach')
 
-const {
-  File,
-  FileTranslation,
-  BookComponent,
-} = require('../../data-model/src').models
+const { File, FileTranslation, BookComponent } =
+  require('../../data-model/src').models
 
 const { deleteFiles: deleteRemoteFiles, signURL } = require('./objectStorage')
 const { imageFinder } = require('../helpers/utils')
@@ -35,6 +32,7 @@ const createFile = async (
       templateId: entityType === 'template' ? entityId : undefined,
       bookComponentId: entityType === 'bookComponent' ? entityId : undefined,
     }
+
     const cleanedObject = pickBy(tempFile, v => v !== undefined)
     const { trx } = options
     logger.info(
@@ -55,11 +53,13 @@ const updateFile = async (id, data, options = {}) => {
     return useTransaction(
       async tr => {
         logger.info(`>>> updating file with id ${id}`)
+
         if (alt) {
           const fileTranslation = await FileTranslation.query(tr).findOne({
             fileId: id,
             languageIso: 'en',
           })
+
           if (fileTranslation) {
             await FileTranslation.query(tr).patchAndFetchById(
               fileTranslation.id,
@@ -77,6 +77,7 @@ const updateFile = async (id, data, options = {}) => {
 
           return File.query(tr).findById(id)
         }
+
         return File.query(tr).patchAndFetchById(id, { name })
       },
       { trx },
@@ -92,9 +93,7 @@ const updateFiles = async (ids, data, options = {}) => {
     return useTransaction(
       async tr => {
         logger.info(`>>> updating files with ids ${ids}`)
-        return File.query(tr)
-          .patch(data)
-          .whereIn(ids)
+        return File.query(tr).patch(data).whereIn(ids)
       },
       { trx },
     )
@@ -111,14 +110,17 @@ const deleteFile = async (id, remoteToo = false, options = {}) => {
         logger.info(
           `>>> deleting file representation from db with file id ${id}`,
         )
+
         const deletedFile = await File.query(tr).patchAndFetchById(id, {
           deleted: true,
         })
+
         const { id: deletedId, mimetype, objectKey } = deletedFile
 
         if (remoteToo) {
           const keys = []
           keys.push(objectKey)
+
           if (mimetype.match(/^image\//) && mimetype !== 'image/svg+xml') {
             const keyDeconstructed = objectKey.split('.')[0]
             logger.info(
@@ -129,6 +131,7 @@ const deleteFile = async (id, remoteToo = false, options = {}) => {
               `${keyDeconstructed}_medium.png`,
             )
           }
+
           if (mimetype.match(/^image\//) && mimetype === 'image/svg+xml') {
             const keyDeconstructed = objectKey.split('.')[0]
             logger.info(
@@ -139,8 +142,10 @@ const deleteFile = async (id, remoteToo = false, options = {}) => {
               `${keyDeconstructed}_medium.svg`,
             )
           }
+
           await deleteRemoteFiles(keys)
         }
+
         return deletedId
       },
       { trx },
@@ -158,16 +163,16 @@ const deleteFiles = async (ids, remoteToo = false, options = {}) => {
     )
     return useTransaction(
       async tr => {
-        await File.query(tr)
-          .patch({ deleted: true })
-          .whereIn('id', ids)
+        await File.query(tr).patch({ deleted: true }).whereIn('id', ids)
         const deletedFiles = await File.query(tr).whereIn('id', ids)
+
         if (remoteToo) {
           await Promise.all(
             map(deletedFiles, async deletedFile => {
               const { mimetype, objectKey } = deletedFile
               const keys = []
               keys.push(objectKey)
+
               if (mimetype.match(/^image\//) && mimetype !== 'image/svg+xml') {
                 const keyDeconstructed = objectKey.split('.')[0]
                 logger.info(
@@ -178,6 +183,7 @@ const deleteFiles = async (ids, remoteToo = false, options = {}) => {
                   `${keyDeconstructed}_medium.png`,
                 )
               }
+
               if (mimetype.match(/^image\//) && mimetype === 'image/svg+xml') {
                 const keyDeconstructed = objectKey.split('.')[0]
                 logger.info(
@@ -188,10 +194,12 @@ const deleteFiles = async (ids, remoteToo = false, options = {}) => {
                   `${keyDeconstructed}_medium.svg`,
                 )
               }
+
               await deleteRemoteFiles(keys)
             }),
           )
         }
+
         return map(deletedFiles, file => file.id)
       },
       { trx },
@@ -219,6 +227,7 @@ const getEntityFiles = async (
             const { key, order } = option
             return { column: key, order }
           })
+
           logger.info(`>>> constructing orderBy params: ${orderByParams}`)
 
           return File.query(tr)
@@ -226,6 +235,7 @@ const getEntityFiles = async (
             .andWhere({ deleted: false })
             .orderBy(orderByParams)
         }
+
         return File.query(tr)
           .where({ [`${entityType}Id`]: entityId })
           .andWhere({ deleted: false })
@@ -256,9 +266,7 @@ const getSpecificFiles = async (ids, options = {}) => {
     logger.info(`>>> fetching the files with ids ${ids}`)
     return useTransaction(
       async tr =>
-        File.query(tr)
-          .whereIn('id', ids)
-          .andWhere({ deleted: false }),
+        File.query(tr).whereIn('id', ids).andWhere({ deleted: false }),
       { trx, passedTrxOnly: true },
     )
   } catch (e) {
@@ -270,12 +278,15 @@ const getFile = async (id, options = {}) => {
   try {
     const { trx } = options
     logger.info(`>>> fetching the file with id ${id}`)
+
     const file = await useTransaction(
       async tr => {
         const item = await File.query(tr).findById(id)
+
         if (item.deleted) {
           throw new Error('this file is deleted')
         }
+
         return item
       },
       { trx, passedTrxOnly: true },
@@ -291,16 +302,20 @@ const getFileURL = async (id, size = undefined, options = {}) => {
   try {
     const { trx } = options
     logger.info(`>>> fetching the file with id ${id}`)
+
     const file = await useTransaction(
       async tr => {
         const item = await File.query(tr).findById(id)
+
         if (item.deleted) {
           throw new Error('this file is deleted')
         }
+
         return item
       },
       { trx, passedTrxOnly: true },
     )
+
     logger.info(`>>> signing url `)
     const { mimetype, objectKey } = file
 
@@ -309,11 +324,13 @@ const getFileURL = async (id, size = undefined, options = {}) => {
         const deconstructedKey = objectKey.split('.')
         return signURL('getObject', `${deconstructedKey[0]}_${size}.png`)
       }
+
       if (size && size !== 'original' && mimetype === 'image/svg+xml') {
         const deconstructedKey = objectKey.split('.')
         return signURL('getObject', `${deconstructedKey[0]}_${size}.svg`)
       }
     }
+
     return signURL('getObject', objectKey)
   } catch (e) {
     throw new Error(e)
@@ -335,6 +352,8 @@ const getContentFiles = async (fileIds, options = {}) => {
               fileId: id,
               languageIso: 'en',
             })
+
+            /* eslint-disable no-param-reassign */
             file.alt = translation.length === 1 ? translation[0].alt : null
 
             if (mimetype.match(/^image\//)) {
@@ -352,10 +371,12 @@ const getContentFiles = async (fileIds, options = {}) => {
                   `${deconstructedKey[0]}_medium.svg`,
                 )
               }
+
               return file
             }
 
             file.source = await signURL('getObject', objectKey)
+            /* eslint-enable no-param-reassign */
 
             return file
           }),
@@ -393,6 +414,7 @@ const isFileInUse = async (bookId, fileId, options = {}) => {
 
         forEach(bookComponentsOfBook, bookComponent => {
           const { content, id } = bookComponent
+
           if (imageFinder(content, fileId)) {
             foundIn.push(id)
           }
@@ -406,6 +428,7 @@ const isFileInUse = async (bookId, fileId, options = {}) => {
     throw new Error(e)
   }
 }
+
 module.exports = {
   createFile,
   updateFile,

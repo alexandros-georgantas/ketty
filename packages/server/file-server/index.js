@@ -1,3 +1,5 @@
+const APIHandler = require('./FileServerBackend')
+
 module.exports = {
-  server: () => app => require('./FileServerBackend')(app),
+  server: () => app => APIHandler(app),
 }

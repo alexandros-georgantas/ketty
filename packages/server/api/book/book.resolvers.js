@@ -9,6 +9,7 @@ const {
   BOOK_METADATA_UPDATED,
   BOOK_RUNNING_HEADERS_UPDATED,
 } = require('./constants')
+
 const { BookTranslation } = require('../../data-model/src').models
 
 const {
@@ -148,6 +149,7 @@ const updateMetadata = async (_, { input }, ctx) => {
 const exportBook = async (_, { input }, ctx) => {
   const { bookId, mode, previewer, templateId, fileExtension, icmlNotes } =
     input
+
   try {
     logger.info('book resolver: executing exportBook use case')
     return useCaseExportBook(
@@ -204,6 +206,7 @@ const changeNumberOfLevels = async (_, { bookId, levelsNumber }, ctx) => {
     logger.info(
       'book resolver: executing changeBookStructureLevelNumber use case',
     )
+
     // const pubsub = await pubsubManager.getPubsub()
     const updatedBookStructure = await useCaseChangeNumberOfLevels(
       bookId,
@@ -252,10 +255,12 @@ const getPagedPreviewerLink = async (_, { hash }, ctx) => {
 const updateLevelContentStructure = async (_, { bookId, levels }, cx) => {
   try {
     logger.info('book resolver: executing updateLevelContentStructure use case')
+
     const updatedLevelsStructure = await useCaseUpdateLevelContentStructure(
       bookId,
       levels,
     )
+
     return updatedLevelsStructure
   } catch (e) {
     throw new Error(e)
@@ -276,6 +281,7 @@ const finalizeBookStructure = async (_, { bookId }, cx) => {
     throw new Error(e)
   }
 }
+
 const updateShowWelcome = async (_, { bookId }, cx) => {
   try {
     logger.info('book resolver: executing updateShowWelcome use case')
@@ -290,6 +296,7 @@ const updateShowWelcome = async (_, { bookId }, cx) => {
     throw new Error(e)
   }
 }
+
 module.exports = {
   Query: {
     getBook,
@@ -331,25 +338,31 @@ module.exports = {
         'author',
         true,
       )
+
       let authors = []
+
       if (authorsTeam && authorsTeam.members.length > 0) {
         authors = authorsTeam.members
       }
+
       return authors
     },
     async isPublished(book, args, ctx, info) {
       let isPublished = false
+
       if (book.publicationDate) {
         const date = book.publicationDate
         const inTimestamp = new Date(date).getTime()
         const nowDate = new Date()
         const nowTimestamp = nowDate.getTime()
+
         if (inTimestamp <= nowTimestamp) {
           isPublished = true
         } else {
           isPublished = false
         }
       }
+
       return isPublished
     },
     async productionEditors(book, _, ctx) {

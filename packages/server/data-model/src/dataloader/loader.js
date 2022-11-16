@@ -6,6 +6,7 @@ class Loader {
 
   load(key) {
     const cache = this.cache.get(key)
+
     if (cache) {
       return cache
     }
@@ -15,6 +16,7 @@ class Loader {
         .then(result => resolve(result))
         .catch(error => reject(error))
     })
+
     this.cache.set(key, promise)
     return promise
   }

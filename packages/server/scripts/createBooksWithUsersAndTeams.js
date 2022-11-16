@@ -1,11 +1,12 @@
 const { logger } = require('@coko/server')
-const { editoriaDataModel } = require('../data-model')
 const { TeamMember } = require('@pubsweet/models')
 const keys = require('lodash/keys')
 const map = require('lodash/map')
+const config = require('config')
+
+const { editoriaDataModel } = require('../data-model')
 
 const { models } = editoriaDataModel
-const config = require('config')
 
 const {
   User,
@@ -23,6 +24,7 @@ const createBooksWithUsersAndTeams = async () => {
     // eslint-disable-next-line no-unused-vars
     let globalTeam
     let collection
+
     if (collections.length === 0) {
       collection = await new BookCollection().save()
       await new BookCollectionTranslation({
@@ -51,6 +53,7 @@ const createBooksWithUsersAndTeams = async () => {
         admin: true,
       }).save()
     }
+
     if (!authorUser) {
       authorUser = await new User({
         username: 'author',
@@ -61,6 +64,7 @@ const createBooksWithUsersAndTeams = async () => {
         admin: false,
       }).save()
     }
+
     if (!productionEditorUser) {
       productionEditorUser = await new User({
         username: 'productionEditor',
@@ -71,6 +75,7 @@ const createBooksWithUsersAndTeams = async () => {
         admin: false,
       }).save()
     }
+
     if (!globalProductionEditorUser) {
       globalProductionEditorUser = await new User({
         username: 'globalProductionEditor',
@@ -81,6 +86,7 @@ const createBooksWithUsersAndTeams = async () => {
         admin: false,
       }).save()
     }
+
     if (!copyEditorUser) {
       copyEditorUser = await new User({
         username: 'copyEditor',
@@ -91,6 +97,7 @@ const createBooksWithUsersAndTeams = async () => {
         admin: false,
       }).save()
     }
+
     if (globalTeams.length === 0) {
       const newTeam = await new Team({
         name: 'Production Editor',
@@ -98,6 +105,7 @@ const createBooksWithUsersAndTeams = async () => {
         deleted: false,
         global: true,
       }).save()
+
       await new TeamMember({
         userId: globalProductionEditorUser.id,
         teamId: newTeam.id,
@@ -110,9 +118,6 @@ const createBooksWithUsersAndTeams = async () => {
           userId: globalProductionEditorUser.id,
           teamId: tempGlobal.id,
         }).save()
-      } else {
-        // eslint-disable-next-line prefer-destructuring
-        globalTeam = globalTeams[0]
       }
     }
 
@@ -142,6 +147,7 @@ const createBooksWithUsersAndTeams = async () => {
               deleted: false,
               global: false,
             }).save()
+
             await new TeamMember({
               userId: authorUser.id,
               teamId: newTeam.id,
@@ -178,6 +184,7 @@ const createBooksWithUsersAndTeams = async () => {
               deleted: false,
               global: false,
             }).save()
+
             await new TeamMember({
               userId: productionEditorUser.id,
               teamId: newTeam.id,
@@ -215,6 +222,7 @@ const createBooksWithUsersAndTeams = async () => {
               deleted: false,
               global: false,
             }).save()
+
             await new TeamMember({
               userId: copyEditorUser.id,
               teamId: newTeam.id,
@@ -241,12 +249,15 @@ const createBooksWithUsersAndTeams = async () => {
       const productionEditorBookTranslation = await BookTranslation.query()
         .where('title', 'Production Editor Book')
         .andWhere('languageIso', 'en')
+
       productionEditorBook = await Book.findById(
         productionEditorBookTranslation[0].bookId,
       )
+
       const copyEditorBookTranslation = await BookTranslation.query()
         .where('title', 'Copy Editor Book')
         .andWhere('languageIso', 'en')
+
       copyEditorBook = await Book.findById(copyEditorBookTranslation[0].bookId)
     }
 
@@ -255,6 +266,7 @@ const createBooksWithUsersAndTeams = async () => {
     throw new Error(e)
   }
 }
+
 module.exports = createBooksWithUsersAndTeams
 
 createBooksWithUsersAndTeams()

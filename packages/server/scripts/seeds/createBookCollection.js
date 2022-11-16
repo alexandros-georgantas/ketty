@@ -11,6 +11,7 @@ const createBookCollection = async trx => {
   const createdBookCollection = await BookCollection.query(trx).insert({})
   logger.info(`books collection created with id: ${createdBookCollection.id}`)
   logger.info('>>> creating a new books collection translation')
+
   const createdBookCollectionTranslation = await BookCollectionTranslation.query(
     trx,
   ).insert({
@@ -18,6 +19,7 @@ const createBookCollection = async trx => {
     languageIso: 'en',
     title: 'Books',
   })
+
   logger.info(
     `books collection translation created with id: ${createdBookCollectionTranslation.id}`,
   )
@@ -34,6 +36,7 @@ const createBookCollectionHandler = async () => {
       logger.warn('>>> collection already exists')
       return false
     }
+
     return useTransaction(createBookCollection)
   } catch (e) {
     logger.error(e.message)

@@ -6,9 +6,9 @@ const get = require('lodash/get')
 const find = require('lodash/find')
 const crypto = require('crypto')
 
+const map = require('lodash/map')
 const { locallyDownloadFile, signURL } = require('../objectStorage')
 const { imageGatherer } = require('./gatherImages')
-const map = require('lodash/map')
 
 const { readFile, writeFile } = require('./filesystem')
 
@@ -34,9 +34,14 @@ const pagednation = async (book, template, pdf = false) => {
     await fs.ensureDir(pagedDestination)
 
     for (let i = 0; i < templateFiles.length; i += 1) {
-      const { id: dbId, objectKey, mimetype, extension, name } = templateFiles[
-        i
-      ]
+      const {
+        id: dbId,
+        objectKey,
+        mimetype,
+        extension,
+        name,
+      } = templateFiles[i]
+
       const originalFilename = `${name}.${extension}`
 
       if (templateFiles[i].mimetype === 'text/css') {
@@ -63,11 +68,13 @@ const pagednation = async (book, template, pdf = false) => {
         })
       }
     }
+
     if (stylesheets.length === 0) {
       throw new Error(
         'No stylesheet file exists in the selected template, export aborted',
       )
     }
+
     const gatheredImages = imageGatherer(book)
     const freshImageLinkMapper = {}
 
@@ -81,8 +88,8 @@ const pagednation = async (book, template, pdf = false) => {
         return true
       }),
     )
-    book.divisions.forEach((division, divisionId) => {
-      division.bookComponents.forEach((bookComponent, bookComponentId) => {
+    book.divisions.forEach(division => {
+      division.bookComponents.forEach(bookComponent => {
         const { content } = bookComponent
         const $ = cheerio.load(content)
 
@@ -92,14 +99,17 @@ const pagednation = async (book, template, pdf = false) => {
           const objectKey = objectKeyExtractor(url)
           $node.attr('src', freshImageLinkMapper[objectKey])
         })
-        $('figure').each((index, node) => {
+        $('figure').each((_, node) => {
           const $node = $(node)
           const srcExists = $node.attr('src')
+
           if (srcExists) {
             $node.removeAttr('src')
           }
         })
+        /* eslint-disable no-param-reassign */
         bookComponent.content = $.html('body')
+        /* eslint-enable no-param-reassign */
       })
     })
 
@@ -144,11 +154,13 @@ const pagednation = async (book, template, pdf = false) => {
         const constructedScriptPath = `${process.cwd()}/${scriptsRootFolder}/${
           foundScript.filename
         }`
+
         if (!fs.existsSync(constructedScriptPath)) {
           throw new Error(
             `the script file declared in the config does not exist under ${process.cwd()}/${scriptsRootFolder}/`,
           )
         }
+
         const targetPath = `${pagedDestination}/${i + 1}.js`
 
         return fs.copy(constructedScriptPath, targetPath)
@@ -161,9 +173,9 @@ const pagednation = async (book, template, pdf = false) => {
     await writeFile(`${stylesheets[0].target}`, fixedCSS)
     const output = cheerio.load(generatePagedjsContainer(book.title))
 
-    book.divisions.forEach((division, divisionId) => {
-      division.bookComponents.forEach((bookComponent, bookComponentId) => {
-        const { content } = bookComponent
+    book.divisions.forEach(division => {
+      division.bookComponents.forEach(bc => {
+        const { content } = bc
         output('body').append(content)
       })
     })

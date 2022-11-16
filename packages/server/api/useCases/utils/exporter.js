@@ -1,6 +1,6 @@
 const cheerio = require('cheerio')
 const fs = require('fs-extra')
-// const path = require('path')
+const path = require('path')
 const config = require('config')
 const get = require('lodash/get')
 const findIndex = require('lodash/findIndex')
@@ -125,8 +125,8 @@ const ExporterService = async (
               bookComponent,
               notesType,
               tocComponent,
-              endnotesComponent,
               shouldMathML,
+              endnotesComponent,
               levelMapper[levelIndex],
             )
           } else {
@@ -136,8 +136,8 @@ const ExporterService = async (
               bookComponent,
               notesType,
               tocComponent,
-              endnotesComponent,
               shouldMathML,
+              endnotesComponent,
             )
           }
         } else {
@@ -147,14 +147,16 @@ const ExporterService = async (
             bookComponent,
             notesType,
             tocComponent,
-            endnotesComponent,
             shouldMathML,
+            endnotesComponent,
           )
         }
 
         const { hasMath, content } = cleanedContent
+        /* eslint-disable no-param-reassign */
         bookComponent.hasMath = hasMath
         bookComponent.content = cleanDataIdAttributes(content)
+        /* eslint-enable no-param-reassign */
         counter += 1
       })
     })
@@ -168,7 +170,9 @@ const ExporterService = async (
             const { id } = bookComponent
 
             if (bbWithConvertedContent[id]) {
+              /* eslint-disable no-param-reassign */
               bookComponent.content = bbWithConvertedContent[id]
+              /* eslint-enable no-param-reassign */
             }
           })
         })
@@ -243,12 +247,11 @@ const ExporterService = async (
     if (previewer === 'pagedjs' || fileExtension === 'pdf') {
       if (fileExtension === 'pdf') {
         const { hash } = await pagednation(book, template, true)
-        const path = require('path')
 
         await fs.emptyDir(`${process.cwd()}/uploads/pdfs`)
         await fs.ensureDir(`${process.cwd()}/uploads/tmp/${hash}/`)
         const pdfPath = '/uploads/pdfs'
-        const resultPath = getResultPath(pdfPath)
+        resultPath = getResultPath(pdfPath)
         const pdfAbsolutePath = path.join(`${process.cwd()}`, `/uploads/pdfs`)
 
         const zipFilePath = await pagedArchiver(
@@ -280,7 +283,7 @@ const ExporterService = async (
         `${process.cwd()}/${uploadsDir}/icmls`,
       )
 
-      const resultPath = getResultPath(icmlFilePath)
+      resultPath = getResultPath(icmlFilePath)
       await fs.remove(icmlTempFolder)
       return {
         path: resultPath,

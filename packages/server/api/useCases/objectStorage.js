@@ -26,6 +26,7 @@ const s3 = new AWS.S3({
   s3ForcePathStyle: true,
   endpoint: serverUrl,
 })
+
 const createImageVersions = async (
   buffer,
   tempRoot,
@@ -55,6 +56,7 @@ const createImageVersions = async (
         },
       }
     }
+
     await sharp(buffer)
       .resize(180, 240, {
         fit: 'contain',
@@ -98,6 +100,7 @@ const healthCheck = () =>
       resolve(data)
     })
   })
+
 // getObject, putObject
 const signURL = async (operation, key) => {
   const s3Params = {
@@ -122,6 +125,7 @@ const uploadFileHandler = (fileStream, filename, mimeType) => {
       if (err) {
         reject(err)
       }
+
       const { Key, Bucket, ETag, Location } = data
       resolve({ key: Key, bucket: Bucket, eTag: ETag, location: Location })
     })
@@ -227,6 +231,7 @@ const uploadFile = async (
 ) => {
   try {
     let hashedFilename
+
     if (forceObjectKey) {
       hashedFilename = forceObjectKey
     } else {
@@ -259,11 +264,13 @@ const getFileInfo = key => {
     Bucket: bucket,
     Key: key,
   }
+
   return new Promise((resolve, reject) => {
     s3.getObject(params, (err, data) => {
       if (err) {
         reject(err)
       }
+
       resolve(data)
     })
   })
@@ -273,11 +280,13 @@ const listFiles = () => {
   const params = {
     Bucket: bucket,
   }
+
   return new Promise((resolve, reject) => {
     s3.listObjects(params, (err, data) => {
       if (err) {
         reject(err)
       }
+
       resolve(data)
     })
   })
@@ -302,6 +311,7 @@ const deleteFiles = keys => {
       if (err) {
         reject(err)
       }
+
       resolve(data)
     })
   })

@@ -617,6 +617,7 @@ const changeLevelLabel = async (bookId, levelId, label, options = {}) => {
         // if existing outline info then update the type based on changed label
         if (clonedBookStructure.outline.length > 0) {
           clonedBookStructure.outline.forEach(levelOneComponent => {
+            /* eslint-disable no-param-reassign */
             if (levelIndex === 0) {
               levelOneComponent.type = toCamelCase(label)
             } else {
@@ -629,6 +630,7 @@ const changeLevelLabel = async (bookId, levelId, label, options = {}) => {
                       levelThreeComponent.type = toCamelCase(label)
                     }
                   })
+                  /* eslint-enable no-param-reassign */
                 }
               })
             }

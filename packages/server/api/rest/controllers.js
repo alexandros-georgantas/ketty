@@ -1,5 +1,6 @@
 const { pubsubManager, logger } = require('@coko/server')
 const express = require('express')
+
 const {
   BookComponent,
   Lock,
@@ -23,7 +24,9 @@ const unlockHandler = async (userId, bookComponentId) => {
     logger.info('nothing to unlock')
     return false
   }
+
   const { userId: userLock } = bookComponentLock[0]
+
   if (userId !== userLock) {
     logger.info('lock taken by another user')
   } else {
@@ -34,8 +37,10 @@ const unlockHandler = async (userId, bookComponentId) => {
       bookComponentLockUpdated: updatedBookComponent,
     })
   }
+
   return true
 }
+
 const {
   useCaseUpdateBookComponentContent,
   useCaseUpdateUploading,
@@ -47,6 +52,7 @@ const Controllers = app => {
     try {
       const pubsub = await pubsubManager.getPubsub()
       const { body } = req
+
       const {
         bookComponentId,
         serviceCredentialId,
@@ -60,6 +66,7 @@ const Controllers = app => {
         const updatedBookComponent = await BookComponent.findById(
           bookComponentId,
         )
+
         await useCaseDeleteBookComponent(updatedBookComponent)
         await pubsub.publish(BOOK_COMPONENT_UPLOADING_UPDATED, {
           bookComponentUploadingUpdated: updatedBookComponent,
@@ -77,6 +84,7 @@ const Controllers = app => {
       if (serviceCallbackToken.length !== 1) {
         throw new Error('unknown service token or conflict')
       }
+
       const uploading = false
       await useCaseUpdateBookComponentContent(
         bookComponentId,

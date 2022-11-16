@@ -29,6 +29,7 @@ class EditoriaUser extends User {
   static async findById(id) {
     return this.find(id)
   }
+
   async hashPassword(pwd) {
     this.passwordHash = await User.hashPassword(pwd)
     delete this.password
@@ -46,8 +47,11 @@ class EditoriaUser extends User {
     options = {},
   ) {
     const { trx } = options
-    const user = await User.query(trx).findById(userId)
-    const isCurrentPasswordValid = await user.validPassword(currentPassword)
+    const foundUser = await User.query(trx).findById(userId)
+
+    const isCurrentPasswordValid = await foundUser.validPassword(
+      currentPassword,
+    )
 
     if (!isCurrentPasswordValid) {
       throw new ValidationError(
@@ -55,7 +59,7 @@ class EditoriaUser extends User {
       )
     }
 
-    if (await user.validPassword(newPassword)) {
+    if (await foundUser.validPassword(newPassword)) {
       throw new ValidationError(
         'Update password: New password must be different from current password',
       )

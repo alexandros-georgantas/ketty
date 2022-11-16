@@ -1,5 +1,5 @@
-const Loader = require('../loader')
 const { model } = require('@pubsweet/model-user')
+const Loader = require('../loader')
 
 const UserLoader = {
   userTeams: new Loader(

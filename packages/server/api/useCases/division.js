@@ -75,14 +75,19 @@ const updateBookComponentOrder = async (
           'divisions',
           { trx: tr },
         )
+
         const { config: divisions } = applicationParameters
+
         const bookComponent = await getBookComponent(bookComponentId, {
           trx: tr,
         })
+
         const sourceDivision = await getDivision(bookComponent.divisionId, {
           trx: tr,
         })
+
         const found = indexOf(sourceDivision.bookComponents, bookComponentId)
+
         if (sourceDivision.id === targetDivisionId) {
           const updatedBookComponents = utils.reorderArray(
             sourceDivision.bookComponents,
@@ -90,6 +95,7 @@ const updateBookComponentOrder = async (
             index,
             found,
           )
+
           await updateDivision(
             sourceDivision.id,
             {
@@ -106,14 +112,17 @@ const updateBookComponentOrder = async (
             },
             { trx: tr },
           )
+
           const targetDivision = await getDivision(targetDivisionId, {
             trx: tr,
           })
+
           const updatedTargetDivisionBookComponents = utils.reorderArray(
             targetDivision.bookComponents,
             bookComponentId,
             index,
           )
+
           const updatedDivision = await updateDivision(
             targetDivision.id,
             {
@@ -121,9 +130,11 @@ const updateBookComponentOrder = async (
             },
             { trx: tr },
           )
+
           const divisionConfig = find(divisions, {
             name: updatedDivision.label,
           })
+
           await updateBookComponent(
             bookComponentId,
             {

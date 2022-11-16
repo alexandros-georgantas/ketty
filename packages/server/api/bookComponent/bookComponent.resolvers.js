@@ -7,15 +7,15 @@ const groupBy = require('lodash/groupBy')
 const pullAll = require('lodash/pullAll')
 const map = require('lodash/map')
 const path = require('path')
-const { extractFragmentProperties, replaceImageSrc } = require('./util')
 const BPromise = require('bluebird')
 
-const { writeLocallyFromReadStream } = require('../helpers/utils')
 const fs = require('fs-extra')
 
 const { logger } = require('@coko/server')
 const { pubsubManager } = require('@coko/server')
 const crypto = require('crypto')
+const { writeLocallyFromReadStream } = require('../helpers/utils')
+const { extractFragmentProperties, replaceImageSrc } = require('./util')
 
 const {
   BookComponentState,
@@ -66,6 +66,7 @@ const getOrderedBookComponents = async bookComponent => {
   ).orderByRaw(
     `label='${'Frontmatter'}' desc, label='${'Body'}' desc, label='${'Backmatter'}' desc`,
   )
+
   const orderedComponent = flattenDeep(
     concat([...map(divisions, division => division.bookComponents)]),
   )
@@ -75,9 +76,11 @@ const getOrderedBookComponents = async bookComponent => {
 
 const getBookComponent = async (_, { id }, ctx) => {
   const bookComponent = await BookComponent.findById(id)
+
   if (!bookComponent) {
     throw new Error(`Book Component with id: ${id} does not exist`)
   }
+
   return bookComponent
 }
 
@@ -297,9 +300,11 @@ const unlockBookComponent = async (_, { input }, ctx) => {
   try {
     const pubsub = await pubsubManager.getPubsub()
     const { id: bookComponentId } = input
+
     const locks = await Lock.query()
       .where('foreignId', bookComponentId)
       .andWhere('deleted', false)
+
     await useCaseUnlockBookComponent(bookComponentId, locks)
 
     const updatedBookComponent = await BookComponent.findById(bookComponentId)
@@ -353,9 +358,8 @@ const updateContent = async (_, { input }, ctx) => {
     const { id, content } = input
     const pubsub = await pubsubManager.getPubsub()
 
-    const {
-      shouldNotifyWorkflowChange,
-    } = await useCaseUpdateBookComponentContent(id, content, 'en')
+    const { shouldNotifyWorkflowChange } =
+      await useCaseUpdateBookComponentContent(id, content, 'en')
 
     const updatedBookComponent = await BookComponent.findById(id)
 
@@ -548,12 +552,15 @@ module.exports = {
   BookComponent: {
     async title(bookComponent, _, ctx) {
       let { title } = bookComponent
+
       if (!title) {
         const bookComponentTranslation = await BookComponentTranslation.query()
           .where('bookComponentId', bookComponent.id)
           .andWhere('languageIso', 'en')
+
         title = bookComponentTranslation[0].title
       }
+
       return title
     },
     async bookId(bookComponent, _, ctx) {
@@ -561,6 +568,7 @@ module.exports = {
     },
     async bookTitle(bookComponent, _, ctx) {
       const book = await Book.findById(bookComponent.bookId)
+
       const bookTranslation = await BookTranslation.query()
         .where('bookId', book.id)
         .andWhere('languageIso', 'en')
@@ -574,14 +582,15 @@ module.exports = {
         'componentType',
         ['toc', 'endnotes'],
       )
-      const transformed = excludeBookComponent.map(
-        bookComponent => bookComponent.id,
-      )
+
+      const transformed = excludeBookComponent.map(bc => bc.id)
 
       const newOrderedComponent = difference(orderedComponent, transformed)
+
       const current = newOrderedComponent.findIndex(
         comp => comp === bookComponent.id,
       )
+
       try {
         const next = newOrderedComponent[current + 1]
         const nextBookComponent = await BookComponent.findById(next)
@@ -600,15 +609,16 @@ module.exports = {
     },
     async prevBookComponent(bookComponent, _, ctx) {
       const orderedComponent = await getOrderedBookComponents(bookComponent)
+
       const excludeBookComponent = await BookComponent.query().whereIn(
         'componentType',
         ['toc', 'endnotes'],
       )
-      const transformed = excludeBookComponent.map(
-        bookComponent => bookComponent.id,
-      )
+
+      const transformed = excludeBookComponent.map(bc => bc.id)
 
       const newOrderedComponent = difference(orderedComponent, transformed)
+
       const current = newOrderedComponent.findIndex(
         comp => comp === bookComponent.id,
       )
@@ -632,11 +642,14 @@ module.exports = {
       const bookComponentTranslation = await BookComponentTranslation.query()
         .where('bookComponentId', bookComponent.id)
         .andWhere('languageIso', 'en')
+
       const content = bookComponentTranslation[0].content || ''
       const hasContent = content.trim().length > 0
+
       if (hasContent) {
         return replaceImageSrc(bookComponentTranslation[0].content)
       }
+
       return bookComponentTranslation[0].content
     },
     async trackChangesEnabled(bookComponent, _, ctx) {
@@ -644,21 +657,25 @@ module.exports = {
         'bookComponentId',
         bookComponent.id,
       )
+
       return bookComponentState[0].trackChangesEnabled
     },
     async hasContent(bookComponent, _, ctx) {
       const bookComponentTranslation = await BookComponentTranslation.query()
         .where('bookComponentId', bookComponent.id)
         .andWhere('languageIso', 'en')
+
       const content = bookComponentTranslation[0].content || ''
       const hasContent = content.trim().length > 0
       return hasContent
     },
     async lock(bookComponent, _, ctx) {
       let locked = null
+
       const lock = await Lock.query()
         .where('foreignId', bookComponent.id)
         .andWhere('deleted', false)
+
       if (lock.length > 0) {
         const user = await User.findById(lock[0].userId)
         locked = {
@@ -671,13 +688,17 @@ module.exports = {
           id: lock[0].id,
         }
       }
+
       return locked
     },
     async componentTypeOrder(bookComponent, _, ctx) {
       const { componentType } = bookComponent
-      const sortedPerDivision = await ctx.connectors.DivisionLoader.model.bookComponents.load(
-        bookComponent.divisionId,
-      )
+
+      const sortedPerDivision =
+        await ctx.connectors.DivisionLoader.model.bookComponents.load(
+          bookComponent.divisionId,
+        )
+
       const groupedByType = groupBy(
         pullAll(sortedPerDivision, [undefined]),
         'componentType',
@@ -692,9 +713,12 @@ module.exports = {
     },
     async uploading(bookComponent, _, ctx) {
       ctx.connectors.BookComponentStateLoader.model.state.clear()
-      const bookComponentState = await ctx.connectors.BookComponentStateLoader.model.state.load(
-        bookComponent.id,
-      )
+
+      const bookComponentState =
+        await ctx.connectors.BookComponentStateLoader.model.state.load(
+          bookComponent.id,
+        )
+
       return bookComponentState[0].uploading
     },
     async pagination(bookComponent, _, ctx) {
@@ -702,9 +726,12 @@ module.exports = {
     },
     async workflowStages(bookComponent, _, ctx) {
       ctx.connectors.BookComponentStateLoader.model.state.clear()
-      const bookComponentState = await ctx.connectors.BookComponentStateLoader.model.state.load(
-        bookComponent.id,
-      )
+
+      const bookComponentState =
+        await ctx.connectors.BookComponentStateLoader.model.state.load(
+          bookComponent.id,
+        )
+
       return bookComponentState[0].workflowStages || null
     },
 
@@ -716,6 +743,7 @@ module.exports = {
       const book = await Book.findById(bookComponent.bookId)
       const hasThreeLevels = book.bookStructure.levels.length > 2
       let bookStructureElements
+
       if (!hasThreeLevels) {
         bookStructureElements = [
           {
@@ -1057,6 +1085,7 @@ module.exports = {
           },
         ]
       }
+
       return bookStructureElements
     },
   },

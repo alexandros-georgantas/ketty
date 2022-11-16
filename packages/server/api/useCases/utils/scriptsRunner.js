@@ -42,6 +42,7 @@ const scriptsRunner = async (book, template) => {
       const constructedScriptPath = `${process.cwd()}/${scriptsRootFolder}/${
         foundScript.filename
       }`
+
       if (!fs.existsSync(constructedScriptPath)) {
         throw new Error(
           `the script file declared in the config does not exist under ${process.cwd()}/${scriptsRootFolder}/`,
@@ -51,20 +52,24 @@ const scriptsRunner = async (book, template) => {
       paths.push(constructedScriptPath)
     }
 
+    /* eslint-disable global-require, import/no-dynamic-require */
     const scripts = paths.map(path => require(path))
+    /* eslint-enable global-require, import/no-dynamic-require */
 
     await Promise.all(
       map(ids, async id => {
         const content = bookComponents[id]
+
         if (content && content.length > 0) {
           return (bookComponents[id] = await scripts.reduce(
             async (accumulated, currentFunc) => {
-              const content = await accumulated
-              return currentFunc(content)
+              const modifiedContent = await accumulated
+              return currentFunc(modifiedContent)
             },
             content,
           ))
         }
+
         return bookComponents[id]
       }),
     )
