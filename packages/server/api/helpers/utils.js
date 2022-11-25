@@ -22,7 +22,7 @@ const writeLocallyFromReadStream = async (
   encoding,
 ) => {
   try {
-    const pathExists = await fs.ensureDir(pathArg)
+    const pathExists = await fs.pathExists(pathArg)
 
     if (!pathExists) throw new Error(`path ${pathArg} does not exists`)
 
@@ -47,7 +47,7 @@ const writeLocallyFromReadStream = async (
 
 const saveDataLocally = async (pathArg, filename, data, encoding) => {
   try {
-    const pathExists = await fs.ensureDir(pathArg)
+    const pathExists = await fs.pathExists(pathArg)
 
     if (!pathExists) throw new Error(`path ${pathArg} does not exists`)
 
