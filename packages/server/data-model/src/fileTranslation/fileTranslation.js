@@ -1,6 +1,6 @@
-const { string } = require('../helpers').schema
-
 const { Model } = require('objection')
+
+const { string } = require('../helpers').schema
 
 const Translation = require('../translation')
 const { id } = require('../helpers').schema
@@ -16,7 +16,10 @@ class FileTranslation extends Translation {
   }
 
   static get relationMappings() {
+    /* eslint-disable global-require */
     const { model: File } = require('../file')
+    /* eslint-enable global-require */
+
     return {
       file: {
         relation: Model.BelongsToOneRelation,

@@ -19,6 +19,7 @@ const searchForUsers = async (search, exclude, options = {}) => {
         if (!search) {
           return []
         }
+
         const allUsers = await User.query(tr).where({ deleted: false })
         const searchLow = search.toLowerCase()
         const res = []
@@ -29,6 +30,7 @@ const searchForUsers = async (search, exclude, options = {}) => {
           )
           forEach(allUsers, user => {
             if (user.admin) return
+
             if (isValidUser(user)) {
               if (
                 (startsWith(
@@ -67,8 +69,10 @@ const searchForUsers = async (search, exclude, options = {}) => {
           )
           forEach(allUsers, user => {
             if (user.admin) return
+
             if (isValidUser(user)) {
               const fullname = `${user.givenName} ${user.surname}`
+
               if (
                 (get(user, 'username', '')
                   .toLowerCase()
@@ -127,6 +131,7 @@ const createEditoriaUser = async (
     return useTransaction(
       async tr => {
         logger.info('>>> checking if user already exists')
+
         const usersExist = await User.query(tr).where({
           username,
           email,
@@ -138,9 +143,11 @@ const createEditoriaUser = async (
           if (user.username === username) {
             errors.push('username')
           }
+
           if (user.surname === surname && user.givenName === givenName) {
             errors.push('name')
           }
+
           if (user.email === email) {
             errors.push('email')
           }
@@ -158,6 +165,7 @@ const createEditoriaUser = async (
           email,
           username,
         })
+
         logger.info(`>>> user created with id ${newUser.id}`)
         return newUser
       },
@@ -184,6 +192,7 @@ const updatePassword = async (
           newPassword,
           { trx: tr },
         )
+
         logger.info(`>>> password updated for user with id ${u.id}`)
         return u.id
       },
@@ -208,6 +217,7 @@ const updatePersonalInformation = async (
           givenName,
           surname,
         })
+
         logger.info(`>>> user info updated for user with id ${userId}`)
         return updatedUser
       },
@@ -224,6 +234,7 @@ const sendPasswordResetEmail = async (username, options = {}) => {
     return useTransaction(
       async tr => {
         const serveClient = config.get('pubsweet-server.serveClient')
+
         const externalServerURL = config.get(
           'pubsweet-server.externalServerURL',
         )
@@ -244,6 +255,7 @@ const sendPasswordResetEmail = async (username, options = {}) => {
         const pathToPage = config.has('password-reset.path')
           ? config.get('password-reset.path')
           : '/password-reset'
+
         const tokenLength = config.has('password-reset.token-length')
           ? config.get('password-reset.token-length')
           : 32
@@ -253,11 +265,13 @@ const sendPasswordResetEmail = async (username, options = {}) => {
         if (result.length !== 1) {
           throw new Error(`user with username ${username} does not exist`)
         }
+
         const user = result[0]
 
         const passwordResetToken = crypto
           .randomBytes(tokenLength)
           .toString('hex')
+
         const passwordResetTimestamp = new Date()
 
         logger.info(
@@ -270,6 +284,7 @@ const sendPasswordResetEmail = async (username, options = {}) => {
         logger.info(
           `>>> user with id ${user.id} patched with password reset token info`,
         )
+
         const token = querystring.encode({
           username,
           token: passwordResetToken,

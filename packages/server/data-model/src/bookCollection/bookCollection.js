@@ -17,7 +17,9 @@ class BookCollection extends Base {
   }
 
   static get relationMappings() {
+    /* eslint-disable global-require */
     const { model: Book } = require('../book') // avoid require loop
+    /* eslint-enable global-require */
 
     return {
       books: {

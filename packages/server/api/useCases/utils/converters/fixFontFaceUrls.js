@@ -15,8 +15,11 @@ module.exports = (content, fonts, where) => {
         for (let i = 0; i < fonts.length; i += 1) {
           const pattern = `\\b${fonts[i].originalFilename}\\b`
           const regExp = new RegExp(pattern, 'g')
+
           if (regExp.test(temp)) {
+            /* eslint-disable no-param-reassign */
             node.value.value = `"${where}/${fonts[i].originalFilename}"`
+            /* eslint-enable no-param-reassign */
           }
         }
       }

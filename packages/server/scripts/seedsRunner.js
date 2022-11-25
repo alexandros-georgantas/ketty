@@ -1,5 +1,6 @@
 const { logger } = require('@coko/server')
 const config = require('config')
+
 const {
   createAdminUser,
   createApplicationParams,

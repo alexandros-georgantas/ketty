@@ -1,5 +1,6 @@
 const assign = require('lodash/assign')
 const { logger, useTransaction } = require('@coko/server')
+
 const {
   BookComponentState,
   BookComponent,
@@ -22,6 +23,7 @@ const bookComponentCreator = async (
         logger.info(
           `>>> creating book component for book with id ${bookId} inside division with id ${divisionId}`,
         )
+
         if (bookComponentId) {
           logger.info(`>>> enforcing book component id ${bookComponentId}`)
           newBookComponent = await BookComponent.query(tr).insert({
@@ -77,12 +79,15 @@ const bookComponentCreator = async (
           bookComponentWorkflowStages = {
             workflowStages: workflowStages.map(stage => {
               let value = -1
+
               if (stage.type === 'upload') {
                 value = 1
               }
+
               if (stage.type === 'file_prep') {
                 value = 0
               }
+
               return {
                 type: stage.type,
                 label: stage.title,

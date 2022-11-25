@@ -7,10 +7,12 @@ const { ServiceCredential } = require('./data-model/src').models
 
 const scripts = config.get('export.scripts')
 const services = config.get('services')
+
 const serviceHandshake = async (which) => {
   if (!services) {
     throw new Error('services are undefined')
   }
+
   const service = get(services, `${which}`)
 
   if (!service) {
@@ -22,15 +24,19 @@ const serviceHandshake = async (which) => {
   const base64data = buff.toString('base64')
 
   const serverUrl = `${protocol}://${host}${port ? `:${port}` : ''}`
+
   const serviceHealthCheck = await axios({
     method: 'get',
     url: `${serverUrl}/healthcheck`,
   })
+
   const { data: healthCheckData } = serviceHealthCheck
   const { message } = healthCheckData
+
   if (message !== 'Coolio') {
     throw new Error(`service ${which} is down`)
   }
+
   return new Promise((resolve, reject) => {
     axios({
       method: 'post',
@@ -47,9 +53,11 @@ const serviceHandshake = async (which) => {
       })
       .catch((err) => {
         const { response } = err
+
         if (!response) {
           return reject(new Error(`Request failed with message: ${err.code}`))
         }
+
         const { status, data } = response
         const { msg } = data
         return reject(
@@ -72,12 +80,15 @@ const init = async () => {
           if (findIndex(serviceCredentials, { name }) === -1) {
             return serviceHandshake(name)
           }
+
           return false
         }),
       )
     }
+
     if (scripts && scripts.length > 0) {
       const errors = []
+
       for (let i = 0; i < scripts.length; i += 1) {
         for (let j = i + 1; j < scripts.length; j += 1) {
           if (
@@ -89,6 +100,7 @@ const init = async () => {
               `your have provided the same label (${scripts[i].label}) for two different scripts`,
             )
           }
+
           if (
             scripts[i].label === scripts[j].label &&
             scripts[i].filename === scripts[j].filename &&
@@ -100,6 +112,7 @@ const init = async () => {
           }
         }
       }
+
       if (errors.length !== 0) {
         throw new Error(errors)
       }

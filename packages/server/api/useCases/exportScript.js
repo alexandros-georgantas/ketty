@@ -6,9 +6,11 @@ const scripts = config.get('export.scripts')
 const getExportScripts = async (scope = undefined) => {
   try {
     let res = []
+
     if (!scripts || scripts.length === 0) {
       return res
     }
+
     if (!scope) {
       res = scripts.map(script => ({
         label: `${script.label} (${script.scope})`,
@@ -17,6 +19,7 @@ const getExportScripts = async (scope = undefined) => {
       }))
       return res
     }
+
     forEach(scripts, script => {
       if (script.scope.toLowerCase() === scope.toLowerCase()) {
         res.push({

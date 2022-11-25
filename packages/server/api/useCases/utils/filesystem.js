@@ -9,6 +9,7 @@ const writeFile = (location, content) =>
       return resolve()
     })
   })
+
 const readFile = location =>
   new Promise((resolve, reject) => {
     fs.readFile(location, 'utf8', (err, data) => {
@@ -31,6 +32,7 @@ const execCommand = cmd =>
       if (error) {
         return reject(error)
       }
+
       return resolve(stdout || stderr)
     })
   })

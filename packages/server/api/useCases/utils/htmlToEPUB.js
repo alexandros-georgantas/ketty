@@ -9,8 +9,9 @@ const config = require('config')
 const get = require('lodash/get')
 const map = require('lodash/map')
 const filter = require('lodash/filter')
-const { writeFile, readFile } = require('./filesystem')
 const beautify = require('js-beautify').html
+
+const { writeFile, readFile } = require('./filesystem')
 const { epubDecorator, fixFontFaceUrls } = require('./converters')
 
 const { locallyDownloadFile, signURL } = require('../objectStorage')
@@ -85,11 +86,13 @@ const createContainer = async metaInfPath => {
       .end({
         pretty: true,
       })
+
     return writeFile(`${metaInfPath}/container.xml`, container)
   } catch (e) {
     throw new Error(e)
   }
 }
+
 const gatherAssets = async (book, templateFiles, epubFolder) => {
   for (let i = 0; i < templateFiles.length; i += 1) {
     const { id: dbId, objectKey, mimetype, extension, name } = templateFiles[i]
@@ -119,6 +122,7 @@ const gatherAssets = async (book, templateFiles, epubFolder) => {
       })
     }
   }
+
   if (stylesheets.length === 0) {
     throw new Error(
       'No stylesheet file exists in the selected template, export aborted',
@@ -167,32 +171,34 @@ const gatherAssets = async (book, templateFiles, epubFolder) => {
       $('figure').each((index, node) => {
         const $node = $(node)
         const srcExists = $node.attr('src')
+
         if (srcExists) {
           $node.removeAttr('src')
         }
       })
-
+      /* eslint-disable no-param-reassign */
       bookComponent.content = $.html('body')
+      /* eslint-enable no-param-reassign */
     })
   })
 }
 
-const transferAssets = async (images, stylesheets, fonts) => {
+const transferAssets = async (imagesParam, stylesheetsParam, fontsParam) => {
   try {
     await Promise.all(
-      map(images, async image => {
+      map(imagesParam, async image => {
         const { objectKey, target } = image
         return locallyDownloadFile(objectKey, target)
       }),
     )
     await Promise.all(
-      map(stylesheets, async stylesheet => {
+      map(stylesheetsParam, async stylesheet => {
         const { objectKey, target } = stylesheet
         return locallyDownloadFile(objectKey, target)
       }),
     )
     await Promise.all(
-      map(fonts, async font => {
+      map(fontsParam, async font => {
         const { objectKey, target } = font
         return locallyDownloadFile(objectKey, target)
       }),
@@ -209,8 +215,10 @@ const decorateText = async (book, hasEndnotes) => {
   const backDivision = book.divisions.get('back')
   let endnotesComponent
   let id
+
   if (hasEndnotes) {
     endnotesComponent = backDivision.bookComponents.get('endnotes')
+
     if (endnotesComponent) {
       // for the case where there isn't any notes inside of the book
       id = endnotesComponent.id
@@ -219,6 +227,7 @@ const decorateText = async (book, hasEndnotes) => {
 
   book.divisions.forEach((division, divisionId) => {
     division.bookComponents.forEach((bookComponent, bookComponentId) => {
+      /* eslint-disable no-param-reassign */
       bookComponent.content = epubDecorator(
         bookComponent,
         book.title,
@@ -226,6 +235,7 @@ const decorateText = async (book, hasEndnotes) => {
         hasEndnotes,
         id,
       )
+      /* eslint-enable no-param-reassign */
     })
   })
 }
@@ -257,6 +267,7 @@ const generateTOCNCX = async (book, epubFolder) => {
       }
     })
   })
+
   const toc = {
     ncx: {
       '@xmlns': 'http://www.daisy.org/z3986/2005/ncx/',
@@ -291,14 +302,17 @@ const generateTOCNCX = async (book, epubFolder) => {
       },
     },
   }
+
   const output = builder.create(toc, { encoding: 'UTF-8' }).end({
     pretty: true,
   })
+
   return writeFile(`${epubFolder.oebps}/toc.ncx`, output)
 }
 
 const generateContentOPF = async (book, epubFolder) => {
   const { metadata, title, updated } = book
+
   const {
     isbn,
     issn,
@@ -309,9 +323,11 @@ const generateContentOPF = async (book, epubFolder) => {
     authors,
     publicationDate,
   } = metadata
+
   const spineData = []
   const manifestData = []
   const identifier = isbn || issn || issnL
+
   const rights = filter(
     [copyrightYear, copyrightHolder, copyrightStatement],
     item => item && item.length > 0,
@@ -344,15 +360,19 @@ const generateContentOPF = async (book, epubFolder) => {
         '@id': `comp-number-${id}`,
         '@media-type': 'application/xhtml+xml',
       }
+
       if (hasMath) {
         tempManifestItem['@properties'] = 'mathml'
       }
+
       if (componentType === 'toc') {
         tempManifestItem['@properties'] = 'nav'
       }
+
       manifestData.push(tempManifestItem)
     })
   })
+
   for (let i = 0; i < images.length; i += 1) {
     manifestData.push({
       '@href': `Images/${images[i].objectKey}`,
@@ -360,6 +380,7 @@ const generateContentOPF = async (book, epubFolder) => {
       '@media-type': `${images[i].mimetype}`,
     })
   }
+
   for (let i = 0; i < fonts.length; i += 1) {
     manifestData.push({
       '@href': `Fonts/${fonts[i].originalFilename}`,
@@ -367,6 +388,7 @@ const generateContentOPF = async (book, epubFolder) => {
       '@media-type': `${fonts[i].mimetype}`,
     })
   }
+
   for (let i = 0; i < stylesheets.length; i += 1) {
     manifestData.push({
       '@href': `Styles/${stylesheets[i].originalFilename}`,
@@ -380,6 +402,7 @@ const generateContentOPF = async (book, epubFolder) => {
     '@id': 'ncx',
     '@media-type': 'application/x-dtbncx+xml',
   })
+
   const contentOPF = {
     package: {
       '@prefix':
@@ -408,6 +431,7 @@ const generateContentOPF = async (book, epubFolder) => {
       },
     },
   }
+
   if (identifier) {
     contentOPF.package.metadata['dc:identifier'] = {
       '@id': 'BookId',
@@ -426,16 +450,19 @@ const generateContentOPF = async (book, epubFolder) => {
       '#text': `urn:uuid:${book.id}`,
     }
   }
+
   if (publicationDate) {
     contentOPF.package.metadata['dc:date'] = {
       '#text': publicationDate,
     }
   }
+
   if (rights) {
     contentOPF.package.metadata['dc:rights'] = {
       '#text': rights,
     }
   }
+
   if (copyrightHolder) {
     contentOPF.package.metadata['dc:publisher'] = { '#text': copyrightHolder }
   }
@@ -443,6 +470,7 @@ const generateContentOPF = async (book, epubFolder) => {
   const output = builder.create(contentOPF, { encoding: 'UTF-8' }).end({
     pretty: true,
   })
+
   return writeFile(`${epubFolder.oebps}/content.opf`, output)
 }
 
@@ -466,8 +494,8 @@ const convertToXML = async content => {
         // console.warn(result.errlog)
         try {
           resolve(result.output.toString())
-        } catch (err) {
-          console.error(err)
+        } catch (e) {
+          console.error(e)
           reject(new Error('There was an error loading the document'))
         }
       }
@@ -513,9 +541,11 @@ const transferTexts = async texts => {
     await Promise.all(
       map(texts, async text => {
         const { content, target } = text
+
         const tidyContent = await convertToXML(
           `<?xml version="1.0" encoding="utf-8"?>${content}`,
         )
+
         return writeFile(target, beautify(tidyContent))
       }),
     )

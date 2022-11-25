@@ -1,10 +1,11 @@
-const { editoriaDataModel } = require('../data-model')
 const map = require('lodash/map')
 const get = require('lodash/get')
 const assign = require('lodash/assign')
 
-const { models } = editoriaDataModel
 const config = require('config')
+const { editoriaDataModel } = require('../data-model')
+
+const { models } = editoriaDataModel
 
 const {
   Book,
@@ -31,6 +32,7 @@ const createBookComponents = async () => {
           archived: false,
           deleted: false,
         }
+
         const createdBookComponent = await new BookComponent(
           newBookComponent,
         ).save()
@@ -70,6 +72,7 @@ const createBookComponents = async () => {
     throw new Error(e)
   }
 }
+
 module.exports = createBookComponents
 
 createBookComponents()

@@ -7,6 +7,7 @@ const {
   BookCollectionTranslation,
   BookTranslation,
 } = require('../../data-model/src').models
+
 const {
   useCaseGetBookCollection,
   useCaseGetBookCollections,
@@ -14,6 +15,7 @@ const {
   useCaseGetEntityTeam,
   useCaseGetBooks,
 } = require('../useCases')
+
 const { COLLECTION_ADDED } = require('./consts')
 
 const getBookCollection = async (_, { input }, ctx) => {
@@ -55,6 +57,7 @@ const createBookCollection = async (_, { input }, ctx) => {
       title,
       languageIso,
     )
+
     logger.info(
       'book collection resolver: broadcasting new book collection to clients',
     )
@@ -85,12 +88,15 @@ module.exports = {
     },
     async books(bookCollection, { ascending, sortKey, archived }, ctx, info) {
       const books = await useCaseGetBooks(bookCollection.id, archived, ctx.user)
+
       const sortable = await Promise.all(
         map(books, async book => {
           const translation = await BookTranslation.query()
             .where('bookId', book.id)
             .andWhere('languageIso', 'en')
+
           const { title } = translation[0]
+
           const authorsTeam = await useCaseGetEntityTeam(
             book.id,
             'book',
@@ -99,9 +105,11 @@ module.exports = {
           )
 
           let auth = 'z'
+
           if (authorsTeam && authorsTeam.members.length > 0) {
             auth = authorsTeam.members[0].surname
           }
+
           let status = 0
 
           if (book.publicationDate !== null) {
@@ -109,12 +117,14 @@ module.exports = {
             const inTimestamp = new Date(date).getTime()
             const nowDate = new Date()
             const nowTimestamp = nowDate.getTime()
+
             if (inTimestamp <= nowTimestamp) {
               status = 1
             } else {
               status = 0
             }
           }
+
           return {
             id: book.id,
             title: title.toLowerCase().trim(),
@@ -126,12 +136,14 @@ module.exports = {
 
       const order = ascending ? 'asc' : 'desc'
       const sorter = []
+
       if (sortKey === 'title') {
         sorter.push(sortKey)
       } else {
         sorter.push(sortKey)
         sorter.push('title')
       }
+
       const sorted = orderBy(sortable, sorter, [order])
       const result = map(sorted, item => find(books, { id: item.id }))
       return result

@@ -12,6 +12,7 @@ const imageGatherer = book => {
         const $node = $(node)
 
         const url = $node.attr('src')
+
         if (!url.includes('data:image')) {
           if ($node.attr('data-fileid')) {
             images.push({

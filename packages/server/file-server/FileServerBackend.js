@@ -18,6 +18,7 @@ const FileServerBackend = app => {
   app.use('/api/fileserver/cleanup/:scope/:hash', async (req, res, next) => {
     const { scope, hash } = req.params
     const path = `${process.cwd()}/${uploadsDir}/${scope}/${hash}`
+
     try {
       await fse.remove(path)
       res.end()

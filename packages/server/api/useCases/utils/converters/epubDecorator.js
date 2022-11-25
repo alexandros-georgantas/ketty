@@ -12,6 +12,7 @@ const editoriaToEPUBPropertiesMapper = {
   appendix: 'appendix',
   endnotes: 'endnotes',
 }
+
 const editoriaExtra = {
   halftitle: 'halftitlepage',
   titlepage: 'titlepage',
@@ -50,6 +51,7 @@ module.exports = (
     'epub:type': editoriaToEPUBPropertiesMapper[componentType],
     role: `doc-${editoriaToEPUBPropertiesMapper[componentType]}`,
   })
+
   if (componentType !== 'toc') {
     if (editoriaToEPUBPropertiesMapper[componentType]) {
       $('section').attr({
@@ -57,6 +59,7 @@ module.exports = (
         role: `doc-${editoriaToEPUBPropertiesMapper[componentType]}`,
       })
     }
+
     if (editoriaExtra[componentType]) {
       $('section').attr({
         'epub:type': editoriaToEPUBPropertiesMapper[componentType],
@@ -67,6 +70,7 @@ module.exports = (
   $('.note-callout').each((i, elem) => {
     const $elem = $(elem)
     $elem.attr('epub:type', 'noteref')
+
     if (hasEndnotes) {
       const link = $elem.attr('href')
 

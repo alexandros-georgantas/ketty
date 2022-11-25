@@ -1,13 +1,17 @@
+const userLoaderModel = require('./loaders/userLoader')
+const bookComponentStateLoaderModel = require('./loaders/bookComponentStateLoader')
+const divisionLoaderModel = require('./loaders/divisionLoader')
+
 module.exports = {
   models: [
-    { modelName: 'UserLoader', model: require('./loaders/userLoader') },
+    { modelName: 'UserLoader', model: userLoaderModel },
     {
       modelName: 'BookComponentStateLoader',
-      model: require('./loaders/bookComponentStateLoader'),
+      model: bookComponentStateLoaderModel,
     },
     {
       modelName: 'DivisionLoader',
-      model: require('./loaders/divisionLoader'),
+      model: divisionLoaderModel,
     },
   ],
 }

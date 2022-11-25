@@ -8,6 +8,7 @@ const getCustomTags = async (options = {}) => {
       async tr => {
         logger.info('>>> fetching all the custom tags')
         const customTags = await CustomTag.query(tr).where({ deleted: false })
+
         if (!customTags) {
           throw new Error(`CustomTags error: Could not fetch Tags`)
         }
@@ -30,6 +31,7 @@ const addCustomTag = async (label, tagType, options = {}) => {
           label,
           tagType,
         })
+
         logger.info(`>>> new custom tag created with id ${newCustomTag.id}`)
         return newCustomTag
       },

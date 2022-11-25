@@ -1,11 +1,8 @@
 const map = require('lodash/map')
 const config = require('config')
-const {
-  Book,
-  BookComponent,
-  BookComponentState,
-  ApplicationParameter,
-} = require('../../data-model/src').models
+
+const { Book, BookComponent, BookComponentState, ApplicationParameter } =
+  require('../../data-model/src').models
 
 const {
   canAddBooks,
@@ -61,7 +58,7 @@ const getDashBoardRules = async (_, args, ctx) => {
     map(books, async value => {
       const data = await executeMultipleAuthorizeRules(ctx, value, dashboard)
 
-      return Object.assign({}, { id: value.id }, data)
+      return { id: value.id, ...data }
     }),
   )
 
@@ -80,6 +77,7 @@ const getBookBuilderRules = async (_, args, ctx) => {
 
   await ctx.connectors.UserLoader.model.userTeams.clear()
   const book = await Book.find(args.id)
+
   const bookComponents = await BookComponent.query().where({
     deleted: false,
     bookId: args.id,
@@ -100,32 +98,36 @@ const getBookBuilderRules = async (_, args, ctx) => {
 
   const teamRoles = await Promise.all(
     map(Object.keys(config.get('authsome.teams')), async role => {
-      const data = await executeMultipleAuthorizeRules(
+      const rules = await executeMultipleAuthorizeRules(
         ctx,
         { id: book.id, role },
         {
           canRemoveTeamMember,
         },
       )
-      return Object.assign({}, { role }, data)
+
+      return { role, ...rules }
     }),
   )
 
-  const data = await executeMultipleAuthorizeRules(ctx, book, bookBuilder)
-
-  const result = Object.assign(
-    {},
-    { id: book.id },
-    { canViewAddTeamMember: canViewAddTeamMembers.canViewAddTeamMember },
-    { teamRoles },
-    data,
+  const bookComponentRules = await executeMultipleAuthorizeRules(
+    ctx,
+    book,
+    bookBuilder,
   )
+
+  const result = {
+    id: book.id,
+    canViewAddTeamMember: canViewAddTeamMembers.canViewAddTeamMember,
+    teamRoles,
+    ...bookComponentRules,
+  }
 
   result.bookComponentStateRules = await Promise.all(
     map(bookComponentState, async value => {
-      const data = await Promise.all(
+      const stage = await Promise.all(
         map(bookBuilderAppConfig[0].config, async v => {
-          const data = await executeMultipleAuthorizeRules(
+          const rules = await executeMultipleAuthorizeRules(
             ctx,
             {
               bookId: book.id,
@@ -137,25 +139,22 @@ const getBookBuilderRules = async (_, args, ctx) => {
 
           // const data = map(workFlowStages, key => {let data={}; data[key] = true; return data; })
 
-          return Object.assign({}, { type: v.type }, data)
+          return { type: v.type, ...rules }
         }),
       )
 
       const canViewFragmentEdits = await executeMultipleAuthorizeRules(
         ctx,
-        Object.assign({}, { bookId: book.id }, value),
+        { bookId: book.id, ...value },
         { canViewFragmentEdit },
       )
 
-      return Object.assign(
-        {},
-        {
-          id: value.id,
-          bookComponentId: value.bookComponentId,
-          canViewFragmentEdit: canViewFragmentEdits.canViewFragmentEdit,
-        },
-        { stage: data },
-      )
+      return {
+        id: value.id,
+        bookComponentId: value.bookComponentId,
+        canViewFragmentEdit: canViewFragmentEdits.canViewFragmentEdit,
+        stage,
+      }
     }),
   )
 
@@ -175,7 +174,7 @@ const getWaxRules = async (_, args, ctx) => {
 
   const data = await executeMultipleAuthorizeRules(ctx, bookComponent, editor)
 
-  return Object.assign({}, data)
+  return { ...data }
 }
 
 module.exports = {

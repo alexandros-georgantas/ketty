@@ -15,6 +15,7 @@ const {
   useCaseDeleteTemplate,
   useCaseUpdateTemplateCSSFile,
 } = require('../useCases')
+
 const exporter = require('../useCases/utils/exporter')
 
 const getTemplates = async (_, { ascending, sortKey, target, notes }, ctx) => {
@@ -25,6 +26,7 @@ const getTemplates = async (_, { ascending, sortKey, target, notes }, ctx) => {
     throw new Error(e)
   }
 }
+
 const getTemplate = async (_, { id }, ctx) => {
   logger.info('template resolver: use case getTemplate')
   return useCaseGetTemplate(id)
@@ -42,6 +44,7 @@ const createTemplate = async (_, { input }, ctx) => {
       notes,
       exportScripts,
     } = input
+
     const pubsub = await pubsubManager.getPubsub()
 
     logger.info('template resolver: use case createTemplate')

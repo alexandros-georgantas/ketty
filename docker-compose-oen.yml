@@ -19,8 +19,8 @@ services:
     environment:
       - NODE_ENV=development
       - CLIENT_PORT=${CLIENT_PORT:-4000}
-      - FEATURE_UPLOAD_DOCX_FILES=${FEATURE_UPLOAD_DOCX_FILES:-true}
-      - FEATURE_BOOK_STRUCTURE=${FEATURE_BOOK_STRUCTURE:-false}
+      - FEATURE_UPLOAD_DOCX_FILES=${FEATURE_UPLOAD_DOCX_FILES:-false}
+      - FEATURE_BOOK_STRUCTURE=${FEATURE_BOOK_STRUCTURE:-true}
       - CLIENT_HOST=0.0.0.0
       - SERVER_PROTOCOL=${SERVER_PROTOCOL:-http}
       - SERVER_HOST=${SERVER_HOST:-localhost}
@@ -163,8 +163,8 @@ services:
       - SERVICE_XSWEET_PROTOCOL=${SERVICE_XSWEET_PROTOCOL:-http}
       - SERVICE_XSWEET_HOST=${SERVICE_XSWEET_HOST:-xsweet}
       - SERVICE_XSWEET_PORT=${SERVICE_XSWEET_PORT:-3004}
-      - FEATURE_BOOK_STRUCTURE=${FEATURE_BOOK_STRUCTURE:-false}
-      - FEATURE_UPLOAD_DOCX_FILES=${FEATURE_UPLOAD_DOCX_FILES:-true}
+      - FEATURE_BOOK_STRUCTURE=${FEATURE_BOOK_STRUCTURE:-true}
+      - FEATURE_UPLOAD_DOCX_FILES=${FEATURE_UPLOAD_DOCX_FILES:-false}
     volumes:
       - ./packages/server/config:/home/node/editoria/config
       - ./packages/server/api:/home/node/editoria/api

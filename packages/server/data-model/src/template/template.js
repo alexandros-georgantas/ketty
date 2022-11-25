@@ -1,13 +1,9 @@
 const { Model } = require('objection')
 const remove = require('lodash/remove')
 const Base = require('../editoriaBase')
-const {
-  id,
-  stringNotEmpty,
-  string,
-  targetType,
-  notesType,
-} = require('../helpers').schema
+
+const { id, stringNotEmpty, string, targetType, notesType } =
+  require('../helpers').schema
 
 class Template extends Base {
   constructor(properties) {
@@ -39,8 +35,9 @@ class Template extends Base {
   }
 
   static get relationMappings() {
+    /* eslint-disable global-require */
     const { model: File } = require('../file')
-
+    /* eslint-enable global-require */
     return {
       files: {
         relation: Model.HasManyRelation,
@@ -64,17 +61,22 @@ class Template extends Base {
   async getFiles(tr = undefined) {
     const { thumbnailId } = this
     const associatedFiles = await this.$relatedQuery('files', tr)
+
     if (thumbnailId) {
       remove(associatedFiles, file => file.id === thumbnailId)
     }
+
     remove(associatedFiles, file => file.deleted === true)
     return associatedFiles
   }
+
   async getThumbnail(tr = undefined) {
     const { thumbnailId } = this
+
     if (thumbnailId) {
       return this.$relatedQuery('thumbnail', tr)
     }
+
     return null
   }
 }

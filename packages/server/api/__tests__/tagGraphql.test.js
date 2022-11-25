@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-commented-out-tests */
 // const { CustomTag } = require('../../data-model/src').models
 // const omit = require('lodash/omit')
 // const pick = require('lodash/pick')

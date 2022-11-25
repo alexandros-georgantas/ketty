@@ -1,3 +1,4 @@
+const merge = require('lodash/merge')
 const authorize = require('./authorize')
 const applicationParameter = require('./applicationParameter')
 const book = require('./book')
@@ -14,7 +15,6 @@ const template = require('./template')
 // const bookTranslation = require('./bookTranslation')
 const file = require('./file')
 const exportScript = require('./exportScript')
-const merge = require('lodash/merge')
 
 module.exports = {
   typeDefs: [

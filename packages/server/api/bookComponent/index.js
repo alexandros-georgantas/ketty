@@ -1,9 +1,12 @@
 const models = require('../../data-model')
+const resolvers = require('./bookComponent.resolvers')
+
+const typeDefs = require('../graphqlLoaderUtil')(
+  'bookComponent/bookComponent.graphql',
+)
 
 module.exports = {
-  resolvers: require('./bookComponent.resolvers'),
-  typeDefs: require('../graphqlLoaderUtil')(
-    'bookComponent/bookComponent.graphql',
-  ),
+  resolvers,
+  typeDefs,
   model: models.bookComponent,
 }

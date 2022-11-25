@@ -14,6 +14,7 @@ const epubArchiver = async (tempFolder, target) => {
         target,
         `${crypto.randomBytes(32).toString('hex')}.epub`,
       )
+
       const output = fs.createWriteStream(destination)
       const archive = archiver('zip')
 

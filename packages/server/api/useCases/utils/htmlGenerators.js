@@ -5,11 +5,16 @@ const paginationExtractor = pagination => {
 
   if (both) {
     return 'start-left start-right'
-  } else if (pagination.left) {
+  }
+
+ if (pagination.left) {
     return 'start-left'
-  } else if (pagination.right) {
+  }
+
+ if (pagination.right) {
     return 'start-right'
   }
+
   return ''
 }
 
@@ -28,8 +33,10 @@ const generateContainer = (
     division,
     number,
   } = bookComponent
+
   let output
   const levelClass = level ? `level-${level}` : undefined
+
   if (componentType === 'toc') {
     output = cheerio.load(
       `<section id="comp-number-${id}"  class="component-${division} ${componentType} ${paginationExtractor(
@@ -49,9 +56,11 @@ const generateContainer = (
     )
   } else {
     let componentNumber
+
     if (componentType === 'chapter' || componentType === 'part') {
       componentNumber = `<span class="${componentType}-number">${number}</span>`
     }
+
     output = cheerio.load(
       `<section id="comp-number-${id}"  class="component-${division} ${levelClass ||
         ''} ${componentType} ${paginationExtractor(pagination)}">${
@@ -61,6 +70,7 @@ const generateContainer = (
         '&#xA0;'}</div><header>${componentNumber || ''}</header></section>`,
     )
   }
+
   return output('body').html()
 }
 
@@ -69,6 +79,7 @@ const generatePagedjsContainer = bookTitle => {
     `<!DOCTYPE html><html><head><title>${bookTitle}</title>
     <meta charset="UTF-8"></head><body class="hyphenate" lang="en-us"></body></html>`,
   )
+
   return output.html()
 }
 

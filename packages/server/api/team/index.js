@@ -1,7 +1,9 @@
 const models = require('../../data-model')
+const resolvers = require('./team.resolvers')
+const typeDefs = require('../graphqlLoaderUtil')('team/team.graphql')
 
 module.exports = {
-  resolvers: require('./team.resolvers'),
-  typeDefs: require('../graphqlLoaderUtil')('team/team.graphql'),
+  resolvers,
+  typeDefs,
   model: models.team,
 }

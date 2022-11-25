@@ -1,7 +1,13 @@
+const cleanHTML = require('./cleanHTML')
+const cleanDataIdAttributes = require('./cleanDataIdAttributes')
+const vivliostyleDecorator = require('./vivliostyleDecorator')
+const epubDecorator = require('./epubDecorator')
+const fixFontFaceUrls = require('./fixFontFaceUrls')
+
 module.exports = {
-  cleanHTML: require('./cleanHTML'),
-  cleanDataIdAttributes: require('./cleanDataIdAttributes'),
-  vivliostyleDecorator: require('./vivliostyleDecorator'),
-  epubDecorator: require('./epubDecorator'),
-  fixFontFaceUrls: require('./fixFontFaceUrls'),
+  cleanHTML,
+  cleanDataIdAttributes,
+  vivliostyleDecorator,
+  epubDecorator,
+  fixFontFaceUrls,
 }

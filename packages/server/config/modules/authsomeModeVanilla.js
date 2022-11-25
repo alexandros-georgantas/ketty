@@ -53,9 +53,11 @@ class EditoriaMode {
       })
     return changes(object, base)
   }
+
   /* eslint-enable */
   async isTeamMember(teamType, object) {
     let membershipCondition
+
     if (object) {
       if (!this.backend) {
         membershipCondition = team =>
@@ -94,6 +96,7 @@ class EditoriaMode {
 
   async hasMembership(object) {
     let collection
+
     if (object.collection) {
       collection = object.collection //eslint-disable-line
     } else {
@@ -106,12 +109,15 @@ class EditoriaMode {
     const memberships = await Promise.all(
       this.user.teams.map(async teamId => {
         const teamFound = await this.context.models.Team.find(teamId.id)
+
         if (teamFound) {
           return membershipCondition(teamFound)
         }
+
         return false
       }),
     )
+
     return memberships.includes(true)
   }
 
@@ -133,6 +139,7 @@ class EditoriaMode {
 
   async findBookByObject(object) {
     let id
+
     if (object.collection) {
       id = object.collection.id //eslint-disable-line
     } else if (object.bookId && object.type) {
@@ -150,20 +157,24 @@ class EditoriaMode {
           break
       }
     }
+
     if (id) {
       return this.context.models.Book.find(id)
     }
+
     return undefined
   }
 
   async canReadBook() {
     await this.getUser()
     let bookId
+
     if (this.object.type === 'bookComponent') {
       bookId = this.object.bookId
     } else {
       bookId = this.object.id
     }
+
     const Book = await this.context.models.Book.find(bookId)
 
     const permission =
@@ -230,17 +241,20 @@ class EditoriaMode {
   async canUpdateTeam() {
     await this.getUser()
     let current
+
     if (this.object.current) {
       current = this.object.current //eslint-disable-line
     } else {
       current = this.object
     }
+
     const collection = { id: current.objectId }
 
     const permissions = await this.checkTeamMembers(
       ['isAssignedProductionEditor', 'isGlobalProductionEditor'],
       collection,
     )
+
     return permissions
   }
 
@@ -252,6 +266,7 @@ class EditoriaMode {
   async canInteractWithBooks() {
     await this.getUser()
     let collection
+
     if (this.object.current) {
       collection = this.object.current //eslint-disable-line
     } else {
@@ -265,6 +280,7 @@ class EditoriaMode {
           team &&
           team.objectId === collection.id,
       ) || false
+
     const permission = foundTeam || (await this.isGlobalProductionEditor())
     return permission
   }
@@ -277,6 +293,7 @@ class EditoriaMode {
   async canInteractWithBookComponents() {
     await this.getUser()
     const collection = this.object
+
     const permissions =
       (await this.checkTeamMembers(
         ['isAssignedProductionEditor', 'isAssignedCopyEditor'],
@@ -307,10 +324,12 @@ class EditoriaMode {
     })
 
     let collection = { id: current.bookId }
+
     if (current.type === 'bookComponentState') {
       const { bookId } = await this.context.models.BookComponent.find(
         current.bookComponentId,
       )
+
       collection = { id: bookId }
     }
 
@@ -325,7 +344,9 @@ class EditoriaMode {
         //   return false
         // }
         return true
-      } else if (await this.isAssignedCopyEditor(collection)) {
+      }
+
+ if (await this.isAssignedCopyEditor(collection)) {
         if (Object.keys(diff).length === 1) {
           // TODO
           // if (
@@ -348,6 +369,7 @@ class EditoriaMode {
           ) {
             return true
           }
+
           if (
             this.getStageType(diff, 'review').value === 1 ||
             this.getStageType(diff, 'review').value === 0 ||
@@ -355,6 +377,7 @@ class EditoriaMode {
           ) {
             return true
           }
+
           if (
             this.getStageType(diff, 'clean_up').value === 1 ||
             this.getStageType(diff, 'clean_up').value === 0 ||
@@ -362,12 +385,14 @@ class EditoriaMode {
           ) {
             return true
           }
+
           if (
             this.getStageType(diff, 'page_check').value === 0 ||
             this.getStageType(diff, 'page_check').value === -1
           ) {
             return true
           }
+
           if (
             (diff.trackChangesEnabled === true ||
               diff.trackChangesEnabled === false) &&
@@ -375,10 +400,12 @@ class EditoriaMode {
           ) {
             return true
           }
+
           if (diff.content) {
             return true
           }
         }
+
         if (Object.keys(diff).length === 2) {
           if (
             diff.deleted !== undefined ||
@@ -391,6 +418,7 @@ class EditoriaMode {
           if (diff.content && diff.title !== undefined) {
             return true
           }
+
           if (
             (diff.trackChangesEnabled === true ||
               diff.trackChangesEnabled === false) &&
@@ -399,8 +427,11 @@ class EditoriaMode {
             return true
           }
         }
+
         return false
-      } else if (await this.isAuthor(collection)) {
+      }
+
+ if (await this.isAuthor(collection)) {
         if (Object.keys(diff).length === 1) {
           // TODO
           // if (
@@ -418,35 +449,44 @@ class EditoriaMode {
           ) {
             return true
           }
+
           if (diff.content) {
             return true
           }
         }
+
         if (Object.keys(diff).length === 2) {
           if (diff.content && diff.title !== undefined) {
             return true
           }
         }
+
         return false
       }
+
       return false
     }
+
     return false
   }
 
   async canBroadcastFragmentPatchEvent() {
     await this.getUser()
+
     const foundFragment = await this.context.models.Fragment.find(
       this.object.fragment.id,
     )
+
     const collection = await this.findBookByObject(foundFragment)
     return foundFragment && collection && this.hasMembership(collection)
   }
+
   async canFragmentEdit() {
     await this.getUser()
 
     const isEditingSate = this.getStageType(this.object, 'edit').value === 0
     const isReviewingSate = this.getStageType(this.object, 'review').value === 0
+
     const isCleaningUpSate =
       this.getStageType(this.object, 'clean_up').value === 0
 
@@ -455,15 +495,20 @@ class EditoriaMode {
     if (book) {
       if (await this.isAssignedProductionEditor(book)) {
         return true
-      } else if (
+      }
+
+ if (
         (await this.isAssignedCopyEditor(book)) &&
         (isEditingSate || isCleaningUpSate)
       ) {
         return true
-      } else if ((await this.isAuthor(book)) && isReviewingSate) {
+      }
+
+ if ((await this.isAuthor(book)) && isReviewingSate) {
         return true
       }
     }
+
     return false
   }
 
@@ -472,55 +517,72 @@ class EditoriaMode {
     const progressType = this.object.type
 
     const collection = { id: this.object.bookId }
+
     if (collection) {
       if (await this.isAssignedProductionEditor(collection)) {
         return true
-      } else if (await this.isAssignedCopyEditor(collection)) {
+      }
+
+ if (await this.isAssignedCopyEditor(collection)) {
         let condition = false
+
         switch (progressType) {
           case 'file_prep': {
             condition = true
             break
           }
+
           case 'edit': {
             condition = true
             break
           }
+
           case 'review': {
             condition = true
             break
           }
+
           case 'clean_up': {
             condition = true
             break
           }
+
           case 'page_check': {
             condition = false
             break
           }
+
           case 'final': {
             condition = false
             break
           }
+
           default: {
             return condition
           }
         }
+
         return condition
-      } else if (await this.isAuthor(collection)) {
+      }
+
+ if (await this.isAuthor(collection)) {
         let condition = false
+
         switch (progressType) {
           case 'review': {
             condition = true
             break
           }
+
           default: {
             return condition
           }
         }
+
         return condition
       }
     }
+
     return false
   }
 
@@ -550,54 +612,72 @@ class EditoriaMode {
     ).value
 
     const collection = { id: this.object.bookId }
+
     if (collection) {
       if (await this.isAssignedProductionEditor(collection)) {
         return true
-      } else if (await this.isAssignedCopyEditor(collection)) {
+      }
+
+ if (await this.isAssignedCopyEditor(collection)) {
         let condition = false
+
         switch (progressType) {
           case 'file_prep': {
             if (fileprepValue === 1) {
               return true
             }
+
             break
           }
+
           case 'edit': {
             if (editValue === 1) {
               condition = true
             }
+
             break
           }
+
           case 'review': {
             if (reviewValue === 1) {
               condition = true
             }
+
             break
           }
+
           case 'clean_up': {
             if (cleanupValue === 1) {
               condition = true
             }
+
             break
           }
+
           case 'page_check': {
             condition = false
             break
           }
+
           case 'final': {
             condition = false
             break
           }
+
           default: {
             return condition
           }
         }
+
         return condition
-      } else if (await this.isAuthor(collection)) {
+      }
+
+ if (await this.isAuthor(collection)) {
         const condition = false
         return condition
       }
     }
+
     return false
   }
 
@@ -622,63 +702,84 @@ class EditoriaMode {
     ).value
 
     const collection = { id: this.object.bookId }
+
     if (collection) {
       if (await this.isAssignedProductionEditor(collection)) {
         return true
-      } else if (await this.isAssignedCopyEditor(collection)) {
+      }
+
+ if (await this.isAssignedCopyEditor(collection)) {
         let condition = false
+
         switch (progressType) {
           case 'file_prep': {
             condition = false
             break
           }
+
           case 'edit': {
             if (editValue === 0) {
               condition = true
             }
+
             break
           }
+
           case 'review': {
             if (reviewValue === -1 || reviewValue === 0) {
               condition = true
             }
+
             break
           }
+
           case 'clean_up': {
             if (cleanupValue === -1 || cleanupValue === 0) {
               condition = true
             }
+
             break
           }
+
           case 'page_check': {
             condition = false
             break
           }
+
           case 'final': {
             condition = false
             break
           }
+
           default: {
             return condition
           }
         }
+
         return condition
-      } else if (await this.isAuthor(collection)) {
+      }
+
+ if (await this.isAuthor(collection)) {
         let condition = false
+
         switch (progressType) {
           case 'review': {
             if (reviewValue === 0) {
               condition = true
             }
+
             break
           }
+
           default: {
             return condition
           }
         }
+
         return condition
       }
     }
+
     return false
   }
 
@@ -695,7 +796,9 @@ class EditoriaMode {
 
     if (await this.isAssignedProductionEditor(collection)) {
       return true
-    } else if (
+    }
+
+ if (
       (await this.isAssignedCopyEditor(collection)) &&
       (isEditingSate || isCleanUpSate)
     ) {
@@ -721,6 +824,7 @@ class EditoriaMode {
     ) {
       return true
     }
+
     return false
   }
 
@@ -764,6 +868,7 @@ class EditoriaMode {
   async canGo() {
     await this.getUser()
     const collection = await this.findBookByObject(this.object)
+
     if (collection) {
       return (
         this.isAssignedProductionEditor(collection) ||
@@ -771,6 +876,7 @@ class EditoriaMode {
         this.isAuthor(collection)
       )
     }
+
     return false
   }
 }
@@ -780,14 +886,17 @@ module.exports = {
     let decision = false
     if (!userId) return decision
     const user = await context.models.UserLoader.userTeams.load(userId)
+
     if (user) {
       const { teams, admin } = user
+
       if (teams.length > 0) {
         decision = findIndex(teams, { global: true }) !== -1
       } else {
         decision = admin || false
       }
     }
+
     return decision
   },
   create: async (userId, operation, object, context) => {
@@ -817,6 +926,7 @@ module.exports = {
     const mode = new EditoriaMode(userId, operation, object, context)
     mode.backend = true
     let data
+
     if (object) {
       if (object.current) {
         data = object.current
@@ -849,6 +959,7 @@ module.exports = {
   read: (userId, operation, object, context) => {
     const mode = new EditoriaMode(userId, operation, object, context)
     mode.backend = true
+
     if (object === 'Book' || object === 'Team' || object === 'BookCollection') {
       return true
     }

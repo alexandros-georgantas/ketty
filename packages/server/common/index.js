@@ -1,4 +1,7 @@
+const mimetypeHelpers = require('./mimetypes')
+const objectKeyExtractor = require('./fileStorageObjectKeyExtractor')
+
 module.exports = {
-  mimetypeHelpers: require('./mimetypes'),
-  objectKeyExtractor: require('./fileStorageObjectKeyExtractor'),
+  mimetypeHelpers,
+  objectKeyExtractor,
 }

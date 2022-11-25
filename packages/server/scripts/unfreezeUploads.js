@@ -1,6 +1,6 @@
 const { logger } = require('@coko/server')
-const { editoriaDataModel } = require('../data-model')
 const map = require('lodash/map')
+const { editoriaDataModel } = require('../data-model')
 
 const { models } = editoriaDataModel
 
@@ -22,6 +22,7 @@ const unfreezeUploading = async () => {
       }),
     )
     const after = await BookComponentState.query().where('uploading', true)
+
     if (after.length === 0) {
       logger.info('Job done')
     } else {
@@ -31,6 +32,7 @@ const unfreezeUploading = async () => {
     throw new Error(e)
   }
 }
+
 module.exports = unfreezeUploading
 
 unfreezeUploading()

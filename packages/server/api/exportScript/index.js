@@ -1,6 +1,10 @@
+const resolvers = require('./exportScript.resolver')
+
+const typeDefs = require('../graphqlLoaderUtil')(
+  'exportScript/exportScript.graphql',
+)
+
 module.exports = {
-  resolvers: require('./exportScript.resolver.js'),
-  typeDefs: require('../graphqlLoaderUtil')(
-    'exportScript/exportScript.graphql',
-  ),
+  resolvers,
+  typeDefs,
 }

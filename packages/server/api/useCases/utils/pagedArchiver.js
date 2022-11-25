@@ -14,6 +14,7 @@ const pagedArchiver = async (tempFolder, target) => {
         target,
         `${crypto.randomBytes(32).toString('hex')}.zip`,
       )
+
       const output = fs.createWriteStream(destination)
       const archive = archiver('zip')
       // pipe archive data to the file

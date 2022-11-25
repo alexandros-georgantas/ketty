@@ -31,6 +31,7 @@ const getTeamMembers = async (
             const user = await User.query(tr).where({
               id: teamMember.userId,
             })
+
             const {
               id: userId,
               username,
@@ -39,15 +40,18 @@ const getTeamMembers = async (
               givenName,
               surname,
             } = user[0]
+
             if (!withTeamMemberId) {
               return { id: userId, username, admin, email, givenName, surname }
             }
+
             return {
               id: teamMember.id,
               user: { id: userId, username, admin, email, givenName, surname },
             }
           }),
         )
+
         return populatedTeamMembers
       },
       { trx, passedTrxOnly: true },
@@ -77,6 +81,7 @@ const createTeam = async (
           role,
           global,
         }
+
         const cleanedData = omitBy(teamData, isUndefined)
         const newTeam = await Team.query(tr).insert(cleanedData)
 
@@ -151,16 +156,21 @@ const getEntityTeams = async (
           deleted: false,
           global: false,
         })
+
         if (teams.length === 0) {
           throw new Error(
             `teams of ${objectType} with id ${objectId} do not exist`,
           )
         }
+
         if (!withTeamMembers) {
           return teams
         }
+
         return Promise.all(teams, async team => {
+          /* eslint-disable no-param-reassign */
           team.members = await getTeamMembers(team.id, { trx: tr })
+          /* eslint-enable no-param-reassign */
           return team
         })
       },
@@ -182,6 +192,7 @@ const deleteTeam = async (teamId, options = {}) => {
           objectId: null,
           objectType: null,
         })
+
         logger.info(`>>> associated team with id ${teamId} deleted`)
         logger.info(`>>> corresponding team's object cleaned`)
 
@@ -218,14 +229,19 @@ const getGlobalTeams = async (withTeamMembers = false, options = {}) => {
           global: true,
           deleted: false,
         })
+
         if (teams.length === 0) {
           throw new Error(`no global teams`)
         }
+
         if (!withTeamMembers) {
           return teams
         }
+
         return Promise.all(teams, async team => {
+          /* eslint-disable no-param-reassign */
           team.members = await getTeamMembers(team.id, { trx: tr })
+          /* eslint-enable no-param-reassign */
           return team
         })
       },
@@ -242,6 +258,7 @@ const getTeam = async (teamId, withTeamMembers = false, options = {}) => {
     return useTransaction(
       async tr => {
         const team = await Team.query(tr).where({ id: teamId, deleted: false })
+
         if (team.length === 0) {
           throw Error(`team with id ${teamId} does not exist`)
         }
@@ -277,6 +294,7 @@ const updateTeamMembers = async (teamId, members, options = {}) => {
 
         forEach(teamMembers, user => {
           const { id } = user
+
           if (indexOf(members, id) === -1) {
             toBeDeleted.push(id)
           }

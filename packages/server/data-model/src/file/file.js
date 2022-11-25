@@ -4,7 +4,6 @@ const Base = require('../editoriaBase')
 
 const {
   arrayOfStringsNotEmpty,
-  foreignType,
   id,
   integerPositive,
   mimetype,
@@ -23,10 +22,12 @@ class File extends Base {
   }
 
   static get relationMappings() {
+    /* eslint-disable global-require */
     const { model: Book } = require('../book')
     const { model: BookComponent } = require('../bookComponent')
     const { model: FileTranslation } = require('../fileTranslation')
     const { model: Template } = require('../template')
+    /* eslint-enable global-require */
 
     return {
       book: {

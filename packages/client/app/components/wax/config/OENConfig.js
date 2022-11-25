@@ -47,7 +47,7 @@ import {
   OENContainersToolGroupService,
 } from 'wax-prosemirror-services'
 
-import { EditoriaSchema } from 'wax-prosemirror-utilities'
+import { EditoriaSchema } from 'wax-prosemirror-core'
 
 import invisibles, { hardBreak } from '@guardian/prosemirror-invisibles'
 
