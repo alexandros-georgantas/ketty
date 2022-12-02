@@ -33,6 +33,7 @@ const BOOK_COMPONENT_ADDED_SUBSCRIPTION = gql`
     }
   }
 `
+
 const BOOK_COMPONENT_DELETED_SUBSCRIPTION = gql`
   subscription BookComponentDeleted {
     bookComponentDeleted {
@@ -48,6 +49,7 @@ const BOOK_COMPONENT_PAGINATION_UPDATED_SUBSCRIPTION = gql`
     }
   }
 `
+
 const BOOK_COMPONENT_WORKFLOW_UPDATED_SUBSCRIPTION = gql`
   subscription BookComponentWorkflowUpdated {
     bookComponentWorkflowUpdated {
@@ -72,6 +74,7 @@ const BOOK_COMPONENT_LOCK_UPDATED_SUBSCRIPTION = gql`
     }
   }
 `
+
 const BOOK_COMPONENT_TITLE_UPDATED_SUBSCRIPTION = gql`
   subscription BookComponentTitleUpdated {
     bookComponentTitleUpdated {
@@ -79,6 +82,7 @@ const BOOK_COMPONENT_TITLE_UPDATED_SUBSCRIPTION = gql`
     }
   }
 `
+
 const TEAM_MEMBERS_UPDATED_SUBSCRIPTION = gql`
   subscription TeamMembersUpdated {
     teamMembersUpdated {
@@ -86,6 +90,7 @@ const TEAM_MEMBERS_UPDATED_SUBSCRIPTION = gql`
     }
   }
 `
+
 const METADATA_UPDATED_SUBSCRIPTION = gql`
   subscription BookMetadataUpdated {
     bookMetadataUpdated {
@@ -93,6 +98,7 @@ const METADATA_UPDATED_SUBSCRIPTION = gql`
     }
   }
 `
+
 const bookMetadataSubscription = props => {
   const { render, getBookQuery, statefull } = props
   const { pauseUpdates } = statefull
@@ -111,6 +117,7 @@ const bookMetadataSubscription = props => {
     </Subscription>
   )
 }
+
 const addTeamMemberSubscription = props => {
   const { render, getBookBuilderRulesQuery, statefull } = props
   const { pauseUpdates } = statefull
@@ -137,10 +144,12 @@ const PRODUCTION_EDITORS_UPDATED_SUBSCRIPTION = gql`
     }
   }
 `
+
 const orderChangeSubscription = props => {
   const { render, getBookQuery, statefull } = props
   const { refetch } = getBookQuery
   const { pauseUpdates } = statefull
+
   const triggerRefetch = () => {
     if (pauseUpdates) return
     refetch()
@@ -163,6 +172,7 @@ const COMPONENT_TYPE_UPDATED_SUBSCRIPTION = gql`
     }
   }
 `
+
 const INCLUDE_IN_TOC_UPDATED_SUBSCRIPTION = gql`
   subscription IncludeInTOCUpdated {
     bookComponentTOCToggled {
@@ -170,10 +180,12 @@ const INCLUDE_IN_TOC_UPDATED_SUBSCRIPTION = gql`
     }
   }
 `
+
 const componentTypeChangeSubscription = props => {
   const { render, getBookQuery, statefull } = props
   const { pauseUpdates } = statefull
   const { refetch } = getBookQuery
+
   const triggerRefetch = () => {
     if (pauseUpdates) return
     refetch()
@@ -193,6 +205,7 @@ const bookComponentIncludeInTOCSubscription = props => {
   const { render, getBookQuery, statefull } = props
   const { pauseUpdates } = statefull
   const { refetch } = getBookQuery
+
   const triggerRefetch = () => {
     if (pauseUpdates) return
     refetch()
@@ -211,6 +224,7 @@ const bookComponentIncludeInTOCSubscription = props => {
 const bookComponentAddedSubscription = props => {
   const { render, getBookQuery, getBookBuilderRulesQuery, statefull } = props
   const { pauseUpdates } = statefull
+
   const triggerRefetch = () => {
     if (pauseUpdates) return
     getBookQuery.refetch()
@@ -226,10 +240,12 @@ const bookComponentAddedSubscription = props => {
     </Subscription>
   )
 }
+
 const bookComponentDeletedSubscription = props => {
   const { render, getBookQuery, statefull } = props
   const { pauseUpdates } = statefull
   const { refetch } = getBookQuery
+
   const triggerRefetch = () => {
     if (pauseUpdates) return
     refetch()
@@ -244,10 +260,12 @@ const bookComponentDeletedSubscription = props => {
     </Subscription>
   )
 }
+
 const paginationChangeSubscription = props => {
   const { render, getBookQuery, statefull } = props
   const { pauseUpdates } = statefull
   const { refetch } = getBookQuery
+
   const triggerRefetch = () => {
     if (pauseUpdates) return
     refetch()
@@ -262,9 +280,11 @@ const paginationChangeSubscription = props => {
     </Subscription>
   )
 }
+
 const workflowChangeSubscription = props => {
   const { render, getBookQuery, getBookBuilderRulesQuery, statefull } = props
   const { pauseUpdates } = statefull
+
   const triggerRefetch = () => {
     if (pauseUpdates) return
     getBookBuilderRulesQuery.refetch()
@@ -280,10 +300,12 @@ const workflowChangeSubscription = props => {
     </Subscription>
   )
 }
+
 const lockChangeSubscription = props => {
   const { render, getBookQuery, statefull } = props
   const { pauseUpdates } = statefull
   const { refetch } = getBookQuery
+
   const triggerRefetch = () => {
     if (pauseUpdates) return
     refetch()
@@ -310,10 +332,12 @@ const lockChangeSubscription = props => {
     </Subscription>
   )
 }
+
 const titleChangeSubscription = props => {
   const { render, getBookQuery, statefull } = props
   const { pauseUpdates } = statefull
   const { refetch } = getBookQuery
+
   const triggerRefetch = () => {
     if (pauseUpdates) return
     refetch()
@@ -328,10 +352,12 @@ const titleChangeSubscription = props => {
     </Subscription>
   )
 }
+
 const teamMembersChangeSubscription = props => {
   const { render, getBookTeamsQuery, statefull } = props
   const { pauseUpdates } = statefull
   const { refetch } = getBookTeamsQuery
+
   const triggerRefetch = () => {
     if (pauseUpdates) return
     refetch()
@@ -346,10 +372,12 @@ const teamMembersChangeSubscription = props => {
     </Subscription>
   )
 }
+
 const productionEditorChangeSubscription = props => {
   const { render, getBookQuery, statefull } = props
   const { pauseUpdates } = statefull
   const { refetch } = getBookQuery
+
   const triggerRefetch = () => {
     if (pauseUpdates) return
     refetch()
@@ -364,6 +392,7 @@ const productionEditorChangeSubscription = props => {
     </Subscription>
   )
 }
+
 const BOOK_RENAMED_SUBSCRIPTION = gql`
   subscription BookRenamed {
     bookRenamed {
@@ -373,10 +402,12 @@ const BOOK_RENAMED_SUBSCRIPTION = gql`
     }
   }
 `
+
 const bookRenamedSubscription = props => {
   const { render, getBookQuery, statefull } = props
   const { pauseUpdates } = statefull
   const { refetch } = getBookQuery
+
   const triggerRefetch = () => {
     if (pauseUpdates) return
     refetch()
@@ -396,6 +427,7 @@ const runningHeadersUpdatedSubscription = props => {
   const { render, getBookQuery, statefull } = props
   const { pauseUpdates } = statefull
   const { refetch } = getBookQuery
+
   const triggerRefetch = () => {
     if (pauseUpdates) return
     refetch()
@@ -415,6 +447,7 @@ const uploadingUpdatedSubscription = props => {
   const { render, getBookQuery, getBookBuilderRulesQuery, statefull } = props
   const { pauseUpdates } = statefull
   const { refetch } = getBookQuery
+
   const triggerRefetch = () => {
     if (pauseUpdates) return
     getBookBuilderRulesQuery.refetch()

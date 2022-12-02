@@ -1,3 +1,5 @@
+/* eslint-disable jest/no-commented-out-tests */
+
 // import React from 'react'
 // import { shallow } from 'enzyme'
 // import expect from 'expect.js'

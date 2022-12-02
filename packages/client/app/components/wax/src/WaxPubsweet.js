@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react'
 import { isEqual, debounce } from 'lodash'
 import styled from 'styled-components'
@@ -98,6 +99,7 @@ const Editoria = ({
   }
 
   let translatedEditing
+
   switch (editing) {
     case 'selection':
       configWax.EnableTrackChangeService.toggle = false
@@ -227,6 +229,7 @@ const Editoria = ({
       translatedEditing = 'full'
       break
   }
+
   const handleCustomTags = customTag => {
     addCustomTags({
       variables: {
@@ -235,9 +238,9 @@ const Editoria = ({
     })
   }
 
-  const updateTitle = debounce(title => {
+  const updateTitle = debounce(titleParam => {
     if (translatedEditing === 'full') {
-      handleTitleUpdate(title, bookComponentId, renameBookComponent)
+      handleTitleUpdate(titleParam, bookComponentId, renameBookComponent)
     }
   }, 2000)
 
@@ -257,15 +260,19 @@ const Editoria = ({
       },
     })
   }
+
   configWax.TitleService = { updateTitle }
   configWax.ImageService = { handleAssetManager }
   configWax.CustomTagService.tags = tags
   configWax.CustomTagService.updateTags = handleCustomTags
+
   if (featureBookStructureEnabled) {
     configWax.OENContainersService = bookStructureElements
   }
+
   const isReadOnly =
     translatedEditing === 'selection' || translatedEditing === 'disabled'
+
   const [workChanged, setWorkChanged] = useState(false)
 
   const previousWorkflow = usePrevious(workflowStages) // reference for checking if the workflowStages actually change
@@ -278,6 +285,7 @@ const Editoria = ({
         [JSON.stringify({ uid: user.id, bbid: bookComponentId })],
         { type: 'text/plain; charset=UTF-8' },
       )
+
       const serverProtocol = process.env.SERVER_PROTOCOL
       const serverHost = process.env.SERVER_HOST
       const serverPort = process.env.SERVER_PORT
@@ -300,17 +308,21 @@ const Editoria = ({
       handleUnlock(bookComponentId, unlockBookComponent)
     }
   }
+
   useEffect(() => {
     if (uploading) {
       const onConfirm = () => {
         history.push(`/books/${bookId}/book-builder`)
       }
+
       return onWarning(
         'Uploading in progress, you will be redirected back to Book Builder',
         onConfirm,
       )
     }
+
     window.addEventListener('beforeunload', onUnload)
+
     if (!isReadOnly) {
       handleLock(bookComponentId, lockBookComponent)
     }
@@ -329,6 +341,7 @@ const Editoria = ({
       const onConfirm = () => {
         history.push(`/books`)
       }
+
       onUnlocked(
         ' You have no permissions to access this book component. You will be redirected back to the dashboard',
         onConfirm,
@@ -348,6 +361,7 @@ const Editoria = ({
       const onConfirm = () => {
         history.push(`/books/${bookId}/book-builder`)
       }
+
       onUnlocked(
         'The admin just unlocked this book component!! You will be redirected back to the Book Builder.',
         onConfirm,
@@ -361,6 +375,7 @@ const Editoria = ({
     // this effect sets precedent which is used when the isReadOnly is calculated
     if (workflowTrigger && workflowTrigger.id === bookComponentId) {
       const { workflowStages: workflowNow } = workflowTrigger
+
       if (!isEqual(previousWorkflow, workflowNow)) {
         const initialChangeFromNoContentToContent =
           previousWorkflow[0].value === -1 && workflowNow[0].value === 0
@@ -378,16 +393,19 @@ const Editoria = ({
       const onConfirm = () => {
         handleLock(bookComponentId, lockBookComponent)
       }
+
       onWarning(
         'You have been granted edit access to this book component',
         onConfirm,
       )
       setWorkChanged(false)
     }
+
     if (workChanged && isReadOnly) {
       const onConfirm = () => {
         handleUnlock(bookComponentId, unlockBookComponent)
       }
+
       onWarning(
         'You no longer have edit access for this book component',
         onConfirm,

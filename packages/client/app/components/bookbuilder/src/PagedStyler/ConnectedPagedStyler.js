@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-
+/* eslint-disable react/prop-types */
 import React from 'react'
 import { get } from 'lodash'
 import { adopt } from 'react-adopt'
@@ -62,13 +62,14 @@ const mapProps = args => ({
     history,
   ) => {
     const {
-      cloneTemplateMutation,
-      updateTemplateCSSFileMutation,
-      withModal,
+      cloneTemplateMutation: cloneTemplateMutationFromArgs,
+      updateTemplateCSSFileMutation: updateTemplateCSSFileMutationFromArgs,
+      withModal: withModalFromArgs,
     } = args
-    const { cloneTemplate } = cloneTemplateMutation
-    const { updateTemplateCSSFile } = updateTemplateCSSFileMutation
-    const { showModal, hideModal } = withModal
+
+    const { cloneTemplate } = cloneTemplateMutationFromArgs
+    const { updateTemplateCSSFile } = updateTemplateCSSFileMutationFromArgs
+    const { showModal, hideModal } = withModalFromArgs
     return new Promise((resolve, reject) => {
       const saveCssBook = () => {
         cloneTemplate({
@@ -83,8 +84,8 @@ const mapProps = args => ({
           },
         }).then(res => {
           const { data } = res
-          const { cloneTemplate } = data
-          const { path } = cloneTemplate
+          const { cloneTemplate: cloneTemplateFromData } = data
+          const { path } = cloneTemplateFromData
           history.replace(`/books/${bookId}/pagedPreviewer/paged/${path}`)
           hideModal()
           resolve()
@@ -103,8 +104,8 @@ const mapProps = args => ({
           },
         }).then(res => {
           const { data } = res
-          const { updateTemplateCSSFile } = data
-          const { path } = updateTemplateCSSFile
+          const { updateTemplateCSSFile: updateTemplateCSSFileFromData } = data
+          const { path } = updateTemplateCSSFileFromData
           history.replace(`/books/${bookId}/pagedPreviewer/paged/${path}`)
           hideModal()
           resolve()
@@ -129,6 +130,7 @@ const Connected = props => {
     },
     history,
   } = props
+
   return (
     <Composed bookId={id} hash={hashed} templateId={templateId}>
       {({

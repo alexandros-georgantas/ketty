@@ -1,4 +1,4 @@
-/* eslint-disable react/sort-comp */
+/* eslint-disable react/prop-types, react/no-unused-state, react/sort-comp, react/forbid-prop-types, import/prefer-default-export */
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -165,35 +165,47 @@ class Menu extends React.Component {
   }
 
   toggleMenu = () => {
+    const { open } = this.state
     this.setState({
-      open: !this.state.open,
+      open: !open,
     })
 
-    if (this.state.open === false) {
+    if (open === false) {
       document.addEventListener('mousedown', this.handleClickOutside)
     }
   }
 
   selectOneOfMultiElement = (event, value) => {
     event.stopPropagation()
+    const { selectElement } = this.props
     const selectOneOfMultiElement = value
     this.setState({ selectOneOfMultiElement })
-    if (this.props.selectElement) this.props.selectElement(value)
+
+    if (selectElement) {
+      selectElement(value)
+    }
   }
 
   removeSelect = (event, value) => {
     event.stopPropagation()
     let { selected } = this.state
+    const { onChange } = this.props
     const index = selected.indexOf(value)
     selected = [...selected.slice(0, index), ...selected.slice(index + 1)]
     this.setState({ selected })
-    if (this.props.onChange) this.props.onChange(selected)
+
+    if (onChange) {
+      onChange(selected)
+    }
   }
 
   handleClickOutside(event) {
-    if (this.state.open) {
+    const { open } = this.state
+
+    if (open) {
       document.removeEventListener('mousedown', this.handleClickOutside)
     }
+
     if (this.wrapperRef && !this.wrapperRef.contains(event.target)) {
       this.toggleMenu()
       document.removeEventListener('mousedown', this.handleClickOutside)
@@ -201,10 +213,12 @@ class Menu extends React.Component {
   }
 
   handleSelect = ({ selected, open }) => {
-    const { multi } = this.props
+    const { multi, onChange } = this.props
+    const { selected: selectedState } = this.state
     let values
+
     if (multi) {
-      values = this.state.selected ? this.state.selected : []
+      values = selectedState || []
       if (values.indexOf(selected) === -1) values.push(selected)
     } else {
       values = selected
@@ -214,7 +228,10 @@ class Menu extends React.Component {
       selected: values,
     })
     this.toggleMenu()
-    if (this.props.onChange) this.props.onChange(values)
+
+    if (onChange) {
+      onChange(values)
+    }
   }
 
   handleKeyPress = (event, selected, open) => {
@@ -227,9 +244,9 @@ class Menu extends React.Component {
     const { options } = this.props
 
     const flatOption = []
-    forEach(options, value => {
-      if (value.children) flatOption.push(value.children)
-      if (!value.children) flatOption.push(value)
+    forEach(options, option => {
+      if (option.children) flatOption.push(option.children)
+      if (!option.children) flatOption.push(option)
     })
 
     return flatOption.find(option => option.value === value)
@@ -244,8 +261,10 @@ class Menu extends React.Component {
     this.wrapperRef = node
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.value !== this.props.value) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    const { value } = this.props
+
+    if (nextProps.value !== value) {
       this.setState({ selected: nextProps.value })
     }
   }
@@ -265,6 +284,7 @@ class Menu extends React.Component {
       reset,
       ...rest
     } = this.props
+
     const { open, selected } = this.state
 
     if (reset === true) this.resetMenu(this.props)
@@ -294,6 +314,7 @@ class Menu extends React.Component {
                 {options.map((option, key) => {
                   let groupedHeader = null
                   let groupedOptions = [option]
+
                   if (option.children) {
                     groupedOptions = option.children
                     groupedHeader = option.text ? (
@@ -305,6 +326,7 @@ class Menu extends React.Component {
                       <hr />
                     )
                   }
+
                   return (
                     <>
                       {key > 0 && groupedHeader}
@@ -414,6 +436,8 @@ Menu.defaultProps = {
   renderOption: DefaultMenuOption,
   renderOpener: DefaultOpener,
   reset: false,
+  label: undefined,
+  maxHeight: undefined,
   placeholder: 'Choose in the list',
 }
 

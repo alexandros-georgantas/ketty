@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import styled from 'styled-components'
@@ -23,7 +24,6 @@ if (!serverUrl) {
   serverUrlWithProtocol = `${window.location.protocol}//${serverUrl}`
 }
 
-
 const Wrapper = styled.div`
   align-items: flex-start;
   display: flex;
@@ -31,6 +31,7 @@ const Wrapper = styled.div`
   justify-content: flex-start;
   padding: 8px;
 `
+
 const CodeEditorWrapper = styled.div`
   display: flex;
   flex-basis: 100%;
@@ -39,6 +40,7 @@ const CodeEditorWrapper = styled.div`
   max-width: 50%;
   width: 50%;
 `
+
 const EditorToolbar = styled.div`
   display: flex;
   justify-content: flex-end;
@@ -46,6 +48,7 @@ const EditorToolbar = styled.div`
     margin-right: ${grid(1)};
   }
 `
+
 const EditorArea = styled.div`
   flex-grow: 1;
   height: 95%;
@@ -56,6 +59,7 @@ const EditorArea = styled.div`
     }
   }
 `
+
 const PreviewArea = styled.div`
   height: 100%;
   max-width: 50%;
@@ -96,9 +100,11 @@ const PagedStyler = ({
       const response = await fetch(
         `${serverUrlWithProtocol}/uploads/paged/${hashed}/${templateFile.name}.${templateFile.extension}`,
       )
+
       const file = await response.text()
       setCssFile(file)
     }
+
     fetchData()
   }, [hashed, id])
 
@@ -117,13 +123,7 @@ const PagedStyler = ({
                 template,
                 hashed,
                 history,
-              ).then(() =>
-                setRandom(
-                  Math.random()
-                    .toString(36)
-                    .substring(7),
-                ),
-              )
+              ).then(() => setRandom(Math.random().toString(36).substring(7)))
             }
             title="Save"
           />

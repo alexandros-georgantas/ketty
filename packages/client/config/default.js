@@ -30,6 +30,7 @@ const featureBookStructureEnabled =
   (process.env.FEATURE_BOOK_STRUCTURE &&
     JSON.parse(process.env.FEATURE_BOOK_STRUCTURE)) ||
   false
+
 let bookBuilder
 
 if (!featureBookStructureEnabled) {

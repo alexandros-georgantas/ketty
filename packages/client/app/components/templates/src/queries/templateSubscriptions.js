@@ -9,6 +9,7 @@ const TEMPLATE_CREATED_SUBSCRIPTION = gql`
     }
   }
 `
+
 const TEMPLATE_UPDATED_SUBSCRIPTION = gql`
   subscription TemplateUpdated {
     templateUpdated {
@@ -24,12 +25,15 @@ const TEMPLATE_DELETED_SUBSCRIPTION = gql`
     }
   }
 `
+
 const templateCreatedSubscription = props => {
   const { render, getTemplatesQuery } = props
   const { refetch } = getTemplatesQuery
+
   const triggerRefetch = () => {
     refetch()
   }
+
   return (
     <Subscription
       onSubscriptionData={triggerRefetch}
@@ -39,12 +43,15 @@ const templateCreatedSubscription = props => {
     </Subscription>
   )
 }
+
 const templateUpdatedSubscription = props => {
   const { render, getTemplatesQuery } = props
   const { refetch } = getTemplatesQuery
+
   const triggerRefetch = () => {
     refetch()
   }
+
   return (
     <Subscription
       onSubscriptionData={triggerRefetch}
@@ -58,6 +65,7 @@ const templateUpdatedSubscription = props => {
 const templateDeletedSubscription = props => {
   const { render, getTemplatesQuery } = props
   const { refetch } = getTemplatesQuery
+
   const triggerRefetch = () => {
     refetch()
   }

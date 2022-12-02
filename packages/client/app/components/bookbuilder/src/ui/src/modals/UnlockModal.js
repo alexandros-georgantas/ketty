@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
@@ -12,6 +13,7 @@ const Text = styled.div`
   font-size: ${th('fontSizeBase')};
   color: #404040;
 `
+
 const UnlockModal = props => {
   const { isOpen, hideModal, data } = props
   const { componentType, title, onConfirm } = data
@@ -25,8 +27,9 @@ const UnlockModal = props => {
       onRequestClose={hideModal}
     >
       <Text>
-        {`Are you sure you want to unlock this ${componentType} with title ${title ||
-          'Untitled'}?`}
+        {`Are you sure you want to unlock this ${componentType} with title ${
+          title || 'Untitled'
+        }?`}
       </Text>
     </DialogModal>
   )

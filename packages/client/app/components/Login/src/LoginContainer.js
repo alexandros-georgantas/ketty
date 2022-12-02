@@ -1,7 +1,7 @@
 import { compose, withState, withHandlers } from 'recompose'
 import { withFormik } from 'formik'
 import { graphql } from '@apollo/client/react/hoc'
-import { LOGIN_USER } from './graphql/mutations/'
+import LOGIN_USER from './graphql/mutations'
 import Login from './Login'
 
 const getNextUrl = () => {
@@ -48,6 +48,9 @@ export default compose(
   }),
   withState('redirectLink', 'loggedIn', null),
   withHandlers({
-    onLoggedIn: ({ loggedIn }) => returnUrl => loggedIn(() => returnUrl),
+    onLoggedIn:
+      ({ loggedIn }) =>
+      returnUrl =>
+        loggedIn(() => returnUrl),
   }),
 )(enhancedFormik)

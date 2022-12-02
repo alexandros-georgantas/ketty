@@ -1,6 +1,4 @@
 const babelIncludes = require('./babel-includes')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const path = require('path')
 
 module.exports = [
   { test: /\.tsx?$/, loader: 'ts-loader' },

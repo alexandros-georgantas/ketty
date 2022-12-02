@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { th, grid } from '@pubsweet/ui-toolkit'
@@ -59,16 +60,19 @@ const InfoContainer = styled.div`
   flex-direction: column;
   max-width: 140px;
 `
+
 const Row = styled.div`
   display: flex;
   flex-direction: column;
   margin-bottom: calc(2 * ${th('gridUnit')});
 `
+
 const Label = styled.div`
   font-family: ${th('fontHeading')};
   font-size: ${th('fontSizeBaseSmall')};
   line-height: ${th('lineHeightBaseSmall')};
 `
+
 const Text = styled.div`
   font-family: ${th('fontReading')};
   font-size: calc(1.125 * ${th('fontSizeBase')});
@@ -88,6 +92,7 @@ const Template = props => {
     onDeleteTemplate,
     onUpdateTemplate,
   } = props
+
   return (
     <Container>
       <ImageContainer color="#F1F1F1" thumbnail={thumbnail}>

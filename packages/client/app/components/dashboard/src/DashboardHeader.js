@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
@@ -10,6 +11,7 @@ import ToggleArchivedButton from './ToggleArchivedButton'
 import SortMenu from './SortMenu'
 
 const { addIcon } = Icons
+
 const HeaderWrapper = styled.div`
   align-items: center;
   justify-content: center;
@@ -29,12 +31,14 @@ const Side1 = styled.div`
   display: flex;
   flex-basis: 50%;
 `
+
 const Side2 = styled.div`
   align-items: center;
   justify-content: flex-end;
   display: flex;
   flex-basis: 50%;
 `
+
 const Title = styled(H3)`
   color: #3f3f3f;
   font-family: ${th('fontReading')};
@@ -45,6 +49,7 @@ const Title = styled(H3)`
   padding-top: 3px;
   text-transform: uppercase;
 `
+
 const InnerWrapper = styled.div`
   flex-basis: 76%;
   display: flex;
@@ -52,6 +57,7 @@ const InnerWrapper = styled.div`
 
 const DashboardHeader = props => {
   const { onChangeSort, title, collectionId, onAddBook, canAddBooks } = props
+
   const handleClick = () => {
     onAddBook(collectionId)
   }

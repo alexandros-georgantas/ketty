@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import { map, last, indexOf, find } from 'lodash'
 import styled from 'styled-components'
@@ -18,6 +19,7 @@ const Container = styled.div`
     }
   }
 `
+
 const WorkflowList = ({
   bookId,
   applicationParameter,
@@ -36,6 +38,7 @@ const WorkflowList = ({
   })
 
   const lastItem = last(stageItems).type
+
   const getCurrentValue = (currentObjects, type) => {
     const currentObject = find(currentObjects, ['type', type])
     return currentObject.value
@@ -55,14 +58,14 @@ const WorkflowList = ({
     disabled,
     currentValueIndex,
     stageItem,
-    handleUpdate,
-    bookId,
+    handleUpdateParam,
+    bookIdParam,
     type,
-    currentValues,
+    currentValuesParam,
   ) => (
     <WorkflowItem
-      bookId={bookId}
-      currentValues={currentValues}
+      bookId={bookIdParam}
+      currentValues={currentValuesParam}
       disabled={disabled}
       index={currentValueIndex}
       interactive={stageItem.type !== 'upload'}
@@ -70,17 +73,19 @@ const WorkflowList = ({
       item={stageItem}
       stage={stage}
       type={type}
-      update={handleUpdate}
+      update={handleUpdateParam}
       values={values}
     />
   )
 
   const items = map(stageItems, stageItem => {
     const { type } = stageItem
+
     const currentValueIndex = indexOf(
       values,
       getCurrentValue(currentValues, stageItem.type),
     )
+
     const previousStageIndex = indexOf(progressOrder, stageItem.type) - 1
     let previousNotDone = false
 
@@ -91,7 +96,9 @@ const WorkflowList = ({
         previousNotDone = true
       }
     }
+
     const selectedStage = stage.find(stg => stg.type === type)
+
     if (selectedStage.canChangeProgressList) {
       return renderStateItem(
         previousNotDone || false,
@@ -114,6 +121,7 @@ const WorkflowList = ({
       currentValues,
     )
   })
+
   return <Container>{items}</Container>
 }
 

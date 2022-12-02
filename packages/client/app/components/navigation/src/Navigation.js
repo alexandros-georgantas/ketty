@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { compose, withProps } from 'recompose'
@@ -20,11 +21,13 @@ const navLinksBuilder = location => {
       !location.pathname.match(/bookComponents/g) &&
       !location.pathname.match(/book-builder/g)) ||
     false
+
   navLinksLeft.push(
     <NavBarLink active={inDashboard.toString()} key="nav-books" to="/books">
       Books
     </NavBarLink>,
   )
+
   const inTemplates =
     (location.pathname.match(/templates/g) &&
       location.pathname.match(/templates/g).length === 1) ||
@@ -42,6 +45,7 @@ const navLinksBuilder = location => {
 
   return navLinksLeft
 }
+
 const Navigation = props => {
   const { currentUser, location, client, logoutUser } = props
   const dropdownItems = [{ link: '/profile', label: 'Profile' }]
@@ -51,6 +55,7 @@ const Navigation = props => {
   if (currentUser && currentUser.admin) {
     dropdownItems.push({ link: '/globalTeams', label: 'Team Manager' })
   }
+
   const itemsLeft = navLinksBuilder(location)
 
   return (

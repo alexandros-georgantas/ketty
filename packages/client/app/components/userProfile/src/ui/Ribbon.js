@@ -41,6 +41,7 @@ const StyledRibbon = styled.div`
       if (!props.keepSpaceOccupied) return 'display: none;'
       return hidden
     }
+
     return null
   }};
 `

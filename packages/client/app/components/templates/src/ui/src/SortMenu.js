@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types, jsx-a11y/click-events-have-key-events,  jsx-a11y/no-static-element-interactions */
 import React from 'react'
 import styled, { css } from 'styled-components'
 import { State } from 'react-powerplug'

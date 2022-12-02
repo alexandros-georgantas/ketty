@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
@@ -26,6 +27,7 @@ const PartContainer = styled.div`
   justify-content: space-evenly;
   border: 1px solid black;
 `
+
 const WithoutPartContainer = styled.div`
   height: 50%;
   padding: 8px;
@@ -35,6 +37,7 @@ const WithoutPartContainer = styled.div`
   flex-direction: column;
   justify-content: space-evenly;
 `
+
 const Part = styled.div`
   width: 100%;
   text-align: center;
@@ -51,11 +54,13 @@ const Chapter = styled.div`
   background: ${th('colorPrimary')};
   color: white;
 `
+
 const Section = styled.div`
   border: 1px solid white;
   width: 100%;
   text-align: center;
 `
+
 const ChaptersContainer = styled.div`
   display: flex;
   width: 100%;

@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 
@@ -8,11 +9,13 @@ const StyledIcon = styled.i`
   width: 24px;
   display: block;
 `
+
 const StyledArrow = styled.i`
   height: 18px;
   width: 18px;
   display: block;
 `
+
 const userIcon = (
   <svg
     height="24"
@@ -50,6 +53,7 @@ const iconDown = (
     <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
   </svg>
 )
+
 const DropdownButton = props => {
   const { active, className, disabled, title, onClick } = props
 

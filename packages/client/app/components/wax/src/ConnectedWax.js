@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-
+/* eslint-disable react/prop-types */
 import React from 'react'
 import { get, sortBy, isEmpty } from 'lodash'
 import { adopt } from 'react-adopt'
@@ -57,12 +57,14 @@ const mapper = {
   renameBookComponentMutation,
   withModal,
 }
+
 // bug
 const getUserWithColor = (teams = []) => {
   const team =
     sortBy(config.authsome.teams, ['weight']).find(teamConfig =>
-      teams.some(team => team.role === teamConfig.role),
+      teams.some(t => t.role === teamConfig.role),
     ) || {}
+
   if (!isEmpty(team)) {
     return team.color
   }
@@ -98,18 +100,20 @@ const mapProps = args => ({
   ),
   onAssetManager: bookId =>
     new Promise((resolve, reject) => {
-      const { withModal } = args
+      const { withModal: withModalFromArgs } = args
 
-      const { showModal, hideModal } = withModal
+      const { showModal, hideModal } = withModalFromArgs
 
       const handleImport = async selectedFileIds => {
         const {
           getSpecificFilesQuery: { client, query },
         } = args
+
         const { data } = await client.query({
           query,
           variables: { ids: selectedFileIds },
         })
+
         const { getSpecificFiles } = data
 
         hideModal()
@@ -123,24 +127,28 @@ const mapProps = args => ({
       })
     }),
   onUnlocked: (warning, handler) => {
-    const { withModal } = args
-    const { showModal, hideModal } = withModal
+    const { withModal: withModalFromArgs } = args
+    const { showModal, hideModal } = withModalFromArgs
+
     const onClick = () => {
       handler()
       hideModal()
     }
+
     showModal('unlockedModal', {
       onConfirm: onClick,
       warning,
     })
   },
   onWarning: (warning, handler) => {
-    const { withModal } = args
-    const { showModal, hideModal } = withModal
+    const { withModal: withModalFromArgs } = args
+    const { showModal, hideModal } = withModalFromArgs
+
     const onClick = () => {
       handler()
       hideModal()
     }
+
     showModal('unlockedModal', {
       onConfirm: onClick,
       warning,
@@ -191,10 +199,11 @@ const Connected = props => {
         lockTrigger,
         workflowTrigger,
       }) => {
-        const user = Object.assign({}, currentUser, {
+        const user = {
+          ...currentUser,
           userColor: getUserWithColor(teams),
           userId: currentUser.id,
-        })
+        }
 
         if (
           loading ||
@@ -207,6 +216,7 @@ const Connected = props => {
           return <Loading />
 
         let editing
+
         const {
           componentType,
           divisionType,

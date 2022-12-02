@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import { get } from 'lodash'
 import { adopt } from 'react-adopt'
@@ -52,9 +53,14 @@ const mapProps = args => ({
     args.getBookCollectionsQuery.networkStatus === 2, // possible apollo bug
   renameBook: args.renameBookMutation.renameBook,
   onAddBook: collectionId => {
-    const { createBookMutation, withModal } = args
-    const { createBook } = createBookMutation
-    const { showModal, hideModal } = withModal
+    const {
+      createBookMutation: createBookMutationFromArgs,
+      withModal: withModalFromArgs,
+    } = args
+
+    const { createBook } = createBookMutationFromArgs
+    const { showModal, hideModal } = withModalFromArgs
+
     const onConfirm = title => {
       createBook({
         variables: {
@@ -66,15 +72,22 @@ const mapProps = args => ({
       })
       hideModal()
     }
+
+    console.log('e1', showModal)
     showModal('addBook', {
       onConfirm,
       hideModal,
     })
   },
   onDeleteBook: (bookId, bookTitle) => {
-    const { deleteBookMutation, withModal } = args
-    const { deleteBook } = deleteBookMutation
-    const { showModal, hideModal } = withModal
+    const {
+      deleteBookMutation: deleteBookMutationFromArgs,
+      withModal: withModalFromArgs,
+    } = args
+
+    const { deleteBook } = deleteBookMutationFromArgs
+    const { showModal, hideModal } = withModalFromArgs
+
     const onConfirm = () => {
       deleteBook({
         variables: {
@@ -83,15 +96,21 @@ const mapProps = args => ({
       })
       hideModal()
     }
+
     showModal('deleteBook', {
       onConfirm,
       bookTitle,
     })
   },
   onArchiveBook: (bookId, bookTitle, archived) => {
-    const { archiveBookMutation, withModal } = args
-    const { archiveBook } = archiveBookMutation
-    const { showModal, hideModal } = withModal
+    const {
+      archiveBookMutation: archiveBookMutationFromArgs,
+      withModal: withModalFromArgs,
+    } = args
+
+    const { archiveBook } = archiveBookMutationFromArgs
+    const { showModal, hideModal } = withModalFromArgs
+
     const onConfirm = () => {
       archiveBook({
         variables: {
@@ -101,6 +120,7 @@ const mapProps = args => ({
       })
       hideModal()
     }
+
     showModal('archiveBook', {
       onConfirm,
       bookTitle,
@@ -134,27 +154,26 @@ const Connected = () => (
       onArchiveBook,
       rules,
     }) => {
-      if(!collections) return null
-      return(
-      <Dashboard
-        archiveBook={archiveBook}
-        collections={collections}
-        deleteBook={deleteBook}
-        loading={loading}
-        loadingRules={loadingRules}
-        onAddBook={onAddBook}
-        onArchiveBook={onArchiveBook}
-        onAssignMembers={onAssignMembers}
-        onChangeSort={onChangeSort}
-        onDeleteBook={onDeleteBook}
-        refetching={refetching}
-        refetchingRules={refetchingRules}
-        renameBook={renameBook}
-        rules={rules}
-      />
-    )
-    }
-    }
+      if (!collections) return null
+      return (
+        <Dashboard
+          archiveBook={archiveBook}
+          collections={collections}
+          deleteBook={deleteBook}
+          loading={loading}
+          loadingRules={loadingRules}
+          onAddBook={onAddBook}
+          onArchiveBook={onArchiveBook}
+          onAssignMembers={onAssignMembers}
+          onChangeSort={onChangeSort}
+          onDeleteBook={onDeleteBook}
+          refetching={refetching}
+          refetchingRules={refetchingRules}
+          renameBook={renameBook}
+          rules={rules}
+        />
+      )
+    }}
   </Composed>
 )
 

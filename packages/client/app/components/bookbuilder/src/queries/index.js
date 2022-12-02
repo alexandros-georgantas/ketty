@@ -29,7 +29,7 @@ export {
   uploadingUpdatedSubscription,
 } from './bookBuilderSubscriptions'
 
-export { templateUpdatedForPagedStyledSubscription } from './templateUpdatedSubscription'
+export { default as templateUpdatedForPagedStyledSubscription } from './templateUpdatedSubscription'
 
 export { default as searchForUsersMutation } from './searchForUsers'
 export { default as updateTeamMutation } from './updateTeam'

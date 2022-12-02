@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 
 import { Action as UIAction, ActionGroup as UIActionGroup } from '@pubsweet/ui'
@@ -92,6 +93,7 @@ const ActionGroup = styled(UIActionGroup)`
     }
   }
 `
+
 const EditingNotification = ({
   bookComponentId,
   currentUser,
@@ -120,11 +122,13 @@ const EditingNotification = ({
     const year = date.getFullYear()
 
     let hours = date.getHours().toString()
+
     if (hours.length === 1) {
       hours = `0${hours}`
     }
 
     let minutes = date.getMinutes().toString()
+
     if (minutes.length === 1) {
       minutes = `0${minutes}`
     }

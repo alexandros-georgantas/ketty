@@ -1,11 +1,11 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
-import { th } from '@pubsweet/ui-toolkit'
 
 const mapping = {
   '-1': 'not_started',
-  '0': 'started',
-  '1': 'completed',
+  0: 'started',
+  1: 'completed',
 }
 
 const SVG = styled.svg`
@@ -43,11 +43,11 @@ const SVG = styled.svg`
 
 const WorkflowIndicator = ({ id, state, withEnd }) => (
   <SVG
-  id={id}
-    viewBox="0 0 100 10"
-    xmlns="http://www.w3.org/2000/svg"
+    id={id}
     state={state}
+    viewBox="0 0 100 10"
     withEnd={withEnd}
+    xmlns="http://www.w3.org/2000/svg"
   >
     <line
       id="line"

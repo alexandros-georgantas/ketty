@@ -37,11 +37,16 @@ const mapProps = args => ({
   loading: args.getTemplatesQuery.networkStatus === 1,
   onChangeSort: args.getTemplatesQuery.refetch,
   onCreateTemplate: () => {
-    const { createTemplateMutation, withModal, getExportScriptsQuery } = args
-    const { data, loading } = getExportScriptsQuery
+    const {
+      createTemplateMutation: createTemplateMutationFromArgs,
+      withModal: withModalFromArgs,
+      getExportScriptsQuery: getExportScriptsQueryFromArgs,
+    } = args
+
+    const { data, loading } = getExportScriptsQueryFromArgs
     const { getExportScripts } = data
-    const { createTemplate } = createTemplateMutation
-    const { showModal, hideModal } = withModal
+    const { createTemplate } = createTemplateMutationFromArgs
+    const { showModal, hideModal } = withModalFromArgs
 
     const onConfirm = ({
       files,
@@ -69,11 +74,13 @@ const mapProps = args => ({
       })
       hideModal()
     }
+
     if (!loading) {
       const options = getExportScripts.map(script => ({
         label: script.label,
         value: script.value,
       }))
+
       showModal('createTemplateModal', {
         onConfirm,
         hideModal,
@@ -84,11 +91,17 @@ const mapProps = args => ({
     }
   },
   onUpdateTemplate: templateId => {
-    const { updateTemplateMutation, withModal, getExportScriptsQuery } = args
-    const { data, loading } = getExportScriptsQuery
+    const {
+      updateTemplateMutation: updateTemplateMutationFromArgs,
+      withModal: withModalFromArgs,
+      getExportScriptsQuery: getExportScriptsQueryFromArgs,
+    } = args
+
+    const { data, loading } = getExportScriptsQueryFromArgs
     const { getExportScripts } = data
-    const { updateTemplate } = updateTemplateMutation
-    const { showModal, hideModal } = withModal
+    const { updateTemplate } = updateTemplateMutationFromArgs
+    const { showModal, hideModal } = withModalFromArgs
+
     const onConfirm = ({
       files,
       deleteFiles,
@@ -121,11 +134,13 @@ const mapProps = args => ({
         hideModal()
       })
     }
+
     if (!loading) {
       const options = getExportScripts.map(script => ({
         label: script.label,
         value: script.value,
       }))
+
       showModal('updateTemplateModal', {
         onConfirm,
         hideModal,
@@ -137,9 +152,14 @@ const mapProps = args => ({
     }
   },
   onDeleteTemplate: (templateId, templateName) => {
-    const { deleteTemplateMutation, withModal } = args
-    const { deleteTemplate } = deleteTemplateMutation
-    const { showModal, hideModal } = withModal
+    const {
+      deleteTemplateMutation: deleteTemplateMutationFromArgs,
+      withModal: withModalFromArgs,
+    } = args
+
+    const { deleteTemplate } = deleteTemplateMutationFromArgs
+    const { showModal, hideModal } = withModalFromArgs
+
     const onConfirm = () => {
       deleteTemplate({
         variables: {
@@ -148,6 +168,7 @@ const mapProps = args => ({
       })
       hideModal()
     }
+
     showModal('deleteTemplateModal', {
       onConfirm,
       templateName,

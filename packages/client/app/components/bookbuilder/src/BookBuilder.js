@@ -9,13 +9,8 @@ import {
   DivisionsArea,
 } from './ui'
 
-const {
-  metadataIcon,
-  assetManagerIcon,
-  bookExportIcon,
-  bookSettingIcon,
-  teamManagerIcon,
-} = Icons
+const { metadataIcon, assetManagerIcon, bookExportIcon, teamManagerIcon } =
+  Icons
 
 // const Container = styled.div`
 //   clear: both;
@@ -35,6 +30,7 @@ const Container = styled.div`
   height: 100%;
   overflow-y: auto;
 `
+
 const InnerWrapper = styled.div`
   display: block;
   clear: both;
@@ -44,6 +40,7 @@ const InnerWrapper = styled.div`
   height: calc(100% - 80px);
 `
 
+/* eslint-disable react/prop-types */
 const BookBuilder = ({
   book,
   applicationParameter,
@@ -76,11 +73,8 @@ const BookBuilder = ({
   onWorkflowUpdate,
   onBookSettings,
 }) => {
-  const {
-    canViewTeamManager,
-    canViewMultipleFilesUpload,
-    canAccessBook,
-  } = rules
+  const { canViewTeamManager, canViewMultipleFilesUpload, canAccessBook } =
+    rules
 
   const { divisions, productionEditors } = book
   // const featureUploadDOCXFiles = process.env.FEATURE_UPLOAD_DOCX_FILES || false
@@ -95,6 +89,7 @@ const BookBuilder = ({
       const onConfirm = () => {
         history.push(`/books`)
       }
+
       onWarning(
         `You don't have permissions to access this book. You will be redirected back to the dashboard`,
         onConfirm,
@@ -134,6 +129,7 @@ const BookBuilder = ({
     //   title="Book Settings"
     // />,
   ]
+
   if (canViewTeamManager) {
     headerActions.unshift(
       <Button

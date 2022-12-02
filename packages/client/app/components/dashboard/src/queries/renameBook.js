@@ -9,6 +9,7 @@ const RENAME_BOOK = gql`
     }
   }
 `
+
 const renameBookMutation = props => {
   const { render } = props
 

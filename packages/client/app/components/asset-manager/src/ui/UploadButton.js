@@ -7,12 +7,14 @@ import { Button } from '../../../../ui'
 const Input = styled.input`
   display: none !important;
 `
+
 const Wrapper = styled.div`
   align-items: center;
   display: flex;
   justify-content: flex-start;
 `
 
+/* eslint-disable react/prop-types */
 const UploadButton = ({
   onChange,
   multiple,
@@ -45,4 +47,5 @@ const UploadButton = ({
     </Wrapper>
   )
 }
+
 export default UploadButton

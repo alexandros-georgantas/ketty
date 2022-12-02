@@ -24,6 +24,7 @@ const Input = styled.input`
     line-height: ${th('lineHeightBase')};
   }
 `
+
 const PlainItem = styled.div`
   font-family: ${th('fontHeading')};
   font-size: ${th('fontSizeBase')};
@@ -31,17 +32,20 @@ const PlainItem = styled.div`
   text-align: left;
   width: 100%;
 `
+
 const Wrapper = styled.div`
   align-items: center;
   display: flex;
   justify-content: flex-start;
   width: 100%;
 `
+
 const Actions = styled.div`
   display: flex;
   width: 15.8%;
 `
 
+/* eslint-disable react/prop-types */
 class InfoItem extends Component {
   constructor(props) {
     super(props)
@@ -85,9 +89,10 @@ class InfoItem extends Component {
   renderItem() {
     const { editable, value } = this.props
     const { newValue, editMode, focus } = this.state
+
     if (editable) {
       return !editMode ? (
-        <Fragment>
+        <>
           <PlainItem>{value}</PlainItem>
           <Actions>
             <Button
@@ -96,9 +101,9 @@ class InfoItem extends Component {
               title="Edit"
             />
           </Actions>
-        </Fragment>
+        </>
       ) : (
-        <Fragment>
+        <>
           <Input
             autoFocus={focus}
             onChange={this.handleKeyPress}
@@ -114,9 +119,10 @@ class InfoItem extends Component {
               title="Cancel"
             />
           </Actions>
-        </Fragment>
+        </>
       )
     }
+
     return <PlainItem>{value}</PlainItem>
   }
 

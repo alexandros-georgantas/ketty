@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
@@ -10,17 +11,20 @@ const ProductionEditorsContainer = styled.div`
   justify-content: flex-start;
   margin: calc(4 * ${th('gridUnit')}) auto calc(4 * ${th('gridUnit')});
 `
+
 const NamesContainer = styled.div`
   display: flex;
   /* flex-flow: column nowrap; */
   margin: 0 calc(3 * ${th('gridUnit')}) 0 0;
 `
+
 const ProductionEditorLabel = styled.div`
   color: ${th('colorText')};
   flex-basis: content;
   font-size: ${th('fontSizeBase')};
   line-height: ${th('lineHeightBase')};
 `
+
 const ProductionEditorNames = styled.div`
   color: ${th('colorText')};
   font-size: ${th('fontSizeBase')};
@@ -40,6 +44,7 @@ const normalizer = productionEditors => {
 
   if (productionEditors && productionEditors.length > 1) {
     label = 'Production Editors:'
+
     for (let i = 0; i < productionEditors.length; i += 1) {
       if (i !== productionEditors.length - 1) {
         names += `${productionEditors[i]}, `
@@ -48,13 +53,16 @@ const normalizer = productionEditors => {
       }
     }
   } else if (productionEditors && productionEditors.length !== 0) {
+    /* eslint-disable prefer-destructuring */
     names = productionEditors[0]
+    /* eslint-enable prefer-destructuring */
   } else {
     names = 'Unassigned'
   }
 
   return { names, label }
 }
+
 const ProductionEditorsArea = ({ productionEditors, actions }) => {
   const { label, names } = normalizer(productionEditors)
 

@@ -96,6 +96,9 @@ if (featureBookStructureEnabled) {
     changeNumberOfLevelsModal: ChangeNumberOfLevelsModal,
   }
 }
+
+console.log('modals1', modals)
+
 ReactDOM.render(
   <ModalProvider modals={modals}>
     <Root history={history} routes={routes} theme={theme} />

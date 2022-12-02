@@ -36,6 +36,7 @@ const Button = styled.button`
   }
 `
 
+/* eslint-disable react/prop-types */
 const IconButton = ({ onClick, icon, disabled, className, type }) => (
   <Button
     className={className}

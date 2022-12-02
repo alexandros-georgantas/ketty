@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { State } from 'react-powerplug'
@@ -8,6 +9,7 @@ import { Button, Icons } from '../../../ui'
 const StyledButton = styled(Button)`
   margin-right: ${th('gridUnit')};
 `
+
 const { archiveIcon, unArchiveIcon } = Icons
 
 const ToggleArchivedButton = ({ onChange }) => (
@@ -18,6 +20,7 @@ const ToggleArchivedButton = ({ onChange }) => (
       const toggleArchived = () => {
         setState({ archived: !archived })
       }
+
       const label = archived ? 'HIDE ARCHIVED' : 'SHOW ARCHIVED'
 
       return (

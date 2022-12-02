@@ -1,5 +1,6 @@
 import findIndex from 'lodash/findIndex'
 // import cloneDeep from 'lodash/cloneDeep'
+/* eslint-disable no-param-reassign */
 
 const uuid = require('uuid/v4')
 
@@ -13,10 +14,13 @@ const cloneOutlineItem = (
   thirdLevelParentId = undefined,
 ) => {
   const levelIndex = levelIndexExtractor(levels, levelId)
+
   if (levelIndex === -1) {
     throw new Error('level id does not exist')
   }
+
   const clonedItem = JSON.parse(JSON.stringify(item))
+
   if (levelIndex === 0) {
     const topParentId = uuid()
     clonedItem.id = topParentId
@@ -33,9 +37,11 @@ const cloneOutlineItem = (
       }
     })
   }
+
   if (levelIndex === 1) {
     const itemId = uuid()
     clonedItem.id = itemId
+
     if (levels.length > 2) {
       clonedItem.children.forEach(child => {
         child.parentId = itemId
@@ -43,6 +49,7 @@ const cloneOutlineItem = (
       })
     }
   }
+
   if (levelIndex === 2) {
     const itemId = uuid()
     clonedItem.id = itemId
@@ -65,6 +72,7 @@ const outlineItemGenerator = (
   topId = undefined,
 ) => {
   const levelIndex = levelIndexExtractor(levels, levelId)
+
   if (levelIndex === -1) {
     console.error('level id does not exist')
     return undefined
@@ -78,7 +86,9 @@ const outlineItemGenerator = (
         console.error('parentId is undefined')
         return undefined
       }
+
       const outlineIdLevelTwo = uuid()
+
       if (numberOfLevels === 2) {
         const outlineIdLevelThree = uuid()
         return {
@@ -97,6 +107,7 @@ const outlineItemGenerator = (
           ],
         }
       }
+
       return {
         id: outlineIdLevelTwo,
         title: null,
@@ -105,11 +116,13 @@ const outlineItemGenerator = (
         children: [],
       }
     }
+
     case 2: {
       if (!parentId) {
         console.error('parentId is undefined')
         return undefined
       }
+
       return {
         id: uuid(),
         parentId,
@@ -118,6 +131,7 @@ const outlineItemGenerator = (
         children: [],
       }
     }
+
     default: {
       const outlineIdLevelOne = uuid()
       const outlineIdLevelTwo = uuid()
@@ -181,6 +195,7 @@ const reorderArrayItems = (array, from, to) => {
   if (!item.length) {
     throw new Error(`There is no item in the array at index ${from}`)
   }
+
   array.splice(to, 0, item[0])
   // Move the item to its new position
   return array
@@ -192,14 +207,17 @@ const reorderArrayItems = (array, from, to) => {
 // The output will be either 1 or 2 corresponding to only Chapters (1) or Parts and Chapters (2)
 const bookStructureLevelsNormalizer = levels => {
   const clonedLevels = JSON.parse(JSON.stringify(levels))
+
   if (levels.length === 3) {
     clonedLevels.splice(2, 1)
     clonedLevels.splice(1, 1)
   }
+
   if (levels.length === 4) {
     clonedLevels.splice(3, 1)
     clonedLevels.splice(2, 1)
   }
+
   return clonedLevels
 }
 

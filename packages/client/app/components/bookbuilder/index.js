@@ -1,5 +1,7 @@
+const BookBuilder = require('./src/BookBuilder')
+
 module.exports = {
   frontend: {
-    components: [() => require('./src/BookBuilder')],
+    components: [() => BookBuilder],
   },
 }

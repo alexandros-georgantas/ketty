@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { find, map } from 'lodash'
 import React from 'react'
 import { Draggable, Droppable } from 'react-beautiful-dnd'
@@ -12,6 +13,7 @@ const DivisionContainer = styled.div`
   flex-direction: column;
   margin-bottom: calc(4 * ${th('gridUnit')});
 `
+
 const DivisionHeader = styled.span`
   color: ${th('colorPrimary')};
   flex-basis: content;
@@ -24,11 +26,13 @@ const DivisionHeader = styled.span`
   margin: 0 calc(2 * ${th('gridUnit')}) 0 0;
   padding-top: 5px;
 `
+
 const HeaderContainer = styled.div`
   align-items: center;
   display: flex;
   margin-bottom: calc(2 * ${th('gridUnit')});
 `
+
 const DivisionActions = styled.div`
   display: flex;
   > button:not(:last-child) {
@@ -45,12 +49,14 @@ const EmptyList = styled.div`
   line-height: ${th('lineHeightBase')};
   margin-left: calc(2 * ${th('gridUnit')});
 `
+
 const BookComponentList = styled.div`
   color: ${th('colorText')};
   font-style: normal;
   font-weight: normal;
   z-index: 1;
 `
+
 class Division extends React.Component {
   constructor(props) {
     super(props)
@@ -124,6 +130,7 @@ class Division extends React.Component {
 
   onUpdateWorkflowState(bookComponentId, workflowStates) {
     const { updateBookComponentWorkflowState } = this.props
+
     const workflowStages = map(workflowStates, item => ({
       label: item.label,
       type: item.type,
@@ -167,13 +174,14 @@ class Division extends React.Component {
     } = this.props
 
     const { canViewAddComponent } = rules
+
     const bookComponentInstances = map(bookComponents, (bookComponent, i) => {
       const {
         componentType,
         uploading,
         bookId,
         lock,
-        divisionId,
+        divisionId: bcDivisionId,
         includeInToc,
         componentTypeOrder,
         hasContent,
@@ -183,10 +191,11 @@ class Division extends React.Component {
         pagination,
         trackChangesEnabled,
       } = bookComponent
+
       return (
         <Draggable draggableId={id} index={i} key={id}>
           {provided => (
-            <div ref={provided.innerRef} {...provided.draggableProps}>
+            <div ref={provided.innerRef} {...provided.draggableProps} key={id}>
               <BookComponent
                 applicationParameter={applicationParameter}
                 bookId={bookId}
@@ -195,7 +204,7 @@ class Division extends React.Component {
                 componentType={componentType}
                 componentTypeOrder={componentTypeOrder}
                 currentUser={currentUser}
-                divisionId={divisionId}
+                divisionId={bcDivisionId}
                 divisionType={label}
                 hasContent={hasContent}
                 history={history}
@@ -258,15 +267,18 @@ class Division extends React.Component {
             addButtons.push(
               <AddComponentButton
                 add={this.onAddClick}
+                key={`add-${bookStructure.levels[0].type}`}
                 label={`Add ${bookStructure.levels[0].displayName}`}
                 type={bookStructure.levels[0].type}
               />,
             )
           }
+
           if (bookStructure.levels.length === 4) {
             addButtons.push(
               <AddComponentButton
                 add={this.onAddClick}
+                key={`add-${bookStructure.levels[0].type}`}
                 label={`Add ${bookStructure.levels[0].displayName}`}
                 type={bookStructure.levels[0].type}
               />,
@@ -274,11 +286,13 @@ class Division extends React.Component {
             addButtons.push(
               <AddComponentButton
                 add={this.onAddClick}
+                key={`add-${bookStructure.levels[1].type}`}
                 label={`Add ${bookStructure.levels[1].displayName}`}
                 type={bookStructure.levels[1].type}
               />,
             )
           }
+
           map(componentConfig.allowedComponentTypes, componentType => {
             if (componentType.visibleInHeader) {
               addButtons.push(
@@ -295,6 +309,7 @@ class Division extends React.Component {
                     ) && componentType.value === 'endnotes'
                   }
                   divisionName={componentConfig.name}
+                  key={`add-${componentType.value}`}
                   label={`Add ${componentType.title}`}
                   type={componentType.value}
                 />,
@@ -319,6 +334,7 @@ class Division extends React.Component {
                     ) && componentType.value === 'endnotes'
                   }
                   divisionName={componentConfig.name}
+                  key={`add-${componentType.value}`}
                   label={`Add ${componentType.title}`}
                   type={componentType.value}
                 />
@@ -340,6 +356,7 @@ class Division extends React.Component {
                 ) && componentType.value === 'endnotes'
               }
               divisionName={componentConfig.name}
+              key={`add-${componentType.value}`}
               label={`Add ${componentType.title}`}
               type={componentType.value}
             />
@@ -349,14 +366,25 @@ class Division extends React.Component {
     }
 
     return (
-      <DivisionContainer data-test-id={`${label}-division`}>
-        <HeaderContainer>
-          <DivisionHeader>{label.toUpperCase()}</DivisionHeader>
-          <DivisionActions>{addButtons}</DivisionActions>
+      <DivisionContainer
+        data-test-id={`${label}-division`}
+        key={`division-${divisionId}-container`}
+      >
+        <HeaderContainer key={`division-${divisionId}-container-header`}>
+          <DivisionHeader key={`division-${divisionId}-header`}>
+            {label.toUpperCase()}
+          </DivisionHeader>
+          <DivisionActions key={`division-${divisionId}-header-actions`}>
+            {addButtons}
+          </DivisionActions>
         </HeaderContainer>
-        <Droppable droppableId={divisionId}>
+        <Droppable
+          droppableId={divisionId}
+          key={`division-${divisionId}-droppable`}
+        >
           {(provided, snapshot) => (
             <div
+              key={`division-${divisionId}-droppable-item`}
               ref={provided.innerRef}
               style={{
                 opacity: snapshot.isDraggingOver ? 0.5 : 1,
@@ -364,9 +392,15 @@ class Division extends React.Component {
               }}
             >
               {bookComponents.length > 0 ? (
-                <BookComponentList>{bookComponentInstances}</BookComponentList>
+                <BookComponentList
+                  key={`division-${divisionId}-bookComponentList`}
+                >
+                  {bookComponentInstances}
+                </BookComponentList>
               ) : (
-                <EmptyList>There are no items in this division.</EmptyList>
+                <EmptyList key={`division-${divisionId}-emptyList`}>
+                  There are no items in this division.
+                </EmptyList>
               )}
               {provided.placeholder}
             </div>

@@ -21,6 +21,7 @@ module.exports = webpackEnv => {
   const isEnvDevelopment = webpackEnv === 'development'
   const isEnvProduction = webpackEnv === 'production'
   const serverProtocol = process.env.SERVER_PROTOCOL
+
   // const featureBookStructure = process.env.FEATURE_BOOK_STRUCTURE || false
   const featureBookStructure =
     (process.env.FEATURE_BOOK_STRUCTURE &&
@@ -35,8 +36,6 @@ module.exports = webpackEnv => {
 
   const serverHost = process.env.SERVER_HOST
   const serverPort = process.env.SERVER_PORT
-  const serverUrl = `${serverHost}${serverPort ? `:${serverPort}` : ''}`
-  const serverUrlWithProtocol = `${serverProtocol}://${serverUrl}`
 
   const devServerHost = process.env.CLIENT_HOST
   const devServerPort = process.env.CLIENT_PORT

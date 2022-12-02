@@ -1,6 +1,7 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 
-import AbstractModal from '../../../../common/src/AbstractModal'
+import AbModal from '../../../../common/src/AbstractModal'
 
 const ErrorModal = ({ container, show, toggle }) => {
   const body = (
@@ -8,9 +9,10 @@ const ErrorModal = ({ container, show, toggle }) => {
       An error occurred during the conversion to epub. Please try again later.
     </div>
   )
+
   const title = 'An error occurred'
   return (
-    <AbstractModal
+    <AbModal
       body={body}
       container={container}
       show={show}

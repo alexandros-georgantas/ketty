@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
@@ -28,6 +29,7 @@ const StyledColumn = styled(Column)`
 const DragAndDropContainer = styled(Row)`
   height: calc(100% - 90px);
 `
+
 const StyledDroppableArea = styled.div`
   height: calc(100% - 51px);
   /* border: 1px black solid; */
@@ -42,6 +44,7 @@ const StyledDroppableArea = styled.div`
 const Padder = styled.div`
   padding-left: ${({ level }) => (level > 2 ? '64px' : '38px')};
 `
+
 const Padder1 = styled.div`
   padding-left: 25px;
 `
@@ -49,6 +52,7 @@ const Padder1 = styled.div`
 const Padder2 = styled.div`
   padding-left: ${({ isLast }) => (isLast ? '32px' : '64px')};
 `
+
 const Padder3 = styled.div`
   padding-left: 32px;
 `
@@ -85,16 +89,20 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
         const { droppableId: dDropId, index: dIndex } = destination
 
         const fromBuildingBlocks = draggableId.includes('buildingBlock')
+
         const sourceLevelId = fromBuildingBlocks
           ? sDropId.split('_')[1]
           : sDropId.split('_')[0]
+
         const sourceParentId = sDropId.split('_')[1]
         const sourceTopId = sDropId.split('_')[2]
         const destinationLevelId = dDropId.split('_')[0]
         const destinationParentId = dDropId.split('_')[1]
         const destinationTopId = dDropId.split('_')[2]
+
         const isReorderWithinSameOutlineItem =
           destinationParentId === sourceParentId
+
         const allowedDrop = sourceLevelId === destinationLevelId
 
         const levelIndex = levelIndexExtractor(
@@ -107,6 +115,7 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
         }
 
         const clonedOutline = JSON.parse(JSON.stringify(outlineInternal))
+
         // CASE CREATING NEW OUTLINE ITEMS
         if (fromBuildingBlocks && allowedDrop) {
           if (levelIndex === 0) {
@@ -116,10 +125,12 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
               outlineItemGenerator(bookStructure.levels, destinationLevelId),
             )
           }
+
           if (levelIndex === 1) {
             const outlineItemIndex = findIndex(clonedOutline, {
               id: destinationParentId,
             })
+
             if (outlineItemIndex === -1) {
               throw new Error(
                 `outline item with id ${destinationParentId} does not exist`,
@@ -136,6 +147,7 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
               ),
             )
           }
+
           if (levelIndex === 2) {
             const levelOneIndex = findIndex(clonedOutline, {
               id: destinationTopId,
@@ -144,15 +156,18 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
             if (levelOneIndex === -1) {
               throw new Error('level one id does not exist')
             }
+
             const levelTwoIndex = findIndex(
               clonedOutline[levelOneIndex].children,
               {
                 id: destinationParentId,
               },
             )
+
             if (levelTwoIndex === -1) {
               throw new Error('level two id does not exist')
             }
+
             clonedOutline[levelOneIndex].children[
               levelTwoIndex
             ].children.splice(
@@ -166,9 +181,11 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
               ),
             )
           }
+
           setState({ outlineInternal: clonedOutline })
           updateBookOutline(clonedOutline)
         }
+
         // CASE REORDER EXISTING COMPONENTS
         if (!fromBuildingBlocks && allowedDrop) {
           if (isReorderWithinSameOutlineItem) {
@@ -177,15 +194,18 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
               // clonedOutline = reorderArrayItems(clonedOutline, sIndex, dIndex)
               reorderArrayItems(clonedOutline, sIndex, dIndex)
             }
+
             if (levelIndex === 1) {
               const outlineItemIndex = findIndex(clonedOutline, {
                 id: destinationParentId,
               })
+
               if (outlineItemIndex === -1) {
                 throw new Error(
                   `outline item with id ${destinationParentId} does not exist`,
                 )
               }
+
               // clonedOutline[outlineItemIndex].children = reorderArrayItems(
               //   clonedOutline[outlineItemIndex].children,
               //   sIndex,
@@ -197,6 +217,7 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                 dIndex,
               )
             }
+
             if (levelIndex === 2) {
               const levelOneIndex = findIndex(clonedOutline, {
                 id: destinationTopId,
@@ -205,15 +226,18 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
               if (levelOneIndex === -1) {
                 throw new Error('level one id does not exist')
               }
+
               const levelTwoIndex = findIndex(
                 clonedOutline[levelOneIndex].children,
                 {
                   id: destinationParentId,
                 },
               )
+
               if (levelTwoIndex === -1) {
                 throw new Error('level two id does not exist')
               }
+
               // clonedOutline[levelOneIndex].children[
               //   levelTwoIndex
               // ].children = reorderArrayItems(
@@ -246,6 +270,7 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                   `outline destination item with id ${destinationParentId} does not exist`,
                 )
               }
+
               if (outlineSourceItemIndex === -1) {
                 throw new Error(
                   `outline source item with id ${outlineSourceItemIndex} does not exist`,
@@ -257,6 +282,7 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                   clonedOutline[outlineSourceItemIndex].children[sIndex],
                 ),
               )
+
               toBeMovedItem.parentId = destinationParentId
 
               clonedOutline[outlineSourceItemIndex].children.splice(sIndex, 1)
@@ -281,6 +307,7 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                   `outline destination item with id ${outlineDestinationItemTopIndex} does not exist`,
                 )
               }
+
               if (outlineSourceItemTopIndex === -1) {
                 throw new Error(
                   `outline source item with id ${outlineSourceItemTopIndex} does not exist`,
@@ -306,6 +333,7 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                   `outline destination item with id ${destinationParentId} does not exist`,
                 )
               }
+
               if (outlineSourceItemIndex === -1) {
                 throw new Error(
                   `outline source item with id ${outlineSourceItemIndex} does not exist`,
@@ -319,6 +347,7 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                   ].children[sIndex],
                 ),
               )
+
               toBeMovedItem.parentId = destinationParentId
 
               clonedOutline[outlineSourceItemTopIndex].children[
@@ -328,6 +357,7 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                 outlineDestinationItemIndex
               ].children.splice(dIndex, 0, toBeMovedItem)
             }
+
             setState({ outlineInternal: clonedOutline })
             updateBookOutline(clonedOutline)
           }
@@ -339,11 +369,13 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
         borderLeft: `4px solid ${isDraggingOver ? '#8992E9' : 'white'}`,
         minHeight: '70px',
       })
+
       const getListStyleLevel2 = isDraggingOver => ({
         width: '100%',
         borderLeft: `4px solid ${isDraggingOver ? '#ADDAE2' : 'white'}`,
         minHeight: `${numberOfLevels > 2 ? '70px' : '35px'}`,
       })
+
       const getListStyleLevel3 = isDraggingOver => ({
         width: '100%',
         borderLeft: `4px solid ${isDraggingOver ? '#FFC7AD' : 'white'}`,
@@ -355,57 +387,72 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
         const itemId = id.split('_')[1]
 
         const levelIndex = levelIndexExtractor(bookStructure.levels, levelId)
+
         if (levelIndex === -1) {
           throw new Error('level id does not exist')
         }
+
         const clonedOutline = JSON.parse(JSON.stringify(outlineInternal))
 
         if (levelIndex === 0) {
           const itemIndex = findIndex(clonedOutline, { id: itemId })
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
+
           clonedOutline[itemIndex].title = value
         }
+
         if (levelIndex === 1) {
           const parentId = id.split('_')[2]
           const parentItemIndex = findIndex(clonedOutline, { id: parentId })
+
           if (parentItemIndex === -1) {
             throw new Error(`item's parent id does not exist`)
           }
+
           const itemIndex = findIndex(clonedOutline[parentItemIndex].children, {
             id: itemId,
           })
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
 
           clonedOutline[parentItemIndex].children[itemIndex].title = value
         }
+
         if (levelIndex === 2) {
           const topParentId = id.split('_')[3]
           const parentId = id.split('_')[2]
+
           const topParentItemIndex = findIndex(clonedOutline, {
             id: topParentId,
           })
+
           if (topParentItemIndex === -1) {
             throw new Error(`item's top parent id does not exist`)
           }
+
           const parentIndex = findIndex(
             clonedOutline[topParentItemIndex].children,
             {
               id: parentId,
             },
           )
+
           if (parentIndex === -1) {
             throw new Error(`item's parent id does not exist`)
           }
+
           const itemIndex = findIndex(
             clonedOutline[topParentItemIndex].children[parentIndex].children,
             {
               id: itemId,
             },
           )
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
@@ -418,62 +465,78 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
         setState({ outlineInternal: clonedOutline })
         // updateBookOutline(clonedOutline)
       }
+
       const onTitleInputBlur = (id, value) => {
         const levelId = id.split('_')[0]
         const itemId = id.split('_')[1]
 
         const levelIndex = levelIndexExtractor(bookStructure.levels, levelId)
+
         if (levelIndex === -1) {
           throw new Error('level id does not exist')
         }
+
         const clonedOutline = JSON.parse(JSON.stringify(outlineInternal))
 
         if (levelIndex === 0) {
           const itemIndex = findIndex(clonedOutline, { id: itemId })
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
+
           clonedOutline[itemIndex].title = value
         }
+
         if (levelIndex === 1) {
           const parentId = id.split('_')[2]
           const parentItemIndex = findIndex(clonedOutline, { id: parentId })
+
           if (parentItemIndex === -1) {
             throw new Error(`item's parent id does not exist`)
           }
+
           const itemIndex = findIndex(clonedOutline[parentItemIndex].children, {
             id: itemId,
           })
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
 
           clonedOutline[parentItemIndex].children[itemIndex].title = value
         }
+
         if (levelIndex === 2) {
           const topParentId = id.split('_')[3]
           const parentId = id.split('_')[2]
+
           const topParentItemIndex = findIndex(clonedOutline, {
             id: topParentId,
           })
+
           if (topParentItemIndex === -1) {
             throw new Error(`item's top parent id does not exist`)
           }
+
           const parentIndex = findIndex(
             clonedOutline[topParentItemIndex].children,
             {
               id: parentId,
             },
           )
+
           if (parentIndex === -1) {
             throw new Error(`item's parent id does not exist`)
           }
+
           const itemIndex = findIndex(
             clonedOutline[topParentItemIndex].children[parentIndex].children,
             {
               id: itemId,
             },
           )
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
@@ -492,57 +555,72 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
         const itemId = id.split('_')[1]
 
         const levelIndex = levelIndexExtractor(bookStructure.levels, levelId)
+
         if (levelIndex === -1) {
           throw new Error('level id does not exist')
         }
+
         const clonedOutline = JSON.parse(JSON.stringify(outlineInternal))
 
         if (levelIndex === 0) {
           const itemIndex = findIndex(clonedOutline, { id: itemId })
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
+
           clonedOutline.splice(itemIndex, 1)
         }
+
         if (levelIndex === 1) {
           const parentId = id.split('_')[2]
           const parentItemIndex = findIndex(clonedOutline, { id: parentId })
+
           if (parentItemIndex === -1) {
             throw new Error(`item's parent id does not exist`)
           }
+
           const itemIndex = findIndex(clonedOutline[parentItemIndex].children, {
             id: itemId,
           })
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
 
           clonedOutline[parentItemIndex].children.splice(itemIndex, 1)
         }
+
         if (levelIndex === 2) {
           const topParentId = id.split('_')[3]
           const parentId = id.split('_')[2]
+
           const topParentItemIndex = findIndex(clonedOutline, {
             id: topParentId,
           })
+
           if (topParentItemIndex === -1) {
             throw new Error(`item's top parent id does not exist`)
           }
+
           const parentIndex = findIndex(
             clonedOutline[topParentItemIndex].children,
             {
               id: parentId,
             },
           )
+
           if (parentIndex === -1) {
             throw new Error(`item's parent id does not exist`)
           }
+
           const itemIndex = findIndex(
             clonedOutline[topParentItemIndex].children[parentIndex].children,
             {
               id: itemId,
             },
           )
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
@@ -561,13 +639,16 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
         const itemId = id.split('_')[1]
 
         const levelIndex = levelIndexExtractor(bookStructure.levels, levelId)
+
         if (levelIndex === -1) {
           throw new Error('level id does not exist')
         }
+
         const clonedOutline = JSON.parse(JSON.stringify(outlineInternal))
 
         if (levelIndex === 0) {
           const itemIndex = findIndex(clonedOutline, { id: itemId })
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
@@ -582,15 +663,19 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
             ),
           )
         }
+
         if (levelIndex === 1) {
           const parentId = id.split('_')[2]
           const parentItemIndex = findIndex(clonedOutline, { id: parentId })
+
           if (parentItemIndex === -1) {
             throw new Error(`item's parent id does not exist`)
           }
+
           const itemIndex = findIndex(clonedOutline[parentItemIndex].children, {
             id: itemId,
           })
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
@@ -610,6 +695,7 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
           const rootId = id.split('_')[3]
           const rootItemIndex = findIndex(clonedOutline, { id: rootId })
           const parentId = id.split('_')[2]
+
           const parentItemIndex = findIndex(
             clonedOutline[rootItemIndex].children,
             {
@@ -623,9 +709,11 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
               id: itemId,
             },
           )
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
+
           clonedOutline[rootItemIndex].children[
             parentItemIndex
           ].children.splice(
@@ -672,7 +760,9 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
             <path d="M9 18Q8.175 18 7.588 17.413Q7 16.825 7 16V4Q7 3.175 7.588 2.587Q8.175 2 9 2H18Q18.825 2 19.413 2.587Q20 3.175 20 4V16Q20 16.825 19.413 17.413Q18.825 18 18 18ZM9 16H18Q18 16 18 16Q18 16 18 16V4Q18 4 18 4Q18 4 18 4H9Q9 4 9 4Q9 4 9 4V16Q9 16 9 16Q9 16 9 16ZM5 22Q4.175 22 3.587 21.413Q3 20.825 3 20V6H5V20Q5 20 5 20Q5 20 5 20H16V22ZM9 4Q9 4 9 4Q9 4 9 4V16Q9 16 9 16Q9 16 9 16Q9 16 9 16Q9 16 9 16V4Q9 4 9 4Q9 4 9 4Z" />
           </svg>
         )
+
         const items = []
+
         if (!withClone) {
           items.push(
             <Button
@@ -727,173 +817,181 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                       style={getListStyleLevel1(snapshot.isDraggingOver)}
                     >
                       {outlineInternal && outlineInternal.length > 0
-                        ? outlineInternal.map((
-                            levelOneItem,
-                            levelOneIndex, // book component level1
-                          ) => (
-                            <Draggable
-                              draggableId={levelOneItem.id}
-                              index={levelOneIndex}
-                              key={levelOneItem.id}
-                            >
-                              {(provided, snapshot) => (
-                                <DraggableItemWrapper
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                >
-                                  <DraggableItem
-                                    active
-                                    dragHandleProps={provided.dragHandleProps}
-                                    headerActionComponents={renderTitleActions(
-                                      `${bookStructure.levels[0].id}_${levelOneItem.id}`,
-                                      outlineInternal.length === 1,
-                                      true,
-                                    )}
-                                    headerComponent={renderTitleInput(
-                                      `${bookStructure.levels[0].id}_${levelOneItem.id}`,
-                                      bookStructure.levels[0].displayName,
-                                      levelOneItem.title,
-                                    )}
-                                    isAccordion
+                        ? outlineInternal.map(
+                            (
+                              levelOneItem,
+                              levelOneIndex, // book component level1
+                            ) => (
+                              <Draggable
+                                draggableId={levelOneItem.id}
+                                index={levelOneIndex}
+                                key={levelOneItem.id}
+                              >
+                                {(providedL1, _) => (
+                                  <DraggableItemWrapper
+                                    ref={providedL1.innerRef}
+                                    {...providedL1.draggableProps}
                                   >
-                                    {bookStructure.levels[0].contentStructure
-                                      .length > 0 && ( // book component level1 content
-                                      <Padder2>
-                                        {bookStructure.levels[0].contentStructure.map(
-                                          item => (
-                                            <div>{item.displayName}</div>
-                                          ),
-                                        )}
-                                      </Padder2>
-                                    )}
-                                    <Padder level={2}>
-                                      <Droppable
-                                        droppableId={`${bookStructure.levels[1].id}_${levelOneItem.id}`}
-                                        key={`${bookStructure.levels[1].id}_${levelOneItem.id}`}
-                                        type={bookStructure.levels[1].type}
-                                      >
-                                        {(provided, snapshot) => (
-                                          <DraggableArea
-                                            {...provided.droppableProps}
-                                            ref={provided.innerRef}
-                                            style={getListStyleLevel2(
-                                              snapshot.isDraggingOver,
-                                            )}
-                                          >
-                                            {outlineInternal[levelOneIndex] &&
-                                              outlineInternal[
-                                                levelOneIndex
-                                              ].children.map(
-                                                (
-                                                  levelTwoItem,
-                                                  levelTwoIndex,
-                                                ) => (
-                                                  <Draggable // book component level2
-                                                    draggableId={
-                                                      levelTwoItem.id
-                                                    }
-                                                    index={levelTwoIndex}
-                                                    isDragDisabled={
-                                                      outlineInternal[
-                                                        levelOneIndex
-                                                      ].children.length === 1
-                                                    }
-                                                    key={levelTwoItem.id}
-                                                  >
-                                                    {(provided, snapshot) => (
-                                                      <DraggableItemWrapper
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                      >
-                                                        <DraggableItem
-                                                          active
-                                                          dragHandleProps={
-                                                            provided.dragHandleProps
+                                    <DraggableItem
+                                      active
+                                      dragHandleProps={
+                                        providedL1.dragHandleProps
+                                      }
+                                      headerActionComponents={renderTitleActions(
+                                        `${bookStructure.levels[0].id}_${levelOneItem.id}`,
+                                        outlineInternal.length === 1,
+                                        true,
+                                      )}
+                                      headerComponent={renderTitleInput(
+                                        `${bookStructure.levels[0].id}_${levelOneItem.id}`,
+                                        bookStructure.levels[0].displayName,
+                                        levelOneItem.title,
+                                      )}
+                                      isAccordion
+                                    >
+                                      {bookStructure.levels[0].contentStructure
+                                        .length > 0 && ( // book component level1 content
+                                        <Padder2>
+                                          {bookStructure.levels[0].contentStructure.map(
+                                            item => (
+                                              <div>{item.displayName}</div>
+                                            ),
+                                          )}
+                                        </Padder2>
+                                      )}
+                                      <Padder level={2}>
+                                        <Droppable
+                                          droppableId={`${bookStructure.levels[1].id}_${levelOneItem.id}`}
+                                          key={`${bookStructure.levels[1].id}_${levelOneItem.id}`}
+                                          type={bookStructure.levels[1].type}
+                                        >
+                                          {(providedL2, snapshotL2) => (
+                                            <DraggableArea
+                                              {...providedL2.droppableProps}
+                                              ref={providedL2.innerRef}
+                                              style={getListStyleLevel2(
+                                                snapshotL2.isDraggingOver,
+                                              )}
+                                            >
+                                              {outlineInternal[levelOneIndex] &&
+                                                outlineInternal[
+                                                  levelOneIndex
+                                                ].children.map(
+                                                  (
+                                                    levelTwoItem,
+                                                    levelTwoIndex,
+                                                  ) => (
+                                                    <Draggable // book component level2
+                                                      draggableId={
+                                                        levelTwoItem.id
+                                                      }
+                                                      index={levelTwoIndex}
+                                                      isDragDisabled={
+                                                        outlineInternal[
+                                                          levelOneIndex
+                                                        ].children.length === 1
+                                                      }
+                                                      key={levelTwoItem.id}
+                                                    >
+                                                      {(providedL3, __) => (
+                                                        <DraggableItemWrapper
+                                                          ref={
+                                                            providedL3.innerRef
                                                           }
-                                                          hasHandle={
-                                                            outlineInternal[
-                                                              levelOneIndex
-                                                            ].children.length >
-                                                            1
-                                                          }
-                                                          headerActionComponents={renderTitleActions(
-                                                            `${bookStructure.levels[1].id}_${levelTwoItem.id}_${levelOneItem.id}`,
-                                                            outlineInternal[
-                                                              levelOneIndex
-                                                            ].children
-                                                              .length === 1,
-                                                            true,
-                                                            // numberOfLevels >
-                                                            //   2,
-                                                          )}
-                                                          headerComponent={renderTitleInput(
-                                                            `${bookStructure.levels[1].id}_${levelTwoItem.id}_${levelOneItem.id}`,
-                                                            bookStructure
-                                                              .levels[1]
-                                                              .displayName,
-                                                            levelTwoItem.title,
-                                                          )}
-                                                          isAccordion={
-                                                            numberOfLevels > 2
-                                                          }
+                                                          {...providedL3.draggableProps}
                                                         >
-                                                          {bookStructure
-                                                            .levels[1]
-                                                            .contentStructure
-                                                            .length > 0 && (
-                                                            <Padder2
-                                                              isLast={
-                                                                bookStructure
-                                                                  .levels
-                                                                  .length === 2
-                                                              }
-                                                            >
-                                                              {bookStructure.levels[1].contentStructure.map(
-                                                                item => (
-                                                                  <DisplayName // book component level2 content
-                                                                    hasHandle={
-                                                                      outlineInternal[
-                                                                        levelOneIndex
-                                                                      ].children
-                                                                        .length >
-                                                                      1
-                                                                    }
-                                                                  >
-                                                                    {
-                                                                      item.displayName
-                                                                    }
-                                                                  </DisplayName>
-                                                                ),
-                                                              )}
-                                                            </Padder2>
-                                                          )}
-                                                        </DraggableItem>
-                                                      </DraggableItemWrapper>
-                                                    )}
-                                                  </Draggable>
+                                                          <DraggableItem
+                                                            active
+                                                            dragHandleProps={
+                                                              provided.dragHandleProps
+                                                            }
+                                                            hasHandle={
+                                                              outlineInternal[
+                                                                levelOneIndex
+                                                              ].children
+                                                                .length > 1
+                                                            }
+                                                            headerActionComponents={renderTitleActions(
+                                                              `${bookStructure.levels[1].id}_${levelTwoItem.id}_${levelOneItem.id}`,
+                                                              outlineInternal[
+                                                                levelOneIndex
+                                                              ].children
+                                                                .length === 1,
+                                                              true,
+                                                              // numberOfLevels >
+                                                              //   2,
+                                                            )}
+                                                            headerComponent={renderTitleInput(
+                                                              `${bookStructure.levels[1].id}_${levelTwoItem.id}_${levelOneItem.id}`,
+                                                              bookStructure
+                                                                .levels[1]
+                                                                .displayName,
+                                                              levelTwoItem.title,
+                                                            )}
+                                                            isAccordion={
+                                                              numberOfLevels > 2
+                                                            }
+                                                          >
+                                                            {bookStructure
+                                                              .levels[1]
+                                                              .contentStructure
+                                                              .length > 0 && (
+                                                              <Padder2
+                                                                isLast={
+                                                                  bookStructure
+                                                                    .levels
+                                                                    .length ===
+                                                                  2
+                                                                }
+                                                              >
+                                                                {bookStructure.levels[1].contentStructure.map(
+                                                                  item => (
+                                                                    <DisplayName // book component level2 content
+                                                                      hasHandle={
+                                                                        outlineInternal[
+                                                                          levelOneIndex
+                                                                        ]
+                                                                          .children
+                                                                          .length >
+                                                                        1
+                                                                      }
+                                                                    >
+                                                                      {
+                                                                        item.displayName
+                                                                      }
+                                                                    </DisplayName>
+                                                                  ),
+                                                                )}
+                                                              </Padder2>
+                                                            )}
+                                                          </DraggableItem>
+                                                        </DraggableItemWrapper>
+                                                      )}
+                                                    </Draggable>
+                                                  ),
+                                                )}
+                                              {provided.placeholder}
+                                            </DraggableArea>
+                                          )}
+                                        </Droppable>
+                                        {bookStructure.levels.length === 3 &&
+                                          bookStructure.levels[2]
+                                            .contentStructure.length > 0 && (
+                                            <Padder1>
+                                              {bookStructure.levels[2].contentStructure.map(
+                                                item => (
+                                                  <div>{item.displayName}</div>
                                                 ),
                                               )}
-                                            {provided.placeholder}
-                                          </DraggableArea>
-                                        )}
-                                      </Droppable>
-                                      {bookStructure.levels.length === 3 &&
-                                        bookStructure.levels[2].contentStructure
-                                          .length > 0 && (
-                                          <Padder1>
-                                            {bookStructure.levels[2].contentStructure.map(
-                                              item => (
-                                                <div>{item.displayName}</div>
-                                              ),
-                                            )}
-                                          </Padder1>
-                                        )}
-                                    </Padder>
-                                  </DraggableItem>
-                                </DraggableItemWrapper>
-                              )}
-                            </Draggable>
-                          ))
+                                            </Padder1>
+                                          )}
+                                      </Padder>
+                                    </DraggableItem>
+                                  </DraggableItemWrapper>
+                                )}
+                              </Draggable>
+                            ),
+                          )
                         : !snapshot.isDraggingOver && (
                             <div>Your book is empty</div>
                           )}
@@ -925,269 +1023,276 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                       style={getListStyleLevel1(snapshot.isDraggingOver)}
                     >
                       {outlineInternal && outlineInternal.length > 0
-                        ? outlineInternal.map((
-                            levelOneItem,
-                            levelOneIndex, // book component level1
-                          ) => (
-                            <Draggable
-                              draggableId={levelOneItem.id}
-                              index={levelOneIndex}
-                              key={levelOneItem.id}
-                            >
-                              {(provided, snapshot) => (
-                                <DraggableItemWrapper
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                >
-                                  <DraggableItem
-                                    active
-                                    dragHandleProps={provided.dragHandleProps}
-                                    headerActionComponents={renderTitleActions(
-                                      `${bookStructure.levels[0].id}_${levelOneItem.id}`,
-                                      outlineInternal.length === 1,
-                                      true,
-                                    )}
-                                    headerComponent={renderTitleInput(
-                                      `${bookStructure.levels[0].id}_${levelOneItem.id}`,
-                                      bookStructure.levels[0].displayName,
-                                      levelOneItem.title,
-                                    )}
-                                    isAccordion
+                        ? outlineInternal.map(
+                            (
+                              levelOneItem,
+                              levelOneIndex, // book component level1
+                            ) => (
+                              <Draggable
+                                draggableId={levelOneItem.id}
+                                index={levelOneIndex}
+                                key={levelOneItem.id}
+                              >
+                                {(providedL1, _) => (
+                                  <DraggableItemWrapper
+                                    ref={providedL1.innerRef}
+                                    {...providedL1.draggableProps}
                                   >
-                                    {bookStructure.levels[0].contentStructure
-                                      .length > 0 && ( // book component level1 content
-                                      <Padder2>
-                                        {bookStructure.levels[0].contentStructure.map(
-                                          item => (
-                                            <div>{item.displayName}</div>
-                                          ),
-                                        )}
-                                      </Padder2>
-                                    )}
-                                    <Padder level={2}>
-                                      <Droppable
-                                        droppableId={`${bookStructure.levels[1].id}_${levelOneItem.id}`}
-                                        key={`${bookStructure.levels[1].id}_${levelOneItem.id}`}
-                                        type={bookStructure.levels[1].type}
-                                      >
-                                        {(provided, snapshot) => (
-                                          <DraggableArea
-                                            {...provided.droppableProps}
-                                            ref={provided.innerRef}
-                                            style={getListStyleLevel2(
-                                              snapshot.isDraggingOver,
-                                            )}
-                                          >
-                                            {outlineInternal[levelOneIndex] &&
-                                              outlineInternal[
-                                                levelOneIndex
-                                              ].children.map(
-                                                (
-                                                  levelTwoItem,
-                                                  levelTwoIndex,
-                                                ) => (
-                                                  <Draggable // book component level2
-                                                    draggableId={
-                                                      levelTwoItem.id
-                                                    }
-                                                    index={levelTwoIndex}
-                                                    isDragDisabled={
-                                                      outlineInternal[
-                                                        levelOneIndex
-                                                      ].children.length === 1
-                                                    }
-                                                    key={levelTwoItem.id}
-                                                  >
-                                                    {(provided, snapshot) => (
-                                                      <DraggableItemWrapper
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                      >
-                                                        <DraggableItem
-                                                          active
-                                                          dragHandleProps={
-                                                            provided.dragHandleProps
+                                    <DraggableItem
+                                      active
+                                      dragHandleProps={provided.dragHandleProps}
+                                      headerActionComponents={renderTitleActions(
+                                        `${bookStructure.levels[0].id}_${levelOneItem.id}`,
+                                        outlineInternal.length === 1,
+                                        true,
+                                      )}
+                                      headerComponent={renderTitleInput(
+                                        `${bookStructure.levels[0].id}_${levelOneItem.id}`,
+                                        bookStructure.levels[0].displayName,
+                                        levelOneItem.title,
+                                      )}
+                                      isAccordion
+                                    >
+                                      {bookStructure.levels[0].contentStructure
+                                        .length > 0 && ( // book component level1 content
+                                        <Padder2>
+                                          {bookStructure.levels[0].contentStructure.map(
+                                            item => (
+                                              <div>{item.displayName}</div>
+                                            ),
+                                          )}
+                                        </Padder2>
+                                      )}
+                                      <Padder level={2}>
+                                        <Droppable
+                                          droppableId={`${bookStructure.levels[1].id}_${levelOneItem.id}`}
+                                          key={`${bookStructure.levels[1].id}_${levelOneItem.id}`}
+                                          type={bookStructure.levels[1].type}
+                                        >
+                                          {(providedL2, snapshotL2) => (
+                                            <DraggableArea
+                                              {...providedL2.droppableProps}
+                                              ref={providedL2.innerRef}
+                                              style={getListStyleLevel2(
+                                                snapshotL2.isDraggingOver,
+                                              )}
+                                            >
+                                              {outlineInternal[levelOneIndex] &&
+                                                outlineInternal[
+                                                  levelOneIndex
+                                                ].children.map(
+                                                  (
+                                                    levelTwoItem,
+                                                    levelTwoIndex,
+                                                  ) => (
+                                                    <Draggable // book component level2
+                                                      draggableId={
+                                                        levelTwoItem.id
+                                                      }
+                                                      index={levelTwoIndex}
+                                                      isDragDisabled={
+                                                        outlineInternal[
+                                                          levelOneIndex
+                                                        ].children.length === 1
+                                                      }
+                                                      key={levelTwoItem.id}
+                                                    >
+                                                      {(providedL3, __) => (
+                                                        <DraggableItemWrapper
+                                                          ref={
+                                                            providedL3.innerRef
                                                           }
-                                                          hasHandle={
-                                                            outlineInternal[
-                                                              levelOneIndex
-                                                            ].children.length >
-                                                            1
-                                                          }
-                                                          headerActionComponents={renderTitleActions(
-                                                            `${bookStructure.levels[1].id}_${levelTwoItem.id}_${levelOneItem.id}`,
-                                                            outlineInternal[
-                                                              levelOneIndex
-                                                            ].children
-                                                              .length === 1,
-                                                            true,
-                                                            // numberOfLevels >
-                                                            //   2,
-                                                          )}
-                                                          headerComponent={renderTitleInput(
-                                                            `${bookStructure.levels[1].id}_${levelTwoItem.id}_${levelOneItem.id}`,
-                                                            bookStructure
-                                                              .levels[1]
-                                                              .displayName,
-                                                            levelTwoItem.title,
-                                                          )}
-                                                          isAccordion={
-                                                            numberOfLevels > 2
-                                                          }
+                                                          {...providedL3.draggableProps}
                                                         >
-                                                          {bookStructure
-                                                            .levels[1]
-                                                            .contentStructure
-                                                            .length > 0 && (
-                                                            <Padder2
-                                                              isLast={
-                                                                bookStructure
-                                                                  .levels
-                                                                  .length === 2
-                                                              }
-                                                            >
-                                                              {bookStructure.levels[1].contentStructure.map(
-                                                                item => (
-                                                                  <DisplayName // book component level2 content
-                                                                    hasHandle={
-                                                                      outlineInternal[
-                                                                        levelOneIndex
-                                                                      ].children
-                                                                        .length >
-                                                                      1
+                                                          <DraggableItem
+                                                            active
+                                                            dragHandleProps={
+                                                              providedL3.dragHandleProps
+                                                            }
+                                                            hasHandle={
+                                                              outlineInternal[
+                                                                levelOneIndex
+                                                              ].children
+                                                                .length > 1
+                                                            }
+                                                            headerActionComponents={renderTitleActions(
+                                                              `${bookStructure.levels[1].id}_${levelTwoItem.id}_${levelOneItem.id}`,
+                                                              outlineInternal[
+                                                                levelOneIndex
+                                                              ].children
+                                                                .length === 1,
+                                                              true,
+                                                              // numberOfLevels >
+                                                              //   2,
+                                                            )}
+                                                            headerComponent={renderTitleInput(
+                                                              `${bookStructure.levels[1].id}_${levelTwoItem.id}_${levelOneItem.id}`,
+                                                              bookStructure
+                                                                .levels[1]
+                                                                .displayName,
+                                                              levelTwoItem.title,
+                                                            )}
+                                                            isAccordion={
+                                                              numberOfLevels > 2
+                                                            }
+                                                          >
+                                                            {bookStructure
+                                                              .levels[1]
+                                                              .contentStructure
+                                                              .length > 0 && (
+                                                              <Padder2
+                                                                isLast={
+                                                                  bookStructure
+                                                                    .levels
+                                                                    .length ===
+                                                                  2
+                                                                }
+                                                              >
+                                                                {bookStructure.levels[1].contentStructure.map(
+                                                                  item => (
+                                                                    <DisplayName // book component level2 content
+                                                                      hasHandle={
+                                                                        outlineInternal[
+                                                                          levelOneIndex
+                                                                        ]
+                                                                          .children
+                                                                          .length >
+                                                                        1
+                                                                      }
+                                                                    >
+                                                                      {
+                                                                        item.displayName
+                                                                      }
+                                                                    </DisplayName>
+                                                                  ),
+                                                                )}
+                                                              </Padder2>
+                                                            )}
+                                                            {bookStructure
+                                                              .levels.length ===
+                                                            4 ? (
+                                                              <>
+                                                                <Padder
+                                                                  level={3}
+                                                                >
+                                                                  <Droppable
+                                                                    droppableId={`${bookStructure.levels[2].id}_${levelTwoItem.id}_${levelOneItem.id}`}
+                                                                    key={`${bookStructure.levels[2].id}_${levelTwoItem.id}_${levelOneItem.id}`}
+                                                                    type={
+                                                                      bookStructure
+                                                                        .levels[2]
+                                                                        .type
                                                                     }
                                                                   >
-                                                                    {
-                                                                      item.displayName
-                                                                    }
-                                                                  </DisplayName>
-                                                                ),
-                                                              )}
-                                                            </Padder2>
-                                                          )}
-                                                          {bookStructure.levels
-                                                            .length === 4 ? (
-                                                            <>
-                                                              <Padder level={3}>
-                                                                <Droppable
-                                                                  droppableId={`${bookStructure.levels[2].id}_${levelTwoItem.id}_${levelOneItem.id}`}
-                                                                  key={`${bookStructure.levels[2].id}_${levelTwoItem.id}_${levelOneItem.id}`}
-                                                                  type={
-                                                                    bookStructure
-                                                                      .levels[2]
-                                                                      .type
-                                                                  }
-                                                                >
-                                                                  {(
-                                                                    provided,
-                                                                    snapshot,
-                                                                  ) => (
-                                                                    <DraggableArea
-                                                                      {...provided.droppableProps}
-                                                                      ref={
-                                                                        provided.innerRef
-                                                                      }
-                                                                      style={getListStyleLevel3(
-                                                                        snapshot.isDraggingOver,
-                                                                      )}
-                                                                    >
-                                                                      {outlineInternal[
-                                                                        levelOneIndex
-                                                                      ]
-                                                                        .children[
-                                                                        levelTwoIndex
-                                                                      ] &&
-                                                                        outlineInternal[
+                                                                    {(
+                                                                      providedL4,
+                                                                      snapshotL4,
+                                                                    ) => (
+                                                                      <DraggableArea
+                                                                        {...providedL4.droppableProps}
+                                                                        ref={
+                                                                          providedL4.innerRef
+                                                                        }
+                                                                        style={getListStyleLevel3(
+                                                                          snapshotL4.isDraggingOver,
+                                                                        )}
+                                                                      >
+                                                                        {outlineInternal[
                                                                           levelOneIndex
                                                                         ]
                                                                           .children[
                                                                           levelTwoIndex
-                                                                        ]
-                                                                          .children &&
-                                                                        outlineInternal[
-                                                                          levelOneIndex
-                                                                        ].children[
-                                                                          levelTwoIndex
-                                                                        ].children.map(
-                                                                          (
-                                                                            levelThreeItem,
-                                                                            levelThreeIndex,
-                                                                          ) => (
-                                                                            <Draggable // book component level3
-                                                                              draggableId={
-                                                                                levelThreeItem.id
-                                                                              }
-                                                                              index={
-                                                                                levelThreeIndex
-                                                                              }
-                                                                              isDragDisabled={
-                                                                                outlineInternal[
-                                                                                  levelOneIndex
-                                                                                ]
-                                                                                  .children[
-                                                                                  levelTwoIndex
-                                                                                ]
-                                                                                  .children
-                                                                                  .length ===
-                                                                                1
-                                                                              }
-                                                                              key={
-                                                                                levelThreeItem.id
-                                                                              }
-                                                                            >
-                                                                              {(
-                                                                                provided,
-                                                                                snapshot,
-                                                                              ) => (
-                                                                                <DraggableItemWrapper
-                                                                                  ref={
-                                                                                    provided.innerRef
-                                                                                  }
-                                                                                  {...provided.draggableProps}
-                                                                                >
-                                                                                  <DraggableItem
-                                                                                    active
-                                                                                    dragHandleProps={
-                                                                                      provided.dragHandleProps
+                                                                        ] &&
+                                                                          outlineInternal[
+                                                                            levelOneIndex
+                                                                          ]
+                                                                            .children[
+                                                                            levelTwoIndex
+                                                                          ]
+                                                                            .children &&
+                                                                          outlineInternal[
+                                                                            levelOneIndex
+                                                                          ].children[
+                                                                            levelTwoIndex
+                                                                          ].children.map(
+                                                                            (
+                                                                              levelThreeItem,
+                                                                              levelThreeIndex,
+                                                                            ) => (
+                                                                              <Draggable // book component level3
+                                                                                draggableId={
+                                                                                  levelThreeItem.id
+                                                                                }
+                                                                                index={
+                                                                                  levelThreeIndex
+                                                                                }
+                                                                                isDragDisabled={
+                                                                                  outlineInternal[
+                                                                                    levelOneIndex
+                                                                                  ]
+                                                                                    .children[
+                                                                                    levelTwoIndex
+                                                                                  ]
+                                                                                    .children
+                                                                                    .length ===
+                                                                                  1
+                                                                                }
+                                                                                key={
+                                                                                  levelThreeItem.id
+                                                                                }
+                                                                              >
+                                                                                {(
+                                                                                  providedL5,
+                                                                                  ___,
+                                                                                ) => (
+                                                                                  <DraggableItemWrapper
+                                                                                    ref={
+                                                                                      providedL5.innerRef
                                                                                     }
-                                                                                    hasHandle={
-                                                                                      outlineInternal[
-                                                                                        levelOneIndex
-                                                                                      ]
-                                                                                        .children[
-                                                                                        levelTwoIndex
-                                                                                      ]
-                                                                                        .children
-                                                                                        .length >
-                                                                                      1
-                                                                                    }
-                                                                                    headerActionComponents={renderTitleActions(
-                                                                                      `${bookStructure.levels[2].id}_${levelThreeItem.id}_${levelTwoItem.id}_${levelOneItem.id}`,
-                                                                                      outlineInternal[
-                                                                                        levelOneIndex
-                                                                                      ]
-                                                                                        .children[
-                                                                                        levelTwoIndex
-                                                                                      ]
-                                                                                        .children
-                                                                                        .length ===
-                                                                                        1,
-                                                                                      true,
-                                                                                    )}
-                                                                                    headerComponent={renderTitleInput(
-                                                                                      `${bookStructure.levels[2].id}_${levelThreeItem.id}_${levelTwoItem.id}_${levelOneItem.id}`,
-                                                                                      bookStructure
-                                                                                        .levels[2]
-                                                                                        .displayName,
-                                                                                      levelThreeItem.title,
-                                                                                    )}
+                                                                                    {...providedL5.draggableProps}
                                                                                   >
-                                                                                    {bookStructure
-                                                                                      .levels[2]
-                                                                                      .contentStructure
-                                                                                      .length >
-                                                                                      0 && (
-                                                                                      <>
+                                                                                    <DraggableItem
+                                                                                      active
+                                                                                      dragHandleProps={
+                                                                                        providedL5.dragHandleProps
+                                                                                      }
+                                                                                      hasHandle={
+                                                                                        outlineInternal[
+                                                                                          levelOneIndex
+                                                                                        ]
+                                                                                          .children[
+                                                                                          levelTwoIndex
+                                                                                        ]
+                                                                                          .children
+                                                                                          .length >
+                                                                                        1
+                                                                                      }
+                                                                                      headerActionComponents={renderTitleActions(
+                                                                                        `${bookStructure.levels[2].id}_${levelThreeItem.id}_${levelTwoItem.id}_${levelOneItem.id}`,
+                                                                                        outlineInternal[
+                                                                                          levelOneIndex
+                                                                                        ]
+                                                                                          .children[
+                                                                                          levelTwoIndex
+                                                                                        ]
+                                                                                          .children
+                                                                                          .length ===
+                                                                                          1,
+                                                                                        true,
+                                                                                      )}
+                                                                                      headerComponent={renderTitleInput(
+                                                                                        `${bookStructure.levels[2].id}_${levelThreeItem.id}_${levelTwoItem.id}_${levelOneItem.id}`,
+                                                                                        bookStructure
+                                                                                          .levels[2]
+                                                                                          .displayName,
+                                                                                        levelThreeItem.title,
+                                                                                      )}
+                                                                                    >
+                                                                                      {bookStructure
+                                                                                        .levels[2]
+                                                                                        .contentStructure
+                                                                                        .length >
+                                                                                        0 && (
                                                                                         <Padder3>
                                                                                           {bookStructure.levels[2].contentStructure.map(
                                                                                             item => (
@@ -1211,59 +1316,60 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                                                                                             ),
                                                                                           )}
                                                                                         </Padder3>
-                                                                                      </>
-                                                                                    )}
-                                                                                  </DraggableItem>
-                                                                                </DraggableItemWrapper>
-                                                                              )}
-                                                                            </Draggable>
-                                                                          ),
-                                                                        )}
-                                                                      {
-                                                                        provided.placeholder
-                                                                      }
-                                                                    </DraggableArea>
-                                                                  )}
-                                                                </Droppable>
-                                                              </Padder>
-                                                              {bookStructure
-                                                                .levels
-                                                                .length === 4 &&
-                                                                bookStructure
-                                                                  .levels[3]
-                                                                  .contentStructure
-                                                                  .length >
-                                                                  0 && (
-                                                                  <Padder2>
-                                                                    {bookStructure.levels[3].contentStructure.map(
-                                                                      item => (
-                                                                        <div>
-                                                                          {
-                                                                            item.displayName
-                                                                          }
-                                                                        </div>
-                                                                      ),
+                                                                                      )}
+                                                                                    </DraggableItem>
+                                                                                  </DraggableItemWrapper>
+                                                                                )}
+                                                                              </Draggable>
+                                                                            ),
+                                                                          )}
+                                                                        {
+                                                                          provided.placeholder
+                                                                        }
+                                                                      </DraggableArea>
                                                                     )}
-                                                                  </Padder2>
-                                                                )}
-                                                            </>
-                                                          ) : null}
-                                                        </DraggableItem>
-                                                      </DraggableItemWrapper>
-                                                    )}
-                                                  </Draggable>
-                                                ),
-                                              )}
-                                            {provided.placeholder}
-                                          </DraggableArea>
-                                        )}
-                                      </Droppable>
-                                    </Padder>
-                                  </DraggableItem>
-                                </DraggableItemWrapper>
-                              )}
-                            </Draggable>
-                          ))
+                                                                  </Droppable>
+                                                                </Padder>
+                                                                {bookStructure
+                                                                  .levels
+                                                                  .length ===
+                                                                  4 &&
+                                                                  bookStructure
+                                                                    .levels[3]
+                                                                    .contentStructure
+                                                                    .length >
+                                                                    0 && (
+                                                                    <Padder2>
+                                                                      {bookStructure.levels[3].contentStructure.map(
+                                                                        item => (
+                                                                          <div>
+                                                                            {
+                                                                              item.displayName
+                                                                            }
+                                                                          </div>
+                                                                        ),
+                                                                      )}
+                                                                    </Padder2>
+                                                                  )}
+                                                              </>
+                                                            ) : null}
+                                                          </DraggableItem>
+                                                        </DraggableItemWrapper>
+                                                      )}
+                                                    </Draggable>
+                                                  ),
+                                                )}
+                                              {provided.placeholder}
+                                            </DraggableArea>
+                                          )}
+                                        </Droppable>
+                                      </Padder>
+                                    </DraggableItem>
+                                  </DraggableItemWrapper>
+                                )}
+                              </Draggable>
+                            ),
+                          )
                         : !snapshot.isDraggingOver && (
                             <div>Your book is empty</div>
                           )}

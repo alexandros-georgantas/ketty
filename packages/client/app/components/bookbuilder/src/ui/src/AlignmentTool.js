@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { find } from 'lodash'
@@ -9,6 +10,7 @@ const Container = styled.div`
   align-items: center;
   flex-basis: ${({ isToplevel }) => (isToplevel ? '9.1%' : '9.4%')};
 `
+
 const Separator = styled.div`
   background-color: #828282;
   height: 28px;
@@ -26,6 +28,7 @@ const AlignmentTool = ({
     const { id } = currentTarget
     onClickAlignmentBox(id)
   }
+
   const leftData = find(data, { id: 'left' })
   const rightData = find(data, { id: 'right' })
 

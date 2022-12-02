@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 
@@ -8,6 +9,7 @@ const StyledIcon = styled.i`
   width: 24px;
   display: block;
 `
+
 const Label = styled.span`
   ${props => props.hasIcon && `margin-left: 4px;`}
 `

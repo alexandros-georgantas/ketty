@@ -9,4 +9,5 @@ const OuterContainer = styled.div`
   width: 100%;
   justify-content: center;
 `
+
 export default OuterContainer

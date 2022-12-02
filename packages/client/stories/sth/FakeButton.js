@@ -8,7 +8,7 @@ const Btn = styled.button`
 `
 
 /** This appears in storybook */
-const Button = props => <Btn primary={props.primary}>{props.label}</Btn>
+const Button = ({ primary, label }) => <Btn primary={primary}>{label}</Btn>
 
 Button.propTypes = {
   /** This also appears in storybook */

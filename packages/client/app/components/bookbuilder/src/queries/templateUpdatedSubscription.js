@@ -13,9 +13,11 @@ const TEMPLATE_UPDATED_SUBSCRIPTION = gql`
 const templateUpdatedForPagedStyledSubscription = props => {
   const { render, getTemplateQuery } = props
   const { refetch } = getTemplateQuery
+
   const triggerRefetch = () => {
     refetch()
   }
+
   return (
     <Subscription
       onSubscriptionData={triggerRefetch}
@@ -26,4 +28,4 @@ const templateUpdatedForPagedStyledSubscription = props => {
   )
 }
 
-export { templateUpdatedForPagedStyledSubscription }
+export default templateUpdatedForPagedStyledSubscription

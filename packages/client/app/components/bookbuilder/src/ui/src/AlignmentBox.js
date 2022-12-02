@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
@@ -17,13 +18,13 @@ const Container = styled.div`
   border-bottom: ${({ noBorder }) => (noBorder.bottom ? 0 : '')};
   border-left: ${({ noBorder }) => (noBorder.left ? 0 : '')};
 `
+
 const AlignmentBox = ({ active, id, noBorder, onClick }) => {
-  
   return (
     <Container
       active={active}
-      noBorder={noBorder}
       id={id}
+      noBorder={noBorder}
       onClick={onClick}
       role="presentation"
     />

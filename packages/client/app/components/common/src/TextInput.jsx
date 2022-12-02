@@ -1,3 +1,4 @@
+/* eslint-disable */
 /*
   Courtesy of Jure and Blahah
   @

@@ -18,6 +18,7 @@ const bookComponentSource = {
       id: monitor.getItem().id,
       no: monitor.getItem().no,
     }
+
     props.onEndDrag(params)
   },
   isDragging(props, monitor) {
@@ -54,6 +55,7 @@ const bookComponentTarget = {
     if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return
 
     props.onMove(dragIndex, hoverIndex, dragDivision, hoverDivision)
+    /* eslint-disable  no-param-reassign */
     monitor.getItem().no = hoverIndex
   },
 }
@@ -70,6 +72,7 @@ const collectDrop = (connect, monitor) => {
     connectDropTarget: connect.dropTarget(),
   }
 }
+
 /* eslint-enable */
 export {
   bookComponentSource,

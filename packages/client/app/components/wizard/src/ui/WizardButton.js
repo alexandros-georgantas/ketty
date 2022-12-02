@@ -41,6 +41,7 @@ const disabledStyles = css`
     border: 1px solid #ccc;
   }
 `
+
 const dangerStyles = css`
   &:hover {
     color: #fff;
@@ -48,6 +49,7 @@ const dangerStyles = css`
     border: 1px solid ${th('colorError')};
   }
 `
+
 const WizardButton = styled.button.attrs(({ title, type }) => ({
   title,
   type: type || 'button',
@@ -57,6 +59,7 @@ const WizardButton = styled.button.attrs(({ title, type }) => ({
     if (active) {
       return `#0B65CB`
     }
+
     return '#fff'
   }};
   border-radius: 4px;
@@ -64,6 +67,7 @@ const WizardButton = styled.button.attrs(({ title, type }) => ({
     if (active) {
       return `1px solid #0B65CB`
     }
+
     return '1px solid #ccc'
   }};
   color: ${th('colorText')};

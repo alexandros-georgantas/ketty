@@ -4,6 +4,7 @@ import { mimetypeHelpers } from '../../../common'
 import UploadButton from './UploadButton'
 
 const { assetManagerFileExtensions } = mimetypeHelpers
+/* eslint-disable react/prop-types */
 class UploadFilesButton extends React.Component {
   constructor(props) {
     super(props)

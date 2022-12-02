@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
@@ -8,6 +9,7 @@ const HeaderContainer = styled.div`
   font-family: 'Fira Sans Condensed';
   margin: 0 auto calc(7 * ${th('gridUnit')});
 `
+
 const Title = styled.div`
   border-bottom: calc(${th('gridUnit')} / 4) solid ${th('colorFurniture')};
   margin-bottom: calc(2 * ${th('gridUnit')});
@@ -24,6 +26,7 @@ const HeaderActions = styled.div`
   flex-flow: row wrap;
   justify-content: space-between;
 `
+
 const Header = ({ bookTitle, actions }) => {
   return (
     <HeaderContainer>

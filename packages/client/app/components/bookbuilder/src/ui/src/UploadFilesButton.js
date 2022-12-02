@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import { sortBy, forEach } from 'lodash'
 import UploadButton from './UploadButton'

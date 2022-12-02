@@ -9,6 +9,7 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
 `
+
 const Spinner = styled.div`
   width: 50px;
   height: 50px;

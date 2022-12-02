@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
@@ -9,6 +10,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: row;
 `
+
 const Label = styled.span`
   color: #828282;
   font-family: 'Fira Sans Condensed';
@@ -19,6 +21,7 @@ const Label = styled.span`
     labelPositionRight ? '0 0 0 10px' : '0 10px 0 0'};
   order: ${({ labelPositionRight }) => (labelPositionRight ? 2 : 0)};
 `
+
 const AlignmentBoxWithLabel = ({
   active,
   id,

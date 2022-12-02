@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+/* eslint-disable react/prop-types, no-shadow */
 
 import React from 'react'
 import { adopt } from 'react-adopt'
@@ -54,4 +54,5 @@ const Connected = props => {
     </Composed>
   )
 }
+
 export default Connected

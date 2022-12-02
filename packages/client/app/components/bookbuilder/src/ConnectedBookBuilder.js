@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-
+/* eslint-disable react/prop-types */
 import React from 'react'
 import { get, findIndex, map, find, pickBy } from 'lodash'
 import { adopt } from 'react-adopt'
@@ -106,9 +106,14 @@ const mapProps = args => ({
   ingestWordFiles: args.ingestWordFilesMutation.ingestWordFiles,
   exportBook: args.exportBookMutation.exportBook,
   onDeleteBookComponent: (bookComponentId, componentType, title) => {
-    const { deleteBookComponentMutation, withModal } = args
-    const { deleteBookComponent } = deleteBookComponentMutation
-    const { showModal, hideModal } = withModal
+    const {
+      deleteBookComponentMutation: deleteBookComponentMutationFromArgs,
+      withModal: withModalFromArgs,
+    } = args
+
+    const { deleteBookComponent } = deleteBookComponentMutationFromArgs
+    const { showModal, hideModal } = withModalFromArgs
+
     const onConfirm = () => {
       deleteBookComponent({
         variables: {
@@ -120,6 +125,7 @@ const mapProps = args => ({
       })
       hideModal()
     }
+
     showModal('deleteBookComponent', {
       onConfirm,
       componentType,
@@ -132,42 +138,49 @@ const mapProps = args => ({
     })
   },
   onError: error => {
-    const { withModal } = args
-    const { showModal, hideModal } = withModal
+    const { withModal: withModalFromArgs } = args
+    const { showModal, hideModal } = withModalFromArgs
     showModal('errorModal', {
       onConfirm: hideModal,
       error,
     })
   },
   onBookSettings: book => {
-    const { withModal, updateRunningHeadersMutation } = args
-    const { updateRunningHeaders } = updateRunningHeadersMutation
-    const { showModal, hideModal } = withModal
+    const {
+      withModalFromArgs,
+      updateRunningHeadersMutation: updateRunningHeadersMutationFromArgs,
+    } = args
+
+    const { updateRunningHeaders } = updateRunningHeadersMutationFromArgs
+    const { showModal, hideModal } = withModalFromArgs
     const { divisions } = book
     const bookComponents = []
+
     for (let i = 0; i < divisions.length; i += 1) {
       for (let j = 0; j < divisions[i].bookComponents.length; j += 1) {
         bookComponents.push(divisions[i].bookComponents[j])
       }
     }
 
-    const onConfirm = bookComponents => {
+    const onConfirm = bookComponentsParam => {
       updateRunningHeaders({
         variables: {
-          input: bookComponents,
+          input: bookComponentsParam,
           bookId: book.id,
         },
       })
       hideModal()
     }
+
     showModal('bookSettingsModal', {
       onConfirm,
       bookComponents,
     })
   },
   onWarning: (warning, handler = undefined) => {
-    const { withModal } = args
-    const { showModal, hideModal } = withModal
+    const { withModal: withModalFromArgs } = args
+    const { showModal, hideModal } = withModalFromArgs
+
     const onClick = () => {
       if (!handler) {
         hideModal()
@@ -176,6 +189,7 @@ const mapProps = args => ({
         hideModal()
       }
     }
+
     showModal('unlockedModal', {
       onConfirm: onClick,
       warning,
@@ -204,9 +218,14 @@ const mapProps = args => ({
       })
     }),
   onAdminUnlock: (bookComponentId, componentType, title) => {
-    const { unlockBookComponentMutation, withModal } = args
-    const { unlockBookComponent } = unlockBookComponentMutation
-    const { showModal, hideModal } = withModal
+    const {
+      unlockBookComponentMutation: unlockBookComponentMutationFromArgs,
+      withModal: withModalFromArgs,
+    } = args
+
+    const { unlockBookComponent } = unlockBookComponentMutationFromArgs
+    const { showModal, hideModal } = withModalFromArgs
+
     const onConfirm = () => {
       unlockBookComponent({
         variables: {
@@ -217,6 +236,7 @@ const mapProps = args => ({
       })
       hideModal()
     }
+
     showModal('unlockModal', {
       onConfirm,
       componentType,
@@ -224,17 +244,26 @@ const mapProps = args => ({
     })
   },
   onMetadataAdd: book => {
-    const { updateBookMetadataMutation, withModal } = args
-    const { updateMetadata } = updateBookMetadataMutation
-    const { showModal, hideModal } = withModal
+    const {
+      updateBookMetadataMutation: updateBookMetadataMutationFromArgs,
+      withModal: withModalFromArgs,
+    } = args
+
+    const { updateMetadata } = updateBookMetadataMutationFromArgs
+    const { showModal, hideModal } = withModalFromArgs
+
     const onConfirm = values => {
-      if (values.edition === '') {
-        values.edition = 0
+      const clonedValues = JSON.parse(JSON.stringify(values))
+
+      if (clonedValues.edition === '') {
+        clonedValues.edition = 0
       }
-      if (values.copyrightYear === '') {
-        values.copyrightYear = 1900
+
+      if (clonedValues.copyrightYear === '') {
+        clonedValues.copyrightYear = 1900
       }
-      const filtered = pickBy(values, v => v !== null && v !== undefined)
+
+      const filtered = pickBy(clonedValues, v => v !== null && v !== undefined)
       updateMetadata({
         variables: {
           input: {
@@ -246,15 +275,16 @@ const mapProps = args => ({
         hideModal()
       })
     }
+
     showModal('metadataModal', {
       onConfirm,
       book,
     })
   },
   onAssetManager: bookId => {
-    const { withModal } = args
+    const { withModal: withModalFromArgs } = args
 
-    const { showModal } = withModal
+    const { showModal } = withModalFromArgs
 
     showModal('assetManagerModal', {
       bookId,
@@ -262,13 +292,18 @@ const mapProps = args => ({
     })
   },
   onExportBook: (book, bookTitle, history) => {
-    const { exportBookMutation, withModal } = args
-    const { exportBook } = exportBookMutation
-    const { showModal, hideModal } = withModal
+    const {
+      exportBookMutation: exportBookMutationFromArgs,
+      withModal: withModalFromArgs,
+    } = args
+
+    const { exportBook } = exportBookMutationFromArgs
+    const { showModal, hideModal } = withModalFromArgs
     const { divisions } = book
     let endnotesComponent
     const backmatterDivision = find(divisions, { label: 'Backmatter' })
     let backmatterBookComponents
+
     if (backmatterDivision) {
       backmatterBookComponents = backmatterDivision.bookComponents
     }
@@ -285,10 +320,12 @@ const mapProps = args => ({
       } = args
 
       const variables = endnotesComponent
-        ? Object.assign({ target }, { notes: 'endnotes' })
+        ? { target, notes: 'endnotes' }
         : { target }
+
       return client.query({ query, variables, fetchPolicy: 'no-cache' })
     }
+
     const onConfirm = (mode, viewer, templateId, format) => {
       const payload = {
         mode,
@@ -305,6 +342,7 @@ const mapProps = args => ({
         if (format !== 'icml') {
           payload.templateId = templateId
         }
+
         payload.fileExtension = format
       }
 
@@ -319,8 +357,8 @@ const mapProps = args => ({
         .then(res => {
           hideModal()
           const { data } = res
-          const { exportBook } = data
-          const { path } = exportBook
+          const { exportBook: exportBookFromData } = data
+          const { path } = exportBookFromData
 
           if (mode === 'download') {
             if (format === 'pdf') {
@@ -340,6 +378,7 @@ const mapProps = args => ({
           })
         })
     }
+
     showModal('exportBookModal', {
       onConfirm,
       bookTitle,
@@ -352,48 +391,65 @@ const mapProps = args => ({
     nextProgressValues,
     textKey,
   ) => {
-    const { updateBookComponentWorkflowStateMutation, withModal } = args
     const {
-      updateBookComponentWorkflowState,
-    } = updateBookComponentWorkflowStateMutation
-    const { showModal, hideModal } = withModal
+      updateBookComponentWorkflowStateMutation:
+        updateBookComponentWorkflowStateMutationFromArgs,
+      withModal: withModalFromArgs,
+    } = args
+
+    const { updateBookComponentWorkflowState } =
+      updateBookComponentWorkflowStateMutationFromArgs
+
+    const { showModal, hideModal } = withModalFromArgs
+
     const onConfirm = () => {
       const { title, type, value } = nextProgressValues
+      const clonedWorkflowStages = JSON.parse(JSON.stringify(workflowStages))
+
       const isLast =
         workflowStages.length - 1 ===
         findIndex(workflowStages, { label: title, type })
-      const indexOfStage = findIndex(workflowStages, { label: title, type })
+
+      const indexOfStage = findIndex(clonedWorkflowStages, {
+        label: title,
+        type,
+      })
 
       if (value === 1) {
-        workflowStages[indexOfStage].value = value
+        clonedWorkflowStages[indexOfStage].value = value
+
         if (!isLast) {
-          workflowStages[indexOfStage + 1].value = 0
+          clonedWorkflowStages[indexOfStage + 1].value = 0
         }
       }
 
       if (value === -1) {
-        workflowStages[indexOfStage].value = value
+        clonedWorkflowStages[indexOfStage].value = value
         const next = indexOfStage + 1
+
         if (type !== 'file_prep') {
           const previous = indexOfStage - 1
-          workflowStages[previous].value = 0
+          clonedWorkflowStages[previous].value = 0
         }
-        workflowStages[next].value = -1
+
+        clonedWorkflowStages[next].value = -1
       }
 
       if (value === 0) {
-        workflowStages[indexOfStage].value = value
+        clonedWorkflowStages[indexOfStage].value = value
         const next = indexOfStage + 1
-        for (let i = next; i < workflowStages.length; i += 1) {
-          workflowStages[i].value = -1
+
+        for (let i = next; i < clonedWorkflowStages.length; i += 1) {
+          clonedWorkflowStages[i].value = -1
         }
       }
 
-      const cleanedWorkflowStages = map(workflowStages, item => ({
+      const cleanedWorkflowStages = map(clonedWorkflowStages, item => ({
         label: item.label,
         type: item.type,
         value: item.value,
       }))
+
       updateBookComponentWorkflowState({
         variables: {
           input: {
@@ -404,6 +460,7 @@ const mapProps = args => ({
       })
       hideModal()
     }
+
     showModal('workflowModal', {
       onConfirm,
       textKey,

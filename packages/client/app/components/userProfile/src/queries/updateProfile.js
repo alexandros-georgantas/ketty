@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import { Mutation } from '@apollo/client/react/components'
 import { gql } from '@apollo/client'

@@ -15,6 +15,7 @@ const UPDATE_APPLICATION_PARAMETERS_SUBSCRIPTION = gql`
 
 const updateApplicationParametersSubscription = props => {
   const { render, ApplicationParameterQuery } = props
+
   const triggerRefetch = () => {
     ApplicationParameterQuery.refetch()
   }
@@ -28,4 +29,5 @@ const updateApplicationParametersSubscription = props => {
     </Subscription>
   )
 }
-export { updateApplicationParametersSubscription }
+
+export default updateApplicationParametersSubscription

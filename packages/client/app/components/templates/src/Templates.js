@@ -1,7 +1,9 @@
-import React, { Fragment } from 'react'
+/* eslint-disable react/prop-types */
+import React from 'react'
 import styled from 'styled-components'
 
-import { TemplatesHeader, TemplatesGrid } from './ui'
+import TemplatesHeader from './ui/src/TemplatesHeader'
+import TemplatesGrid from './ui/src/TemplatesGrid'
 
 import { Loading } from '../../../ui'
 
@@ -14,6 +16,7 @@ const Container = styled.div`
   max-width: 100%;
   overflow-y: auto;
 `
+
 const InnerWrapper = styled.div`
   display: block;
   clear: both;
@@ -22,6 +25,7 @@ const InnerWrapper = styled.div`
   max-width: 76%;
   height: calc(100% - 80px);
 `
+
 const Template = ({
   templates,
   onCreateTemplate,
@@ -35,7 +39,7 @@ const Template = ({
 
   return (
     <Container>
-      <Fragment>
+      <>
         <TemplatesHeader
           canAddTemplates
           onChangeSort={onChangeSort}
@@ -50,7 +54,7 @@ const Template = ({
             templates={templates}
           />
         </InnerWrapper>
-      </Fragment>
+      </>
     </Container>
   )
 }

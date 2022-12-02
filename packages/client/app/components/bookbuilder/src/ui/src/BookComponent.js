@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
@@ -37,6 +38,7 @@ const StyledButton = styled(ButtonWithoutLabel)`
     }
   }
 `
+
 const BookComponentContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -45,14 +47,17 @@ const BookComponentContainer = styled.div`
       if (componentType !== 'toc') {
         return '5%'
       }
+
       return '3%'
     }
+
     return '0'
   }};
   margin-bottom: calc(3 * ${th('gridUnit')});
   background-color: white;
   width: 100%;
 `
+
 const ActionsLeft = styled.div`
   display: flex;
   flex-basis: 7%;
@@ -168,11 +173,11 @@ const BookComponent = ({
     })
   }
 
-  const onToggleIncludeInTOC = id => {
+  const onToggleIncludeInTOC = idParam => {
     toggleIncludeInTOC({
       variables: {
         input: {
-          id,
+          id: idParam,
         },
       },
     })
@@ -189,6 +194,7 @@ const BookComponent = ({
       },
     })
   }
+
   const icon = (
     <svg
       fill="none"
@@ -216,6 +222,7 @@ const BookComponent = ({
       </g>
     </svg>
   )
+
   const tocIcon = (
     <svg
       fill="none"
@@ -251,11 +258,13 @@ const BookComponent = ({
       </g>
     </svg>
   )
+
   const goToEditor = () => {
     history.push(`/books/${bookId}/bookComponents/${id}`)
   }
 
   let isToplevel = componentType === 'part'
+
   if (featureBookStructureEnabled) {
     if (bookStructure.levels.length === 3 && componentType === 'chapter') {
       isToplevel = true

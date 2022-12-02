@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { th, grid } from '@pubsweet/ui-toolkit'
@@ -15,6 +16,7 @@ const Root = styled.nav`
   width: 100%;
   z-index: 2;
 `
+
 const Brand = styled(NavBarLink)`
   margin-right: ${grid(2)};
 `

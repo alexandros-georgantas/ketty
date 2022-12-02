@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { Component, Fragment } from 'react'
 import styled from 'styled-components'
 import find from 'lodash/find'
@@ -17,6 +18,7 @@ const BookTitle = styled.div`
   text-align: center;
   width: 80%;
 `
+
 const Container = styled.div`
   align-items: center;
   display: flex;
@@ -24,6 +26,7 @@ const Container = styled.div`
   flex-grow: 1;
   width: 100%;
 `
+
 const ModeRow = styled.div`
   align-items: center;
   border: 1px solid #828282;
@@ -31,12 +34,14 @@ const ModeRow = styled.div`
   justify-content: center;
   margin-bottom: calc(${th('gridUnit')} * 4);
 `
+
 const FormatRow = styled.div`
   align-items: center;
   display: flex;
   justify-content: center;
   margin-bottom: calc(${th('gridUnit')} * 3);
 `
+
 const TemplateRow = styled.div`
   align-items: center;
   display: flex;
@@ -101,6 +106,7 @@ const StyledSelect = styled(WrappedSelect)`
     font-weight: normal;
   }
 `
+
 const FormatLabel = styled.div`
   color: #828282;
   font-family: ${th('fontHeading')};
@@ -155,6 +161,7 @@ const extractTemplates = res => {
   const { getTemplates } = data
   return getTemplates
 }
+
 const targetMapper = {
   epub: 'epub',
   pdf: 'pagedjs',
@@ -204,6 +211,7 @@ class ExportBookModal extends Component {
     const { data } = this.props
     const { getTemplates } = data
     const modeChanged = prevMode !== mode
+
     if (modeChanged) {
       if (mode === 'preview') {
         return getTemplates(targetMapper[viewer]).then(res =>
@@ -214,6 +222,7 @@ class ExportBookModal extends Component {
           }),
         )
       }
+
       return getTemplates(targetMapper[format]).then(res =>
         this.setState({
           selectOptions: optionsFormatter(res),
@@ -222,7 +231,36 @@ class ExportBookModal extends Component {
         }),
       )
     }
+
     return false
+  }
+
+  handleSubmit() {
+    const { mode, viewer, format, templateId } = this.state
+    const { data } = this.props
+    const { onConfirm } = data
+
+    if (!templateId && format !== 'icml') return false
+
+    if (format === 'epub') {
+      this.setState({ validating: true })
+    }
+
+    if (format === 'pdf' || format === 'icml') {
+      this.setState({ generating: true })
+    }
+
+    return onConfirm(mode, viewer, templateId, format)
+  }
+
+  onChange(selection) {
+    const { value } = selection
+    const { templates } = this.state
+
+    const selectedTemplate = find(templates, { id: value })
+
+    const hasEndnotes = selectedTemplate.notes === 'endnotes'
+    this.setState({ templateId: value, selectedValue: selection, hasEndnotes })
   }
 
   changeMode(mode) {
@@ -258,6 +296,7 @@ class ExportBookModal extends Component {
         hasEndnotes: false,
       })
     }
+
     return getTemplates(targetMapper[value]).then(res =>
       this.setState({
         selectOptions: optionsFormatter(res),
@@ -267,47 +306,16 @@ class ExportBookModal extends Component {
     )
   }
 
-  handleSubmit() {
-    const { mode, viewer, format, templateId } = this.state
-    const { data } = this.props
-    const { onConfirm } = data
-
-    if (!templateId && format !== 'icml') return false
-    if (format === 'epub') {
-      this.setState({ validating: true })
-    }
-    if (format === 'pdf' || format === 'icml') {
-      this.setState({ generating: true })
-    }
-
-    return onConfirm(mode, viewer, templateId, format)
-  }
-
-  onChange(selection) {
-    const { value } = selection
-    const { templates } = this.state
-
-    const selectedTemplate = find(templates, { id: value })
-
-    const hasEndnotes = selectedTemplate.notes === 'endnotes'
-    this.setState({ templateId: value, selectedValue: selection, hasEndnotes })
-  }
-
   renderTemplateSection() {
-    const {
-      mode,
-      format,
-      selectOptions,
-      selectedValue,
-      hasEndnotes,
-    } = this.state
+    const { mode, format, selectOptions, selectedValue, hasEndnotes } =
+      this.state
 
     if (mode === 'download' && format === 'icml') {
       return null
     }
 
     return (
-      <Fragment>
+      <>
         <TemplateRow>
           <TemplateLabel>Template</TemplateLabel>
           <StyledSelect
@@ -326,23 +334,23 @@ class ExportBookModal extends Component {
             will be gathered and placed at the Backmatter of the book
           </InfoContainer>
         )}
-      </Fragment>
+      </>
     )
   }
 
   renderFormatOptions() {
     const { mode, viewer, format } = this.state
+
     const textMapper = {
       epub: 'You are about to export a valid EPUB v3 file.',
-      icml:
-        'You will get a compressed zip file containing all images used in the book and the ICML file ready to be imported in Adobe inDesign.',
+      icml: 'You will get a compressed zip file containing all images used in the book and the ICML file ready to be imported in Adobe inDesign.',
       pdf: 'Using PagedJS, we’ll generate a PDF version of your book',
       pagedjs: 'View your book in PagedJS for more granular styles tunning',
     }
 
     if (mode === 'download') {
       return (
-        <Fragment>
+        <>
           <FormatLabel>Format</FormatLabel>
           <FormatRow>
             <RadioButton>
@@ -377,11 +385,12 @@ class ExportBookModal extends Component {
             </RadioButton>
           </FormatRow>
           <InfoContainer>{textMapper[format]}</InfoContainer>
-        </Fragment>
+        </>
       )
     }
+
     return (
-      <Fragment>
+      <>
         <FormatLabel>Viewer</FormatLabel>
         <FormatRow>
           <RadioButton last>
@@ -396,7 +405,7 @@ class ExportBookModal extends Component {
           </RadioButton>
         </FormatRow>
         <InfoContainer>{textMapper[viewer]}</InfoContainer>
-      </Fragment>
+      </>
     )
   }
 
@@ -411,6 +420,7 @@ class ExportBookModal extends Component {
     if (generating) {
       confirmLabel = 'Generating'
     }
+
     if (validating) {
       confirmLabel = 'Validating'
     }

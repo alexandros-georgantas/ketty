@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { th, grid } from '@pubsweet/ui-toolkit'
@@ -12,6 +13,7 @@ const Text = styled.div`
   font-size: ${th('fontSizeBase')};
   color: ${th('colorText')};
 `
+
 const DeleteBookModal = props => {
   const { isOpen, hideModal, data } = props
   const { bookTitle, onConfirm } = data
