@@ -31,7 +31,8 @@ const Template = ({
   onCreateTemplate,
   onUpdateTemplate,
   onDeleteTemplate,
-  onChangeSort,
+  setSortingParams,
+  sortingParams,
   loading,
   refetching,
 }) => {
@@ -42,8 +43,9 @@ const Template = ({
       <>
         <TemplatesHeader
           canAddTemplates
-          onChangeSort={onChangeSort}
           onCreateTemplate={onCreateTemplate}
+          setSortingParams={setSortingParams}
+          sortingParams={sortingParams}
           title="Templates"
         />
         <InnerWrapper>

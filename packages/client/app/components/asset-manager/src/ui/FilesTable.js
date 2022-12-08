@@ -194,6 +194,7 @@ const FilesTable = ({
           <TableHeadCell width={2}>
             <input
               checked={
+                !loading &&
                 files &&
                 files.length > 0 &&
                 files.length === checkboxSelected.length

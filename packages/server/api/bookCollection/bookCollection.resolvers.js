@@ -3,10 +3,8 @@ const orderBy = require('lodash/orderBy')
 const map = require('lodash/map')
 const find = require('lodash/find')
 
-const {
-  BookCollectionTranslation,
-  BookTranslation,
-} = require('../../data-model/src').models
+const { BookCollectionTranslation, BookTranslation } =
+  require('../../data-model/src').models
 
 const {
   useCaseGetBookCollection,

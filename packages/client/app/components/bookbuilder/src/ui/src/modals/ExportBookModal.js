@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { Component, Fragment } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import find from 'lodash/find'
 import { th } from '@pubsweet/ui-toolkit'
@@ -168,7 +168,7 @@ const targetMapper = {
   pagedjs: 'pagedjs',
 }
 
-class ExportBookModal extends Component {
+class ExportBookModal extends React.Component {
   constructor(props) {
     super(props)
     this.renderFormatOptions = this.renderFormatOptions.bind(this)

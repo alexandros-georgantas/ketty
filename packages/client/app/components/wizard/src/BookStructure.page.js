@@ -257,7 +257,7 @@ const Connected = props => {
               }
 
               const backToDashboard = () => history.push(`/books/`)
-              console.log('book', bookStructure)
+
               return (
                 <BookStructure
                   backToDashboard={backToDashboard}

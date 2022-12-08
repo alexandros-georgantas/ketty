@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { th, darken, grid } from '@pubsweet/ui-toolkit'
 
@@ -33,7 +33,7 @@ const SecondaryAction = styled.span`
 `
 
 /* eslint-disable react/prop-types */
-class ActionSection extends Component {
+class ActionSection extends React.Component {
   constructor(props) {
     super(props)
     this.state = {

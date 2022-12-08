@@ -1,6 +1,6 @@
-/* eslint-disable react/prop-types, react/no-unused-state, react/sort-comp, react/forbid-prop-types, import/prefer-default-export */
+/* eslint-disable */
 
-import React from 'react'
+import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { th, override } from '@pubsweet/ui-toolkit'
@@ -165,44 +165,33 @@ class Menu extends React.Component {
   }
 
   toggleMenu = () => {
-    const { open } = this.state
     this.setState({
-      open: !open,
+      open: !this.state.open,
     })
 
-    if (open === false) {
+    if (this.state.open === false) {
       document.addEventListener('mousedown', this.handleClickOutside)
     }
   }
 
   selectOneOfMultiElement = (event, value) => {
     event.stopPropagation()
-    const { selectElement } = this.props
     const selectOneOfMultiElement = value
     this.setState({ selectOneOfMultiElement })
-
-    if (selectElement) {
-      selectElement(value)
-    }
+    if (this.props.selectElement) this.props.selectElement(value)
   }
 
   removeSelect = (event, value) => {
     event.stopPropagation()
     let { selected } = this.state
-    const { onChange } = this.props
     const index = selected.indexOf(value)
     selected = [...selected.slice(0, index), ...selected.slice(index + 1)]
     this.setState({ selected })
-
-    if (onChange) {
-      onChange(selected)
-    }
+    if (this.props.onChange) this.props.onChange(selected)
   }
 
   handleClickOutside(event) {
-    const { open } = this.state
-
-    if (open) {
+    if (this.state.open) {
       document.removeEventListener('mousedown', this.handleClickOutside)
     }
 
@@ -213,12 +202,11 @@ class Menu extends React.Component {
   }
 
   handleSelect = ({ selected, open }) => {
-    const { multi, onChange } = this.props
-    const { selected: selectedState } = this.state
+    const { multi } = this.props
     let values
 
     if (multi) {
-      values = selectedState || []
+      values = this.state.selected ? this.state.selected : []
       if (values.indexOf(selected) === -1) values.push(selected)
     } else {
       values = selected
@@ -228,10 +216,7 @@ class Menu extends React.Component {
       selected: values,
     })
     this.toggleMenu()
-
-    if (onChange) {
-      onChange(values)
-    }
+    if (this.props.onChange) this.props.onChange(values)
   }
 
   handleKeyPress = (event, selected, open) => {
@@ -244,9 +229,9 @@ class Menu extends React.Component {
     const { options } = this.props
 
     const flatOption = []
-    forEach(options, option => {
-      if (option.children) flatOption.push(option.children)
-      if (!option.children) flatOption.push(option)
+    forEach(options, value => {
+      if (value.children) flatOption.push(value.children)
+      if (!value.children) flatOption.push(value)
     })
 
     return flatOption.find(option => option.value === value)
@@ -261,10 +246,8 @@ class Menu extends React.Component {
     this.wrapperRef = node
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const { value } = this.props
-
-    if (nextProps.value !== value) {
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.value !== this.props.value) {
       this.setState({ selected: nextProps.value })
     }
   }
@@ -318,17 +301,17 @@ class Menu extends React.Component {
                   if (option.children) {
                     groupedOptions = option.children
                     groupedHeader = option.text ? (
-                      <>
+                      <Fragment>
                         <span>{option.text}</span>
                         <hr />
-                      </>
+                      </Fragment>
                     ) : (
                       <hr />
                     )
                   }
 
                   return (
-                    <>
+                    <Fragment>
                       {key > 0 && groupedHeader}
                       {groupedOptions.map(groupoption => (
                         <RenderOption
@@ -341,7 +324,7 @@ class Menu extends React.Component {
                           value={groupoption.value}
                         />
                       ))}
-                    </>
+                    </Fragment>
                   )
                 })}
                 <RenderFooterOption />
@@ -436,8 +419,6 @@ Menu.defaultProps = {
   renderOption: DefaultMenuOption,
   renderOpener: DefaultOpener,
   reset: false,
-  label: undefined,
-  maxHeight: undefined,
   placeholder: 'Choose in the list',
 }
 

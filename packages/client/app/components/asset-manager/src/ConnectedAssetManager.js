@@ -3,7 +3,7 @@
 import React from 'react'
 import { get } from 'lodash'
 import { adopt } from 'react-adopt'
-import { AssetManager } from './ui'
+import AssetManager from './ui/AssetManager'
 import {
   getEntityFilesQuery,
   uploadFilesMutation,

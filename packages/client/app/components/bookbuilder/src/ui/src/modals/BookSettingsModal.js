@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types,react/no-unused-state */
-import React, { Component } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import cloneDeep from 'lodash/cloneDeep'
 import forEach from 'lodash/forEach'
@@ -140,7 +140,7 @@ const icon = (
   </svg>
 )
 
-class BookSettings extends Component {
+class BookSettings extends React.Component {
   constructor(props) {
     super(props)
     const { data } = this.props

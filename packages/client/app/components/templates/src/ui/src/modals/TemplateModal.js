@@ -15,7 +15,6 @@ const { deleteIcon } = Icons
 const selectOptions = [
   { label: 'EPUB', value: 'epub' },
   { label: 'PagedJS', value: 'pagedjs' },
-  { label: 'VivlioStyle', value: 'vivliostyle' },
 ]
 
 const noteSelectOptions = [
@@ -726,7 +725,7 @@ class TemplateModal extends React.Component {
   render() {
     const { isOpen, hideModal, data } = this.props
     const { headerText } = data
-    console.log('templates', isOpen)
+
     const body = this.renderBody()
 
     return (

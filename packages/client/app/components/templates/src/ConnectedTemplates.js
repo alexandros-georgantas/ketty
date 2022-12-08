@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { get } from 'lodash'
 import { adopt } from 'react-adopt'
 
@@ -35,7 +35,15 @@ const mapProps = args => ({
   showModal: args.withModal.showModal,
   hideModal: args.withModal.hideModal,
   loading: args.getTemplatesQuery.networkStatus === 1,
-  onChangeSort: args.getTemplatesQuery.refetch,
+  onChangeSort: sortingParams => {
+    const { getTemplatesQuery: getTemplatesQueryFromArgs } = args
+    const { ascending, sortKey } = sortingParams
+    const { refetch } = getTemplatesQueryFromArgs
+    refetch({
+      ascending,
+      sortKey,
+    })
+  },
   onCreateTemplate: () => {
     const {
       createTemplateMutation: createTemplateMutationFromArgs,
@@ -192,18 +200,29 @@ const Connected = () => (
       refetching,
       loading,
       createTemplate,
-    }) => (
-      <Templates
-        createTemplate={createTemplate}
-        loading={loading}
-        onChangeSort={onChangeSort}
-        onCreateTemplate={onCreateTemplate}
-        onDeleteTemplate={onDeleteTemplate}
-        onUpdateTemplate={onUpdateTemplate}
-        refetching={refetching}
-        templates={templates}
-      />
-    )}
+    }) => {
+      const [sortingParams, setSortingParams] = useState({
+        ascending: true,
+        sortKey: 'name',
+      })
+
+      useEffect(() => {
+        onChangeSort(sortingParams)
+      }, [sortingParams])
+      return (
+        <Templates
+          createTemplate={createTemplate}
+          loading={loading}
+          onCreateTemplate={onCreateTemplate}
+          onDeleteTemplate={onDeleteTemplate}
+          onUpdateTemplate={onUpdateTemplate}
+          refetching={refetching}
+          setSortingParams={setSortingParams}
+          sortingParams={sortingParams}
+          templates={templates}
+        />
+      )
+    }}
   </Composed>
 )
 

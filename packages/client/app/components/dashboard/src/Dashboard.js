@@ -39,6 +39,8 @@ const Dashboard = ({
   onAssignMembers,
   onDeleteBook,
   onArchiveBook,
+  setSortingParams,
+  sortingParams,
 }) => {
   if (loading || loadingRules) return <Loading />
 
@@ -50,7 +52,8 @@ const Dashboard = ({
             canAddBooks={rules.canAddBooks}
             collectionId={collection.id}
             onAddBook={onAddBook}
-            onChangeSort={onChangeSort}
+            setSortingParams={setSortingParams}
+            sortingParams={sortingParams}
             title={collection.title}
           />
           <InnerWrapper>

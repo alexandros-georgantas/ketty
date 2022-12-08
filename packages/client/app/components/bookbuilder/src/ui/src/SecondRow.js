@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { findIndex, find, forIn } from 'lodash'
-import React, { Component } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 // import { AlignmentTool } from '@pubsweet/ui'
 import AlignmentTool from './AlignmentTool'
@@ -16,7 +16,7 @@ const SecondRowContainer = styled.div`
   min-height: 28px;
 `
 
-class SecondRow extends Component {
+class SecondRow extends React.Component {
   constructor(props) {
     super(props)
 
@@ -511,6 +511,7 @@ class SecondRow extends Component {
         {canViewStateList && (
           <WorkflowList
             applicationParameter={applicationParameter}
+            bookComponentId={bookComponentId}
             bookComponentStateRules={bookComponentStateRules.find(
               stateRule => stateRule.bookComponentId === bookComponentId,
             )}

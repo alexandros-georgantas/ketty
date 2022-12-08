@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+/* eslint-disable */
 import React, { useState } from 'react'
 import styled, { css, keyframes } from 'styled-components'
 import { find, map, groupBy, forEach, findIndex } from 'lodash'
@@ -107,7 +107,6 @@ const SettingsIcon = styled.span`
     }
   }
 `
-
 const settingsIcon = (
   <svg
     fill="none"
@@ -143,7 +142,6 @@ const settingsIcon = (
     </g>
   </svg>
 )
-
 const triangleLeft = css`
   ${triangle};
   clip-path: polygon(49% 49%, 0 0, 0 100%);
@@ -260,21 +258,18 @@ const Opener = props => {
   )
 }
 
-const Footer = (handleSave, divisions, divisionType) => {
+const Footer = (handleSave, divisions, divisionType) => () => {
   const [text, setText] = useState(null)
 
-  const createJsonConfig = textParam => {
-    /* eslint-disable react/destructuring-assignment */
+  const createJsonConfig = text => {
     divisions.map(division => {
       if (division.name === divisionType) {
         division.allowedComponentTypes.push({
-          value: textParam.replace(/\s+/g, '_').toLowerCase(),
-          title: textParam,
+          value: text.replace(/\s+/g, '_').toLowerCase(),
+          title: text,
           predefined: false,
         })
       }
-      /* eslint-enable react/destructuring-assignment */
-
       return division
     })
 
@@ -327,7 +322,6 @@ const ComponentTypeMenu = ({
   const division = find(divisions, { name: divisionType })
   // These should be served by server. Refactor when you have time
   const clonedDivision = JSON.parse(JSON.stringify(division))
-
   if (featureBookStructureEnabled) {
     if (clonedDivision.name === 'Body') {
       if (bookStructure.levels.length === 3) {
@@ -338,7 +332,6 @@ const ComponentTypeMenu = ({
           visibleInHeader: true,
         })
       }
-
       if (bookStructure.levels.length === 4) {
         clonedDivision.allowedComponentTypes.splice(0, 0, {
           predefined: true,
@@ -365,19 +358,17 @@ const ComponentTypeMenu = ({
     const endnotesIndex = findIndex(groupedOptions.predefined, {
       value: 'endnotes',
     })
-
     if (endnotesIndex !== -1) {
       groupedOptions.predefined.splice(endnotesIndex, 1)
     }
   }
-
   const options = []
   forEach(groupedOptions, groupOption => {
     options.push({
       text: null,
-      children: map(groupOption, compType => ({
-        label: compType.title,
-        value: compType.value,
+      children: map(groupOption, componentType => ({
+        label: componentType.title,
+        value: componentType.value,
       })),
     })
   })
@@ -396,5 +387,4 @@ const ComponentTypeMenu = ({
     />
   )
 }
-
 export default ComponentTypeMenu

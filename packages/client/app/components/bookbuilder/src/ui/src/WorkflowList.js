@@ -22,6 +22,7 @@ const Container = styled.div`
 
 const WorkflowList = ({
   bookId,
+  bookComponentId,
   applicationParameter,
   className,
   currentValues,
@@ -71,6 +72,7 @@ const WorkflowList = ({
       interactive={stageItem.type !== 'upload'}
       isLast={stageItem.type === lastItem}
       item={stageItem}
+      key={`${bookComponentId}-${stageItem.type}`}
       stage={stage}
       type={type}
       update={handleUpdateParam}

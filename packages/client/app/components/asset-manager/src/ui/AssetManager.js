@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { indexOf, forEach, find } from 'lodash'
 
@@ -23,7 +23,7 @@ const InnerWrapper = styled.div`
 `
 
 /* eslint-disable react/prop-types */
-class AssetManager extends Component {
+class AssetManager extends React.Component {
   constructor(props) {
     super(props)
 

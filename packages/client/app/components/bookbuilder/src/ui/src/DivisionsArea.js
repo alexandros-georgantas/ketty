@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { Component } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { map, clone, find, findIndex, cloneDeep } from 'lodash'
 import { DragDropContext } from 'react-beautiful-dnd'
@@ -29,7 +29,7 @@ const reorder = (array, item, to, from = undefined) => {
   return resArray
 }
 
-class DivisionsArea extends Component {
+class DivisionsArea extends React.Component {
   constructor(props) {
     super(props)
 

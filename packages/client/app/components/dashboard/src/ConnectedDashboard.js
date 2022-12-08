@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { get } from 'lodash'
 import { adopt } from 'react-adopt'
 
@@ -42,7 +42,16 @@ const mapProps = args => ({
   hideModal: args.withModal.hideModal,
   deleteBook: args.deleteBookMutation.deleteBook,
   loading: args.getBookCollectionsQuery.networkStatus === 1,
-  onChangeSort: args.getBookCollectionsQuery.refetch,
+  onChangeSort: sortingParams => {
+    const { getBookCollectionsQuery: getBookCollectionsQueryFromArgs } = args
+    const { ascending, sortKey, archived } = sortingParams
+    const { refetch } = getBookCollectionsQueryFromArgs
+    refetch({
+      ascending,
+      sortKey,
+      archived,
+    })
+  },
   onAssignMembers: bookId => {
     args.withModal.showModal('dashboardTeamManager', {
       bookId,
@@ -73,7 +82,6 @@ const mapProps = args => ({
       hideModal()
     }
 
-    console.log('e1', showModal)
     showModal('addBook', {
       onConfirm,
       hideModal,
@@ -154,7 +162,18 @@ const Connected = () => (
       onArchiveBook,
       rules,
     }) => {
+      const [sortingParams, setSortingParams] = useState({
+        ascending: true,
+        sortKey: 'title',
+        archived: false,
+      })
+
+      useEffect(() => {
+        onChangeSort(sortingParams)
+      }, [sortingParams])
+
       if (!collections) return null
+
       return (
         <Dashboard
           archiveBook={archiveBook}
@@ -165,12 +184,13 @@ const Connected = () => (
           onAddBook={onAddBook}
           onArchiveBook={onArchiveBook}
           onAssignMembers={onAssignMembers}
-          onChangeSort={onChangeSort}
           onDeleteBook={onDeleteBook}
           refetching={refetching}
           refetchingRules={refetchingRules}
           renameBook={renameBook}
           rules={rules}
+          setSortingParams={setSortingParams}
+          sortingParams={sortingParams}
         />
       )
     }}

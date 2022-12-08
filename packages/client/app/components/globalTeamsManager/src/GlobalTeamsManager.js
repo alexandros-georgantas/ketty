@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types,react/no-unused-state */
 import styled from 'styled-components'
 import { Form, Formik } from 'formik'
-import React, { Component } from 'react'
+import React from 'react'
 import Select from 'react-select'
 import sortBy from 'lodash/sortBy'
 import keys from 'lodash/keys'
@@ -182,7 +182,7 @@ const TeamManagerForm = props => {
   )
 }
 
-class GlobalTeamsManager extends Component {
+class GlobalTeamsManager extends React.Component {
   constructor(props) {
     super(props)
 

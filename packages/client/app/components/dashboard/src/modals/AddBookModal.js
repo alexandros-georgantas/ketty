@@ -94,7 +94,6 @@ class AddBookModal extends React.Component {
 
     const confirmLabel = 'Save'
     const cancelLabel = 'Cancel'
-    console.log('whaaaaaaa')
 
     return (
       <StyledFormik
@@ -161,7 +160,6 @@ class AddBookModal extends React.Component {
 
   render() {
     const { isOpen, hideModal } = this.props
-    console.log('e2', isOpen)
     const body = this.renderBody()
 
     return (

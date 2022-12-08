@@ -56,7 +56,14 @@ const InnerWrapper = styled.div`
 `
 
 const DashboardHeader = props => {
-  const { onChangeSort, title, collectionId, onAddBook, canAddBooks } = props
+  const {
+    title,
+    collectionId,
+    canAddBooks,
+    onAddBook,
+    setSortingParams,
+    sortingParams,
+  } = props
 
   const handleClick = () => {
     onAddBook(collectionId)
@@ -78,8 +85,14 @@ const DashboardHeader = props => {
         </Side1>
 
         <Side2>
-          <ToggleArchivedButton onChange={onChangeSort} />
-          <SortMenu onChange={onChangeSort} />
+          <ToggleArchivedButton
+            setSortingParams={setSortingParams}
+            sortingParams={sortingParams}
+          />
+          <SortMenu
+            setSortingParams={setSortingParams}
+            sortingParams={sortingParams}
+          />
         </Side2>
       </InnerWrapper>
     </HeaderWrapper>

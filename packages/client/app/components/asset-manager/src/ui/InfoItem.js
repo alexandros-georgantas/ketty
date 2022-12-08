@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
 
@@ -46,7 +46,7 @@ const Actions = styled.div`
 `
 
 /* eslint-disable react/prop-types */
-class InfoItem extends Component {
+class InfoItem extends React.Component {
   constructor(props) {
     super(props)
 
@@ -108,7 +108,7 @@ class InfoItem extends Component {
             autoFocus={focus}
             onChange={this.handleKeyPress}
             type="text"
-            value={newValue}
+            value={newValue || ''}
           />
           <Actions>
             <Button icon={saveIcon} onClick={this.handleSave} title="Save" />

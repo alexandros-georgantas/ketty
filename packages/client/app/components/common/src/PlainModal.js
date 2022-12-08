@@ -11,8 +11,8 @@ const PlainModal = props => {
     <ReactModal
       contentLabel="Example Modal"
       isOpen={isOpen}
-      onAfterOpen={() => console.log('haha')}
-      onRequestClose={() => console.log('haho')}
+      onAfterOpen={() => console.warn('on after open')}
+      onRequestClose={() => console.warn('on request close')}
     >
       <h2>Hello</h2>
       <button onClick={onRequestClose} type="button">

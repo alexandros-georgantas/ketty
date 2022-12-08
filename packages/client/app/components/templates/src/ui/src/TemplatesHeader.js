@@ -55,7 +55,13 @@ const InnerWrapper = styled.div`
 `
 
 const TemplatesHeader = props => {
-  const { onChangeSort, title, canAddTemplates, onCreateTemplate } = props
+  const {
+    setSortingParams,
+    sortingParams,
+    title,
+    canAddTemplates,
+    onCreateTemplate,
+  } = props
 
   const handleClick = () => {
     onCreateTemplate()
@@ -77,7 +83,10 @@ const TemplatesHeader = props => {
         </Side1>
 
         <Side2>
-          <SortMenu onChange={onChangeSort} />
+          <SortMenu
+            setSortingParams={setSortingParams}
+            sortingParams={sortingParams}
+          />
         </Side2>
       </InnerWrapper>
     </HeaderWrapper>
