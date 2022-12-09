@@ -103,6 +103,7 @@
     "yup": "^0.28.1"
   },
   "devDependencies": {
+    "@coko/lint": "^2.0.0",
     "faker": "^4.1.0",
     "joi-browser": "^13.0.1",
     "standard-version": "^9.2.0"
