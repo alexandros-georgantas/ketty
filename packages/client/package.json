@@ -33,6 +33,7 @@
     "@babel/preset-env": "^7.13.12",
     "@babel/preset-react": "^7.13.13",
     "@coko/client": "^0.0.4",
+    "@coko/lint": "^2.0.0",
     "@guardian/prosemirror-invisibles": "^1.2.0",
     "@pubsweet/client": "^11.0.15",
     "@pubsweet/coko-theme": "^5.1.22",
@@ -103,7 +104,6 @@
     "yup": "^0.28.1"
   },
   "devDependencies": {
-    "@coko/lint": "^2.0.0",
     "faker": "^4.1.0",
     "joi-browser": "^13.0.1",
     "standard-version": "^9.2.0"
