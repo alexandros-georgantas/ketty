@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
@@ -29,6 +30,7 @@ const StyledColumn = styled(Column)`
 const DragAndDropContainer = styled(Row)`
   height: calc(100% - 90px);
 `
+
 const StyledDroppableArea = styled.div`
   height: calc(100% - 51px);
   /* border: 1px black solid; */
@@ -36,11 +38,13 @@ const StyledDroppableArea = styled.div`
   overflow-y: auto;
   padding: 8px;
 `
+
 const PlaceholdersColumn = styled(StyledColumn)`
   width: 30%;
   margin-left: 16px;
   border-left: 1px solid #ccc;
 `
+
 const Padder = styled.div`
   padding-left: ${({ level }) => (level > 2 ? '64px' : '38px')};
 `
@@ -65,9 +69,11 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
   >
     {({ state, setState }) => {
       const { outlineInternal, showDropIndicators } = state
+
       const onDragStart = ({ draggableId, type }) => {
         const isPlaceholderDragging =
           draggableId && draggableId.split('_')[0] === 'buildingBlock'
+
         const isItemDragging = !isPlaceholderDragging
 
         if (isPlaceholderDragging) {
@@ -90,6 +96,7 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
           })
         }
       }
+
       const onDragEnd = ({ source, destination, draggableId }) => {
         if (
           !destination ||
@@ -109,16 +116,20 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
         const { droppableId: dDropId, index: dIndex } = destination
 
         const fromBuildingBlocks = draggableId.includes('buildingBlock')
+
         const sourceLevelId = fromBuildingBlocks
           ? sDropId.split('_')[1]
           : sDropId.split('_')[0]
+
         const sourceParentId = sDropId.split('_')[1]
         const sourceTopId = sDropId.split('_')[2]
         const destinationLevelId = dDropId.split('_')[0]
         const destinationParentId = dDropId.split('_')[1]
         const destinationTopId = dDropId.split('_')[2]
+
         const isReorderWithinSameOutlineItem =
           destinationParentId === sourceParentId
+
         const allowedDrop = sourceLevelId === destinationLevelId
 
         const levelIndex = levelIndexExtractor(
@@ -138,6 +149,7 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
         }
 
         const clonedOutline = JSON.parse(JSON.stringify(outlineInternal))
+
         // CASE CREATING NEW OUTLINE ITEMS
         if (fromBuildingBlocks && allowedDrop) {
           if (levelIndex === 0) {
@@ -147,10 +159,12 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
               outlineItemGenerator(bookStructure.levels, destinationLevelId),
             )
           }
+
           if (levelIndex === 1) {
             const outlineItemIndex = findIndex(clonedOutline, {
               id: destinationParentId,
             })
+
             if (outlineItemIndex === -1) {
               setState({
                 showDropIndicators: {
@@ -174,6 +188,7 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
               ),
             )
           }
+
           if (levelIndex === 2) {
             const levelOneIndex = findIndex(clonedOutline, {
               id: destinationTopId,
@@ -189,12 +204,14 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
               })
               throw new Error('level one id does not exist')
             }
+
             const levelTwoIndex = findIndex(
               clonedOutline[levelOneIndex].children,
               {
                 id: destinationParentId,
               },
             )
+
             if (levelTwoIndex === -1) {
               setState({
                 showDropIndicators: {
@@ -205,6 +222,7 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
               })
               throw new Error('level two id does not exist')
             }
+
             clonedOutline[levelOneIndex].children[
               levelTwoIndex
             ].children.splice(
@@ -229,6 +247,7 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
           })
           updateBookOutline(clonedOutline)
         }
+
         // CASE REORDER EXISTING COMPONENTS
         if (!fromBuildingBlocks && allowedDrop) {
           // CASE REORDER COMPONENTS OF SAME PARENT
@@ -237,10 +256,12 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
               // clonedOutline = reorderArrayItems(clonedOutline, sIndex, dIndex)
               reorderArrayItems(clonedOutline, sIndex, dIndex)
             }
+
             if (levelIndex === 1) {
               const outlineItemIndex = findIndex(clonedOutline, {
                 id: destinationParentId,
               })
+
               if (outlineItemIndex === -1) {
                 setState({
                   showDropIndicators: {
@@ -253,6 +274,7 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                   `outline item with id ${destinationParentId} does not exist`,
                 )
               }
+
               // clonedOutline[outlineItemIndex].children = reorderArrayItems(
               //   clonedOutline[outlineItemIndex].children,
               //   sIndex,
@@ -264,6 +286,7 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                 dIndex,
               )
             }
+
             if (levelIndex === 2) {
               const levelOneIndex = findIndex(clonedOutline, {
                 id: destinationTopId,
@@ -279,12 +302,14 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                 })
                 throw new Error('level one id does not exist')
               }
+
               const levelTwoIndex = findIndex(
                 clonedOutline[levelOneIndex].children,
                 {
                   id: destinationParentId,
                 },
               )
+
               if (levelTwoIndex === -1) {
                 setState({
                   showDropIndicators: {
@@ -295,6 +320,7 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                 })
                 throw new Error('level two id does not exist')
               }
+
               // clonedOutline[levelOneIndex].children[
               //   levelTwoIndex
               // ].children = reorderArrayItems(
@@ -342,6 +368,7 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                   `outline destination item with id ${destinationParentId} does not exist`,
                 )
               }
+
               if (outlineSourceItemIndex === -1) {
                 setState({
                   showDropIndicators: {
@@ -360,6 +387,7 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                   clonedOutline[outlineSourceItemIndex].children[sIndex],
                 ),
               )
+
               toBeMovedItem.parentId = destinationParentId
 
               clonedOutline[outlineSourceItemIndex].children.splice(sIndex, 1)
@@ -391,6 +419,7 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                   `outline destination item with id ${outlineDestinationItemTopIndex} does not exist`,
                 )
               }
+
               if (outlineSourceItemTopIndex === -1) {
                 setState({
                   showDropIndicators: {
@@ -430,6 +459,7 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                   `outline destination item with id ${destinationParentId} does not exist`,
                 )
               }
+
               if (outlineSourceItemIndex === -1) {
                 setState({
                   showDropIndicators: {
@@ -450,6 +480,7 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                   ].children[sIndex],
                 ),
               )
+
               toBeMovedItem.parentId = destinationParentId
 
               clonedOutline[outlineSourceItemTopIndex].children[
@@ -478,11 +509,13 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
         borderLeft: `4px solid ${isDraggingOver ? '#8992E9' : 'white'}`,
         minHeight: '70px',
       })
+
       const getListStyleLevel2 = isDraggingOver => ({
         width: '100%',
         borderLeft: `4px solid ${isDraggingOver ? '#ADDAE2' : 'white'}`,
         minHeight: `${numberOfLevels > 2 ? '70px' : '35px'}`,
       })
+
       const getListStyleLevel3 = isDraggingOver => ({
         width: '100%',
         borderLeft: `4px solid ${isDraggingOver ? '#FFC7AD' : 'white'}`,
@@ -494,57 +527,72 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
         const itemId = id.split('_')[1]
 
         const levelIndex = levelIndexExtractor(bookStructure.levels, levelId)
+
         if (levelIndex === -1) {
           throw new Error('level id does not exist')
         }
+
         const clonedOutline = JSON.parse(JSON.stringify(outlineInternal))
 
         if (levelIndex === 0) {
           const itemIndex = findIndex(clonedOutline, { id: itemId })
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
+
           clonedOutline[itemIndex].title = value
         }
+
         if (levelIndex === 1) {
           const parentId = id.split('_')[2]
           const parentItemIndex = findIndex(clonedOutline, { id: parentId })
+
           if (parentItemIndex === -1) {
             throw new Error(`item's parent id does not exist`)
           }
+
           const itemIndex = findIndex(clonedOutline[parentItemIndex].children, {
             id: itemId,
           })
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
 
           clonedOutline[parentItemIndex].children[itemIndex].title = value
         }
+
         if (levelIndex === 2) {
           const topParentId = id.split('_')[3]
           const parentId = id.split('_')[2]
+
           const topParentItemIndex = findIndex(clonedOutline, {
             id: topParentId,
           })
+
           if (topParentItemIndex === -1) {
             throw new Error(`item's top parent id does not exist`)
           }
+
           const parentIndex = findIndex(
             clonedOutline[topParentItemIndex].children,
             {
               id: parentId,
             },
           )
+
           if (parentIndex === -1) {
             throw new Error(`item's parent id does not exist`)
           }
+
           const itemIndex = findIndex(
             clonedOutline[topParentItemIndex].children[parentIndex].children,
             {
               id: itemId,
             },
           )
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
@@ -557,62 +605,78 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
         setState({ outlineInternal: clonedOutline })
         // updateBookOutline(clonedOutline)
       }
+
       const onTitleInputBlur = (id, value) => {
         const levelId = id.split('_')[0]
         const itemId = id.split('_')[1]
 
         const levelIndex = levelIndexExtractor(bookStructure.levels, levelId)
+
         if (levelIndex === -1) {
           throw new Error('level id does not exist')
         }
+
         const clonedOutline = JSON.parse(JSON.stringify(outlineInternal))
 
         if (levelIndex === 0) {
           const itemIndex = findIndex(clonedOutline, { id: itemId })
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
+
           clonedOutline[itemIndex].title = value
         }
+
         if (levelIndex === 1) {
           const parentId = id.split('_')[2]
           const parentItemIndex = findIndex(clonedOutline, { id: parentId })
+
           if (parentItemIndex === -1) {
             throw new Error(`item's parent id does not exist`)
           }
+
           const itemIndex = findIndex(clonedOutline[parentItemIndex].children, {
             id: itemId,
           })
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
 
           clonedOutline[parentItemIndex].children[itemIndex].title = value
         }
+
         if (levelIndex === 2) {
           const topParentId = id.split('_')[3]
           const parentId = id.split('_')[2]
+
           const topParentItemIndex = findIndex(clonedOutline, {
             id: topParentId,
           })
+
           if (topParentItemIndex === -1) {
             throw new Error(`item's top parent id does not exist`)
           }
+
           const parentIndex = findIndex(
             clonedOutline[topParentItemIndex].children,
             {
               id: parentId,
             },
           )
+
           if (parentIndex === -1) {
             throw new Error(`item's parent id does not exist`)
           }
+
           const itemIndex = findIndex(
             clonedOutline[topParentItemIndex].children[parentIndex].children,
             {
               id: itemId,
             },
           )
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
@@ -631,57 +695,72 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
         const itemId = id.split('_')[1]
 
         const levelIndex = levelIndexExtractor(bookStructure.levels, levelId)
+
         if (levelIndex === -1) {
           throw new Error('level id does not exist')
         }
+
         const clonedOutline = JSON.parse(JSON.stringify(outlineInternal))
 
         if (levelIndex === 0) {
           const itemIndex = findIndex(clonedOutline, { id: itemId })
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
+
           clonedOutline.splice(itemIndex, 1)
         }
+
         if (levelIndex === 1) {
           const parentId = id.split('_')[2]
           const parentItemIndex = findIndex(clonedOutline, { id: parentId })
+
           if (parentItemIndex === -1) {
             throw new Error(`item's parent id does not exist`)
           }
+
           const itemIndex = findIndex(clonedOutline[parentItemIndex].children, {
             id: itemId,
           })
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
 
           clonedOutline[parentItemIndex].children.splice(itemIndex, 1)
         }
+
         if (levelIndex === 2) {
           const topParentId = id.split('_')[3]
           const parentId = id.split('_')[2]
+
           const topParentItemIndex = findIndex(clonedOutline, {
             id: topParentId,
           })
+
           if (topParentItemIndex === -1) {
             throw new Error(`item's top parent id does not exist`)
           }
+
           const parentIndex = findIndex(
             clonedOutline[topParentItemIndex].children,
             {
               id: parentId,
             },
           )
+
           if (parentIndex === -1) {
             throw new Error(`item's parent id does not exist`)
           }
+
           const itemIndex = findIndex(
             clonedOutline[topParentItemIndex].children[parentIndex].children,
             {
               id: itemId,
             },
           )
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
@@ -700,13 +779,16 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
         const itemId = id.split('_')[1]
 
         const levelIndex = levelIndexExtractor(bookStructure.levels, levelId)
+
         if (levelIndex === -1) {
           throw new Error('level id does not exist')
         }
+
         const clonedOutline = JSON.parse(JSON.stringify(outlineInternal))
 
         if (levelIndex === 0) {
           const itemIndex = findIndex(clonedOutline, { id: itemId })
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
@@ -721,15 +803,19 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
             ),
           )
         }
+
         if (levelIndex === 1) {
           const parentId = id.split('_')[2]
           const parentItemIndex = findIndex(clonedOutline, { id: parentId })
+
           if (parentItemIndex === -1) {
             throw new Error(`item's parent id does not exist`)
           }
+
           const itemIndex = findIndex(clonedOutline[parentItemIndex].children, {
             id: itemId,
           })
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
@@ -749,6 +835,7 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
           const rootId = id.split('_')[3]
           const rootItemIndex = findIndex(clonedOutline, { id: rootId })
           const parentId = id.split('_')[2]
+
           const parentItemIndex = findIndex(
             clonedOutline[rootItemIndex].children,
             {
@@ -762,9 +849,11 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
               id: itemId,
             },
           )
+
           if (itemIndex === -1) {
             throw new Error('item id does not exist')
           }
+
           clonedOutline[rootItemIndex].children[
             parentItemIndex
           ].children.splice(
@@ -795,12 +884,14 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
           value={title || undefined}
         />
       )
+
       const renderTitleActions = (
         itemId,
         disableRemove = false,
         withClone = true,
       ) => {
         const items = []
+
         const removeIcon = (
           <svg height="24" width="24" xmlns="http://www.w3.org/2000/svg">
             <path d="M8.4 17 12 13.4 15.6 17 17 15.6 13.4 12 17 8.4 15.6 7 12 10.6 8.4 7 7 8.4 10.6 12 7 15.6ZM5 19H19V5H5ZM5 21Q4.175 21 3.587 20.413Q3 19.825 3 19V5Q3 4.175 3.587 3.587Q4.175 3 5 3H19Q19.825 3 20.413 3.587Q21 4.175 21 5V19Q21 19.825 20.413 20.413Q19.825 21 19 21ZM5 19V5V19Z" />
@@ -812,6 +903,7 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
             <path d="M9 18Q8.175 18 7.588 17.413Q7 16.825 7 16V4Q7 3.175 7.588 2.587Q8.175 2 9 2H18Q18.825 2 19.413 2.587Q20 3.175 20 4V16Q20 16.825 19.413 17.413Q18.825 18 18 18ZM9 16H18Q18 16 18 16Q18 16 18 16V4Q18 4 18 4Q18 4 18 4H9Q9 4 9 4Q9 4 9 4V16Q9 16 9 16Q9 16 9 16ZM5 22Q4.175 22 3.587 21.413Q3 20.825 3 20V6H5V20Q5 20 5 20Q5 20 5 20H16V22ZM9 4Q9 4 9 4Q9 4 9 4V16Q9 16 9 16Q9 16 9 16Q9 16 9 16Q9 16 9 16V4Q9 4 9 4Q9 4 9 4Z" />
           </svg>
         )
+
         if (!withClone) {
           items.push(
             <Button
@@ -847,6 +939,7 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
 
         return items
       }
+
       return (
         <InnerWrapper>
           <Header>&#9313; Outline Content</Header>
@@ -883,15 +976,15 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                                   index={levelOneIndex}
                                   key={levelOneItem.id}
                                 >
-                                  {(provided, snapshot) => (
+                                  {(providedL1, _) => (
                                     <DraggableItemWrapper
-                                      ref={provided.innerRef}
-                                      {...provided.draggableProps}
+                                      ref={providedL1.innerRef}
+                                      {...providedL1.draggableProps}
                                     >
                                       <DraggableItem
                                         active
                                         dragHandleProps={
-                                          provided.dragHandleProps
+                                          providedL1.dragHandleProps
                                         }
                                         headerActionComponents={renderTitleActions(
                                           `${bookStructure.levels[0].id}_${levelOneItem.id}`,
@@ -911,12 +1004,12 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                                             key={`${bookStructure.levels[1].id}_${levelOneItem.id}`}
                                             type={bookStructure.levels[1].type}
                                           >
-                                            {(provided, snapshot) => (
+                                            {(providedL2, snapshotL2) => (
                                               <DraggableArea
-                                                {...provided.droppableProps}
-                                                ref={provided.innerRef}
+                                                {...providedL2.droppableProps}
+                                                ref={providedL2.innerRef}
                                                 style={getListStyleLevel2(
-                                                  snapshot.isDraggingOver ||
+                                                  snapshotL2.isDraggingOver ||
                                                     showDropIndicators.levelTwo,
                                                 )}
                                               >
@@ -943,20 +1036,17 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                                                         }
                                                         key={levelTwoItem.id}
                                                       >
-                                                        {(
-                                                          provided,
-                                                          snapshot,
-                                                        ) => (
+                                                        {(providedL3, __) => (
                                                           <DraggableItemWrapper
                                                             ref={
-                                                              provided.innerRef
+                                                              providedL3.innerRef
                                                             }
-                                                            {...provided.draggableProps}
+                                                            {...providedL3.draggableProps}
                                                           >
                                                             <DraggableItem
                                                               active
                                                               dragHandleProps={
-                                                                provided.dragHandleProps
+                                                                providedL3.dragHandleProps
                                                               }
                                                               hasHandle={
                                                                 outlineInternal[
@@ -1002,16 +1092,16 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                                                                     }
                                                                   >
                                                                     {(
-                                                                      provided,
-                                                                      snapshot,
+                                                                      providedL4,
+                                                                      snapshotL4,
                                                                     ) => (
                                                                       <DraggableArea
-                                                                        {...provided.droppableProps}
+                                                                        {...providedL4.droppableProps}
                                                                         ref={
-                                                                          provided.innerRef
+                                                                          providedL4.innerRef
                                                                         }
                                                                         style={getListStyleLevel3(
-                                                                          snapshot.isDraggingOver ||
+                                                                          snapshotL4.isDraggingOver ||
                                                                             showDropIndicators.levelThree,
                                                                         )}
                                                                       >
@@ -1060,19 +1150,19 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                                                                                 }
                                                                               >
                                                                                 {(
-                                                                                  provided,
-                                                                                  snapshot,
+                                                                                  providedL5,
+                                                                                  ___,
                                                                                 ) => (
                                                                                   <DraggableItemWrapper
                                                                                     ref={
-                                                                                      provided.innerRef
+                                                                                      providedL5.innerRef
                                                                                     }
-                                                                                    {...provided.draggableProps}
+                                                                                    {...providedL5.draggableProps}
                                                                                   >
                                                                                     <DraggableItem
                                                                                       active
                                                                                       dragHandleProps={
-                                                                                        provided.dragHandleProps
+                                                                                        providedL5.dragHandleProps
                                                                                       }
                                                                                       hasHandle={
                                                                                         outlineInternal[
@@ -1112,7 +1202,7 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                                                                             ),
                                                                           )}
                                                                         {
-                                                                          provided.placeholder
+                                                                          providedL4.placeholder
                                                                         }
                                                                       </DraggableArea>
                                                                     )}
@@ -1152,13 +1242,14 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                     if (level.type === 'chapterCloser') {
                       return null
                     }
+
                     return (
                       <Droppable
                         droppableId={`buildingBlocksLevel_${level.id}`}
                         key={`buildingBlocksLevel_${level.id}`}
                         type={`${level.type}`}
                       >
-                        {(provided, snapshot) => (
+                        {(provided, _) => (
                           <DraggableArea
                             {...provided.droppableProps}
                             ref={provided.innerRef}
@@ -1168,14 +1259,14 @@ const StepTwo = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                               index={0}
                               key={`buildingBlock_${level.type}`}
                             >
-                              {(provided, snapshot) => (
+                              {(providedL1, __) => (
                                 <DraggableItemWrapper
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
+                                  ref={providedL1.innerRef}
+                                  {...providedL1.draggableProps}
                                 >
                                   <DraggableItem
                                     active
-                                    dragHandleProps={provided.dragHandleProps}
+                                    dragHandleProps={providedL1.dragHandleProps}
                                     grabFreeMoveIcon
                                     headerComponent={<p>{level.displayName}</p>}
                                     isAccordion={false}

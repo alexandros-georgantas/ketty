@@ -1,4 +1,5 @@
-import React, { Component } from 'react'
+/* eslint-disable react/prop-types,react/no-unused-state */
+import React from 'react'
 import styled from 'styled-components'
 import cloneDeep from 'lodash/cloneDeep'
 import forEach from 'lodash/forEach'
@@ -108,6 +109,7 @@ const StyledTD = styled.td`
   text-align: ${({ align }) => align};
   width: 32%;
 `
+
 const TableContainer = styled.div`
   flex-grow: 1;
   margin-bottom: 8px;
@@ -119,6 +121,7 @@ const StyledTBody = styled.tbody`
 
   width: 100%;
 `
+
 const icon = (
   <svg
     fill="none"
@@ -137,19 +140,21 @@ const icon = (
   </svg>
 )
 
-class BookSettings extends Component {
+class BookSettings extends React.Component {
   constructor(props) {
     super(props)
     const { data } = this.props
     const { bookComponents } = data
 
     const init = {}
+
     for (let i = 0; i < bookComponents.length; i += 1) {
       init[`${bookComponents[i].id}_runningHeadersRight`] =
         bookComponents[i].runningHeadersRight
       init[`${bookComponents[i].id}_runningHeadersLeft`] =
         bookComponents[i].runningHeadersLeft
     }
+
     this.state = { error: false, bookComponents: init }
   }
 
@@ -214,6 +219,7 @@ class BookSettings extends Component {
               )
             })
           }
+
           return (
             <StyledForm onSubmit={handleSubmit}>
               <Body>

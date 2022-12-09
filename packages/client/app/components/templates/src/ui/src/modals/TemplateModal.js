@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types,react/no-unused-state,func-names */
 import React from 'react'
 import styled from 'styled-components'
 import { th, grid } from '@pubsweet/ui-toolkit'
@@ -14,7 +15,6 @@ const { deleteIcon } = Icons
 const selectOptions = [
   { label: 'EPUB', value: 'epub' },
   { label: 'PagedJS', value: 'pagedjs' },
-  { label: 'VivlioStyle', value: 'vivliostyle' },
 ]
 
 const noteSelectOptions = [
@@ -26,6 +26,7 @@ const noteSelectOptions = [
 const StyledFormik = styled(Formik)`
   width: 100%;
 `
+
 const Body = styled.div`
   align-items: center;
   display: flex;
@@ -44,6 +45,7 @@ const Footer = styled.div`
     margin-right: ${grid(1)};
   }
 `
+
 const Input = styled.input`
   border: 0;
   border-bottom: 1px dashed
@@ -65,6 +67,7 @@ const Input = styled.input`
     line-height: ${th('lineHeightBase')};
   }
 `
+
 const Text = styled.div`
   color: #404040;
   font-family: ${th('fontInterface')};
@@ -73,6 +76,7 @@ const Text = styled.div`
   margin-right: calc(3 * ${th('gridUnit')});
   min-width: 55px;
 `
+
 const Error = styled.div`
   color: ${th('colorError')};
   font-family: ${th('fontInterface')};
@@ -90,22 +94,26 @@ const Container = styled.div`
   width: 90%;
   justify-content: space-between;
 `
+
 const Side1 = styled.div`
   display: flex;
   flex-basis: 8%;
   height: 100%;
 `
+
 const Side2 = styled.div`
   display: flex;
   flex-basis: 65%;
   flex-direction: column;
   height: 100%;
 `
+
 const FormFieldContainer = styled.div`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
 `
+
 const FormField = styled.div`
   align-items: flex-start;
   font-family: ${th('fontInterface')};
@@ -120,6 +128,7 @@ const StyledForm = styled.form`
   height: calc(100% - 24px);
   width: 100%;
 `
+
 const ThumbnailContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -128,6 +137,7 @@ const ThumbnailContainer = styled.div`
 const Filename = styled(Text)`
   flex-grow: 1;
 `
+
 const FileList = styled.div`
   overflow-y: auto;
   display: flex;
@@ -141,6 +151,7 @@ const Image = styled.img`
   width: 188px;
   margin-bottom: ${grid(1)};
 `
+
 class TemplateModal extends React.Component {
   constructor(props) {
     super(props)
@@ -155,6 +166,7 @@ class TemplateModal extends React.Component {
     this.handleSelectNotes = this.handleSelectNotes.bind(this)
     this.handleSelect = this.handleSelect.bind(this)
     this.handleSelectScripts = this.handleSelectScripts.bind(this)
+
     if (mode === 'create') {
       this.state = {
         error: false,
@@ -196,18 +208,6 @@ class TemplateModal extends React.Component {
     }
   }
 
-  updateFileList(fileList, setFieldValue, setFieldTouched) {
-    const { files } = this.state
-    const tempFiles = cloneDeep(files)
-    const selectedFiles = tempFiles
-    for (let i = 0; i < fileList.length; i += 1) {
-      selectedFiles.push(fileList.item(i))
-    }
-    this.setState({ files: selectedFiles })
-    setFieldValue('files', selectedFiles)
-    setFieldTouched('files', true)
-  }
-
   handleSelect(selected, setFieldValue, setFieldTouched) {
     this.setState({ target: selected })
     setFieldValue('target', selected)
@@ -219,6 +219,7 @@ class TemplateModal extends React.Component {
     setFieldValue('notes', selected)
     setFieldTouched('notes', true)
   }
+
   handleSelectScripts(selected, setFieldValue, setFieldTouched) {
     if (!selected) {
       this.setState({
@@ -234,13 +235,28 @@ class TemplateModal extends React.Component {
       })
     }
   }
-  /* eslint-disable */
+
+  updateFileList(fileList, setFieldValue, setFieldTouched) {
+    const { files } = this.state
+    const tempFiles = cloneDeep(files)
+    const selectedFiles = tempFiles
+
+    for (let i = 0; i < fileList.length; i += 1) {
+      selectedFiles.push(fileList.item(i))
+    }
+
+    this.setState({ files: selectedFiles })
+    setFieldValue('files', selectedFiles)
+    setFieldTouched('files', true)
+  }
+
   updateThumbnail(file, setFieldValue, setFieldTouched) {
     const { thumbnail, mode } = this.state
     const reader = new FileReader()
     reader.readAsDataURL(file)
-    reader.onloadend = function(e) {
+    reader.onloadend = function (e) {
       let newState
+
       if (mode === 'update') {
         newState = {
           thumbnailPreview: reader.result,
@@ -250,12 +266,13 @@ class TemplateModal extends React.Component {
       } else {
         newState = { thumbnailPreview: reader.result, thumbnail: file }
       }
+
       this.setState(newState)
       setFieldValue('thumbnail', file)
       setFieldTouched('thumbnail', true)
     }.bind(this)
   }
-  /* eslint-enable */
+
   removeFile(filename, setFieldValue, setFieldTouched) {
     const { files, mode, deleteFiles } = this.state
     let newState
@@ -289,6 +306,7 @@ class TemplateModal extends React.Component {
     const { thumbnail, mode } = this.state
     let newState
     setFieldValue('thumbnail', null)
+
     if (mode === 'update') {
       newState = {
         deleteThumbnail: thumbnail.id,
@@ -301,6 +319,7 @@ class TemplateModal extends React.Component {
         thumbnail: undefined,
       }
     }
+
     this.setState(newState)
     setFieldTouched('thumbnail', true)
   }
@@ -343,6 +362,7 @@ class TemplateModal extends React.Component {
   renderBody() {
     const { data } = this.props
     const { onConfirm, hideModal, mode, scriptOptions } = data
+
     const {
       thumbnailPreview,
       thumbnail,
@@ -358,6 +378,7 @@ class TemplateModal extends React.Component {
     const confirmLabel = mode === 'create' ? 'Save' : 'Update'
     const cancelLabel = 'Cancel'
     let filteredScriptOptions = []
+
     if (target) {
       filteredScriptOptions = scriptOptions.filter(script => {
         const { value } = script
@@ -367,6 +388,7 @@ class TemplateModal extends React.Component {
     }
 
     let initialValues
+
     if (mode === 'create') {
       initialValues = {
         name: undefined,
@@ -396,77 +418,92 @@ class TemplateModal extends React.Component {
         initialValues={initialValues}
         onSubmit={(values, { setSubmitting }) => {
           const {
-            name,
-            author,
-            trimSize,
-            files,
-            thumbnail,
-            target,
-            notes,
-            exportScripts,
+            name: nameFromValues,
+            author: authorFromValues,
+            trimSize: trimSizeFromValues,
+            files: filesFromValues,
+            thumbnail: thumbnailFromValues,
+            target: targetFromValues,
+            notes: notesFromValues,
+            exportScripts: exportScriptsFromValues,
           } = values
-          const { deleteFiles, deleteThumbnail, mode } = this.state
-          let data
 
-          if (mode === 'create') {
-            data = {
-              name,
-              author,
-              trimSize,
-              files,
-              thumbnail,
-              target: target ? target.value : undefined,
-              notes: notes ? notes.value : undefined,
-              exportScripts,
+          const {
+            deleteFiles,
+            deleteThumbnail,
+            mode: modeFromState,
+          } = this.state
+
+          let dataIn
+
+          if (modeFromState === 'create') {
+            dataIn = {
+              name: nameFromValues,
+              author: authorFromValues,
+              trimSize: trimSizeFromValues,
+              files: filesFromValues,
+              thumbnail: thumbnailFromValues,
+              target: targetFromValues ? targetFromValues.value : undefined,
+              notes: notesFromValues ? notesFromValues.value : undefined,
+              exportScripts: exportScriptsFromValues,
             }
           } else {
-            data = {
-              name,
-              author,
+            dataIn = {
+              name: nameFromValues,
+              author: authorFromValues,
+              trimSize: trimSizeFromValues,
               deleteFiles,
               deleteThumbnail,
-              trimSize,
-              files: filter(files, file => !file.id),
-              thumbnail: thumbnail && thumbnail.id ? null : thumbnail,
-              target: target ? target.value : undefined,
-              notes: notes ? notes.value : undefined,
-              exportScripts,
+              files: filter(filesFromValues, file => !file.id),
+              thumbnail:
+                thumbnailFromValues && thumbnailFromValues.id
+                  ? null
+                  : thumbnailFromValues,
+              target: targetFromValues ? targetFromValues.value : undefined,
+              notes: notesFromValues ? notesFromValues.value : undefined,
+              exportScripts: exportScriptsFromValues,
             }
           }
 
-          onConfirm(data)
+          onConfirm(dataIn)
           setSubmitting(false)
         }}
         validate={values => {
           const errors = {}
-          const { files } = this.state
+          const { files: filesFromState } = this.state
+
           if (!values.name || values.name === '') {
             errors.name = '* The name of the template should not be empty'
           }
 
           if (values.files.length > 0) {
             let stylesheetCounter = 0
+
             // const { files } = values
-            for (let i = 0; i < files.length; i += 1) {
+            for (let i = 0; i < filesFromState.length; i += 1) {
               if (
-                files[i].type === 'text/css' ||
-                files[i].mimetype === 'text/css'
+                filesFromState[i].type === 'text/css' ||
+                filesFromState[i].mimetype === 'text/css'
               ) {
                 stylesheetCounter += 1
               }
             }
+
             if (stylesheetCounter > 1) {
               errors.files =
                 '* Only one stylesheet can be uploaded per Template'
             }
           }
+
           if (!values.target) {
             errors.target = '* The target of the template should not be empty'
           }
+
           if (!values.notes) {
             errors.notes =
               '* The notes type of the template should not be empty'
           }
+
           if (values.exportScripts.length > 0) {
             if (!values.target.value) {
               errors.exportScripts = '* You have to select a target first'
@@ -474,6 +511,7 @@ class TemplateModal extends React.Component {
               for (let i = 0; i < values.exportScripts.length; i += 1) {
                 const { value } = values.exportScripts[i]
                 const tokens = value.split('-')
+
                 if (tokens[1].toLowerCase() !== target.value.toLowerCase()) {
                   errors.exportScripts =
                     '* The scope of the scripts should match the selected target'
@@ -481,6 +519,7 @@ class TemplateModal extends React.Component {
               }
             }
           }
+
           return errors
         }}
       >
@@ -686,6 +725,7 @@ class TemplateModal extends React.Component {
   render() {
     const { isOpen, hideModal, data } = this.props
     const { headerText } = data
+
     const body = this.renderBody()
 
     return (

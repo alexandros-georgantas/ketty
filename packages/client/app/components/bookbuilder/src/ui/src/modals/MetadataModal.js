@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types, react/no-unused-state */
 import React from 'react'
 import styled from 'styled-components'
 import { th, grid } from '@pubsweet/ui-toolkit'
@@ -15,6 +16,7 @@ const Label = styled.label`
   margin-right: 18px;
   color: #757575;
 `
+
 const Text = styled.div`
   font-family: ${th('fontInterface')};
   text-align: center;
@@ -29,12 +31,14 @@ const StyledFormik = styled(Formik)`
   width: 100%;
   height: 100%;
 `
+
 const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
   width: 100%;
 `
+
 const Body = styled.div`
   align-items: center;
   display: flex;
@@ -80,6 +84,7 @@ const Row = styled.div`
   flex-basis: 100%;
   align-items: center;
 `
+
 const Container = styled.div`
   display: flex;
 

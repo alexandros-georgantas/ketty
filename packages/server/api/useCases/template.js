@@ -38,11 +38,12 @@ const getTemplates = async (
 
           const sortable = map(templates, template => {
             const { id, name, author, target: innerTarget } = template
+
             return {
               id,
               name: name.toLowerCase().trim(),
               author,
-              target: innerTarget,
+              targetType: innerTarget,
             }
           })
 

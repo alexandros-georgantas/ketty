@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useContext, useState, useCallback, useEffect } from 'react'
 import styled, { css, ThemeProvider } from 'styled-components'
 import PanelGroup from 'react-panelgroup'
@@ -177,7 +178,9 @@ const NotesContainer = styled.div`
   height: 100%;
   width: 65%;
 `
+
 const WaxBottomRightInfo = styled.div``
+
 const InfoContainer = styled.div`
   display: flex;
   position: fixed;
@@ -200,6 +203,7 @@ const getNotes = main => {
     main.state.schema.nodes.footnote,
     true,
   )
+
   return notes
 }
 
@@ -231,9 +235,12 @@ const EditoriaLayout = ({ editor }) => {
       zIndex: '99999',
     }
   }
+
   const notes = main && getNotes(main)
+
   const commentsTracksCount =
     main && DocumentHelpers.getCommentsTracksCount(main)
+
   const trackBlockNodesCount =
     main && DocumentHelpers.getTrackBlockNodesCount(main)
 

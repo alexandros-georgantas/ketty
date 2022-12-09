@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
@@ -64,6 +65,7 @@ const collapseIcon = (
     <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
   </svg>
 )
+
 const expandIcon = (
   <svg
     fill="#000000"
@@ -81,6 +83,7 @@ const AccordionIcon = styled.div`
   display: flex;
   align-items: center;
 `
+
 const StyledIcon = styled.i`
   height: 24px;
   padding-right: 8px;
@@ -100,11 +103,13 @@ const StyledIcon = styled.i`
     }
   }
 `
+
 const Wrapper = styled.div`
   display: flex;
   flex-grow: 1;
   align-items: center;
 `
+
 const DraggableItem = ({
   active = false,
   isAccordion,
@@ -124,13 +129,17 @@ const DraggableItem = ({
       if (isActive) {
         return <StyledIcon>{collapseIcon}</StyledIcon>
       }
+
       return <StyledIcon>{expandIcon}</StyledIcon>
     }
+
     if (active) {
       return <StyledIcon>{collapseIcon}</StyledIcon>
     }
+
     return <StyledIcon>{expandIcon}</StyledIcon>
   }
+
   return (
     <Container>
       <Header hasHandle={hasHandle}>
@@ -143,6 +152,7 @@ const DraggableItem = ({
               if (!externalHandler) {
                 return setIsActive(!isActive)
               }
+
               return externalHandler(level)
             }}
           >
@@ -154,8 +164,8 @@ const DraggableItem = ({
           {headerActionComponents}
         </Wrapper>
       </Header>
-      {!externalHandler && isActive && <>{children}</>}
-      {externalHandler && active && <>{children}</>}
+      {!externalHandler && isActive && { children }}
+      {externalHandler && active && { children }}
     </Container>
   )
 }

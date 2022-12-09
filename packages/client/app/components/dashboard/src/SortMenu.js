@@ -1,6 +1,6 @@
+/* eslint-disable react/prop-types,jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
 import React from 'react'
 import styled, { css } from 'styled-components'
-import { State } from 'react-powerplug'
 import { th } from '@pubsweet/ui-toolkit'
 
 import { Menu as UIMenu } from '@pubsweet/ui'
@@ -141,12 +141,12 @@ const Opener = props => {
 
 const options = [
   {
-    label: 'author',
-    value: 'author',
-  },
-  {
     label: 'title',
     value: 'title',
+  },
+  {
+    label: 'author',
+    value: 'author',
   },
   {
     label: 'status',
@@ -154,31 +154,27 @@ const options = [
   },
 ]
 
-const SortMenu = ({ onChange }) => (
-  <State initial={{ ascending: true, sortKey: 'title' }} onChange={onChange}>
-    {({ state, setState }) => {
-      const { ascending, sortKey } = state
+const SortMenu = ({ setSortingParams, sortingParams }) => {
+  const { ascending, sortKey, archived } = sortingParams
 
-      const handleChangeSortKey = value => {
-        setState({ sortKey: value })
-      }
+  const handleChangeSortKey = value => {
+    setSortingParams({ sortKey: value, ascending, archived })
+  }
 
-      const handleChangeSortOrder = () => {
-        setState({ ascending: !state.ascending })
-      }
+  const handleChangeSortOrder = () => {
+    setSortingParams({ ascending: !ascending, sortKey, archived })
+  }
 
-      return (
-        <Menu
-          ascending={ascending}
-          onChange={handleChangeSortKey}
-          onChangeSortOrder={handleChangeSortOrder}
-          options={options}
-          renderOpener={Opener}
-          value={sortKey}
-        />
-      )
-    }}
-  </State>
-)
+  return (
+    <Menu
+      ascending={ascending}
+      onChange={handleChangeSortKey}
+      onChangeSortOrder={handleChangeSortOrder}
+      options={options}
+      renderOpener={Opener}
+      value={sortKey}
+    />
+  )
+}
 
 export default SortMenu

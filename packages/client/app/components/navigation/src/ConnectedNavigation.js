@@ -1,10 +1,11 @@
+/* eslint-disable func-names */
 import React from 'react'
 import { get } from 'lodash'
 import { adopt } from 'react-adopt'
 
 import CurrentUserQuery from './queries/currentUser'
 import ApplicationParameterQuery from './queries/applicationParameter'
-import { updateApplicationParametersSubscription } from './queries/applicationParameterSubscriptions'
+import updateApplicationParametersSubscription from './queries/applicationParameterSubscriptions'
 
 const mapper = {
   CurrentUserQuery,
@@ -24,22 +25,25 @@ const mapProps = args => ({
 
 const Composed = adopt(mapper, mapProps)
 
-const Connected = WrappedComponent => props => (
-  <Composed>
-    {({ loading, currentUser, applicationParameter, client }) => {
-      if (loading) return null
+const Connected = WrappedComponent =>
+  function (props) {
+    return (
+      <Composed>
+        {({ loading, currentUser, applicationParameter, client }) => {
+          if (loading) return null
 
-      return (
-        <WrappedComponent
-          applicationParameter={applicationParameter}
-          client={client}
-          currentUser={currentUser}
-          loading={loading}
-          {...props}
-        />
-      )
-    }}
-  </Composed>
-)
+          return (
+            <WrappedComponent
+              applicationParameter={applicationParameter}
+              client={client}
+              currentUser={currentUser}
+              loading={loading}
+              {...props}
+            />
+          )
+        }}
+      </Composed>
+    )
+  }
 
 export default Connected

@@ -7,27 +7,33 @@ const BOOK_CREATED_SUBSCRIPTION = gql`
     bookCreated
   }
 `
+
 const BOOK_ARCHIVED_SUBSCRIPTION = gql`
   subscription BookArchived {
     bookArchived
   }
 `
+
 const BOOK_RENAMED_SUBSCRIPTION = gql`
   subscription BookRenamed {
     bookRenamed
   }
 `
+
 const BOOK_DELETED_SUBSCRIPTION = gql`
   subscription BookDeleted {
     bookDeleted
   }
 `
+
 const bookCreatedSubscription = (props) => {
   const { render, getBookCollectionsQuery, getDashboardRulesQuery } = props
+
   const triggerRefetch = () => {
     getBookCollectionsQuery.refetch()
     getDashboardRulesQuery.refetch()
   }
+
   return (
     <Subscription
       onSubscriptionData={triggerRefetch}
@@ -37,12 +43,15 @@ const bookCreatedSubscription = (props) => {
     </Subscription>
   )
 }
+
 const bookArchivedSubscription = (props) => {
   const { render, getBookCollectionsQuery } = props
   const { refetch } = getBookCollectionsQuery
+
   const triggerRefetch = () => {
     refetch()
   }
+
   return (
     <Subscription
       onSubscriptionData={triggerRefetch}
@@ -52,9 +61,11 @@ const bookArchivedSubscription = (props) => {
     </Subscription>
   )
 }
+
 const bookRenamedSubscription = (props) => {
   const { render, getBookCollectionsQuery } = props
   const { refetch } = getBookCollectionsQuery
+
   const triggerRefetch = () => {
     refetch()
   }
@@ -68,9 +79,11 @@ const bookRenamedSubscription = (props) => {
     </Subscription>
   )
 }
+
 const bookDeletedSubscription = (props) => {
   const { render, getBookCollectionsQuery } = props
   const { refetch } = getBookCollectionsQuery
+
   const triggerRefetch = () => {
     refetch()
   }

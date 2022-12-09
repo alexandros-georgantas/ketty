@@ -20,9 +20,11 @@ const TEAM_MEMBERS_UPDATED_SUBSCRIPTION = gql`
 
 const addTeamMemberSubscription = props => {
   const { render, getUsersTeamsQuery } = props
+
   const triggerRefetch = () => {
     getUsersTeamsQuery.refetch()
   }
+
   return (
     <Subscription
       onSubscriptionData={triggerRefetch}

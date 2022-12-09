@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
@@ -12,23 +13,20 @@ const Button = styled.button`
   font-family: 'Fira Sans Condensed' !important;
   /* padding: calc(${th('gridUnit')} / 2); */
   svg {
-    
     svg {
-      path{
-
-      fill: #828282;
+      path {
+        fill: #828282;
       }
     }
-    width:28px;
-    height:28px;
+    width: 28px;
+    height: 28px;
   }
 
   &:disabled {
     color: ${th('colorFurniture')};
     svg {
-      path{
-
-      fill: ${th('colorFurniture')};
+      path {
+        fill: ${th('colorFurniture')};
       }
     }
     cursor: not-allowed !important;
@@ -42,9 +40,8 @@ const Button = styled.button`
     /* background-color: ${th('colorBackgroundHue')}; */
     color: ${th('colorPrimary')};
     svg {
-      path{
-
-      fill: ${th('colorPrimary')};
+      path {
+        fill: ${th('colorPrimary')};
       }
     }
   }
@@ -54,9 +51,8 @@ const Button = styled.button`
     color: ${th('colorPrimary')};
     outline: none;
     svg {
-      path{
-
-      fill: ${th('colorPrimary')};
+      path {
+        fill: ${th('colorPrimary')};
       }
     }
   }
@@ -64,17 +60,20 @@ const Button = styled.button`
     outline: 0;
   }
 `
+
 const Icon = styled.span`
   height: calc(3.5 * ${th('gridUnit')});
   /* margin: 0 ${th('gridUnit')} 0 0; */
   padding: 0;
   width: calc(3.5 * ${th('gridUnit')});
 `
+
 const OnlyIcon = styled.span`
   height: calc(3.5 * ${th('gridUnit')});
   padding: 0;
   width: calc(3.5 * ${th('gridUnit')});
 `
+
 const Label = styled.div`
   font-size: ${th('fontSizeBase')};
   line-height: ${th('lineHeightBase')};
@@ -91,10 +90,10 @@ const ButtonWithIcon = ({
 }) => {
   return (
     <Button
-      title={title}
       className={className}
-      onClick={onClick}
       disabled={disabled}
+      onClick={onClick}
+      title={title}
     >
       <Icon>{icon}</Icon>
       <Label>{label.toUpperCase()}</Label>
@@ -105,10 +104,10 @@ const ButtonWithIcon = ({
 const DefaultButton = ({ onClick, label, disabled, className, title }) => {
   return (
     <Button
-      title={title}
       className={className}
-      onClick={onClick}
       disabled={disabled}
+      onClick={onClick}
+      title={title}
     >
       <Label>{label.toUpperCase()}</Label>
     </Button>
@@ -118,13 +117,14 @@ const DefaultButton = ({ onClick, label, disabled, className, title }) => {
 const ButtonWithoutLabel = ({ onClick, icon, disabled, className, title }) => {
   return (
     <Button
-      title={title}
       className={className}
-      onClick={onClick}
       disabled={disabled}
+      onClick={onClick}
+      title={title}
     >
       <OnlyIcon>{icon}</OnlyIcon>
     </Button>
   )
 }
+
 export { ButtonWithIcon, DefaultButton, ButtonWithoutLabel }

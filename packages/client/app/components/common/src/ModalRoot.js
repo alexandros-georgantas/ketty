@@ -14,7 +14,7 @@ ReactModal.setAppElement('#root')
   This is to make react modal and styled components play nice
   See https://github.com/styled-components/styled-components/issues/1494#issuecomment-363362709
 */
-function ReactModalAdapter({ className, modalClassName, ...props }) {
+const ReactModalAdapter = ({ className, modalClassName, ...props }) => {
   return (
     <ReactModal
       className={modalClassName}
@@ -42,6 +42,7 @@ const medium = css`
   width: calc(936px - 16px);
   margin: ${grid(7)} auto;
 `
+
 const mediumNarrow = css`
   height: calc(536px - 16px);
   width: calc(752px - 16px);
@@ -109,13 +110,15 @@ const ModalRoot = props => {
     footerComponent = null,
     headerComponent = null,
     onRequestClose,
+    isOpen,
     ...rest
   } = props
 
-  if (!props.isOpen) return null
+  if (!isOpen) return null
   return (
     <StyledModal
       className={className}
+      isOpen={isOpen}
       onRequestClose={onRequestClose}
       {...rest}
     >

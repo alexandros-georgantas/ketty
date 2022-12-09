@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import Modal from '../../../../common/src/Modal'
 
@@ -13,6 +14,7 @@ const DeleteModal = ({
     remove(bookComponentId)
     toggle()
   }
+
   return (
     <Modal
       action="delete"
@@ -27,4 +29,5 @@ const DeleteModal = ({
     />
   )
 }
+
 export default DeleteModal

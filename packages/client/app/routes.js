@@ -56,7 +56,7 @@ const featureBookStructureEnabled =
   false
 
 export default (
-  <Fragment>
+  <>
     <GlobalStyle />
     <Switch>
       <Redirect exact path="/" to="/books" />
@@ -106,5 +106,5 @@ export default (
         </Page>
       </PageLayout>
     </Switch>
-  </Fragment>
+  </>
 )

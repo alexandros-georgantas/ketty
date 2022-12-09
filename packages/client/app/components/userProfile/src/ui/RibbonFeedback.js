@@ -41,7 +41,7 @@ const RibbonFeedback = props => {
   }
 
   return (
-    <Fragment>
+    <>
       <Ribbon
         message={getMessage()}
         status={successStatus ? 'success' : 'error'}
@@ -49,7 +49,7 @@ const RibbonFeedback = props => {
       />
 
       {children(notifyRibbon)}
-    </Fragment>
+    </>
   )
 }
 

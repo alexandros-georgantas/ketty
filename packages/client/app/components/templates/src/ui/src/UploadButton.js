@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { Button } from '../../../../../ui'
@@ -23,7 +24,7 @@ const UploadButton = ({
   }
 
   return (
-    <React.Fragment>
+    <>
       <Button
         className={className}
         disabled={disabled}
@@ -42,7 +43,8 @@ const UploadButton = ({
         }}
         type="file"
       />
-    </React.Fragment>
+    </>
   )
 }
+
 export default UploadButton

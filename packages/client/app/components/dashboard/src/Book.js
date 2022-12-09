@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 // import { includes, some } from 'lodash'
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -47,10 +48,10 @@ const TopRowValue = styled.span`
 `
 
 const TopRowKeyValue = ({ value }) => (
-  <React.Fragment>
+  <>
     <TopRowKey>author</TopRowKey>
     <TopRowValue>{value}</TopRowValue>
-  </React.Fragment>
+  </>
 )
 
 const TopRowValuesWrapper = styled.div`
@@ -69,6 +70,7 @@ const MainRow = styled.div`
   align-items: center;
   flex-basis: 100%;
 `
+
 const ArchivedIndicator = styled.i`
   svg {
     height: 24px;
@@ -80,6 +82,7 @@ const ArchivedIndicator = styled.i`
     }
   }
 `
+
 const icon = (
   <svg
     fill="none"
@@ -115,6 +118,7 @@ const TopRowValues = ({ authors }) => {
         if (!author.surname || !author.givenName) {
           return <Author author={author.username} key={author.username} />
         }
+
         return (
           <Author
             author={`${author.givenName} ${author.surname}`}
@@ -137,6 +141,7 @@ const Book = props => {
     canAssignMembers,
     onAssignMembers,
   } = props
+
   const { authors, isPublished, archived } = book
 
   const { canRenameBooks, canDeleteBooks, canArchiveBooks } = bookRule
@@ -175,6 +180,7 @@ const Book = props => {
         }
 
         let statusLabel
+
         if (isPublished) {
           if (archived) {
             statusLabel = 'published (archived)'
@@ -186,7 +192,9 @@ const Book = props => {
         } else {
           statusLabel = 'in progress'
         }
+
         let canAct
+
         if (featureBookStructureEnabled) {
           if (!canDeleteBooks) {
             if (!book.bookStructure.finalized) {
@@ -242,14 +250,13 @@ const Book = props => {
   )
 }
 
+/* eslint-disable react/forbid-prop-types */
 Book.propTypes = {
   book: PropTypes.shape({
     id: PropTypes.string,
     rev: PropTypes.string,
     title: PropTypes.string,
   }).isRequired,
-  history: PropTypes.any.isRequired,
-  remove: PropTypes.func.isRequired,
   renameBook: PropTypes.func.isRequired,
 }
 

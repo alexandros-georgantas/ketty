@@ -1,5 +1,7 @@
+const ConnectedWax = require('./src/ConnectedWax')
+
 module.exports = {
   frontend: {
-    components: [() => require('./src/ConnectedWax')],
+    components: [() => ConnectedWax],
   },
 }

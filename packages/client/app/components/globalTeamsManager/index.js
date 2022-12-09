@@ -1,5 +1,7 @@
+const GlobalTeamsManager = require('./src/GlobalTeamsManager')
+
 module.exports = {
   frontend: {
-    components: [() => require('./src/GlobalTeamsManager')],
+    components: [() => GlobalTeamsManager],
   },
 }

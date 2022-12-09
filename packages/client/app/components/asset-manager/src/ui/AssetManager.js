@@ -1,10 +1,12 @@
-import React, { Component } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { indexOf, forEach, find } from 'lodash'
 
 import DialogModal from '../../../common/src/DialogModal'
 
-import { ActionSection, FilesTable, FileDetails } from '../ui'
+import ActionSection from './ActionSection'
+import FilesTable from './FilesTable'
+import FileDetails from './FileDetails'
 
 const OuterWrapper = styled.div`
   display: flex;
@@ -20,7 +22,8 @@ const InnerWrapper = styled.div`
   width: 100%;
 `
 
-class AssetManager extends Component {
+/* eslint-disable react/prop-types */
+class AssetManager extends React.Component {
   constructor(props) {
     super(props)
 
@@ -61,20 +64,24 @@ class AssetManager extends Component {
 
   findSelected(id) {
     const { files } = this.props
+
     if (files && id) {
       return find(files, { id })
     }
+
     return undefined
   }
 
   checkboxSelection(id, all = undefined) {
     const { checkboxSelected } = this.state
+
     if (all) {
       const { files } = this.props
 
       if (checkboxSelected.length === files.length) {
         return this.setState({ checkboxSelected: [] })
       }
+
       const temp = []
       forEach(files, file => temp.push(file.id))
       return this.setState({ checkboxSelected: temp })
@@ -84,6 +91,7 @@ class AssetManager extends Component {
       checkboxSelected.push(id)
     } else {
       const found = indexOf(checkboxSelected, id)
+
       if (found !== -1) {
         checkboxSelected.splice(found, 1)
       } else {
@@ -96,10 +104,14 @@ class AssetManager extends Component {
 
   toggleOrder(key) {
     const { refetch, bookId } = this.props
-    this.setState({ [key]: !this.state[key] })
+    const { name, updated } = this.state
+
+    this.setState(prevState => ({ [key]: !prevState[key] }))
+    // this.setState({ [key]: !this.state[key] })
+
     refetch(bookId, [
-      { key: 'name', order: this.state.name ? 'asc' : 'desc' },
-      { key: 'updated', order: this.state.updated ? 'asc' : 'desc' },
+      { key: 'name', order: name ? 'asc' : 'desc' },
+      { key: 'updated', order: updated ? 'asc' : 'desc' },
     ])
   }
 
@@ -127,9 +139,11 @@ class AssetManager extends Component {
   importHandler() {
     const { handleImport } = this.props
     const { checkboxSelected } = this.state
+
     if (checkboxSelected.length > 0) {
       return handleImport(checkboxSelected)
     }
+
     return false
   }
 
@@ -141,13 +155,9 @@ class AssetManager extends Component {
 
   renderBody() {
     const { files, withImport, loading, refetching } = this.props
-    const {
-      selectedItem,
-      name,
-      updated,
-      checkboxSelected,
-      shouldLoader,
-    } = this.state
+
+    const { selectedItem, name, updated, checkboxSelected, shouldLoader } =
+      this.state
 
     const sortingState = {
       name,

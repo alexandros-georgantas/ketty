@@ -1,5 +1,7 @@
+const BookStructurePage = require('./src/BookStructure.page')
+
 module.exports = {
   frontend: {
-    components: [() => require('./src/BookSchema.page')],
+    components: [() => BookStructurePage],
   },
 }

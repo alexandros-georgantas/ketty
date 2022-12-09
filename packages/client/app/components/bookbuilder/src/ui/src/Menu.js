@@ -1,6 +1,6 @@
-/* eslint-disable react/sort-comp */
+/* eslint-disable */
 
-import React from 'react'
+import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { th, override } from '@pubsweet/ui-toolkit'
@@ -194,6 +194,7 @@ class Menu extends React.Component {
     if (this.state.open) {
       document.removeEventListener('mousedown', this.handleClickOutside)
     }
+
     if (this.wrapperRef && !this.wrapperRef.contains(event.target)) {
       this.toggleMenu()
       document.removeEventListener('mousedown', this.handleClickOutside)
@@ -203,6 +204,7 @@ class Menu extends React.Component {
   handleSelect = ({ selected, open }) => {
     const { multi } = this.props
     let values
+
     if (multi) {
       values = this.state.selected ? this.state.selected : []
       if (values.indexOf(selected) === -1) values.push(selected)
@@ -265,6 +267,7 @@ class Menu extends React.Component {
       reset,
       ...rest
     } = this.props
+
     const { open, selected } = this.state
 
     if (reset === true) this.resetMenu(this.props)
@@ -294,19 +297,21 @@ class Menu extends React.Component {
                 {options.map((option, key) => {
                   let groupedHeader = null
                   let groupedOptions = [option]
+
                   if (option.children) {
                     groupedOptions = option.children
                     groupedHeader = option.text ? (
-                      <>
+                      <Fragment>
                         <span>{option.text}</span>
                         <hr />
-                      </>
+                      </Fragment>
                     ) : (
                       <hr />
                     )
                   }
+
                   return (
-                    <>
+                    <Fragment>
                       {key > 0 && groupedHeader}
                       {groupedOptions.map(groupoption => (
                         <RenderOption
@@ -319,7 +324,7 @@ class Menu extends React.Component {
                           value={groupoption.value}
                         />
                       ))}
-                    </>
+                    </Fragment>
                   )
                 })}
                 <RenderFooterOption />

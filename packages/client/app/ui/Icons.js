@@ -35,6 +35,7 @@ const deleteIcon = (
     <path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z" />
   </svg>
 )
+
 const addIcon = (
   <svg
     fill="black"
@@ -47,6 +48,7 @@ const addIcon = (
     <path d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
   </svg>
 )
+
 const metadataIcon = (
   <svg
     enableBackground="new 0 0 24 24"
@@ -61,6 +63,7 @@ const metadataIcon = (
     </g>
   </svg>
 )
+
 const assetManagerIcon = (
   <svg
     height="24"
@@ -148,6 +151,7 @@ const dragIcon = (
     <path d="M20 9H4v2h16V9zM4 15h16v-2H4v2z" />
   </svg>
 )
+
 const exitIcon = (
   <svg
     height="24"
@@ -159,6 +163,7 @@ const exitIcon = (
     <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
   </svg>
 )
+
 const saveIcon = (
   <svg
     height="24"
@@ -194,6 +199,7 @@ const previousIcon = (
     <path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z" />
   </svg>
 )
+
 const nextIcon = (
   <svg
     height="24"
@@ -205,6 +211,7 @@ const nextIcon = (
     <path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z" />
   </svg>
 )
+
 const Icons = {
   addIcon,
   archiveIcon,

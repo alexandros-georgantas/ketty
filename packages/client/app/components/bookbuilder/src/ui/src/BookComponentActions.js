@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { get } from 'lodash'
 import React from 'react'
 import styled, { css } from 'styled-components'
@@ -72,8 +73,10 @@ const ActionGroup = styled(UIActionGroup)`
       if (!lock) {
         return '9.5%'
       }
+
       return '9.4%'
     }
+
     return '10%'
   }};
   align-items: center;
@@ -100,6 +103,7 @@ const ActionGroup = styled(UIActionGroup)`
     }
   }
 `
+
 const Container = styled.div`
   display: flex;
   flex-basis: 10%;
@@ -122,6 +126,7 @@ const BookComponentActions = ({
   rules,
 }) => {
   const { bookComponentStateRules, canViewDeleteAction } = rules
+
   const { canViewFragmentEdit } =
     bookComponentStateRules.find(
       bookComponentState =>
@@ -129,19 +134,23 @@ const BookComponentActions = ({
     ) || {}
 
   const isLocked = get(lock, 'username')
+
   const handleClick = () => {
     onDeleteBookComponent(bookComponentId, componentType, title)
   }
 
   const goToEditor = (preview = undefined) => {
     if (uploading) return
+
     if (preview) {
       history.push(`/books/${bookId}/bookComponents/${bookComponentId}/preview`)
     } else {
       history.push(`/books/${bookId}/bookComponents/${bookComponentId}`)
     }
   }
+
   if (componentType === 'toc') return null
+
   if (!isLocked) {
     return (
       <ActionGroup
@@ -163,6 +172,7 @@ const BookComponentActions = ({
       </ActionGroup>
     )
   }
+
   return (
     <Container>
       <EditingNotification

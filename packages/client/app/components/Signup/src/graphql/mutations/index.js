@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client'
 
-export const SIGNUP_USER = gql`
-  mutation($input: EditoriaUserInput) {
+const SIGNUP_USER = gql`
+  mutation ($input: EditoriaUserInput) {
     createEditoriaUser(input: $input) {
       id
       type
@@ -10,3 +10,5 @@ export const SIGNUP_USER = gql`
     }
   }
 `
+
+export default SIGNUP_USER

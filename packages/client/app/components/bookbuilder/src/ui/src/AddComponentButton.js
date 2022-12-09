@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import { Button, Icons } from '../../../../../ui'
 
@@ -7,6 +8,7 @@ const AddComponentButton = ({ add, label, type, disabled }) => {
   const addComponent = () => {
     add(type)
   }
+
   return (
     <Button
       disabled={disabled}
@@ -17,4 +19,5 @@ const AddComponentButton = ({ add, label, type, disabled }) => {
     />
   )
 }
+
 export default AddComponentButton

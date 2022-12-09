@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import WorkflowIndicator from './WorkflowIndicator'
@@ -67,6 +68,7 @@ const WorkflowItem = ({
 
   const arrayShift = (array, i, direction) => {
     let newValue
+
     switch (direction) {
       case 'left':
         newValue = i - 1
@@ -75,70 +77,42 @@ const WorkflowItem = ({
         newValue = i + 1
         break
     }
+
     return newValue
   }
 
-  const renderIndicator = (disabled, side) => {
-    const iconRight = (
-      <svg
-        version="1.1"
-        id="Layer_1"
-        xmlns="http://www.w3.org/2000/svg"
-        x="0px"
-        y="0px"
-        width="24px"
-        height="24px"
-        viewBox="0 0 24 24"
-        enableBackground="new 0 0 24 24"
-      >
-        <path d="M8.59,16.59L13.17,12L8.59,7.41L10,6l6,6l-6,6L8.59,16.59z" />
-        <path fill="none" d="M0,0h24v24H0V0z" />
-      </svg>
-    )
-    const iconLeft = (
-      <svg
-        version="1.1"
-        id="Layer_1"
-        xmlns="http://www.w3.org/2000/svg"
-        x="0px"
-        y="0px"
-        width="24px"
-        height="24px"
-        viewBox="0 0 24 24"
-        enableBackground="new 0 0 24 24"
-      >
-        <path d="M15.41,16.59L10.83,12l4.58-4.59L14,6l-6,6l6,6L15.41,16.59z" />
-        <path fill="none" d="M0,0h24v24H0V0z" />
-      </svg>
-    )
+  const renderIndicator = (disabledParam, side) => {
     if (side === 'left') {
       return (
         <Arrow
           // className={classes[side]}
           // icon={iconLeft}
+          disabled={
+            disabledParam ||
+            !interactive ||
+            values[index] === 0 ||
+            values[index] === -1
+          }
           id="arrowLeft"
           label="<"
-          disabled={
-            disabled ||
-            !interactive ||
-            (values[index] === 0 || values[index] === -1)
-          }
           onClick={interactive ? handleInteractionLeft : null}
           onKeyPress={interactive ? handleInteractionLeft : null}
         />
       )
     }
+
     return (
       <Arrow
         // className={classes[side]}
         // icon={iconRight}
+        disabled={
+          disabledParam ||
+          !interactive ||
+          values[index] === 1 ||
+          values[index] === -1
+        }
         id="arrowRight"
         label=">"
-        disabled={
-          disabled ||
-          !interactive ||
-          (values[index] === 1 || values[index] === -1)
-        }
         onClick={interactive ? handleInteractionRight : null}
         onKeyPress={interactive ? handleInteractionRight : null}
       />
@@ -148,6 +122,7 @@ const WorkflowItem = ({
   const selectedStage = stage.find(stg => stg.type === type)
   let progressListLeft = ''
   let progressListRight = ''
+
   if (selectedStage.canChangeProgressListLeft) {
     progressListLeft = renderIndicator(false, 'left')
   } else {
@@ -172,12 +147,20 @@ const WorkflowItem = ({
       {/* <div className={classes.content}> */}
       <FirstRow>
         {progressListLeft}
-        <Label id="workLabel" active={values[index] === 0} completed={values[index] === 1}>
+        <Label
+          active={values[index] === 0}
+          completed={values[index] === 1}
+          id="workLabel"
+        >
           {item.title}
         </Label>
         {progressListRight}
       </FirstRow>
-      <WorkflowIndicator id={item.type} state={values[index]} withEnd={isLast} />
+      <WorkflowIndicator
+        id={item.type}
+        state={values[index]}
+        withEnd={isLast}
+      />
     </Container>
   )
 }

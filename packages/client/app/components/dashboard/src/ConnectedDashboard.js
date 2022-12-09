@@ -1,4 +1,5 @@
-import React from 'react'
+/* eslint-disable react/prop-types */
+import React, { useState, useEffect } from 'react'
 import { get } from 'lodash'
 import { adopt } from 'react-adopt'
 
@@ -41,7 +42,16 @@ const mapProps = args => ({
   hideModal: args.withModal.hideModal,
   deleteBook: args.deleteBookMutation.deleteBook,
   loading: args.getBookCollectionsQuery.networkStatus === 1,
-  onChangeSort: args.getBookCollectionsQuery.refetch,
+  onChangeSort: sortingParams => {
+    const { getBookCollectionsQuery: getBookCollectionsQueryFromArgs } = args
+    const { ascending, sortKey, archived } = sortingParams
+    const { refetch } = getBookCollectionsQueryFromArgs
+    refetch({
+      ascending,
+      sortKey,
+      archived,
+    })
+  },
   onAssignMembers: bookId => {
     args.withModal.showModal('dashboardTeamManager', {
       bookId,
@@ -52,9 +62,14 @@ const mapProps = args => ({
     args.getBookCollectionsQuery.networkStatus === 2, // possible apollo bug
   renameBook: args.renameBookMutation.renameBook,
   onAddBook: collectionId => {
-    const { createBookMutation, withModal } = args
-    const { createBook } = createBookMutation
-    const { showModal, hideModal } = withModal
+    const {
+      createBookMutation: createBookMutationFromArgs,
+      withModal: withModalFromArgs,
+    } = args
+
+    const { createBook } = createBookMutationFromArgs
+    const { showModal, hideModal } = withModalFromArgs
+
     const onConfirm = title => {
       createBook({
         variables: {
@@ -66,15 +81,21 @@ const mapProps = args => ({
       })
       hideModal()
     }
+
     showModal('addBook', {
       onConfirm,
       hideModal,
     })
   },
   onDeleteBook: (bookId, bookTitle) => {
-    const { deleteBookMutation, withModal } = args
-    const { deleteBook } = deleteBookMutation
-    const { showModal, hideModal } = withModal
+    const {
+      deleteBookMutation: deleteBookMutationFromArgs,
+      withModal: withModalFromArgs,
+    } = args
+
+    const { deleteBook } = deleteBookMutationFromArgs
+    const { showModal, hideModal } = withModalFromArgs
+
     const onConfirm = () => {
       deleteBook({
         variables: {
@@ -83,15 +104,21 @@ const mapProps = args => ({
       })
       hideModal()
     }
+
     showModal('deleteBook', {
       onConfirm,
       bookTitle,
     })
   },
   onArchiveBook: (bookId, bookTitle, archived) => {
-    const { archiveBookMutation, withModal } = args
-    const { archiveBook } = archiveBookMutation
-    const { showModal, hideModal } = withModal
+    const {
+      archiveBookMutation: archiveBookMutationFromArgs,
+      withModal: withModalFromArgs,
+    } = args
+
+    const { archiveBook } = archiveBookMutationFromArgs
+    const { showModal, hideModal } = withModalFromArgs
+
     const onConfirm = () => {
       archiveBook({
         variables: {
@@ -101,6 +128,7 @@ const mapProps = args => ({
       })
       hideModal()
     }
+
     showModal('archiveBook', {
       onConfirm,
       bookTitle,
@@ -134,27 +162,38 @@ const Connected = () => (
       onArchiveBook,
       rules,
     }) => {
-      if(!collections) return null
-      return(
-      <Dashboard
-        archiveBook={archiveBook}
-        collections={collections}
-        deleteBook={deleteBook}
-        loading={loading}
-        loadingRules={loadingRules}
-        onAddBook={onAddBook}
-        onArchiveBook={onArchiveBook}
-        onAssignMembers={onAssignMembers}
-        onChangeSort={onChangeSort}
-        onDeleteBook={onDeleteBook}
-        refetching={refetching}
-        refetchingRules={refetchingRules}
-        renameBook={renameBook}
-        rules={rules}
-      />
-    )
-    }
-    }
+      const [sortingParams, setSortingParams] = useState({
+        ascending: true,
+        sortKey: 'title',
+        archived: false,
+      })
+
+      useEffect(() => {
+        onChangeSort(sortingParams)
+      }, [sortingParams])
+
+      if (!collections) return null
+
+      return (
+        <Dashboard
+          archiveBook={archiveBook}
+          collections={collections}
+          deleteBook={deleteBook}
+          loading={loading}
+          loadingRules={loadingRules}
+          onAddBook={onAddBook}
+          onArchiveBook={onArchiveBook}
+          onAssignMembers={onAssignMembers}
+          onDeleteBook={onDeleteBook}
+          refetching={refetching}
+          refetchingRules={refetchingRules}
+          renameBook={renameBook}
+          rules={rules}
+          setSortingParams={setSortingParams}
+          sortingParams={sortingParams}
+        />
+      )
+    }}
   </Composed>
 )
 

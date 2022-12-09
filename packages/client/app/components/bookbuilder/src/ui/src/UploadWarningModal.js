@@ -1,6 +1,7 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 
-import AbstractModal from '../../../../common/src/AbstractModal'
+import AbModal from '../../../../common/src/AbstractModal'
 
 const UploadWarningModal = ({ type, container, show, toggle }) => {
   const body = (
@@ -8,10 +9,11 @@ const UploadWarningModal = ({ type, container, show, toggle }) => {
       You are not allowed to import contents while a {type} is being edited.
     </div>
   )
+
   const title = 'Import not allowed'
 
   return (
-    <AbstractModal
+    <AbModal
       body={body}
       container={container}
       show={show}

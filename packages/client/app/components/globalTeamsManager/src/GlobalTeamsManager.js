@@ -1,7 +1,7 @@
-/* eslint-disable react/prop-types */
+/* eslint-disable react/prop-types,react/no-unused-state */
 import styled from 'styled-components'
 import { Form, Formik } from 'formik'
-import React, { Component } from 'react'
+import React from 'react'
 import Select from 'react-select'
 import sortBy from 'lodash/sortBy'
 import keys from 'lodash/keys'
@@ -19,12 +19,14 @@ const Container = styled.div`
   max-width: 100%;
   height: 100%;
 `
+
 const StyledForm = styled(Form)`
   display: flex;
   flex-direction: column;
   flex-grow:1
   justify-content: center;
 `
+
 const Title = styled(H3)`
   color: #3f3f3f;
   font-family: ${th('fontReading')};
@@ -35,6 +37,7 @@ const Title = styled(H3)`
   padding-top: 3px;
   text-transform: uppercase;
 `
+
 const InnerWrapper = styled.div`
   display: block;
   clear: both;
@@ -55,6 +58,7 @@ const HeaderWrapper = styled.div`
   top: 0;
   margin-bottom: calc(1 * ${th('gridUnit')});
 `
+
 const TeamHeadingWrapper = styled.h4`
   font-size: 24px;
   line-height: 28px;
@@ -119,15 +123,18 @@ const TeamSection = props => {
         id: user.id,
       }))
     : []
+
   const selectValue = value
     ? value.map(usr => {
         const user = users.find(u => u.id === usr)
+
         if (user) {
           return {
             label: user.username,
             id: usr,
           }
         }
+
         return usr
       })
     : []
@@ -153,7 +160,7 @@ const TeamSection = props => {
 }
 
 const TeamManagerForm = props => {
-  const { setFieldValue, teams, users, values } = props
+  const { setFieldValue, teams, users, values, dirty } = props
 
   return (
     <StyledForm>
@@ -169,18 +176,13 @@ const TeamManagerForm = props => {
       ))}
 
       <ButtonWrapper>
-        <Button
-          disabled={!props.dirty}
-          label="Save"
-          title="Save"
-          type="submit"
-        />
+        <Button disabled={!dirty} label="Save" title="Save" type="submit" />
       </ButtonWrapper>
     </StyledForm>
   )
 }
 
-class GlobalTeamsManager extends Component {
+class GlobalTeamsManager extends React.Component {
   constructor(props) {
     super(props)
 
@@ -192,6 +194,7 @@ class GlobalTeamsManager extends Component {
 
   handleSubmit = (formValues, formikBag) => {
     const { teams, updateGlobalTeam } = this.props
+
     const data = keys(formValues).map(role => {
       const team = teams.find(t => t.role === role)
       const clonedTeam = cloneDeep(team)

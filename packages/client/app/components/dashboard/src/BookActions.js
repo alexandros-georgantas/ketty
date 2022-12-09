@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled, { css } from 'styled-components'
 
@@ -130,9 +131,11 @@ const renderRemove = (book, onDeleteBook, canDeleteBooks) => {
 
 const renderArchive = (book, onArchiveBook, canArchiveBooks) => {
   const { archived } = book
+
   const handleClick = () => {
     onArchiveBook(book.id, book.title, archived)
   }
+
   const label = archived ? 'Unarchive' : 'Archive'
   return (
     canArchiveBooks && (
@@ -147,6 +150,7 @@ const renderTeamManager = (bookId, onAssignMembers) => {
   const handleClick = () => {
     onAssignMembers(bookId)
   }
+
   return (
     <Action key="book-assign-members" onClick={handleClick}>
       Assign Members
@@ -168,6 +172,7 @@ const Actions = props => {
     onArchiveBook,
     onAssignMembers,
   } = props
+
   const { archived, id, bookStructure } = book
   // const featureBookStructureEnabled =
   //   process.env.FEATURE_BOOK_STRUCTURE || false
@@ -185,8 +190,10 @@ const Actions = props => {
     ) {
       return <Action to={`/books/${id}/book-structure`}>Plan Book</Action>
     }
+
     return <Action to={`/books/${id}/book-builder`}>Edit</Action>
   }
+
   if (
     featureBookStructureEnabled &&
     !bookStructure.finalized &&
@@ -194,6 +201,7 @@ const Actions = props => {
   ) {
     return null
   }
+
   return (
     <ActionGroup>
       {!archived && renderMainAction()}

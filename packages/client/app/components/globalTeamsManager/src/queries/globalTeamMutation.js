@@ -21,6 +21,7 @@ const UPDATE_GLOBAL_TEAM = gql`
     }
   }
 `
+
 const globalTeamMutation = props => {
   const { render } = props
 

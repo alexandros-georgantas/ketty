@@ -1,7 +1,7 @@
 import { compose } from 'recompose'
 import { withFormik } from 'formik'
 import { graphql } from '@apollo/client/react/hoc'
-import { SIGNUP_USER } from './graphql/mutations'
+import SIGNUP_USER from './graphql/mutations'
 
 import Signup from './Signup'
 
@@ -32,9 +32,11 @@ const validate = values => {
     errors.givenName = 'First name and given name are the same'
     errors.surname = 'First name and given name are the same'
   }
+
   if (Object.keys(errors).length) {
     return errors
   }
+
   return true
 }
 

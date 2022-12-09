@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled, { keyframes, css } from 'styled-components'
 
@@ -17,6 +18,7 @@ const StyledUpload = styled(UploadButton)`
         animation: ${animation} 2s infinite;
       `
     }
+
     return false
   }}
 `
@@ -35,6 +37,7 @@ const UploadFileButton = ({
     if (lock === null || lock === undefined) return false
     return true
   }
+
   const handleFileUpload = event => {
     event.preventDefault()
     const file = event.target.files[0]
@@ -73,6 +76,7 @@ const UploadFileButton = ({
   }
 
   let text = 'Upload word'
+
   if (uploading) {
     text = 'Uploading'
   }

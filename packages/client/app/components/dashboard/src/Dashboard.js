@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { Fragment } from 'react'
 import styled from 'styled-components'
 import DashboardHeader from './DashboardHeader'
@@ -13,6 +14,7 @@ const Container = styled.div`
   height: 100%;
   overflow-y: auto;
 `
+
 const InnerWrapper = styled.div`
   display: block;
   clear: both;
@@ -21,6 +23,7 @@ const InnerWrapper = styled.div`
   max-width: 76%;
   height: calc(100% - 80px);
 `
+
 const Dashboard = ({
   collections,
   archiveBook,
@@ -36,6 +39,8 @@ const Dashboard = ({
   onAssignMembers,
   onDeleteBook,
   onArchiveBook,
+  setSortingParams,
+  sortingParams,
 }) => {
   if (loading || loadingRules) return <Loading />
 
@@ -47,7 +52,8 @@ const Dashboard = ({
             canAddBooks={rules.canAddBooks}
             collectionId={collection.id}
             onAddBook={onAddBook}
-            onChangeSort={onChangeSort}
+            setSortingParams={setSortingParams}
+            sortingParams={sortingParams}
             title={collection.title}
           />
           <InnerWrapper>

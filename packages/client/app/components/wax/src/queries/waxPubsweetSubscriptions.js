@@ -10,6 +10,7 @@ const BOOK_COMPONENT_TRACK_CHANGES_UPDATED_SUBSCRIPTION = gql`
     }
   }
 `
+
 const BOOK_COMPONENT_WORKFLOW_UPDATED_SUBSCRIPTION = gql`
   subscription BookComponentWorkflowUpdated {
     bookComponentWorkflowUpdated {
@@ -22,6 +23,7 @@ const BOOK_COMPONENT_WORKFLOW_UPDATED_SUBSCRIPTION = gql`
     }
   }
 `
+
 const CUSTOM_TAG_SUBSCRIPTION = gql`
   subscription CustomTagUpdated {
     customTagUpdated {
@@ -92,6 +94,7 @@ const teamMembersChangeSubscription = props => {
     const { data } = subscriptionData
     const { teamMembersUpdated } = data
     const { objectId: bId } = teamMembersUpdated
+
     if (bookId === bId || bId === null) {
       refetch()
     }
@@ -135,6 +138,7 @@ const trackChangeSubscription = props => {
 const orderChangeSubscription = props => {
   const { render, getBookComponentQuery } = props
   const { refetch } = getBookComponentQuery
+
   const triggerRefetch = () => {
     refetch()
   }
@@ -152,6 +156,7 @@ const orderChangeSubscription = props => {
 const titleChangeSubscription = props => {
   const { render, getBookComponentQuery } = props
   const { refetch } = getBookComponentQuery
+
   const triggerRefetch = () => {
     refetch()
   }
@@ -215,9 +220,11 @@ const unlockedByAdminSubscription = props => {
     </Subscription>
   )
 }
+
 const customTagsSubscription = props => {
   const { render, getCustomTagsQuery } = props
   const { refetch } = getCustomTagsQuery
+
   const triggerRefetch = () => {
     refetch()
   }
@@ -239,6 +246,7 @@ const workflowChangeSubscription = props => {
     getWaxRulesQuery,
     bookComponentId,
   } = props
+
   const { refetch: bookComponentRefetch } = getBookComponentQuery
   const { refetch: waxRulesRefetch } = getWaxRulesQuery
 
@@ -253,6 +261,7 @@ const workflowChangeSubscription = props => {
       waxRulesRefetch()
     }
   }
+
   return (
     <Subscription
       onSubscriptionData={triggerRefetch}

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { get } from 'lodash'
 import { adopt } from 'react-adopt'
 
@@ -35,13 +35,26 @@ const mapProps = args => ({
   showModal: args.withModal.showModal,
   hideModal: args.withModal.hideModal,
   loading: args.getTemplatesQuery.networkStatus === 1,
-  onChangeSort: args.getTemplatesQuery.refetch,
+  onChangeSort: sortingParams => {
+    const { getTemplatesQuery: getTemplatesQueryFromArgs } = args
+    const { ascending, sortKey } = sortingParams
+    const { refetch } = getTemplatesQueryFromArgs
+    refetch({
+      ascending,
+      sortKey,
+    })
+  },
   onCreateTemplate: () => {
-    const { createTemplateMutation, withModal, getExportScriptsQuery } = args
-    const { data, loading } = getExportScriptsQuery
+    const {
+      createTemplateMutation: createTemplateMutationFromArgs,
+      withModal: withModalFromArgs,
+      getExportScriptsQuery: getExportScriptsQueryFromArgs,
+    } = args
+
+    const { data, loading } = getExportScriptsQueryFromArgs
     const { getExportScripts } = data
-    const { createTemplate } = createTemplateMutation
-    const { showModal, hideModal } = withModal
+    const { createTemplate } = createTemplateMutationFromArgs
+    const { showModal, hideModal } = withModalFromArgs
 
     const onConfirm = ({
       files,
@@ -69,11 +82,13 @@ const mapProps = args => ({
       })
       hideModal()
     }
+
     if (!loading) {
       const options = getExportScripts.map(script => ({
         label: script.label,
         value: script.value,
       }))
+
       showModal('createTemplateModal', {
         onConfirm,
         hideModal,
@@ -84,11 +99,17 @@ const mapProps = args => ({
     }
   },
   onUpdateTemplate: templateId => {
-    const { updateTemplateMutation, withModal, getExportScriptsQuery } = args
-    const { data, loading } = getExportScriptsQuery
+    const {
+      updateTemplateMutation: updateTemplateMutationFromArgs,
+      withModal: withModalFromArgs,
+      getExportScriptsQuery: getExportScriptsQueryFromArgs,
+    } = args
+
+    const { data, loading } = getExportScriptsQueryFromArgs
     const { getExportScripts } = data
-    const { updateTemplate } = updateTemplateMutation
-    const { showModal, hideModal } = withModal
+    const { updateTemplate } = updateTemplateMutationFromArgs
+    const { showModal, hideModal } = withModalFromArgs
+
     const onConfirm = ({
       files,
       deleteFiles,
@@ -121,11 +142,13 @@ const mapProps = args => ({
         hideModal()
       })
     }
+
     if (!loading) {
       const options = getExportScripts.map(script => ({
         label: script.label,
         value: script.value,
       }))
+
       showModal('updateTemplateModal', {
         onConfirm,
         hideModal,
@@ -137,9 +160,14 @@ const mapProps = args => ({
     }
   },
   onDeleteTemplate: (templateId, templateName) => {
-    const { deleteTemplateMutation, withModal } = args
-    const { deleteTemplate } = deleteTemplateMutation
-    const { showModal, hideModal } = withModal
+    const {
+      deleteTemplateMutation: deleteTemplateMutationFromArgs,
+      withModal: withModalFromArgs,
+    } = args
+
+    const { deleteTemplate } = deleteTemplateMutationFromArgs
+    const { showModal, hideModal } = withModalFromArgs
+
     const onConfirm = () => {
       deleteTemplate({
         variables: {
@@ -148,6 +176,7 @@ const mapProps = args => ({
       })
       hideModal()
     }
+
     showModal('deleteTemplateModal', {
       onConfirm,
       templateName,
@@ -171,18 +200,29 @@ const Connected = () => (
       refetching,
       loading,
       createTemplate,
-    }) => (
-      <Templates
-        createTemplate={createTemplate}
-        loading={loading}
-        onChangeSort={onChangeSort}
-        onCreateTemplate={onCreateTemplate}
-        onDeleteTemplate={onDeleteTemplate}
-        onUpdateTemplate={onUpdateTemplate}
-        refetching={refetching}
-        templates={templates}
-      />
-    )}
+    }) => {
+      const [sortingParams, setSortingParams] = useState({
+        ascending: true,
+        sortKey: 'name',
+      })
+
+      useEffect(() => {
+        onChangeSort(sortingParams)
+      }, [sortingParams])
+      return (
+        <Templates
+          createTemplate={createTemplate}
+          loading={loading}
+          onCreateTemplate={onCreateTemplate}
+          onDeleteTemplate={onDeleteTemplate}
+          onUpdateTemplate={onUpdateTemplate}
+          refetching={refetching}
+          setSortingParams={setSortingParams}
+          sortingParams={sortingParams}
+          templates={templates}
+        />
+      )
+    }}
   </Composed>
 )
 

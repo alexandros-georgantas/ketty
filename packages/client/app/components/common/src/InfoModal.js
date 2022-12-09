@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 
@@ -14,6 +15,7 @@ const Centered = styled.div`
     notCentered ? 'flex-start' : 'center'};
   text-align: center;
 `
+
 const InfoModal = props => {
   const { children, headerText, ...rest } = props
 

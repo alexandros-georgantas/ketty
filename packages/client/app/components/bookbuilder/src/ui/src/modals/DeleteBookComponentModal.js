@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
@@ -11,6 +12,7 @@ const Text = styled.div`
   font-size: ${th('fontSizeBase')};
   color: #404040;
 `
+
 const DeleteBookComponentModal = props => {
   const { isOpen, hideModal, data } = props
   const { componentType, title, onConfirm } = data
@@ -24,8 +26,9 @@ const DeleteBookComponentModal = props => {
       onRequestClose={hideModal}
     >
       <Text>
-        {`Are you sure you want to delete this ${componentType} with title ${title ||
-          'Untitled'}?`}
+        {`Are you sure you want to delete this ${componentType} with title ${
+          title || 'Untitled'
+        }?`}
         <br />
         {componentType === 'endnotes' &&
           `By doing so you will not be able to see templates with notes option endnotes`}

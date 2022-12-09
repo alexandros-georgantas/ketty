@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { isEmpty } from 'lodash'
 import React from 'react'
 import PropTypes from 'prop-types'

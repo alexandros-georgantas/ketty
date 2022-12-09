@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import AbstractModal from '../../common/src/AbstractModal'
+import AbModal from '../../common/src/AbstractModal'
 
 class RemoveBookModal extends React.Component {
   renderBody() {
@@ -21,7 +21,7 @@ class RemoveBookModal extends React.Component {
     const body = this.renderBody()
 
     return (
-      <AbstractModal
+      <AbModal
         body={body}
         container={container}
         show={show}
@@ -33,6 +33,8 @@ class RemoveBookModal extends React.Component {
     )
   }
 }
+
+/* eslint-disable react/forbid-prop-types */
 
 RemoveBookModal.propTypes = {
   book: PropTypes.shape({

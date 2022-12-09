@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import CenteredContainer from './ui/CenteredContainer'
@@ -10,6 +11,7 @@ const CenteredContent = styled(Content)`
   text-align: center;
   justify-content: center;
 `
+
 const StyledRow = styled(Row)`
   justify-content: center;
   align-items: center;
@@ -18,6 +20,7 @@ const StyledRow = styled(Row)`
     margin-right: 16px;
   }
 `
+
 const Welcome = ({ onClickStart, backToDashboard }) => (
   <CenteredContainer>
     <Header>Welcome to the Open Textbook Planner</Header>

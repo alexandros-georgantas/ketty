@@ -1,7 +1,8 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 
-import { Template } from '../../ui'
+import Template from './Template'
 import { Loading } from '../../../../../ui'
 
 const GridContainer = styled.div`
@@ -21,15 +22,9 @@ const TemplatesGrid = props => {
   return (
     <GridContainer>
       {templates.map(template => {
-        const {
-          name,
-          id,
-          author,
-          target,
-          thumbnail,
-          trimSize,
-          notes,
-        } = template
+        const { name, id, author, target, thumbnail, trimSize, notes } =
+          template
+
         return (
           <Template
             author={author}

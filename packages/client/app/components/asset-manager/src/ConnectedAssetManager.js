@@ -1,9 +1,7 @@
-/* eslint-disable no-console */
-
 import React from 'react'
 import { get } from 'lodash'
 import { adopt } from 'react-adopt'
-import { AssetManager } from './ui'
+import AssetManager from './ui/AssetManager'
 import {
   getEntityFilesQuery,
   uploadFilesMutation,
@@ -12,7 +10,7 @@ import {
   filesUploadedSubscription,
   filesDeletedSubscription,
   fileUpdatedSubscription,
-} from '../src/queries'
+} from './queries'
 
 const mapper = {
   getEntityFilesQuery,
@@ -27,8 +25,8 @@ const mapper = {
 const mapProps = args => ({
   files: get(args.getEntityFilesQuery, 'data.getEntityFiles'),
   uploadFiles: (bookId, files) => {
-    const { uploadFilesMutation } = args
-    const { uploadFiles } = uploadFilesMutation
+    const { uploadFilesMutation: uploadFilesMutationFromArgs } = args
+    const { uploadFiles } = uploadFilesMutationFromArgs
     return uploadFiles({
       variables: {
         files,
@@ -38,8 +36,8 @@ const mapProps = args => ({
     })
   },
   deleteFiles: ids => {
-    const { deleteBookFilesMutation } = args
-    const { deleteFiles } = deleteBookFilesMutation
+    const { deleteBookFilesMutation: deleteBookFilesMutationFromArgs } = args
+    const { deleteFiles } = deleteBookFilesMutationFromArgs
     return deleteFiles({
       variables: {
         ids,
@@ -47,8 +45,8 @@ const mapProps = args => ({
     })
   },
   refetch: (bookId, sortingParams) => {
-    const { getEntityFilesQuery } = args
-    const { refetch } = getEntityFilesQuery
+    const { getEntityFilesQuery: getEntityFilesQueryFromArgs } = args
+    const { refetch } = getEntityFilesQueryFromArgs
     refetch({
       input: {
         entityId: bookId,
@@ -59,8 +57,8 @@ const mapProps = args => ({
     })
   },
   updateFile: (fileId, data) => {
-    const { updateFileMutation } = args
-    const { updateFile } = updateFileMutation
+    const { updateFileMutation: updateFileMutationFromArgs } = args
+    const { updateFile } = updateFileMutationFromArgs
     return updateFile({
       variables: {
         input: {
@@ -79,8 +77,10 @@ const mapProps = args => ({
 const Composed = adopt(mapper, mapProps)
 
 const Connected = props => {
+  /* eslint-disable react/prop-types */
   const { data, isOpen, hideModal } = props
   const { bookId, withImport, handleImport } = data
+  /* eslint-enable react/prop-types */
 
   return (
     <Composed entityId={bookId}>

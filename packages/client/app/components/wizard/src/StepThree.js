@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
@@ -41,19 +42,23 @@ const StyledColumn = styled(Column)`
 const StyledSectionHeader = styled(SectionHeader)`
   font-size: 20px;
 `
+
 const StyledDraggableArea = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
 `
+
 const Padder = styled.div`
   padding-left: ${({ level }) => {
     if (level === 2) {
       return '24px'
     }
+
     if (level === 3) {
       return '48px'
     }
+
     return '0'
   }};
 `
@@ -66,6 +71,7 @@ const StyledDroppableArea = styled.div`
   overflow-x: hidden;
   padding: 8px;
 `
+
 // const DropZoneColumn = styled(StyledColumn)
 const PlaceholdersColumn = styled(StyledColumn)`
   width: 30%;
@@ -102,9 +108,11 @@ const getListStyleLevel = (isDraggingOver, levelIndex) => {
   if (levelIndex === 0) {
     borderLeft = `4px solid ${isDraggingOver ? '#8992E9' : 'white'}`
   }
+
   if (levelIndex === 1) {
     borderLeft = `4px solid ${isDraggingOver ? '#ADDAE2' : 'white'}`
   }
+
   if (levelIndex === 2) {
     borderLeft = `4px solid ${isDraggingOver ? '#FFC7AD' : 'white'}`
   }
@@ -137,6 +145,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
           levelsInternal: bookStructure.levels,
         })
       }
+
       const expandedLevelsHandler = numberOfLevel => {
         const clonedExpandedLevels = JSON.parse(JSON.stringify(expandedLevels))
         clonedExpandedLevels[numberOfLevel] = !expandedLevels[numberOfLevel]
@@ -148,14 +157,16 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
 
       const onDragStart = ({ draggableId, source, type }) => {
         const startDraggingPlaceholder = !draggableId.split('_')[1]
+
         const isLevelTwoCloser =
           draggableId.split('_')[1] &&
           draggableId.split('_')[1].includes('Closer')
-        console.log('e', draggableId)
+
         const isLevelTwoItem =
           findIndex(bookStructure.levels, {
             type: draggableId.split('_')[1],
           }) === 1
+
         if (isLevelTwoItem) {
           setState({
             showDropIndicators: {
@@ -177,6 +188,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
               },
             })
           }
+
           if (levelsInternal.length === 4) {
             if (draggableId === 'outline') {
               setState({
@@ -199,6 +211,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
             }
           }
         }
+
         if (
           levelsInternal.length === 3 &&
           findIndex(bookStructure.levels, {
@@ -214,6 +227,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
             },
           })
         }
+
         if (isLevelTwoCloser) {
           if (levelsInternal.length === 3) {
             return setState({
@@ -225,6 +239,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
               },
             })
           }
+
           return setState({
             showDropIndicators: {
               levelOne: false,
@@ -234,10 +249,11 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
             },
           })
         }
+
         return false
       }
 
-      const onDragEnd = ({ type, destination, source, draggableId }) => {
+      const onDragEnd = ({ destination, source, draggableId }) => {
         if (!destination) {
           console.warn('drag and drop between the lines')
           setState({
@@ -254,13 +270,16 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
         const { droppableId: sDroppableId, index: sIndex } = source
         const { droppableId: dDroppableId, index: dIndex } = destination
         const isPlaceholder = openersAndClosersDictionary[draggableId]
+
         const isSameType =
           sDroppableId &&
           dDroppableId &&
           (sDroppableId.split('_')[0].includes(dDroppableId.split('_')[0]) ||
             dDroppableId.split('_')[0].includes(sDroppableId.split('_')[0]))
+
         const dragAndDropBetweenParentsAndDifferentTypes =
           sDroppableId !== dDroppableId && !isSameType
+
         const dragAndDropBetweenParentsOfSameType =
           sDroppableId !== dDroppableId && isSameType
 
@@ -288,6 +307,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
           })
           return
         }
+
         if (sDroppableId === dDroppableId && sIndex === dIndex) {
           console.warn('drag and drop on the same spot')
           setState({
@@ -345,6 +365,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
         }
 
         const clonedLevels = JSON.parse(JSON.stringify(bookStructure.levels))
+
         if (isPlaceholder) {
           clonedLevels[dropLevelIndex].contentStructure.splice(dIndex, 0, {
             id: uuid(),
@@ -352,6 +373,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
             displayName: openersAndClosersDictionary[draggableId],
           })
         }
+
         if (
           !isPlaceholder &&
           !dragAndDropBetweenParentsAndDifferentTypes &&
@@ -371,9 +393,8 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
             sDroppableId.split('_')[1],
           )
 
-          const { displayName, type } = clonedLevels[
-            sourceLevelIndex
-          ].contentStructure[sIndex]
+          const { displayName, type } =
+            clonedLevels[sourceLevelIndex].contentStructure[sIndex]
 
           clonedLevels[sourceLevelIndex].contentStructure.splice(sIndex, 1)
           clonedLevels[dropLevelIndex].contentStructure.splice(dIndex, 0, {
@@ -406,6 +427,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
         }
 
         const clonedLevels = JSON.parse(JSON.stringify(bookStructure.levels))
+
         const itemIndex = findIndex(clonedLevels[levelIndex].contentStructure, {
           id: itemId.split('_')[1],
         })
@@ -413,18 +435,22 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
         if (itemIndex === -1) {
           throw new Error('item id does not exist')
         }
+
         clonedLevels[levelIndex].contentStructure.splice(itemIndex, 1)
 
         setState({ levelsInternal: clonedLevels })
         updateLevelContentStructure(clonedLevels)
       }
+
       const removeIcon = (
         <svg height="24" width="24" xmlns="http://www.w3.org/2000/svg">
           <path d="M8.4 17 12 13.4 15.6 17 17 15.6 13.4 12 17 8.4 15.6 7 12 10.6 8.4 7 7 8.4 10.6 12 7 15.6ZM5 19H19V5H5ZM5 21Q4.175 21 3.587 20.413Q3 19.825 3 19V5Q3 4.175 3.587 3.587Q4.175 3 5 3H19Q19.825 3 20.413 3.587Q21 4.175 21 5V19Q21 19.825 20.413 20.413Q19.825 21 19 21ZM5 19V5V19Z" />
         </svg>
       )
+
       const renderTitleActions = (itemId, isMainContent = false) => {
         const items = []
+
         if (isMainContent) {
           return items
         }
@@ -476,11 +502,9 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                           key={`${levelsInternal[0].type}_${levelsInternal[0].id}`}
                           type="openers_and_closers"
                         >
-                          {(provided, snapshot) => {
-                            const {
-                              isDraggingOver,
-                              draggingOverWith,
-                            } = snapshot
+                          {(providedL0, snapshotL0) => {
+                            const { isDraggingOver, draggingOverWith } =
+                              snapshotL0
 
                             const notDifferentTypes =
                               draggingOverWith &&
@@ -497,7 +521,9 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                             const isPlaceholder =
                               draggingOverWith &&
                               draggingOverWith.split('_')[0] !== 'item'
+
                             const isOutline = draggingOverWith === 'outline'
+
                             const isOutlineOnPart =
                               levelsInternal.length === 4 &&
                               isPlaceholder &&
@@ -511,8 +537,8 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
 
                             return (
                               <DraggableArea
-                                {...provided.droppableProps}
-                                ref={provided.innerRef}
+                                {...providedL0.droppableProps}
+                                ref={providedL0.innerRef}
                                 style={getListStyleLevel(allowed, 0)}
                               >
                                 {levelsInternal[0].contentStructure &&
@@ -523,15 +549,15 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                                         index={indx}
                                         key={`item_${levelsInternal[0].type}_${levelsInternal[0].id}_${item.id}`}
                                       >
-                                        {(provided, snapshot) => (
+                                        {(providedL1, _) => (
                                           <DraggableItemWrapper
-                                            ref={provided.innerRef}
-                                            {...provided.draggableProps}
+                                            ref={providedL1.innerRef}
+                                            {...providedL1.draggableProps}
                                           >
                                             <DraggableItem
                                               active={false}
                                               dragHandleProps={
-                                                provided.dragHandleProps
+                                                providedL1.dragHandleProps
                                               }
                                               headerActionComponents={renderTitleActions(
                                                 `${levelsInternal[0].id}_${item.id}`,
@@ -546,7 +572,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                                       </Draggable>
                                     ),
                                   )}
-                                {provided.placeholder}
+                                {providedL0.placeholder}
                               </DraggableArea>
                             )
                           }}
@@ -570,11 +596,9 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                           key={`${levelsInternal[1].type}_${levelsInternal[1].id}`}
                           type="openers_and_closers"
                         >
-                          {(provided, snapshot) => {
-                            const {
-                              isDraggingOver,
-                              draggingOverWith,
-                            } = snapshot
+                          {(providedL0, snapshotL0) => {
+                            const { isDraggingOver, draggingOverWith } =
+                              snapshotL0
 
                             const notDifferentTypes =
                               draggingOverWith &&
@@ -591,6 +615,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                             const isPlaceholder =
                               draggingOverWith &&
                               draggingOverWith.split('_')[0] !== 'item'
+
                             const allowed =
                               showDropIndicators.levelTwo ||
                               (isDraggingOver &&
@@ -598,8 +623,8 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
 
                             return (
                               <DraggableArea
-                                {...provided.droppableProps}
-                                ref={provided.innerRef}
+                                {...providedL0.droppableProps}
+                                ref={providedL0.innerRef}
                                 style={getListStyleLevel(allowed, 1)}
                               >
                                 {levelsInternal[1].contentStructure &&
@@ -610,15 +635,15 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                                         index={indx}
                                         key={`item_${levelsInternal[1].type}_${levelsInternal[1].id}_${item.id}`}
                                       >
-                                        {(provided, snapshot) => (
+                                        {(providedL1, _) => (
                                           <DraggableItemWrapper
-                                            ref={provided.innerRef}
-                                            {...provided.draggableProps}
+                                            ref={providedL1.innerRef}
+                                            {...providedL1.draggableProps}
                                           >
                                             <DraggableItem
                                               active={false}
                                               dragHandleProps={
-                                                provided.dragHandleProps
+                                                providedL1.dragHandleProps
                                               }
                                               headerActionComponents={renderTitleActions(
                                                 `${levelsInternal[1].id}_${item.id}`,
@@ -633,7 +658,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                                       </Draggable>
                                     ),
                                   )}
-                                {provided.placeholder}
+                                {providedL0.placeholder}
                               </DraggableArea>
                             )
                           }}
@@ -649,11 +674,9 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                           key={`${levelsInternal[2].type}_${levelsInternal[2].id}`}
                           type="openers_and_closers"
                         >
-                          {(provided, snapshot) => {
-                            const {
-                              isDraggingOver,
-                              draggingOverWith,
-                            } = snapshot
+                          {(providedL0, snapshotL0) => {
+                            const { isDraggingOver, draggingOverWith } =
+                              snapshotL0
 
                             const notDifferentTypes =
                               draggingOverWith &&
@@ -670,6 +693,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                             const isPlaceholder =
                               draggingOverWith &&
                               draggingOverWith.split('_')[0] !== 'item'
+
                             const allowed =
                               showDropIndicators.levelThree ||
                               (isDraggingOver &&
@@ -677,8 +701,8 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
 
                             return (
                               <DraggableArea
-                                {...provided.droppableProps}
-                                ref={provided.innerRef}
+                                {...providedL0.droppableProps}
+                                ref={providedL0.innerRef}
                                 style={getListStyleLevel(allowed, 0)}
                               >
                                 {levelsInternal[2].contentStructure &&
@@ -689,15 +713,15 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                                         index={indx}
                                         key={`item_${levelsInternal[2].type}_${levelsInternal[2].id}_${item.id}`}
                                       >
-                                        {(provided, snapshot) => (
+                                        {(providedL1, _) => (
                                           <DraggableItemWrapper
-                                            ref={provided.innerRef}
-                                            {...provided.draggableProps}
+                                            ref={providedL1.innerRef}
+                                            {...providedL1.draggableProps}
                                           >
                                             <DraggableItem
                                               active={false}
                                               dragHandleProps={
-                                                provided.dragHandleProps
+                                                providedL1.dragHandleProps
                                               }
                                               headerActionComponents={renderTitleActions(
                                                 `${levelsInternal[2].id}_${item.id}`,
@@ -712,7 +736,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                                       </Draggable>
                                     ),
                                   )}
-                                {provided.placeholder}
+                                {providedL0.placeholder}
                               </DraggableArea>
                             )
                           }}
@@ -732,11 +756,9 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                             key={`${levelsInternal[2].type}_${levelsInternal[2].id}`}
                             type="openers_and_closers"
                           >
-                            {(provided, snapshot) => {
-                              const {
-                                isDraggingOver,
-                                draggingOverWith,
-                              } = snapshot
+                            {(providedL0, snapshotL0) => {
+                              const { isDraggingOver, draggingOverWith } =
+                                snapshotL0
 
                               const notDifferentTypes =
                                 draggingOverWith &&
@@ -753,6 +775,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                               const isPlaceholder =
                                 draggingOverWith &&
                                 draggingOverWith.split('_')[0] !== 'item'
+
                               const allowed =
                                 showDropIndicators.levelThree ||
                                 (isDraggingOver &&
@@ -760,8 +783,8 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
 
                               return (
                                 <DraggableArea
-                                  {...provided.droppableProps}
-                                  ref={provided.innerRef}
+                                  {...providedL0.droppableProps}
+                                  ref={providedL0.innerRef}
                                   style={getListStyleLevel(allowed, 2)}
                                 >
                                   {levelsInternal[2].contentStructure &&
@@ -772,15 +795,15 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                                           index={indx}
                                           key={`item_${levelsInternal[2].type}_${levelsInternal[2].id}_${item.id}`}
                                         >
-                                          {(provided, snapshot) => (
+                                          {(providedL1, _) => (
                                             <DraggableItemWrapper
-                                              ref={provided.innerRef}
-                                              {...provided.draggableProps}
+                                              ref={providedL1.innerRef}
+                                              {...providedL1.draggableProps}
                                             >
                                               <DraggableItem
                                                 active={false}
                                                 dragHandleProps={
-                                                  provided.dragHandleProps
+                                                  providedL1.dragHandleProps
                                                 }
                                                 headerActionComponents={renderTitleActions(
                                                   `${levelsInternal[2].id}_${item.id}`,
@@ -795,7 +818,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                                         </Draggable>
                                       ),
                                     )}
-                                  {provided.placeholder}
+                                  {providedL0.placeholder}
                                 </DraggableArea>
                               )
                             }}
@@ -811,8 +834,9 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                         key={`${levelsInternal[3].type}_${levelsInternal[3].id}`}
                         type="openers_and_closers"
                       >
-                        {(provided, snapshot) => {
-                          const { isDraggingOver, draggingOverWith } = snapshot
+                        {(providedL0, snapshotL0) => {
+                          const { isDraggingOver, draggingOverWith } =
+                            snapshotL0
 
                           const notDifferentTypes =
                             draggingOverWith &&
@@ -829,6 +853,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                           const isPlaceholder =
                             draggingOverWith &&
                             draggingOverWith.split('_')[0] !== 'item'
+
                           const allowed =
                             showDropIndicators.levelFour ||
                             (isDraggingOver &&
@@ -836,8 +861,8 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
 
                           return (
                             <DraggableArea
-                              {...provided.droppableProps}
-                              ref={provided.innerRef}
+                              {...providedL0.droppableProps}
+                              ref={providedL0.innerRef}
                               style={getListStyleLevel(allowed, 1)}
                             >
                               {levelsInternal[3].contentStructure &&
@@ -848,15 +873,15 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                                       index={indx}
                                       key={`item_${levelsInternal[3].type}_${levelsInternal[3].id}_${item.id}`}
                                     >
-                                      {(provided, snapshot) => (
+                                      {(providedL1, snapshotL1) => (
                                         <DraggableItemWrapper
-                                          ref={provided.innerRef}
-                                          {...provided.draggableProps}
+                                          ref={providedL1.innerRef}
+                                          {...providedL1.draggableProps}
                                         >
                                           <DraggableItem
                                             active={false}
                                             dragHandleProps={
-                                              provided.dragHandleProps
+                                              providedL1.dragHandleProps
                                             }
                                             headerActionComponents={renderTitleActions(
                                               `${levelsInternal[3].id}_${item.id}`,
@@ -871,7 +896,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                                     </Draggable>
                                   ),
                                 )}
-                              {provided.placeholder}
+                              {providedL0.placeholder}
                             </DraggableArea>
                           )
                         }}
@@ -889,10 +914,10 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                     key="openers"
                     type="openers_and_closers"
                   >
-                    {(provided, snapshot) => (
+                    {(providedL0, snapshotL0) => (
                       <StyledDraggableArea
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
+                        {...providedL0.droppableProps}
+                        ref={providedL0.innerRef}
                       >
                         <StyledSectionHeader>Openers</StyledSectionHeader>
                         <Draggable
@@ -900,15 +925,15 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                           index={1}
                           key="introduction"
                         >
-                          {(provided, snapshot) => (
+                          {(providedL1, _) => (
                             <DraggableItemWrapper
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
+                              ref={providedL1.innerRef}
+                              {...providedL1.draggableProps}
+                              {...providedL1.dragHandleProps}
                             >
                               <DraggableItem
                                 active
-                                dragHandleProps={provided.dragHandleProps}
+                                dragHandleProps={providedL1.dragHandleProps}
                                 grabFreeMoveIcon
                                 headerComponent={<span>Introduction</span>}
                                 isAccordion={false}
@@ -921,15 +946,15 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                           index={2}
                           key="outline"
                         >
-                          {(provided, snapshot) => (
+                          {(providedL2, __) => (
                             <DraggableItemWrapper
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
+                              ref={providedL2.innerRef}
+                              {...providedL2.draggableProps}
+                              {...providedL2.dragHandleProps}
                             >
                               <DraggableItem
                                 active
-                                dragHandleProps={provided.dragHandleProps}
+                                dragHandleProps={providedL2.dragHandleProps}
                                 grabFreeMoveIcon
                                 headerComponent={<span>Outline</span>}
                                 isAccordion={false}
@@ -942,15 +967,15 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                           index={3}
                           key="learningObjectives"
                         >
-                          {(provided, snapshot) => (
+                          {(providedL3, ___) => (
                             <DraggableItemWrapper
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
+                              ref={providedL3.innerRef}
+                              {...providedL3.draggableProps}
+                              {...providedL3.dragHandleProps}
                             >
                               <DraggableItem
                                 active
-                                dragHandleProps={provided.dragHandleProps}
+                                dragHandleProps={providedL3.dragHandleProps}
                                 grabFreeMoveIcon
                                 headerComponent={
                                   <span>Learning Objectives</span>
@@ -965,15 +990,15 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                           index={4}
                           key="focusQuestions"
                         >
-                          {(provided, snapshot) => (
+                          {(providedL4, ____) => (
                             <DraggableItemWrapper
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
+                              ref={providedL4.innerRef}
+                              {...providedL4.draggableProps}
+                              {...providedL4.dragHandleProps}
                             >
                               <DraggableItem
                                 active
-                                dragHandleProps={provided.dragHandleProps}
+                                dragHandleProps={providedL4.dragHandleProps}
                                 grabFreeMoveIcon
                                 headerComponent={<span>Focus Questions</span>}
                                 isAccordion={false}
@@ -986,15 +1011,15 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                           index={5}
                           key="contentOpenerImage"
                         >
-                          {(provided, snapshot) => (
+                          {(providedL5, _____) => (
                             <DraggableItemWrapper
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
+                              ref={providedL5.innerRef}
+                              {...providedL5.draggableProps}
+                              {...providedL5.dragHandleProps}
                             >
                               <DraggableItem
                                 active
-                                dragHandleProps={provided.dragHandleProps}
+                                dragHandleProps={providedL5.dragHandleProps}
                                 grabFreeMoveIcon
                                 headerComponent={
                                   <span>Content Opener Image</span>
@@ -1004,7 +1029,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                             </DraggableItemWrapper>
                           )}
                         </Draggable>
-                        {provided.placeholder}
+                        {providedL0.placeholder}
                       </StyledDraggableArea>
                     )}
                   </Droppable>
@@ -1013,10 +1038,10 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                     key="openersAndClosers"
                     type="openers_and_closers"
                   >
-                    {(provided, snapshot) => (
+                    {(providedL0, _) => (
                       <StyledDraggableArea
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
+                        {...providedL0.droppableProps}
+                        ref={providedL0.innerRef}
                       >
                         <StyledSectionHeader>
                           Openers and closers
@@ -1026,15 +1051,15 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                           index={6}
                           key="keyTerms"
                         >
-                          {(provided, snapshot) => (
+                          {(providedL1, __) => (
                             <DraggableItemWrapper
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
+                              ref={providedL1.innerRef}
+                              {...providedL1.draggableProps}
+                              {...providedL1.dragHandleProps}
                             >
                               <DraggableItem
                                 active
-                                dragHandleProps={provided.dragHandleProps}
+                                dragHandleProps={providedL1.dragHandleProps}
                                 grabFreeMoveIcon
                                 headerComponent={<span>Key Terms List</span>}
                                 isAccordion={false}
@@ -1047,15 +1072,15 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                           index={7}
                           key="selfReflectionActivity"
                         >
-                          {(provided, snapshot) => (
+                          {(providedL2, ___) => (
                             <DraggableItemWrapper
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
+                              ref={providedL2.innerRef}
+                              {...providedL2.draggableProps}
+                              {...providedL2.dragHandleProps}
                             >
                               <DraggableItem
                                 active
-                                dragHandleProps={provided.dragHandleProps}
+                                dragHandleProps={providedL2.dragHandleProps}
                                 grabFreeMoveIcon
                                 headerComponent={
                                   <span>Self-reflection Activity</span>
@@ -1066,7 +1091,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                           )}
                         </Draggable>
 
-                        {provided.placeholder}
+                        {providedL0.placeholder}
                       </StyledDraggableArea>
                     )}
                   </Droppable>
@@ -1075,10 +1100,10 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                     key="closers"
                     type="openers_and_closers"
                   >
-                    {(provided, snapshot) => (
+                    {(providedL0, _) => (
                       <StyledDraggableArea
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
+                        {...providedL0.droppableProps}
+                        ref={providedL0.innerRef}
                       >
                         <StyledSectionHeader>Closers</StyledSectionHeader>
                         <Draggable
@@ -1086,15 +1111,15 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                           index={8}
                           key="reviewActivity"
                         >
-                          {(provided, snapshot) => (
+                          {(providedL1, __) => (
                             <DraggableItemWrapper
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
+                              ref={providedL1.innerRef}
+                              {...providedL1.draggableProps}
+                              {...providedL1.dragHandleProps}
                             >
                               <DraggableItem
                                 active
-                                dragHandleProps={provided.dragHandleProps}
+                                dragHandleProps={providedL1.dragHandleProps}
                                 grabFreeMoveIcon
                                 headerComponent={<span>Review Activity</span>}
                                 isAccordion={false}
@@ -1107,15 +1132,15 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                           index={9}
                           key="summary"
                         >
-                          {(provided, snapshot) => (
+                          {(providedL2, ___) => (
                             <DraggableItemWrapper
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
+                              ref={providedL2.innerRef}
+                              {...providedL2.draggableProps}
+                              {...providedL2.dragHandleProps}
                             >
                               <DraggableItem
                                 active
-                                dragHandleProps={provided.dragHandleProps}
+                                dragHandleProps={providedL2.dragHandleProps}
                                 grabFreeMoveIcon
                                 headerComponent={<span>Summary</span>}
                                 isAccordion={false}
@@ -1128,15 +1153,15 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                           index={10}
                           key="references"
                         >
-                          {(provided, snapshot) => (
+                          {(providedL3, ____) => (
                             <DraggableItemWrapper
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
+                              ref={providedL3.innerRef}
+                              {...providedL3.draggableProps}
+                              {...providedL3.dragHandleProps}
                             >
                               <DraggableItem
                                 active
-                                dragHandleProps={provided.dragHandleProps}
+                                dragHandleProps={providedL3.dragHandleProps}
                                 grabFreeMoveIcon
                                 headerComponent={<span>References</span>}
                                 isAccordion={false}
@@ -1149,15 +1174,15 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                           index={11}
                           key="bibliography"
                         >
-                          {(provided, snapshot) => (
+                          {(providedL4, _____) => (
                             <DraggableItemWrapper
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
+                              ref={providedL4.innerRef}
+                              {...providedL4.draggableProps}
+                              {...providedL4.dragHandleProps}
                             >
                               <DraggableItem
                                 active
-                                dragHandleProps={provided.dragHandleProps}
+                                dragHandleProps={providedL4.dragHandleProps}
                                 grabFreeMoveIcon
                                 headerComponent={<span>Bibliography</span>}
                                 isAccordion={false}
@@ -1170,15 +1195,15 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                           index={12}
                           key="furtherReading"
                         >
-                          {(provided, snapshot) => (
+                          {(providedL5, ______) => (
                             <DraggableItemWrapper
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
+                              ref={providedL5.innerRef}
+                              {...providedL5.draggableProps}
+                              {...providedL5.dragHandleProps}
                             >
                               <DraggableItem
                                 active
-                                dragHandleProps={provided.dragHandleProps}
+                                dragHandleProps={providedL5.dragHandleProps}
                                 grabFreeMoveIcon
                                 headerComponent={<span>Further Reading</span>}
                                 isAccordion={false}
@@ -1186,7 +1211,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                             </DraggableItemWrapper>
                           )}
                         </Draggable>
-                        {provided.placeholder}
+                        {providedL0.placeholder}
                       </StyledDraggableArea>
                     )}
                   </Droppable>

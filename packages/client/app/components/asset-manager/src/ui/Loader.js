@@ -43,12 +43,14 @@ const Wrapper = styled.div`
   justify-content: center;
   width: 100%;
 `
+
 const Label = styled.div`
   color: ${th('colorPrimary')};
   font-family: ${th('fontHeading')};
   font-size: ${th('fontSizeBase')};
   line-height: ${th('lineHeightBase')};
 `
+
 const Loader = () => (
   <Wrapper>
     <StyledSpinner viewBox="0 0 50 50">
@@ -64,4 +66,5 @@ const Loader = () => (
     <Label>Loading ...</Label>
   </Wrapper>
 )
+
 export default Loader

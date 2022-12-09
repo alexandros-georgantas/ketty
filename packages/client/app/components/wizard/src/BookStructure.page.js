@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-
+/* eslint-disable react/prop-types */
 import React from 'react'
 import { adopt } from 'react-adopt'
 import { get } from 'lodash'
@@ -37,8 +37,8 @@ const mapProps = args => ({
     args.getBookQuery.networkStatus === 4 ||
     args.getBookQuery.networkStatus === 2, // possible apollo bug
   onChangeLevelLabelHandler: (bookId, levelId, label) => {
-    const { changeLevelLabelMutation } = args
-    const { changeLevelLabel } = changeLevelLabelMutation
+    const { changeLevelLabelMutation: changeLevelLabelMutationFromArgs } = args
+    const { changeLevelLabel } = changeLevelLabelMutationFromArgs
     changeLevelLabel({
       variables: {
         bookId,
@@ -48,8 +48,10 @@ const mapProps = args => ({
     })
   },
   onClickStart: bookId => {
-    const { updateShowWelcomeMutation } = args
-    const { updateShowWelcome } = updateShowWelcomeMutation
+    const { updateShowWelcomeMutation: updateShowWelcomeMutationFromArgs } =
+      args
+
+    const { updateShowWelcome } = updateShowWelcomeMutationFromArgs
     updateShowWelcome({
       variables: {
         bookId,
@@ -62,10 +64,15 @@ const mapProps = args => ({
     bookTitle,
     caseFirstTime = false,
   ) => {
-    const { changeNumberOfLevelsMutation, withModal, getBookQuery } = args
-    const { changeNumberOfLevels } = changeNumberOfLevelsMutation
-    const { showModal, hideModal } = withModal
-    const { refetch } = getBookQuery
+    const {
+      changeNumberOfLevelsMutation: changeNumberOfLevelsMutationFromArgs,
+      withModal: withModalFromArgs,
+      getBookQuery: getBookQueryFromArgs,
+    } = args
+
+    const { changeNumberOfLevels } = changeNumberOfLevelsMutationFromArgs
+    const { showModal, hideModal } = withModalFromArgs
+    const { refetch } = getBookQueryFromArgs
 
     if (caseFirstTime) {
       return changeNumberOfLevels({
@@ -77,6 +84,7 @@ const mapProps = args => ({
         refetch({ id: bookId })
       })
     }
+
     const onConfirm = () => {
       changeNumberOfLevels({
         variables: {
@@ -88,14 +96,17 @@ const mapProps = args => ({
         hideModal()
       })
     }
+
     return showModal('changeNumberOfLevelsModal', {
       onConfirm,
       bookTitle,
     })
   },
   onUpdateBookOutlineHandler: (bookId, outline) => {
-    const { updateBookOutlineMutation } = args
-    const { updateBookOutline } = updateBookOutlineMutation
+    const { updateBookOutlineMutation: updateBookOutlineMutationFromArgs } =
+      args
+
+    const { updateBookOutline } = updateBookOutlineMutationFromArgs
     updateBookOutline({
       variables: {
         bookId,
@@ -104,8 +115,14 @@ const mapProps = args => ({
     })
   },
   onUpdateLevelContentStructure: (bookId, levels) => {
-    const { updateLevelContentStructureMutation } = args
-    const { updateLevelContentStructure } = updateLevelContentStructureMutation
+    const {
+      updateLevelContentStructureMutation:
+        updateLevelContentStructureMutationFromArgs,
+    } = args
+
+    const { updateLevelContentStructure } =
+      updateLevelContentStructureMutationFromArgs
+
     updateLevelContentStructure({
       variables: {
         bookId,
@@ -114,9 +131,13 @@ const mapProps = args => ({
     })
   },
   onFinalizeBookStructure: (bookId, title, history) => {
-    const { finalizeBookStructureMutation, withModal } = args
-    const { finalizeBookStructure } = finalizeBookStructureMutation
-    const { showModal, hideModal } = withModal
+    const {
+      finalizeBookStructureMutation: finalizeBookStructureMutationFromArgs,
+      withModal: withModalFromArgs,
+    } = args
+
+    const { finalizeBookStructure } = finalizeBookStructureMutationFromArgs
+    const { showModal, hideModal } = withModalFromArgs
 
     const onConfirm = () => {
       finalizeBookStructure({
@@ -128,6 +149,7 @@ const mapProps = args => ({
         history.push('/books')
       })
     }
+
     showModal('finalizeBookStructureModal', {
       onConfirm,
       title,
@@ -172,6 +194,8 @@ const Connected = props => {
                 if (bookStructure.levels.length === levelsNumber) {
                   return
                 }
+
+                /* eslint-disable consistent-return */
                 if (bookStructure.levels.length === 0) {
                   const caseFirstTime = true
                   return onChangeNumberOfLevelsHandler(
@@ -181,6 +205,7 @@ const Connected = props => {
                     caseFirstTime,
                   )
                 }
+
                 if (bookStructure.levels.length - 2 !== levelsNumber) {
                   return onChangeNumberOfLevelsHandler(
                     book.id,
@@ -188,26 +213,29 @@ const Connected = props => {
                     book.title,
                   )
                 }
+                /* eslint-enable consistent-return */
               }
 
-              const changeLevelLabel = (id, value, index) => {
+              const changeLevelLabel = (idParam, value, index) => {
                 if (!errors[`level-${index}-displayName`]) {
-                  onChangeLevelLabelHandler(book.id, id, value)
+                  onChangeLevelLabelHandler(book.id, idParam, value)
                 }
               }
 
-              const setErrors = errors =>
+              const setErrors = errorsParams =>
                 setState({
-                  errors,
+                  errors: errorsParams,
                 })
 
               const changeStepHandler = value => {
                 if (value === 100 && stepNumber < 4) {
                   return setState({ stepNumber: stepNumber + 1 })
                 }
+
                 if (value === -1 && stepNumber >= 2) {
                   return setState({ stepNumber: stepNumber - 1 })
                 }
+
                 return setState({ stepNumber: value })
               }
 
@@ -222,12 +250,14 @@ const Connected = props => {
               const finalizeBookStructure = () => {
                 onFinalizeBookStructure(book.id, book.title, history)
               }
+
               const start = () => {
                 onClickStart(book.id)
                 setState({ stepNumber: 1 })
               }
+
               const backToDashboard = () => history.push(`/books/`)
-              console.log('book', bookStructure)
+
               return (
                 <BookStructure
                   backToDashboard={backToDashboard}

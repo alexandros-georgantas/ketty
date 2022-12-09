@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { th, lighten, darken } from '@pubsweet/ui-toolkit'
@@ -21,11 +22,11 @@ const ConfirmButton = styled.button`
   border: none;
   color: white;
   display: flex;
-  margin-bottom:8px;
-  padding: calc(${th('gridUnit')}/2) calc(3 * ${th('gridUnit')});
+  margin-bottom: 8px;
+  padding: calc(${th('gridUnit')} / 2) calc(3 * ${th('gridUnit')});
   /* border-bottom: 1px solid ${th('colorBackground')}; */
   &:disabled {
-    background:#ccc;
+    background: #ccc;
     cursor: not-allowed;
   }
   &:not(:disabled):hover {
@@ -41,6 +42,7 @@ const ConfirmButton = styled.button`
     outline: 0;
   }
 `
+
 const CancelButton = styled.button`
   align-items: center;
   cursor: pointer;
@@ -64,6 +66,7 @@ const CancelButton = styled.button`
     outline: 0;
   }
 `
+
 const Label = styled.span`
   font-family: 'Fira Sans Condensed';
   font-size: ${th('fontSizeBase')};

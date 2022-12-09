@@ -1,8 +1,8 @@
-import React, { Component, Fragment } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { th, darken, grid } from '@pubsweet/ui-toolkit'
 
-import { UploadFilesButton } from '../ui'
+import UploadFilesButton from './UploadFilesButton'
 import { Button } from '../../../../ui'
 
 const Wrapper = styled.div`
@@ -24,6 +24,7 @@ const WarningAlert = styled.div`
   line-height: ${th('lineHeightBase')};
   width: 100%;
 `
+
 const SecondaryAction = styled.span`
   cursor: pointer;
   &:hover {
@@ -31,7 +32,8 @@ const SecondaryAction = styled.span`
   }
 `
 
-class ActionSection extends Component {
+/* eslint-disable react/prop-types */
+class ActionSection extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -55,6 +57,7 @@ class ActionSection extends Component {
 
   render() {
     const { shouldWarn } = this.state
+
     const {
       shouldShowDelete,
       shouldShowImport,
@@ -76,7 +79,7 @@ class ActionSection extends Component {
             </SecondaryAction>
           </WarningAlert>
         ) : (
-          <Fragment>
+          <>
             <UploadFilesButton handler={uploadHandler} />
             {shouldShowImport && (
               <Button
@@ -95,7 +98,7 @@ class ActionSection extends Component {
                 title="Delete Selected"
               />
             )}
-          </Fragment>
+          </>
         )}
       </Wrapper>
     )

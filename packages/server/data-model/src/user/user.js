@@ -67,7 +67,7 @@ class EditoriaUser extends User {
 
     const passwordHash = await User.hashPassword(newPassword)
 
-    return user.$query(trx).patchAndFetch({
+    return foundUser.$query(trx).patchAndFetch({
       passwordHash,
     })
   }

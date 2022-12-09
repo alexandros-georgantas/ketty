@@ -1,4 +1,5 @@
-import React, { Fragment } from 'react'
+/* eslint-disable react/prop-types */
+import React from 'react'
 import { th, grid } from '@pubsweet/ui-toolkit'
 import styled, { css } from 'styled-components'
 import { NavBarLink, Icons } from '../../../ui'
@@ -17,6 +18,7 @@ const StyledNavLinks = styled(NavBarLink)`
     }
   }
 `
+
 const Text = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -24,26 +26,32 @@ const Text = styled.div`
   overflow: hidden;
   width: 100%;
 `
+
 const center = css`
   justify-content: center;
 `
+
 const left = css`
   justify-content: flex-start;
 `
+
 const right = css`
   justify-content: flex-end;
 `
+
 const Container = styled.div`
   display: flex;
   align-items: center;
   width: 32%;
 `
+
 const Icon = styled.span`
   margin: 0 4px;
   > svg {
     display: block;
   }
 `
+
 const { previousIcon, nextIcon } = Icons
 
 const Header = styled.div`
@@ -62,6 +70,7 @@ const createUrl = (bookId, bookComponentId, hasLock) => {
   if (hasLock) {
     return `/books/${bookId}/bookComponents/${bookComponentId}/preview`
   }
+
   return `/books/${bookId}/bookComponents/${bookComponentId}`
 }
 
@@ -75,15 +84,13 @@ const WaxHeader = ({
   <Header>
     <Container>
       {prevBookComponent && (
-        <Fragment>
-          <StyledNavLinks
-            position="left"
-            to={createUrl(bookId, prevBookComponent.id, prevBookComponent.lock)}
-          >
-            <Icon>{previousIcon}</Icon>
-            <Text>{`${prevBookComponent.title || 'Untitled'}`}</Text>
-          </StyledNavLinks>
-        </Fragment>
+        <StyledNavLinks
+          position="left"
+          to={createUrl(bookId, prevBookComponent.id, prevBookComponent.lock)}
+        >
+          <Icon>{previousIcon}</Icon>
+          <Text>{`${prevBookComponent.title || 'Untitled'}`}</Text>
+        </StyledNavLinks>
       )}
     </Container>
     <Container>
@@ -94,15 +101,13 @@ const WaxHeader = ({
 
     <Container>
       {nextBookComponent && (
-        <Fragment>
-          <StyledNavLinks
-            position="right"
-            to={createUrl(bookId, nextBookComponent.id, nextBookComponent.lock)}
-          >
-            <Text>{`${nextBookComponent.title || 'Untitled'}`}</Text>
-            <Icon>{nextIcon}</Icon>
-          </StyledNavLinks>
-        </Fragment>
+        <StyledNavLinks
+          position="right"
+          to={createUrl(bookId, nextBookComponent.id, nextBookComponent.lock)}
+        >
+          <Text>{`${nextBookComponent.title || 'Untitled'}`}</Text>
+          <Icon>{nextIcon}</Icon>
+        </StyledNavLinks>
       )}
     </Container>
   </Header>

@@ -20,6 +20,7 @@ const Container = styled.div`
   max-width: 100%;
   height: 100%;
 `
+
 const Title = styled(H3)`
   color: #3f3f3f;
   font-family: ${th('fontReading')};
@@ -30,6 +31,7 @@ const Title = styled(H3)`
   padding-top: 3px;
   text-transform: uppercase;
 `
+
 const InnerWrapper = styled.div`
   display: block;
   clear: both;
@@ -120,7 +122,7 @@ const PersonalInformation = props => {
                   !isValid
 
                 return (
-                  <Fragment>
+                  <>
                     <TextField
                       error={errors.givenName}
                       handleBlur={handleBlur}
@@ -147,7 +149,7 @@ const PersonalInformation = props => {
                       title="Update"
                       type="submit"
                     />
-                  </Fragment>
+                  </>
                 )
               }}
             </Form>
@@ -247,8 +249,8 @@ const Password = props => {
       .test(
         'new-password-match',
         'Passwords do not match',
-        /* eslint-disable func-names */
-        function(val) {
+        /* eslint-disable func-names, react/no-this-in-sfc */
+        function (val) {
           return val === this.parent.newPassword1
         },
       ),
@@ -265,6 +267,7 @@ const Password = props => {
         {notifyRibbon => {
           const handleSubmit = (formValues, formikBag) => {
             const { currentPassword, newPassword1 } = formValues
+
             const patch = {
               currentPassword,
               newPassword: newPassword1,
@@ -307,7 +310,7 @@ const Password = props => {
                 } = formProps
 
                 return (
-                  <Fragment>
+                  <>
                     <TextField
                       error={errors.currentPassword}
                       handleBlur={handleBlur}
@@ -347,7 +350,7 @@ const Password = props => {
                       title="Change password"
                       type="submit"
                     />
-                  </Fragment>
+                  </>
                 )
               }}
             </Form>

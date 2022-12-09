@@ -1,6 +1,6 @@
+/* eslint-disable react/prop-types */
 import { findIndex, map } from 'lodash'
 import React from 'react'
-import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
 
@@ -41,26 +41,29 @@ const User = styled.span`
     width: 0;
   }
 `
+
 const ActionsContainer = styled.div`
   align-items: center;
   display: flex;
   flex-basis: 10%;
   justify-content: center;
 `
+
 export class Member extends React.Component {
   constructor(props) {
     super(props)
-    this._remove = this._remove.bind(this)
+    this.remove = this.remove.bind(this)
   }
 
-  _remove() {
+  remove() {
     const { user, team, update } = this.props
     const memberIndex = findIndex(team.members, { user: { id: user.id } })
     const clonedMembers = [...team.members]
     clonedMembers.splice(memberIndex, 1)
+
     const withoutMember = map(clonedMembers, member => {
-      const { user } = member
-      return { user: { id: user.id } }
+      const { user: userFromMember } = member
+      return { user: { id: userFromMember.id } }
     })
 
     update({
@@ -70,6 +73,7 @@ export class Member extends React.Component {
 
   render() {
     const { team, rules, user } = this.props
+
     const { canRemoveTeamMember } =
       rules.teamRoles.find(rule => rule.role === team.role) || {}
 
@@ -84,7 +88,7 @@ export class Member extends React.Component {
             <Button
               danger
               label="Remove"
-              onClick={this._remove}
+              onClick={this.remove}
               title="Remove"
             />
           </ActionsContainer>
@@ -92,35 +96,6 @@ export class Member extends React.Component {
       </ListItem>
     )
   }
-}
-
-Member.propTypes = {
-  user: PropTypes.shape({
-    admin: PropTypes.bool,
-    email: PropTypes.string,
-    id: PropTypes.string,
-    rev: PropTypes.string,
-    type: PropTypes.string,
-    username: PropTypes.string,
-  }).isRequired,
-  color: PropTypes.string.isRequired,
-  team: PropTypes.shape({
-    id: PropTypes.string,
-    name: PropTypes.string,
-    type: PropTypes.string,
-    rev: PropTypes.string,
-    role: PropTypes.shape({
-      name: PropTypes.string,
-      permissions: PropTypes.arrayOf(PropTypes.string),
-    }),
-    members: PropTypes.arrayOf(PropTypes.string),
-    object: PropTypes.shape({
-      id: PropTypes.string,
-      type: PropTypes.string,
-    }),
-  }).isRequired,
-  update: PropTypes.func.isRequired,
-  remove: PropTypes.bool.isRequired,
 }
 
 export default Member

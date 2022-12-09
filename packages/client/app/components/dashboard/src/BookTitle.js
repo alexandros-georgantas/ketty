@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
@@ -5,12 +6,13 @@ import withLink from '../../common/src/withLink'
 
 const Container = styled.div`
   padding: 0;
-  flex-grow:1;
+  flex-grow: 1;
   /* padding-right: calc(${th('gridUnit')} / 2); */
   /* flex-basis: 88%; */
   overflow-x: hidden;
   overflow-y: hidden;
 `
+
 const Input = styled.input`
   border: 0;
   padding: 0;
@@ -27,8 +29,9 @@ const Input = styled.input`
     border-bottom: 1px solid #0964cc;
   }
 `
+
 const Title = styled.span`
-flex-grow:0;
+  flex-grow: 0;
   background-color: white;
   color: #3f3f3f;
   padding-right: ${th('gridUnit')};
@@ -39,8 +42,8 @@ flex-grow:0;
   line-height: ${th('lineHeightHeading4')};
   &:after {
     float: left;
-    flex-grow:0;
-    padding-top:3px;
+    flex-grow: 0;
+    padding-top: 3px;
     width: 0;
     font-size: ${th('fontSizeBaseSmall')};
     white-space: nowrap;
@@ -109,6 +112,7 @@ const BookTitle = ({
       {withLink(title, url)}
     </Title>
   )
+
   if (isRenaming) {
     const handleKey = event => {
       if (event.charCode !== 13) return

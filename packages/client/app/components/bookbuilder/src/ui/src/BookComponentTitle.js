@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import { find, indexOf } from 'lodash'
 import styled from 'styled-components'
@@ -11,11 +12,13 @@ const Container = styled.div`
     if (lock && !isToplevel) {
       return '83%'
     }
+
     return '88%'
   }};
   overflow-x: hidden;
   overflow-y: hidden;
 `
+
 const Title = styled.span`
   background-color: white;
   padding-right: ${th('gridUnit')};
@@ -103,6 +106,7 @@ const BookComponentTitle = ({
     </Title>
   )
   const url = `/books/${bookId}/bookComponents/${bookComponentId}`
+
   if (
     (lock === null || lock === undefined) &&
     !uploading &&

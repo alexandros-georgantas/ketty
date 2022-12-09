@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
@@ -11,18 +12,19 @@ const Text = styled.div`
   font-size: ${th('fontSizeBase')};
   color: #404040;
 `
+
 const UnlockedModal = props => {
   const { isOpen, hideModal, data } = props
   const { onConfirm, warning } = data
 
   return (
     <InfoModal
-      shouldCloseOnOverlayClick={false}
-      shouldCloseOnEsc={false}
-      isOpen={isOpen}
       headerText="Warning"
-      onRequestClose={hideModal}
+      isOpen={isOpen}
       onConfirm={onConfirm}
+      onRequestClose={hideModal}
+      shouldCloseOnEsc={false}
+      shouldCloseOnOverlayClick={false}
     >
       <Text>{`${warning}`}</Text>
     </InfoModal>

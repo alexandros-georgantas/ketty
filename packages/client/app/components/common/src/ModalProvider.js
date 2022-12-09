@@ -1,18 +1,15 @@
-import { get, omit } from 'lodash'
+/* eslint-disable react/prop-types */
 import React from 'react'
 import { State } from 'react-powerplug'
 
 import ModalContext from './ModalContext'
-import ModalRoot from './ModalRoot'
-import PlainModal from './PlainModal'
-import DialogModal from './DialogModal'
 
-function ModalProvider({ children, modals }) {
+const ModalProvider = ({ children, modals: modalsInit }) => {
   return (
     <State
       initial={{
         modalState: { data: undefined, modalKey: undefined },
-        modals,
+        modals: modalsInit,
       }}
     >
       {({ state, setState }) => {
@@ -36,6 +33,7 @@ function ModalProvider({ children, modals }) {
           })
         }
 
+        /* eslint-disable react/jsx-no-constructed-context-values */
         return (
           <ModalContext.Provider
             value={{

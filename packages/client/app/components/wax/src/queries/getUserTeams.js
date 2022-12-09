@@ -18,6 +18,7 @@ const getUserTeamsQuery = props => {
     currentUser: { id },
     render,
   } = props
+
   return (
     <Query
       fetchPolicy="network-only"

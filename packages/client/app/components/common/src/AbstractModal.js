@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types, jsx-a11y/anchor-is-valid, jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions, react/forbid-prop-types */
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Modal } from 'react-bootstrap'

@@ -1,5 +1,5 @@
+/* eslint-disable react/prop-types,react/no-unused-state */
 import React from 'react'
-import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { th, grid } from '@pubsweet/ui-toolkit'
 import { Formik } from 'formik'
@@ -110,6 +110,7 @@ class AddBookModal extends React.Component {
           if (!values.title) {
             errors.title = '* The title of the book should not be empty'
           }
+
           return errors
         }}
       >
@@ -159,7 +160,6 @@ class AddBookModal extends React.Component {
 
   render() {
     const { isOpen, hideModal } = this.props
-
     const body = this.renderBody()
 
     return (
@@ -173,14 +173,6 @@ class AddBookModal extends React.Component {
       </FormModal>
     )
   }
-}
-
-AddBookModal.propTypes = {
-  collectionId: PropTypes.string.isRequired,
-  create: PropTypes.func.isRequired,
-  container: PropTypes.any.isRequired,
-  show: PropTypes.bool.isRequired,
-  toggle: PropTypes.func.isRequired,
 }
 
 export default AddBookModal

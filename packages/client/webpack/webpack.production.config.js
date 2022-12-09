@@ -1,1 +1,1 @@
-module.exports = require('./webpack.config.js')('production')
+module.exports = require('./webpack.config')('production')

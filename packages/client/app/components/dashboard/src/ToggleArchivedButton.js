@@ -1,6 +1,6 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
-import { State } from 'react-powerplug'
 import { th } from '@pubsweet/ui-toolkit'
 
 import { Button, Icons } from '../../../ui'
@@ -8,28 +8,26 @@ import { Button, Icons } from '../../../ui'
 const StyledButton = styled(Button)`
   margin-right: ${th('gridUnit')};
 `
+
 const { archiveIcon, unArchiveIcon } = Icons
 
-const ToggleArchivedButton = ({ onChange }) => (
-  <State initial={{ archived: false }} onChange={onChange}>
-    {({ state, setState }) => {
-      const { archived } = state
+const ToggleArchivedButton = ({ setSortingParams, sortingParams }) => {
+  const { archived, ...rest } = sortingParams
 
-      const toggleArchived = () => {
-        setState({ archived: !archived })
-      }
-      const label = archived ? 'HIDE ARCHIVED' : 'SHOW ARCHIVED'
+  const toggleArchived = () => {
+    setSortingParams({ archived: !archived, ...rest })
+  }
 
-      return (
-        <StyledButton
-          icon={archived ? unArchiveIcon : archiveIcon}
-          label={label}
-          onClick={toggleArchived}
-          title={label}
-        />
-      )
-    }}
-  </State>
-)
+  const label = archived ? 'HIDE ARCHIVED' : 'SHOW ARCHIVED'
+
+  return (
+    <StyledButton
+      icon={archived ? unArchiveIcon : archiveIcon}
+      label={label}
+      onClick={toggleArchived}
+      title={label}
+    />
+  )
+}
 
 export default ToggleArchivedButton
