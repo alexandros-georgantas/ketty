@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 import React from 'react'
 import { get } from 'lodash'
 import { adopt } from 'react-adopt'
