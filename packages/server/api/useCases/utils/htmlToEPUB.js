@@ -1,5 +1,4 @@
 const cheerio = require('cheerio')
-const crypto = require('crypto')
 const path = require('path')
 const builder = require('xmlbuilder')
 const fs = require('fs-extra')
@@ -27,8 +26,8 @@ const createEPUBFolder = async () => {
   try {
     const result = {}
     const uploadsDir = get(config, ['pubsweet-server', 'uploads'], 'uploads')
-
-    const folder = `temp/${crypto.randomBytes(32).toString('hex')}`
+    const currentTime = new Date().getTime()
+    const folder = `temp/epub/${currentTime}`
     const tempPath = `${process.cwd()}/${uploadsDir}/${folder}`
     await fs.ensureDir(tempPath)
     result.root = tempPath

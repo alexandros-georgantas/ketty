@@ -165,6 +165,10 @@ services:
       - SERVICE_XSWEET_PORT=${SERVICE_XSWEET_PORT:-3004}
       - FEATURE_BOOK_STRUCTURE=${FEATURE_BOOK_STRUCTURE:-false}
       - FEATURE_UPLOAD_DOCX_FILES=${FEATURE_UPLOAD_DOCX_FILES:-true}
+      - TEMP_DIRECTORY_CRON_JOB_SCHEDULE=${TEMP_DIRECTORY_CRON_JOB_TIMING:-0 8 * * 0}
+      - TEMP_DIRECTORY_CRON_JOB_OFFSET=${TEMP_DIRECTORY_CRON_JOB_OFFSET:-1000 * 60 * 60 * 8}
+      - TEMP_DIRECTORY_CLEAN_UP=${TEMP_DIRECTORY_CLEAN_UP:-false}
+      
     volumes:
       - ./packages/server/config:/home/node/editoria/config
       - ./packages/server/api:/home/node/editoria/api

@@ -386,7 +386,7 @@ const pagedPreviewerLinkHandler = async dirPath => {
   const serverUrl = `${protocol}://${host}${port ? `:${port}` : ''}`
 
   const zipPath = await zipper(
-    path.join(`${process.cwd()}`, uploadsDir, 'paged', dirPath),
+    path.join(`${process.cwd()}`, uploadsDir, 'temp', 'paged', dirPath),
   )
 
   const form = new FormData()

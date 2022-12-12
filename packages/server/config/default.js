@@ -102,6 +102,9 @@ module.exports = {
       surname: 'ADMIN_SURNAME',
       email: 'ADMIN_EMAIL',
     },
+    cron: {
+      path: path.join(__dirname, '..', 'services', 'tempCleanUp.cron.js'),
+    },
   },
   'file-server': {
     accessKeyId: 'S3_ACCESS_KEY_ID_USER',
@@ -151,4 +154,5 @@ module.exports = {
   validations: path.join(__dirname, 'modules', 'validations'),
   featureBookStructure: false,
   featureUploadDOCXFiles: true,
+  tempDirectoryCleanUp: true,
 }

@@ -4,7 +4,6 @@ const map = require('lodash/map')
 const find = require('lodash/find')
 
 const path = require('path')
-const crypto = require('crypto')
 
 const { writeFileSync, createReadStream } = require('fs')
 const fs = require('fs-extra')
@@ -212,8 +211,7 @@ const cloneTemplate = async (id, name, cssFile, hashed, options = {}) => {
     const { trx } = options
     return useTransaction(
       async tr => {
-        const randomHash = crypto.randomBytes(16).toString('hex')
-        const tempFolder = `${uploadsPath}/temp/${randomHash}`
+        const tempFolder = `${uploadsPath}/temp`
 
         await fs.ensureDir(uploadsPath)
         await fs.ensureDir(tempFolder)

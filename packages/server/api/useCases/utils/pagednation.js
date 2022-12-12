@@ -28,9 +28,10 @@ const pagednation = async (book, template, pdf = false) => {
     const scripts = template.exportScripts
 
     // const images = []
+    const currentTime = new Date().getTime()
     const hash = crypto.randomBytes(32).toString('hex')
-    const pagedDir = `${process.cwd()}/${uploadsDir}/paged`
-    const pagedDestination = path.join(pagedDir, `${hash}`)
+    const tempDir = `${process.cwd()}/${uploadsDir}/temp`
+    const pagedDestination = path.join(tempDir, 'paged', `${currentTime}`)
     await fs.ensureDir(pagedDestination)
 
     for (let i = 0; i < templateFiles.length; i += 1) {
@@ -189,7 +190,11 @@ const pagednation = async (book, template, pdf = false) => {
     }
 
     await writeFile(`${pagedDestination}/index.html`, output.html())
-    return { clientPath: `${hash}/template/${template.id}`, hash }
+    return {
+      clientPath: `${currentTime}/template/${template.id}`,
+      currentTime,
+      hash,
+    }
   } catch (e) {
     throw new Error(e)
   }

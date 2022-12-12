@@ -3,7 +3,6 @@ const fs = require('fs-extra')
 const path = require('path')
 const config = require('config')
 const get = require('lodash/get')
-const crypto = require('crypto')
 const mime = require('mime-types')
 const map = require('lodash/map')
 
@@ -21,9 +20,9 @@ const uploadsDir = get(config, ['pubsweet-server', 'uploads'], 'uploads')
 const icmlPreparation = async book => {
   try {
     const images = []
-    const hash = crypto.randomBytes(32).toString('hex')
+    const currentTime = new Date().getTime()
     const tempDir = `${process.cwd()}/${uploadsDir}/temp`
-    const tempDestination = path.join(tempDir, `${hash}`)
+    const tempDestination = path.join(tempDir, 'icml', `${currentTime}`)
     await fs.ensureDir(tempDestination)
     const gatheredImages = imageGatherer(book)
     const originalImageLinkMapper = {}
@@ -91,7 +90,7 @@ const icmlPreparation = async book => {
     })
 
     await writeFile(`${tempDestination}/index.html`, output.html())
-    return { path: tempDestination, hash }
+    return { path: tempDestination, currentTime }
   } catch (e) {
     throw new Error(e)
   }

@@ -98,7 +98,7 @@ const PagedStyler = ({
   useEffect(() => {
     async function fetchData() {
       const response = await fetch(
-        `${serverUrlWithProtocol}/uploads/paged/${hashed}/${templateFile.name}.${templateFile.extension}`,
+        `${serverUrlWithProtocol}/uploads/temp/paged/${hashed}/${templateFile.name}.${templateFile.extension}`,
       )
 
       const file = await response.text()

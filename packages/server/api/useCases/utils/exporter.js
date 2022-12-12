@@ -30,6 +30,19 @@ const uploadsDir = get(config, ['pubsweet-server', 'uploads'], 'uploads')
 const { epubcheckerHandler, icmlHandler, pdfHandler } = require('../services')
 
 const levelMapper = { 0: 'one', 1: 'two', 2: 'three' }
+const currentTime = new Date().getTime()
+
+const getResultPath = absolutePath => {
+  const serverProtocol = process.env.SERVER_PROTOCOL
+  const serverHost = process.env.SERVER_HOST
+  const serverPort = process.env.SERVER_PORT
+
+  const serverUrl = `${serverProtocol}://${serverHost}${
+    serverPort ? `:${serverPort}` : ''
+  }`
+
+  return serverUrl.concat(absolutePath)
+}
 
 const ExporterService = async (
   bookId,
@@ -210,7 +223,7 @@ const ExporterService = async (
 
       const epubFilePath = await epubArchiver(
         tempFolder,
-        `${process.cwd()}/${uploadsDir}/epubs`,
+        `${process.cwd()}/${uploadsDir}/temp/epub/${currentTime}`,
       )
 
       const epubAbsolutePath = `${process.cwd()}`.concat(epubFilePath)
@@ -248,20 +261,24 @@ const ExporterService = async (
       if (fileExtension === 'pdf') {
         const { hash } = await pagednation(book, template, true)
 
-        await fs.emptyDir(`${process.cwd()}/uploads/pdfs`)
-        await fs.ensureDir(`${process.cwd()}/uploads/tmp/${hash}/`)
-        const pdfPath = '/uploads/pdfs'
+        await fs.emptyDir(`${process.cwd()}/uploads/temp/pdf`)
+        await fs.ensureDir(`${process.cwd()}/uploads/tmp/${currentTime}/`)
+        const pdfPath = '/uploads/temp/pdf'
         resultPath = getResultPath(pdfPath)
-        const pdfAbsolutePath = path.join(`${process.cwd()}`, `/uploads/pdfs`)
+
+        const pdfAbsolutePath = path.join(
+          `${process.cwd()}`,
+          `/uploads/temp/pdf`,
+        )
 
         const zipFilePath = await pagedArchiver(
-          `${process.cwd()}/uploads/paged/${hash}/`,
-          `${process.cwd()}/uploads/tmp/${hash}/`,
+          `${process.cwd()}/uploads/temp/paged/${currentTime}/`,
+          `${process.cwd()}/uploads/tmp/${currentTime}/`,
         )
 
         await pdfHandler(zipFilePath, pdfAbsolutePath, `${hash}.pdf`)
-        await fs.remove(`${process.cwd()}/uploads/tmp/${hash}/`)
-        await fs.remove(`${process.cwd()}/uploads/paged/${hash}/`)
+        await fs.remove(`${process.cwd()}/uploads/tmp/${currentTime}/`)
+        await fs.remove(`${process.cwd()}/uploads/temp/paged/${currentTime}/`)
         // pagedjs-cli
         return {
           path: `${resultPath}/${hash}.pdf`,
@@ -295,18 +312,6 @@ const ExporterService = async (
   } catch (e) {
     throw new Error(e)
   }
-}
-
-const getResultPath = absolutePath => {
-  const serverProtocol = process.env.SERVER_PROTOCOL
-  const serverHost = process.env.SERVER_HOST
-  const serverPort = process.env.SERVER_PORT
-
-  const serverUrl = `${serverProtocol}://${serverHost}${
-    serverPort ? `:${serverPort}` : ''
-  }`
-
-  return serverUrl.concat(absolutePath)
 }
 
 module.exports = ExporterService
