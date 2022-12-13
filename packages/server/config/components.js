@@ -2,7 +2,6 @@ module.exports = [
   '@pubsweet/model-user',
   '@pubsweet/model-team',
   '@pubsweet/component-password-reset-server',
-  // './vivliostyle',
   './data-model/src/applicationParameter',
   './data-model/src/book',
   './data-model/src/lock',
@@ -25,5 +24,4 @@ module.exports = [
   './data-model/src/serviceCallbackToken',
   './api',
   './api/rest',
-  './file-server',
 ]

@@ -5,15 +5,17 @@ const map = require('lodash/map')
 const crypto = require('crypto')
 const { dirContents } = require('./filesystem')
 
-const epubArchiver = async (tempFolder, target) => {
+const epubArchiver = async (
+  EPUBtempFolderAssetsPath,
+  EPUBtempFolderFilePath,
+) => {
   try {
-    await fs.ensureDir(target)
-    const epubFiles = await dirContents(tempFolder)
+    await fs.ensureDir(EPUBtempFolderFilePath)
+    const epubFiles = await dirContents(EPUBtempFolderAssetsPath)
     return new Promise((resolve, reject) => {
-      const destination = path.join(
-        target,
-        `${crypto.randomBytes(32).toString('hex')}.epub`,
-      )
+      const tempFilename = `${crypto.randomBytes(32).toString('hex')}.epub`
+
+      const destination = path.join(EPUBtempFolderFilePath, tempFilename)
 
       const output = fs.createWriteStream(destination)
       const archive = archiver('zip')
@@ -21,12 +23,11 @@ const epubArchiver = async (tempFolder, target) => {
       // listen for all archive data to be written
       // 'close' event is fired only when a file descriptor is involved
       output.on('close', () => {
-        const epubPath = destination.replace(`${process.cwd()}`, '');
-        resolve(epubPath)
+        resolve(tempFilename)
       })
 
       // good practice to catch warnings (ie stat failures and other non-blocking errors)
-      archive.on('warning', (err) => {
+      archive.on('warning', err => {
         if (err.code === 'ENOENT') {
           // log warning
         } else {
@@ -36,7 +37,9 @@ const epubArchiver = async (tempFolder, target) => {
       })
 
       // good practice to catch this error explicitly
-      archive.on('error', (err) => {
+      archive.on('error', async err => {
+        await fs.remove(EPUBtempFolderAssetsPath)
+        await fs.remove(EPUBtempFolderFilePath)
         throw err
       })
 
@@ -44,8 +47,8 @@ const epubArchiver = async (tempFolder, target) => {
       archive.pipe(output)
       archive.append('application/epub+zip', { name: 'mimetype', store: true })
 
-      const appendFile = (item) => {
-        const absoluteFilePath = path.join(tempFolder, item)
+      const appendFile = item => {
+        const absoluteFilePath = path.join(EPUBtempFolderAssetsPath, item)
         const stream = fs.createReadStream(absoluteFilePath)
 
         return archive.append(stream, {
@@ -53,7 +56,7 @@ const epubArchiver = async (tempFolder, target) => {
         })
       }
 
-      map(epubFiles, (file) => appendFile(file))
+      map(epubFiles, file => appendFile(file))
       archive.finalize()
     })
   } catch (e) {

@@ -211,7 +211,7 @@ const cloneTemplate = async (id, name, cssFile, hashed, options = {}) => {
     const { trx } = options
     return useTransaction(
       async tr => {
-        const tempFolder = `${uploadsPath}/temp`
+        const tempFolder = `${uploadsPath}/temp/previewer`
 
         await fs.ensureDir(uploadsPath)
         await fs.ensureDir(tempFolder)
@@ -286,7 +286,7 @@ const cloneTemplate = async (id, name, cssFile, hashed, options = {}) => {
           }),
         )
         await fs.remove(tempFolder)
-        await fs.remove(`${uploadsPath}/paged/${hashed}`)
+        await fs.remove(`${uploadsPath}/temp/previewer/${hashed}`)
         return newTemplate
       },
       { trx },
@@ -518,12 +518,24 @@ const updateTemplateCSSFile = async (id, data, hashed, options = {}) => {
         const { mimetype, name, extension, templateId } = oldFile
 
         fs.writeFileSync(
-          path.join(uploadsPath, 'paged', hashed, `${name}.${extension}`),
+          path.join(
+            uploadsPath,
+            'temp',
+            'previewer',
+            hashed,
+            `${name}.${extension}`,
+          ),
           data,
         )
 
         const fileStream = createReadStream(
-          path.join(uploadsPath, 'paged', hashed, `${name}.${extension}`),
+          path.join(
+            uploadsPath,
+            'temp',
+            'previewer',
+            hashed,
+            `${name}.${extension}`,
+          ),
         )
 
         const { original } = await uploadFile(
@@ -542,7 +554,7 @@ const updateTemplateCSSFile = async (id, data, hashed, options = {}) => {
           templateId,
           { trx: tr },
         )
-        await fs.remove(path.join(uploadsPath, 'paged', hashed))
+        await fs.remove(path.join(uploadsPath, 'temp', 'previewer', hashed))
         return Template.query(tr).findById(templateId)
       },
       { trx },

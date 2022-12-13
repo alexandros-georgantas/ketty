@@ -1,10 +1,7 @@
 const cheerio = require('cheerio')
 const fs = require('fs-extra')
-const path = require('path')
 const config = require('config')
-const get = require('lodash/get')
 const find = require('lodash/find')
-const crypto = require('crypto')
 
 const map = require('lodash/map')
 const { locallyDownloadFile, signURL } = require('../objectStorage')
@@ -18,9 +15,12 @@ const { generatePagedjsContainer } = require('./htmlGenerators')
 
 const { objectKeyExtractor } = require('../../../common')
 
-const uploadsDir = get(config, ['pubsweet-server', 'uploads'], 'uploads')
-
-const pagednation = async (book, template, pdf = false) => {
+const pagednation = async (
+  book,
+  template,
+  pagedJStempFolderAssetsPath,
+  pdf = false,
+) => {
   try {
     const templateFiles = await template.getFiles()
     const fonts = []
@@ -28,11 +28,11 @@ const pagednation = async (book, template, pdf = false) => {
     const scripts = template.exportScripts
 
     // const images = []
-    const currentTime = new Date().getTime()
-    const hash = crypto.randomBytes(32).toString('hex')
-    const tempDir = `${process.cwd()}/${uploadsDir}/temp`
-    const pagedDestination = path.join(tempDir, 'paged', `${currentTime}`)
-    await fs.ensureDir(pagedDestination)
+    // const currentTime = new Date().getTime()
+    // const hash = crypto.randomBytes(32).toString('hex')
+    // const tempDir = `${process.cwd()}/${uploadsDir}/temp`
+    // const pagedDestination = path.join(tempDir, 'paged', `${currentTime}`)
+    await fs.ensureDir(pagedJStempFolderAssetsPath)
 
     for (let i = 0; i < templateFiles.length; i += 1) {
       const {
@@ -46,7 +46,7 @@ const pagednation = async (book, template, pdf = false) => {
       const originalFilename = `${name}.${extension}`
 
       if (templateFiles[i].mimetype === 'text/css') {
-        const target = `${pagedDestination}/${originalFilename}`
+        const target = `${pagedJStempFolderAssetsPath}/${originalFilename}`
         const id = `stylesheet-${dbId}-${i}`
         stylesheets.push({
           id,
@@ -57,7 +57,7 @@ const pagednation = async (book, template, pdf = false) => {
           extension,
         })
       } else {
-        const target = `${pagedDestination}/${originalFilename}`
+        const target = `${pagedJStempFolderAssetsPath}/${originalFilename}`
         const id = `font-${dbId}-${i}`
         fonts.push({
           id,
@@ -162,7 +162,7 @@ const pagednation = async (book, template, pdf = false) => {
           )
         }
 
-        const targetPath = `${pagedDestination}/${i + 1}.js`
+        const targetPath = `${pagedJStempFolderAssetsPath}/${i + 1}.js`
 
         return fs.copy(constructedScriptPath, targetPath)
       }),
@@ -189,12 +189,13 @@ const pagednation = async (book, template, pdf = false) => {
         .appendTo('head')
     }
 
-    await writeFile(`${pagedDestination}/index.html`, output.html())
-    return {
-      clientPath: `${currentTime}/template/${template.id}`,
-      currentTime,
-      hash,
-    }
+    await writeFile(`${pagedJStempFolderAssetsPath}/index.html`, output.html())
+    return true
+    // return {
+    //   clientPath: `${currentTime}/template/${template.id}`,
+    //   currentTime,
+    //   hash,
+    // }
   } catch (e) {
     throw new Error(e)
   }

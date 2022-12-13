@@ -4,8 +4,8 @@ const path = require('path')
 const config = require('config')
 const get = require('lodash/get')
 const findIndex = require('lodash/findIndex')
+const crypto = require('crypto')
 const { epubArchiver } = require('./epubArchiver')
-// const crypto = require('crypto')
 
 const {
   cleanHTML,
@@ -30,9 +30,8 @@ const uploadsDir = get(config, ['pubsweet-server', 'uploads'], 'uploads')
 const { epubcheckerHandler, icmlHandler, pdfHandler } = require('../services')
 
 const levelMapper = { 0: 'one', 1: 'two', 2: 'three' }
-const currentTime = new Date().getTime()
 
-const getResultPath = absolutePath => {
+const getURL = relativePath => {
   const serverProtocol = process.env.SERVER_PROTOCOL
   const serverHost = process.env.SERVER_HOST
   const serverPort = process.env.SERVER_PORT
@@ -41,7 +40,7 @@ const getResultPath = absolutePath => {
     serverPort ? `:${serverPort}` : ''
   }`
 
-  return serverUrl.concat(absolutePath)
+  return `${serverUrl}/${relativePath}`
 }
 
 const ExporterService = async (
@@ -73,7 +72,7 @@ const ExporterService = async (
       notesType = icmlNotes
     }
 
-    let resultPath
+    // let resultPath
 
     // The produced representation of the book holds two Map data types one
     // for the division and one for the book components of each division to
@@ -206,29 +205,42 @@ const ExporterService = async (
       }
     }
 
-    // if (previewer === 'vivliostyle' || fileExtension === 'epub') {
     if (fileExtension === 'epub') {
-      // if (previewer === 'vivliostyle') {
-      //   book.divisions.forEach((division, divisionId) => {
-      //     division.bookComponents.forEach((bookComponent, bookComponentId) => {
-      //       bookComponent.content = vivliostyleDecorator(
-      //         bookComponent,
-      //         book.title,
-      //       )
-      //     })
-      //   })
-      // }
+      const assetsTimestamp = `${new Date().getTime()}`
+      const EPUBFileTimestamp = `${new Date().getTime() + 1}` // delay it a bit
 
-      const tempFolder = await htmlToEPUB(book, template)
-
-      const epubFilePath = await epubArchiver(
-        tempFolder,
-        `${process.cwd()}/${uploadsDir}/temp/epub/${currentTime}`,
+      const EPUBtempFolderAssetsPath = path.join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        uploadsDir,
+        'temp',
+        'epub',
+        assetsTimestamp,
       )
 
-      const epubAbsolutePath = `${process.cwd()}`.concat(epubFilePath)
-      resultPath = getResultPath(epubFilePath)
-      const { outcome, messages } = await epubcheckerHandler(epubAbsolutePath)
+      const EPUBtempFolderFilePath = path.join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        uploadsDir,
+        'temp',
+        'epub',
+        EPUBFileTimestamp,
+      )
+
+      await htmlToEPUB(book, template, EPUBtempFolderAssetsPath)
+
+      const filename = await epubArchiver(
+        EPUBtempFolderAssetsPath,
+        EPUBtempFolderFilePath,
+      )
+
+      const { outcome, messages } = await epubcheckerHandler(
+        `${EPUBtempFolderFilePath}/${filename}`,
+      )
 
       if (outcome === 'not valid') {
         let errors = ''
@@ -241,69 +253,151 @@ const ExporterService = async (
         throw new Error(errors)
       }
 
-      // if (previewer === 'vivliostyle') {
-      //   const vivliostyleRoot = `${process.cwd()}/${uploadsDir}/vivliostyle/`
-      //   const destination = path.join(
-      //     vivliostyleRoot,
-      //     `${crypto.randomBytes(32).toString('hex')}`,
-      //   )
-      //   await fs.ensureDir(destination)
-      //   await fs.copy(tempFolder, destination)
-      //   await fs.remove(epubFilePath)
-      //   resultPath = destination.replace(`${process.cwd()}`, '')
-      // }
-      await fs.remove(tempFolder)
+      await fs.remove(EPUBtempFolderAssetsPath)
 
-      return { path: resultPath }
+      return {
+        path: getURL(
+          path.join(uploadsDir, 'temp', 'epub', EPUBFileTimestamp, filename),
+        ),
+      }
     }
 
     if (previewer === 'pagedjs' || fileExtension === 'pdf') {
+      const assetsTimestamp = `${new Date().getTime()}`
+      const zippedFileTimestamp = `${new Date().getTime() + 1}` // delay it a bit
+      const PDFFileTimestamp = `${new Date().getTime() + 2}` // delay it a bit
+
+      const pagedJStempFolderAssetsPathForPDF = path.join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        uploadsDir,
+        'temp',
+        'paged',
+        assetsTimestamp,
+      )
+
+      const pagedJStempFolderAssetsPathForPreviewer = path.join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        uploadsDir,
+        'temp',
+        'previewer',
+        assetsTimestamp,
+      )
+
+      const zippedTempFolderFilePath = path.join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        uploadsDir,
+        'temp',
+        'paged',
+        zippedFileTimestamp,
+      )
+
+      const PDFtempFolderFilePath = path.join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        uploadsDir,
+        'temp',
+        'paged',
+        PDFFileTimestamp,
+      )
+
       if (fileExtension === 'pdf') {
-        const { hash } = await pagednation(book, template, true)
-
-        await fs.emptyDir(`${process.cwd()}/uploads/temp/pdf`)
-        await fs.ensureDir(`${process.cwd()}/uploads/tmp/${currentTime}/`)
-        const pdfPath = '/uploads/temp/pdf'
-        resultPath = getResultPath(pdfPath)
-
-        const pdfAbsolutePath = path.join(
-          `${process.cwd()}`,
-          `/uploads/temp/pdf`,
+        const PDFFilename = `${crypto.randomBytes(32).toString('hex')}.pdf`
+        await pagednation(
+          book,
+          template,
+          pagedJStempFolderAssetsPathForPDF,
+          true,
         )
 
-        const zipFilePath = await pagedArchiver(
-          `${process.cwd()}/uploads/temp/paged/${currentTime}/`,
-          `${process.cwd()}/uploads/tmp/${currentTime}/`,
+        const zippedAssetsFilename = await pagedArchiver(
+          pagedJStempFolderAssetsPathForPDF,
+          zippedTempFolderFilePath,
         )
 
-        await pdfHandler(zipFilePath, pdfAbsolutePath, `${hash}.pdf`)
-        await fs.remove(`${process.cwd()}/uploads/tmp/${currentTime}/`)
-        await fs.remove(`${process.cwd()}/uploads/temp/paged/${currentTime}/`)
+        await pdfHandler(
+          `${zippedTempFolderFilePath}/${zippedAssetsFilename}`,
+          PDFtempFolderFilePath,
+          PDFFilename,
+        )
+
+        await fs.remove(pagedJStempFolderAssetsPathForPDF)
+        await fs.remove(zippedTempFolderFilePath)
+
         // pagedjs-cli
         return {
-          path: `${resultPath}/${hash}.pdf`,
+          path: getURL(
+            path.join(
+              uploadsDir,
+              'temp',
+              'paged',
+              PDFFileTimestamp,
+              PDFFilename,
+            ),
+          ),
           validationResult: undefined,
         }
       }
 
-      const { clientPath } = await pagednation(book, template)
-      return { path: clientPath, validationResult: undefined }
+      await pagednation(book, template, pagedJStempFolderAssetsPathForPreviewer)
+
+      return {
+        path: `${assetsTimestamp}/template/${templateId}`,
+        validationResult: undefined,
+      }
     }
 
     if (fileExtension === 'icml') {
-      const { path: icmlTempFolder } = await icmlPreparation(book)
-      await icmlHandler(icmlTempFolder)
-      await fs.remove(`${icmlTempFolder}/index.html`)
+      const assetsTimestamp = `${new Date().getTime()}`
+      const zippedFileTimestamp = `${new Date().getTime() + 1}` // delay it a bit
 
-      const icmlFilePath = await icmlArchiver(
-        icmlTempFolder,
-        `${process.cwd()}/${uploadsDir}/icmls`,
+      const ICMLtempFolderAssetsPath = path.join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        uploadsDir,
+        'temp',
+        'icml',
+        assetsTimestamp,
       )
 
-      resultPath = getResultPath(icmlFilePath)
-      await fs.remove(icmlTempFolder)
+      const ICMLtempFolderFilePath = path.join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        uploadsDir,
+        'temp',
+        'icml',
+        zippedFileTimestamp,
+      )
+
+      await icmlPreparation(book, ICMLtempFolderAssetsPath)
+      await icmlHandler(ICMLtempFolderAssetsPath)
+      await fs.remove(`${ICMLtempFolderAssetsPath}/index.html`)
+
+      const filename = await icmlArchiver(
+        ICMLtempFolderAssetsPath,
+        ICMLtempFolderFilePath,
+      )
+
+      await fs.remove(ICMLtempFolderAssetsPath)
+
       return {
-        path: resultPath,
+        path: getURL(
+          path.join(uploadsDir, 'temp', 'icml', zippedFileTimestamp, filename),
+        ),
         validationResult: undefined,
       }
     }

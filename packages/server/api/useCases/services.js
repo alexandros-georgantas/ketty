@@ -210,7 +210,7 @@ const icmlHandler = async icmlTempPath => {
   })
 }
 
-const pdfHandler = async (zipPath, outputPath, filename) => {
+const pdfHandler = async (zipPath, outputPath, PDFFilename) => {
   const serviceCredential = await ServiceCredential.query().where({
     name: PAGEDJS,
   })
@@ -245,9 +245,10 @@ const pdfHandler = async (zipPath, outputPath, filename) => {
       data: form,
     })
       .then(async res => {
+        await fs.ensureDir(outputPath)
         await writeLocallyFromReadStream(
           outputPath,
-          filename,
+          PDFFilename,
           res.data,
           'binary',
         )
@@ -265,7 +266,7 @@ const pdfHandler = async (zipPath, outputPath, filename) => {
 
         if (status === 401 && msg === 'expired token') {
           await serviceHandshake(PAGEDJS)
-          return pdfHandler(zipPath, outputPath, filename)
+          return pdfHandler(zipPath, outputPath, PDFFilename)
         }
 
         return reject(
@@ -386,7 +387,7 @@ const pagedPreviewerLinkHandler = async dirPath => {
   const serverUrl = `${protocol}://${host}${port ? `:${port}` : ''}`
 
   const zipPath = await zipper(
-    path.join(`${process.cwd()}`, uploadsDir, 'temp', 'paged', dirPath),
+    path.join(`${process.cwd()}`, uploadsDir, 'temp', 'previewer', dirPath),
   )
 
   const form = new FormData()

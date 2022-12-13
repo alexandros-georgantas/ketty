@@ -4,8 +4,6 @@ const builder = require('xmlbuilder')
 const fs = require('fs-extra')
 const tidy = require('libtidy-updated')
 const mime = require('mime-types')
-const config = require('config')
-const get = require('lodash/get')
 const map = require('lodash/map')
 const filter = require('lodash/filter')
 const beautify = require('js-beautify').html
@@ -22,19 +20,15 @@ let stylesheets = []
 let fonts = []
 let xhtmls = []
 
-const createEPUBFolder = async () => {
+const createEPUBFolder = async EPUBtempFolderAssetsPath => {
   try {
     const result = {}
-    const uploadsDir = get(config, ['pubsweet-server', 'uploads'], 'uploads')
-    const currentTime = new Date().getTime()
-    const folder = `temp/epub/${currentTime}`
-    const tempPath = `${process.cwd()}/${uploadsDir}/${folder}`
-    await fs.ensureDir(tempPath)
-    result.root = tempPath
-    const metaPath = path.join(tempPath, 'META-INF')
+    await fs.ensureDir(EPUBtempFolderAssetsPath)
+    result.root = EPUBtempFolderAssetsPath
+    const metaPath = path.join(EPUBtempFolderAssetsPath, 'META-INF')
     await fs.ensureDir(metaPath)
     result.metaInf = metaPath
-    const oebpsPath = path.join(tempPath, 'OEBPS')
+    const oebpsPath = path.join(EPUBtempFolderAssetsPath, 'OEBPS')
     await fs.ensureDir(oebpsPath)
     result.oebps = oebpsPath
     const imagesPath = path.join(oebpsPath, 'Images')
@@ -560,11 +554,11 @@ const cleaner = () => {
   xhtmls = []
 }
 
-const htmlToEPUB = async (book, template) => {
+const htmlToEPUB = async (book, template, EPUBtempFolderAssetsPath) => {
   try {
     const templateFiles = await template.getFiles()
     const hasEndnotes = template.notes === 'endnotes'
-    const epubFolder = await createEPUBFolder()
+    const epubFolder = await createEPUBFolder(EPUBtempFolderAssetsPath)
 
     await createMimetype(epubFolder.root)
     await createContainer(epubFolder.metaInf)

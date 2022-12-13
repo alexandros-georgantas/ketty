@@ -1,4 +1,4 @@
-const { cron } = require('@coko/server')
+const { cron, logger } = require('@coko/server')
 const fs = require('fs-extra')
 const path = require('path')
 const config = require('config')
@@ -6,16 +6,17 @@ const config = require('config')
 const tempDirectoryCleanUp =
   JSON.parse(config.get('tempDirectoryCleanUp')) || false
 
-// const tempDirectoryCRONJobSchedule =
-//   config.get('tempDirectoryCRONJobSchedule') || '0 8 * * 0'
+// default run every one hour
 const tempDirectoryCRONJobSchedule =
-  config.get('tempDirectoryCRONJobSchedule') || '*/10 * * * * *'
+  config.get('tempDirectoryCRONJobSchedule') || '0 * * * *'
 
-// default is 8 hours
+// default is 30 minutes
 const tempDirectoryCRONJobOffset =
-  config.get('tempDirectoryCRONJobSchedule') || 1000 * 60
+  (config.get('tempDirectoryCRONJobOffset') &&
+    parseInt(config.get('tempDirectoryCRONJobOffset'), 10)) ||
+  1800000
 
-const tempRootDirectory = path.join(__dirname, '../../', 'uploads/temp')
+const tempRootDirectory = path.join(__dirname, '..', 'uploads/temp')
 
 const getTempDir = serviceSubfolder => {
   return `${tempRootDirectory}/${serviceSubfolder}`
@@ -29,30 +30,41 @@ const exportServiceDirectories = {
 }
 
 if (tempDirectoryCleanUp) {
+  logger.info(
+    `cleanup job and will be registered with params ${tempDirectoryCRONJobSchedule} and ${tempDirectoryCRONJobOffset}`,
+  )
   cron.schedule(tempDirectoryCRONJobSchedule, async () => {
     try {
+      logger.info('running cleanup job for temp files')
       const keys = Object.keys(exportServiceDirectories)
-      console.log('in cron1')
       await Promise.all(
         keys.map(async key => {
-          const subDirectories = fs.readdirSync(exportServiceDirectories[key], {
-            withFileTypes: true,
-          })
+          let subDirectories
 
-          console.log('in cron2', key)
+          if (fs.pathExistsSync(exportServiceDirectories[key])) {
+            subDirectories = fs.readdirSync(exportServiceDirectories[key])
+          }
 
-          if (subDirectories.length > 0) {
+          if (subDirectories && subDirectories.length > 0) {
+            logger.info(`found temp directories for ${key}`)
             subDirectories.forEach(subDirectory => {
-              if (subDirectory.isDirectory()) {
-                console.log('in cron3')
-
+              if (
+                fs
+                  .lstatSync(
+                    path.resolve(
+                      `${path.join(__dirname, '..', 'uploads/temp', key)}`,
+                      subDirectory,
+                    ),
+                  )
+                  .isDirectory()
+              ) {
                 const cronRunTime =
                   new Date().getTime() - tempDirectoryCRONJobOffset
 
-                if (subDirectory.name <= cronRunTime) {
-                  console.log('in cron4', cronRunTime)
+                if (subDirectory <= cronRunTime) {
+                  logger.info(`deleting sub-directory ${subDirectory}`)
                   return fs.remove(
-                    `${exportServiceDirectories[key]}/${subDirectory.name}`,
+                    `${exportServiceDirectories[key]}/${subDirectory}`,
                   )
                 }
               }
