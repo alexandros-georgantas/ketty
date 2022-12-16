@@ -8,10 +8,12 @@ WORKDIR /home/node/app
 
 COPY package.json .
 COPY ./public ./public
+COPY yarn.lock .
+
 RUN chown -R node:node .
 USER node
 
+
 RUN yarn install
-COPY yarn.lock .
 
 COPY --chown=node:node . .

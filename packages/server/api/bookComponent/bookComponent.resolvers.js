@@ -94,7 +94,7 @@ const ingestWordFile = async (_, { bookComponentFiles }, ctx) => {
       const title = filename.split('.')[0]
       const readerStream = createReadStream()
 
-      const tempFilePath = path.join(`${process.cwd()}`, 'uploads', 'tmp')
+      const tempFilePath = path.join(`${process.cwd()}`, 'uploads', 'temp')
       const randomFilename = `${crypto.randomBytes(32).toString('hex')}.docx`
       fs.ensureDir(tempFilePath)
 

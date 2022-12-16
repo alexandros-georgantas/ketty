@@ -77,6 +77,7 @@ const handleDownload = hashed => e => {
     .then(res => {
       window.location.replace(res.request.responseURL)
     })
+    .catch(err => console.error(err))
 }
 
 const getCssFile = template =>
@@ -98,7 +99,7 @@ const PagedStyler = ({
   useEffect(() => {
     async function fetchData() {
       const response = await fetch(
-        `${serverUrlWithProtocol}/uploads/paged/${hashed}/${templateFile.name}.${templateFile.extension}`,
+        `${serverUrlWithProtocol}/uploads/temp/previewer/${hashed}/${templateFile.name}.${templateFile.extension}`,
       )
 
       const file = await response.text()

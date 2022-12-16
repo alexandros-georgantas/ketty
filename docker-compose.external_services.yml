@@ -1,6 +1,18 @@
 version: '2'
 
 services:
+
+  db-app:
+    image: postgres:14-alpine
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=editoria_dev
+      - POSTGRES_DB=editoria_dev
+      - POSTGRES_PASSWORD=editoria_dev
+    volumes:
+      - ./scripts/init-pgboss.sql:/docker-entrypoint-initdb.d/init-pgboss.sql
+  
   db-epubchecker:
     image: postgres:14-alpine
     environment:

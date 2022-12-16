@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+/* eslint-disable react/prop-types,react/jsx-no-useless-fragment */
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
@@ -164,8 +164,8 @@ const DraggableItem = ({
           {headerActionComponents}
         </Wrapper>
       </Header>
-      {!externalHandler && isActive && { children }}
-      {externalHandler && active && { children }}
+      {!externalHandler && isActive && <>{children}</>}
+      {externalHandler && active && <>{children}</>}
     </Container>
   )
 }

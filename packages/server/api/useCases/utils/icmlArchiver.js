@@ -5,15 +5,17 @@ const fse = require('fs-extra')
 const crypto = require('crypto')
 const { dirContents } = require('./filesystem')
 
-const icmlArchiver = async (tempFolder, target) => {
+const icmlArchiver = async (
+  ICMLtempFolderAssetsPath,
+  ICMLtempFolderFilePath,
+) => {
   try {
-    await fse.ensureDir(target)
-    const icmlFiles = await dirContents(tempFolder)
+    await fse.ensureDir(ICMLtempFolderFilePath)
+    const icmlFiles = await dirContents(ICMLtempFolderAssetsPath)
     return new Promise((resolve, reject) => {
-      const destination = path.join(
-        target,
-        `${crypto.randomBytes(32).toString('hex')}.zip`,
-      )
+      const tempFilename = `${crypto.randomBytes(32).toString('hex')}.zip`
+
+      const destination = path.join(ICMLtempFolderFilePath, tempFilename)
 
       const output = fs.createWriteStream(destination)
       const archive = archiver('zip')
@@ -21,16 +23,20 @@ const icmlArchiver = async (tempFolder, target) => {
       archive.pipe(output)
 
       icmlFiles.forEach(item => {
-        const absoluteFilePath = path.join(tempFolder, item)
+        const absoluteFilePath = path.join(ICMLtempFolderAssetsPath, item)
         archive.append(fs.createReadStream(absoluteFilePath), { name: item })
       })
       archive.finalize()
 
       output.on('close', () => {
-        const icmlFilePath = destination.replace(`${process.cwd()}`, '');
-        resolve(icmlFilePath)
+        resolve(tempFilename)
       })
-      archive.on('error', err => reject(err))
+
+      archive.on('error', async err => {
+        await fs.remove(ICMLtempFolderAssetsPath)
+        await fs.remove(ICMLtempFolderFilePath)
+        reject(err)
+      })
     })
   } catch (e) {
     throw new Error(e)

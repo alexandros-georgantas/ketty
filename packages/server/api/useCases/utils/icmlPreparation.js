@@ -1,9 +1,6 @@
 const cheerio = require('cheerio')
 const fs = require('fs-extra')
 const path = require('path')
-const config = require('config')
-const get = require('lodash/get')
-const crypto = require('crypto')
 const mime = require('mime-types')
 const map = require('lodash/map')
 
@@ -16,15 +13,11 @@ const { generatePagedjsContainer } = require('./htmlGenerators')
 const { objectKeyExtractor } = require('../../../common')
 const { imageGatherer } = require('./gatherImages')
 
-const uploadsDir = get(config, ['pubsweet-server', 'uploads'], 'uploads')
-
-const icmlPreparation = async book => {
+const icmlPreparation = async (book, tempFolderPath) => {
   try {
     const images = []
-    const hash = crypto.randomBytes(32).toString('hex')
-    const tempDir = `${process.cwd()}/${uploadsDir}/temp`
-    const tempDestination = path.join(tempDir, `${hash}`)
-    await fs.ensureDir(tempDestination)
+
+    await fs.ensureDir(tempFolderPath)
     const gatheredImages = imageGatherer(book)
     const originalImageLinkMapper = {}
 
@@ -37,8 +30,8 @@ const icmlPreparation = async book => {
         return true
       }),
     )
-    book.divisions.forEach((division, divisionId) => {
-      division.bookComponents.forEach((bookComponent, bookComponentId) => {
+    book.divisions.forEach(division => {
+      division.bookComponents.forEach(bookComponent => {
         const { content, id } = bookComponent
         const $ = cheerio.load(content)
 
@@ -50,7 +43,7 @@ const icmlPreparation = async book => {
           const objectKey = objectKeyExtractor(url)
           const extension = path.extname(objectKey)
           const mimetype = mime.lookup(objectKey)
-          const target = `${tempDestination}/${originalImageLinkMapper[objectKey]}`
+          const target = `${tempFolderPath}/${originalImageLinkMapper[objectKey]}`
 
           images.push({
             id: constructedId,
@@ -83,15 +76,15 @@ const icmlPreparation = async book => {
       }),
     )
     const output = cheerio.load(generatePagedjsContainer(book.title))
-    book.divisions.forEach((division, divisionId) => {
-      division.bookComponents.forEach((bookComponent, bookComponentId) => {
+    book.divisions.forEach(division => {
+      division.bookComponents.forEach(bookComponent => {
         const { content } = bookComponent
         output('body').append(content)
       })
     })
 
-    await writeFile(`${tempDestination}/index.html`, output.html())
-    return { path: tempDestination, hash }
+    await writeFile(`${tempFolderPath}/index.html`, output.html())
+    return true
   } catch (e) {
     throw new Error(e)
   }
