@@ -903,7 +903,7 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                                                           <DraggableItem
                                                             active
                                                             dragHandleProps={
-                                                              provided.dragHandleProps
+                                                              providedL3.dragHandleProps
                                                             }
                                                             hasHandle={
                                                               outlineInternal[
@@ -1040,7 +1040,9 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                                   >
                                     <DraggableItem
                                       active
-                                      dragHandleProps={provided.dragHandleProps}
+                                      dragHandleProps={
+                                        providedL1.dragHandleProps
+                                      }
                                       headerActionComponents={renderTitleActions(
                                         `${bookStructure.levels[0].id}_${levelOneItem.id}`,
                                         outlineInternal.length === 1,
@@ -1324,7 +1326,7 @@ const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (
                                                                             ),
                                                                           )}
                                                                         {
-                                                                          provided.placeholder
+                                                                          providedL4.placeholder
                                                                         }
                                                                       </DraggableArea>
                                                                     )}
