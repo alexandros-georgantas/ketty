@@ -22,11 +22,11 @@ const Brand = styled(NavBarLink)`
 `
 
 const InnerContainer = styled.section`
-  display: flex;
-  justify-content: space-between;
-  flex-grow: 1;
   align-items: center;
+  display: flex;
+  flex-grow: 1;
   height: 100%;
+  justify-content: space-between;
 `
 
 const NavBar = ({ className, brand, itemsLeft, itemsRight }) => (

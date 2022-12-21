@@ -12,60 +12,60 @@ import Column from './ui/Column'
 
 const InnerWrapper = styled.div`
   display: flex;
-  width: 100%;
-  height: calc(100% - 66px);
   flex-direction: column;
+  height: calc(100% - 66px);
+  width: 100%;
 `
 
 const PartContainer = styled.div`
-  height: 50%;
-  width: 100%;
   align-items: center;
-  padding: 8px;
+  border: 1px solid black;
   display: flex;
   flex-direction: column;
+  height: 50%;
   justify-content: space-evenly;
-  border: 1px solid black;
+  padding: 8px;
+  width: 100%;
 `
 
 const WithoutPartContainer = styled.div`
-  height: 50%;
-  padding: 8px;
   align-items: center;
-  width: 100%;
   display: flex;
   flex-direction: column;
+  height: 50%;
   justify-content: space-evenly;
+  padding: 8px;
+  width: 100%;
 `
 
 const Part = styled.div`
-  width: 100%;
   text-align: center;
+  width: 100%;
 `
 
 const Chapter = styled.div`
-  display: flex;
-  width: 28%;
-  padding: 8px;
-  flex-direction: column;
-  justify-content: space-evenly;
-  height: 100%;
   align-items: center;
   background: ${th('colorPrimary')};
   color: white;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-evenly;
+  padding: 8px;
+  width: 28%;
 `
 
 const Section = styled.div`
   border: 1px solid white;
-  width: 100%;
   text-align: center;
+  width: 100%;
 `
 
 const ChaptersContainer = styled.div`
   display: flex;
-  width: 100%;
-  justify-content: space-evenly;
   height: 70%;
+  justify-content: space-evenly;
+  width: 100%;
 `
 
 const StepOne = ({ bookLevels, changeNumberOfLevels }) => (

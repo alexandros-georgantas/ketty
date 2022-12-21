@@ -22,22 +22,22 @@ const { metadataIcon, assetManagerIcon, bookExportIcon, teamManagerIcon } =
 //   overflow-y: auto;
 // `
 const Container = styled.div`
-  display: block;
   clear: both;
+  display: block;
   float: none;
+  height: 100%;
   margin: 0 auto;
   max-width: 100%;
-  height: 100%;
   overflow-y: auto;
 `
 
 const InnerWrapper = styled.div`
-  display: block;
   clear: both;
+  display: block;
   float: none;
+  height: calc(100% - 80px);
   margin: 0 auto;
   max-width: 76%;
-  height: calc(100% - 80px);
 `
 
 /* eslint-disable react/prop-types */

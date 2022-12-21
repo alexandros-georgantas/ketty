@@ -1,52 +1,49 @@
 /* eslint-disable react/prop-types */
+/* stylelint-disable string-quotes,font-family-no-missing-generic-family-keyword, font-family-name-quotes */
 import React from 'react'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
 import withLink from '../../common/src/withLink'
 
 const Container = styled.div`
-  padding: 0;
   flex-grow: 1;
-  /* padding-right: calc(${th('gridUnit')} / 2); */
-  /* flex-basis: 88%; */
   overflow-x: hidden;
   overflow-y: hidden;
+  padding: 0;
+  /* padding-right: calc(${th('gridUnit')} / 2); */
+  /* flex-basis: 88%; */
 `
 
 const Input = styled.input`
   border: 0;
-  padding: 0;
-  flex-grow: 0;
-  /* line-height: 30px; */
-  font-family: 'Vollkorn';
-  color: #3f3f3f;
-  font-size: ${th('fontSizeHeading4')};
   border-bottom: 1px solid #3f3f3f;
+  color: #3f3f3f;
+  flex-grow: 0;
+  font-family: 'Vollkorn';
+  font-size: ${th('fontSizeHeading4')};
   line-height: ${th('lineHeightHeading4')};
   outline: 0;
+  padding: 0;
+  /* line-height: 30px; */
   width: 100%;
+
   &:focus {
     border-bottom: 1px solid #0964cc;
   }
 `
 
 const Title = styled.span`
-  flex-grow: 0;
   background-color: white;
   color: #3f3f3f;
-  padding-right: ${th('gridUnit')};
+  flex-grow: 0;
   font-family: 'Vollkorn';
-  word-wrap: break-word;
-  overflow-y: hidden;
   font-size: ${th('fontSizeHeading4')};
   line-height: ${th('lineHeightHeading4')};
-  &:after {
-    float: left;
-    flex-grow: 0;
-    padding-top: 3px;
-    width: 0;
-    font-size: ${th('fontSizeBaseSmall')};
-    white-space: nowrap;
+  overflow-y: hidden;
+  padding-right: ${th('gridUnit')};
+  word-wrap: break-word;
+
+  &::after {
     content: '. . . . . . . . . . . . . . . . . . . . '
       '. . . . . . . . . . . . . . . . . . . . '
       '. . . . . . . . . . . . . . . . . . . . '
@@ -58,12 +55,20 @@ const Title = styled.span`
       '. . . . . . . . . . . . . . . . . . . . '
       '. . . . . . . . . . . . . . . . . . . . '
       '. . . . . . . . . . . . . . . . . . . . ';
+    flex-grow: 0;
+    float: left;
+    font-size: ${th('fontSizeBaseSmall')};
+    padding-top: 3px;
+    white-space: nowrap;
+    width: 0;
   }
+
   a {
     /* font-size: ${th('fontSizeHeading4')};
   line-height: ${th('lineHeightHeading4')}; */
-    text-decoration: none;
     color: #3f3f3f;
+    text-decoration: none;
+
     &:hover {
       color: #3f3f3f;
     }

@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-
+/* stylelint-disable color-function-notation,alpha-value-notation */
 import React from 'react'
 import ReactModal from 'react-modal'
 import styled, { css } from 'styled-components'
@@ -26,27 +26,27 @@ const ReactModalAdapter = ({ className, modalClassName, ...props }) => {
 }
 
 const large = css`
-  width: calc(1144px - 16px);
   height: calc(640px - 16px);
   margin: ${grid(5)} auto;
+  width: calc(1144px - 16px);
 `
 
 const largeNarrow = css`
-  width: calc(1000px - 16px);
   height: calc(640px - 16px);
   margin: ${grid(5)} auto;
+  width: calc(1000px - 16px);
 `
 
 const medium = css`
   height: calc(536px - 16px);
-  width: calc(936px - 16px);
   margin: ${grid(7)} auto;
+  width: calc(936px - 16px);
 `
 
 const small = css`
   height: calc(248px - 16px);
-  width: calc(496px - 16px);
   margin: ${grid(8)} auto;
+  width: calc(496px - 16px);
 `
 
 const StyledModal = styled(ReactModalAdapter).attrs({

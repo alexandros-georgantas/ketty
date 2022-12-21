@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types,react/no-unused-state,func-names */
+
 import React from 'react'
 import styled from 'styled-components'
 import { th, grid } from '@pubsweet/ui-toolkit'
@@ -62,6 +63,7 @@ const Input = styled.input`
     border-bottom: 1px dashed ${th('colorPrimary')};
     outline: 0;
   }
+
   &:placeholder-shown {
     font-size: ${th('fontSizeBase')};
     line-height: ${th('lineHeightBase')};
@@ -91,8 +93,8 @@ const Container = styled.div`
   align-items: flex-start;
   display: flex;
   height: 90%;
-  width: 90%;
   justify-content: space-between;
+  width: 90%;
 `
 
 const Side1 = styled.div`
@@ -116,10 +118,10 @@ const FormFieldContainer = styled.div`
 
 const FormField = styled.div`
   align-items: flex-start;
-  font-family: ${th('fontInterface')};
   display: flex;
-  width: ${({ notFull }) => (notFull ? '98%' : '100%')};
+  font-family: ${th('fontInterface')};
   margin-bottom: calc(1 * ${th('gridUnit')});
+  width: ${({ notFull }) => (notFull ? '98%' : '100%')};
 `
 
 const StyledForm = styled.form`
@@ -139,17 +141,17 @@ const Filename = styled(Text)`
 `
 
 const FileList = styled.div`
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  width: 100%;
   flex-grow: 1;
+  overflow-y: auto;
+  width: 100%;
 `
 
 const Image = styled.img`
   height: 266px;
-  width: 188px;
   margin-bottom: ${grid(1)};
+  width: 188px;
 `
 
 class TemplateModal extends React.Component {

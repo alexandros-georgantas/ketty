@@ -8,22 +8,23 @@ import { Button } from '../../../../ui'
 import FormModal from '../../../common/src/FormModal'
 
 const Input = styled.input`
-  width: 100%;
-  line-height: ${th('lineHeightBase')};
-  font-size: ${th('fontSizeBase')};
-  font-family: ${th('fontInterface')};
-  color: ${th('colorText')};
   border: 0;
-  outline: 0;
-  text-align: center;
-  margin-bottom: calc(${th('gridUnit')});
   border-bottom: 1px dashed
     ${({ errors }) => (errors.title ? th('colorError') : th('colorText'))};
+  color: ${th('colorText')};
+  font-family: ${th('fontInterface')};
+  font-size: ${th('fontSizeBase')};
+  line-height: ${th('lineHeightBase')};
+  margin-bottom: calc(${th('gridUnit')});
+  outline: 0;
+  text-align: center;
+  width: 100%;
 
   &:focus {
-    outline: 0;
     border-bottom: 1px dashed ${th('colorPrimary')};
+    outline: 0;
   }
+
   &:placeholder-shown {
     font-size: ${th('fontSizeBase')};
     line-height: ${th('lineHeightBase')};
@@ -31,28 +32,28 @@ const Input = styled.input`
 `
 
 const Text = styled.div`
-  font-family: ${th('fontInterface')};
-  text-align: center;
-  margin-bottom: ${grid(3)};
-  line-height: ${th('lineHeightBase')};
-  width: 100%;
-  font-size: ${th('fontSizeBase')};
   color: ${th('colorText')};
+  font-family: ${th('fontInterface')};
+  font-size: ${th('fontSizeBase')};
+  line-height: ${th('lineHeightBase')};
+  margin-bottom: ${grid(3)};
+  text-align: center;
+  width: 100%;
 `
 
 const Error = styled.div`
+  color: ${th('colorError')};
   font-family: ${th('fontInterface')};
-  text-align: left;
+  font-size: ${th('fontSizeBase')};
   height: ${th('lineHeightBase')};
   line-height: ${th('lineHeightBase')};
+  text-align: left;
   width: 100%;
-  font-size: ${th('fontSizeBase')};
-  color: ${th('colorError')};
 `
 
 const StyledFormik = styled(Formik)`
-  width: 100%;
   height: 100%;
+  width: 100%;
 `
 
 const StyledForm = styled.form`

@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+/* stylelint-disable string-quotes,font-family-no-missing-generic-family-keyword */
 // import { includes, some } from 'lodash'
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -19,21 +20,21 @@ const Wrapper = styled.div`
 `
 
 const TopRow = styled.div`
+  align-items: center;
+  display: flex;
   font-family: 'Fira Sans Condensed';
   font-size: 14px;
-  line-height: 16px;
-  display: flex;
-  align-items: center;
   justify-content: flex-start;
+  line-height: 16px;
   margin-left: ${({ archived }) => (archived ? '-26px' : 0)};
 `
 
 const Status = styled.span`
-  color: ${props => (props.isPublished ? '#0964CC' : '#828282')};
-  text-transform: uppercase;
-  display: inline-flex;
   align-items: center;
+  color: ${props => (props.isPublished ? '#0964CC' : '#828282')};
+  display: inline-flex;
   justify-content: center;
+  text-transform: uppercase;
 `
 
 const TopRowKey = styled.span`
@@ -66,17 +67,18 @@ const TopRowValuesWrapper = styled.div`
 `
 
 const MainRow = styled.div`
-  display: flex;
   align-items: center;
+  display: flex;
   flex-basis: 100%;
 `
 
 const ArchivedIndicator = styled.i`
   svg {
+    align-self: center;
     height: 24px;
     margin-right: 4px;
-    align-self: center;
     width: 24px;
+
     #folder {
       fill: #828282;
     }

@@ -64,10 +64,12 @@ const TableRow = styled.div`
   display: flex;
   user-select: none;
   width: 100%;
+
   &:nth-child(even) {
     background: ${({ selected }) =>
       selected ? th('colorPrimary') : th('colorBackgroundHue')};
   }
+
   &:hover {
     background: ${th('colorPrimary')};
     color: white;

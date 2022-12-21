@@ -5,18 +5,18 @@ import { th } from '@pubsweet/ui-toolkit'
 
 const Container = styled.div`
   display: flex;
-  width: 100%;
-  /* padding: 8px; */
   flex-direction: column;
   margin-bottom: 8px;
+  width: 100%;
+  /* padding: 8px; */
 `
 
 const Header = styled.div`
-  display: flex;
-  width: 100%;
   align-items: center;
-  padding-left: ${({ hasHandle }) => (hasHandle ? '0' : '38px')};
+  display: flex;
   margin-bottom: 4px;
+  padding-left: ${({ hasHandle }) => (hasHandle ? '0' : '38px')};
+  width: 100%;
 `
 // const grabIcon = (
 //   <svg
@@ -80,23 +80,26 @@ const expandIcon = (
 )
 
 const AccordionIcon = styled.div`
-  display: flex;
   align-items: center;
+  display: flex;
 `
 
 const StyledIcon = styled.i`
   height: 24px;
   padding-right: 8px;
+
   &:hover {
     svg {
       fill: ${th('colorPrimary')};
     }
   }
+
   &:active {
     svg {
       fill: ${th('colorPrimary')};
     }
   }
+
   &:focus {
     svg {
       fill: ${th('colorPrimary')};
@@ -105,9 +108,9 @@ const StyledIcon = styled.i`
 `
 
 const Wrapper = styled.div`
+  align-items: center;
   display: flex;
   flex-grow: 1;
-  align-items: center;
 `
 
 const DraggableItem = ({

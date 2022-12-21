@@ -1,4 +1,6 @@
 /* eslint-disable react/prop-types */
+/* stylelint-disable font-family-name-quotes,declaration-no-important */
+/* stylelint-disable string-quotes, font-family-no-missing-generic-family-keyword */
 import React from 'react'
 import styled from 'styled-components'
 import { th, lighten, darken } from '@pubsweet/ui-toolkit'
@@ -7,20 +9,20 @@ import DialogModal from '../../../common/src/DialogModal'
 import ModalFooter from '../../../common/src/ModalFooter'
 
 const Text = styled.div`
-  font-family: 'Fira Sans Condensed';
-  text-align: center;
-  line-height: ${th('lineHeightBase')};
-  width: 100%;
-  font-size: ${th('fontSizeBase')};
   color: #404040;
+  font-family: 'Fira Sans Condensed';
+  font-size: ${th('fontSizeBase')};
+  line-height: ${th('lineHeightBase')};
+  text-align: center;
+  width: 100%;
 `
 
 const ConfirmButton = styled.button`
   align-items: center;
-  cursor: pointer;
   background: ${th('colorPrimary')};
   border: none;
   color: white;
+  cursor: pointer;
   display: flex;
   margin-bottom: 8px;
   padding: calc(${th('gridUnit')} / 2) calc(3 * ${th('gridUnit')});
@@ -29,49 +31,54 @@ const ConfirmButton = styled.button`
     background: #ccc;
     cursor: not-allowed;
   }
+
+  &:focus {
+    background: ${darken('colorPrimary', 10)};
+    outline: 0;
+  }
+
   &:not(:disabled):hover {
     background: ${lighten('colorPrimary', 10)};
   }
+
   &:not(:disabled):active {
     background: ${darken('colorPrimary', 10)};
     border: none;
     outline: none;
-  }
-  &:focus {
-    background: ${darken('colorPrimary', 10)};
-    outline: 0;
   }
 `
 
 const CancelButton = styled.button`
   align-items: center;
-  cursor: pointer;
   background: none;
   border: none;
+  border-bottom: 1px solid ${th('colorBackground')};
   color: #828282;
+  cursor: pointer;
   display: flex;
   padding: 0;
-  border-bottom: 1px solid ${th('colorBackground')};
+
+  &:focus {
+    outline: 0;
+  }
 
   &:not(:disabled):hover {
     color: ${th('colorPrimary')};
   }
+
   &:not(:disabled):active {
     border: none;
+    border-bottom: 1px solid ${th('colorPrimary')};
     color: ${th('colorPrimary')};
     outline: none;
-    border-bottom: 1px solid ${th('colorPrimary')};
-  }
-  &:focus {
-    outline: 0;
   }
 `
 
 const Label = styled.span`
   font-family: 'Fira Sans Condensed';
   font-size: ${th('fontSizeBase')};
-  line-height: ${th('lineHeightBase')};
   font-weight: normal;
+  line-height: ${th('lineHeightBase')};
 `
 
 const Footer = props => {

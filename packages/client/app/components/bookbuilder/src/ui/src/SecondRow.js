@@ -8,12 +8,12 @@ import WorkflowList from './WorkflowList'
 import UploadFileButton from './UploadFileButton'
 
 const SecondRowContainer = styled.div`
-  display: flex;
-  padding-left: 6.7%;
-  flex-basis: 100%;
   align-items: center;
+  display: flex;
+  flex-basis: 100%;
   justify-content: space-between;
   min-height: 28px;
+  padding-left: 6.7%;
 `
 
 class SecondRow extends React.Component {

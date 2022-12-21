@@ -16,8 +16,8 @@ const DropWrapper = styled.div`
   background: white;
   margin-top: ${grid(1)};
   position: absolute;
+  right: 0;
   z-index: 202;
-  right: 0px;
 `
 
 const Dropdown = props => {

@@ -22,8 +22,8 @@ import {
 } from './helpers/helpers'
 
 const StyledColumn = styled(Column)`
-  height: 100%;
   align-items: flex-start;
+  height: 100%;
 `
 
 const DragAndDropContainer = styled(Row)`
@@ -33,9 +33,9 @@ const DragAndDropContainer = styled(Row)`
 const StyledDroppableArea = styled.div`
   height: calc(100% - 51px);
   /* border: 1px black solid; */
-  width: 100%;
   overflow-y: auto;
   padding: 8px;
+  width: 100%;
 `
 // const Padder = styled.div`
 //   padding-left: ${({ level }) => (level > 2 ? '48px' : '24px')};
@@ -63,9 +63,9 @@ const DisplayName = styled.div`
 
 const InnerWrapper = styled.div`
   display: flex;
-  width: 100%;
-  height: calc(100% - 66px);
   flex-direction: column;
+  height: calc(100% - 66px);
+  width: 100%;
 `
 
 const StepFour = ({ bookStructure, updateBookOutline, numberOfLevels }) => (

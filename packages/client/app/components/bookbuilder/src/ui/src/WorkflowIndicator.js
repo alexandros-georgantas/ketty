@@ -9,35 +9,38 @@ const mapping = {
 }
 
 const SVG = styled.svg`
-  width: 100%;
   margin: 0;
   padding: 0;
+  width: 100%;
 
   #line {
     stroke: ${({ state }) =>
       mapping[state] !== 'completed' ? '#C4C4C4' : '#4A90E2'};
   }
+
   #symbol {
-    transform: translateX(43%);
-    stroke: white;
-    stroke-width: 0.02em;
     display: ${({ state }) =>
       mapping[state] === 'started' ? 'initial' : 'none'};
-  }
-  #start {
-    left: 0;
-    stroke-width: 0.05em;
     stroke: white;
+    stroke-width: 0.02em;
+    transform: translateX(43%);
+  }
+
+  #start {
     fill: ${({ state }) =>
       mapping[state] === 'not_started' ? '#C4C4C4' : '#4A90E2'};
+    left: 0;
+    stroke: white;
+    stroke-width: 0.05em;
   }
+
   #end {
     display: ${({ withEnd }) => (withEnd ? 'initial' : 'none')};
-    transform: translateX(85%);
     fill: ${({ state }) =>
       mapping[state] !== 'completed' ? '#C4C4C4' : '#4A90E2'};
-    stroke-width: 0.05em;
     stroke: white;
+    stroke-width: 0.05em;
+    transform: translateX(85%);
   }
 `
 

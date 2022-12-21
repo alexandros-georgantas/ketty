@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types, react/destructuring-assignment */
 import React from 'react'
 import { Form } from 'formik'
 import { override } from '@pubsweet/ui-toolkit'
@@ -16,6 +17,7 @@ import { isEmpty } from 'lodash'
 const FormContainer = styled.div`
   ${override('Login.FormContainer')};
 `
+
 const SuccessText = styled.div`
   color: green;
 `
@@ -23,8 +25,10 @@ const SuccessText = styled.div`
 const Logo = styled.div`
   ${override('Login.Logo')};
 `
+
 const validateEmail = value => {
   let error
+
   if (!value) {
     error = 'Required'
   } else if (
@@ -34,11 +38,13 @@ const validateEmail = value => {
   ) {
     error = 'Invalid email address'
   }
+
   return error
 }
 
 const validateUsername = value => {
   let error
+
   if (value === 'admin') {
     error = 'Nice try!'
   } else if (value === 'null') {
@@ -46,28 +52,34 @@ const validateUsername = value => {
   } else if (!value) {
     error = 'Required'
   }
+
   return error
 }
 
 const validateNames = value => {
   let error
+
   if (value === 'null') {
     error = 'This is not a valid name'
   } else if (!value) {
     error = 'Required'
   }
+
   return error
 }
 
 const validatePassword = value => {
   let error
+
   if (!value) {
     error = 'Required'
   } else if (value.length < 8) {
     error = 'Password should be more than 7 characters'
   }
+
   return error
 }
+
 const GivenNameInput = props => (
   <TextField
     data-test-id="givenName"
@@ -76,6 +88,7 @@ const GivenNameInput = props => (
     placeholder="Given Name"
   />
 )
+
 const SurnameInput = props => (
   <TextField
     data-test-id="surname"
@@ -84,6 +97,7 @@ const SurnameInput = props => (
     placeholder="Surname"
   />
 )
+
 const UsernameInput = props => (
   <TextField
     data-test-id="username"
@@ -102,6 +116,7 @@ const EmailInput = props => (
     type="email"
   />
 )
+
 const PasswordInput = props => (
   <TextField
     data-test-id="password"

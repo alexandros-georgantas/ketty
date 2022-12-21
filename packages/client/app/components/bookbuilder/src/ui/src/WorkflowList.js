@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+/* stylelint-disable selector-type-no-unknown */
 import React from 'react'
 import { map, last, indexOf, find } from 'lodash'
 import styled from 'styled-components'
@@ -7,13 +8,15 @@ import Label from './Label'
 import WorkflowItem from './WorkflowItem'
 
 const Container = styled.div`
-  display: flex;
   align-self: flex-end;
+  display: flex;
   flex-basis: 73%;
+
   &:hover {
     ${Arrow}:not([disabled]) {
       visibility: visible;
     }
+
     ${Label} {
       visibility: visible;
     }

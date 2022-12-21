@@ -39,8 +39,8 @@ const Opener = styled.button.attrs({
 `
 
 const Value = styled.span`
-  border-right: ${th('borderWidth')} ${th('borderStyle')}
-    ${th('colorFurniture')};
+  border-right: ${`${th('borderWidth')} ${th('borderStyle')}
+    ${th('colorFurniture')}`};
   display: flex;
   flex-grow: 1;
   flex-wrap: wrap;
@@ -63,7 +63,7 @@ const MultipleValue = styled.span`
 
   button {
     margin-left: calc(${th('gridUnit')} / 2);
-    min-width: 0px;
+    min-width: 0;
     padding: calc(${th('gridUnit')} / 2);
   }
 `
@@ -313,15 +313,15 @@ class Menu extends React.Component {
                   return (
                     <Fragment>
                       {key > 0 && groupedHeader}
-                      {groupedOptions.map(groupoption => (
+                      {groupedOptions.map(groupOption => (
                         <RenderOption
                           handleKeyPress={this.handleKeyPress}
                           handleSelect={this.handleSelect}
-                          key={groupoption.value}
-                          label={groupoption.label}
+                          key={groupOption.value}
+                          label={groupOption.label}
                           multi={multi}
                           selected={selected}
-                          value={groupoption.value}
+                          value={groupOption.value}
                         />
                       ))}
                     </Fragment>
@@ -396,23 +396,23 @@ const DefaultOpener = ({
 
 Menu.propTypes = {
   /** Menu items. */
-  options: PropTypes.arrayOf(
-    PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      value: PropTypes.any.isRequired,
-    }),
-  ).isRequired,
-  /** Custom component for the selected option. */
-  renderOpener: PropTypes.oneOfType([PropTypes.func, PropTypes.element]),
-  /** Custom option component. The component will be rendered with *optionProps*. */
-  renderOption: PropTypes.oneOfType([PropTypes.func, PropTypes.element]),
-  reset: PropTypes.bool,
-  /** Optional label to be shown above the menu. */
-  label: PropTypes.string,
-  /** Placeholder until a value is selected. */
-  placeholder: PropTypes.string,
-  /** Maximum height of the options container. */
-  maxHeight: PropTypes.number,
+  // options: PropTypes.arrayOf(
+  //   PropTypes.shape({
+  //     label: PropTypes.string.isRequired,
+  //     value: PropTypes.any.isRequired,
+  //   }),
+  // ).isRequired,
+  // /** Custom component for the selected option. */
+  // renderOpener: PropTypes.oneOfType([PropTypes.func, PropTypes.element]),
+  // /** Custom option component. The component will be rendered with *optionProps*. */
+  // renderOption: PropTypes.oneOfType([PropTypes.func, PropTypes.element]),
+  // reset: PropTypes.bool,
+  // /** Optional label to be shown above the menu. */
+  // label: PropTypes.string,
+  // /** Placeholder until a value is selected. */
+  // placeholder: PropTypes.string,
+  // /** Maximum height of the options container. */
+  // maxHeight: PropTypes.number,
 }
 
 Menu.defaultProps = {

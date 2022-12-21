@@ -1,4 +1,7 @@
 /* eslint-disable */
+
+/* stylelint-disable font-family-name-quotes,declaration-no-important */
+/* stylelint-disable string-quotes, font-family-no-missing-generic-family-keyword */
 import React, { useState } from 'react'
 import styled, { css, keyframes } from 'styled-components'
 import { find, map, groupBy, forEach, findIndex } from 'lodash'
@@ -21,15 +24,16 @@ const AddTypeButton = styled(DefaultButton)`
 
 const Input = styled.input`
   border: 0;
+  border-bottom: 1px solid #3f3f3f;
+  color: #3f3f3f;
+  font-family: 'Vollkorn';
+  font-size: ${th('fontSizeHeading4')};
+  line-height: ${th('lineHeightHeading4')};
   margin: 10px;
   /* line-height: 30px; */
-  font-family: 'Vollkorn';
-  color: #3f3f3f;
-  width: 100%;
-  font-size: ${th('fontSizeHeading4')};
-  border-bottom: 1px solid #3f3f3f;
-  line-height: ${th('lineHeightHeading4')};
   outline: 0;
+  width: 100%;
+
   &:focus {
     border-bottom: 1px solid #0964cc;
   }
@@ -47,24 +51,29 @@ const triangle = css`
 `
 
 const rotate = keyframes`
-from { transform: rotate(0deg);}
-    to {  transform: rotate(360deg); } 
+  from { transform: rotate(0deg); }
+
+  to { transform: rotate(360deg); }
 `
 
 const SettingsIcon = styled.span`
   height: calc(4 * ${th('gridUnit')});
   width: calc(4 * ${th('gridUnit')});
+
   svg {
     height: auto;
 
     padding: 0;
     width: calc(4 * ${th('gridUnit')});
+
     #outer {
       stroke: ${th('colorBackground')};
     }
+
     #inner {
       fill: ${th('colorBackground')};
     }
+
     #icon {
       fill: ${th('colorFurniture')};
     }
@@ -72,33 +81,42 @@ const SettingsIcon = styled.span`
 
   &:hover {
     cursor: pointer;
+
     svg {
       #outer {
         stroke: ${th('colorBackground')};
       }
+
       #inner {
         fill: ${th('colorBackgroundHue')};
       }
+
       #icon {
         fill: ${th('colorPrimary')};
       }
     }
   }
+
   &:active {
     cursor: pointer;
+
     svg {
       animation: ${rotate} 0.9s ease-in-out;
+
       #outer {
         stroke: ${th('colorPrimary')};
       }
+
       #inner {
         fill: ${th('colorPrimary')};
       }
+
       #icon {
         fill: ${th('colorBackground')};
       }
     }
   }
+
   &:focus {
     svg {
       #outer {
@@ -143,23 +161,24 @@ const settingsIcon = (
   </svg>
 )
 const triangleLeft = css`
-  ${triangle};
   clip-path: polygon(49% 49%, 0 0, 0 100%);
+  ${triangle};
 `
 
 const triangleUp = css`
-  ${triangle};
   clip-path: polygon(0% 100%, 50% 50%, 100% 100%);
+  ${triangle};
 `
 
 const triangleOption = css`
-  ${triangleLeft};
   left: 0;
+  ${triangleLeft};
   top: 8px;
 `
 
 const Menu = styled(UIMenu)`
   display: inline-flex;
+
   div[role='listbox'] {
     background: white;
 
@@ -181,8 +200,8 @@ const Menu = styled(UIMenu)`
       width: 200px;
 
       &::before {
-        ${triangleUp}
         left: calc(50% - 15px / 2);
+        ${triangleUp}
         top: -19px;
       }
     }
@@ -227,8 +246,8 @@ const Menu = styled(UIMenu)`
 `
 
 const OpenerWrapper = styled.div`
-  display: flex;
   align-items: center;
+  display: flex;
 
   > span {
     font-family: 'Fira Sans Condensed';

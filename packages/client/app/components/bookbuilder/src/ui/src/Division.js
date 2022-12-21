@@ -1,4 +1,7 @@
 /* eslint-disable react/prop-types */
+
+/* stylelint-disable font-family-name-quotes,declaration-no-important */
+/* stylelint-disable string-quotes, font-family-no-missing-generic-family-keyword */
 import { find, map } from 'lodash'
 import React from 'react'
 import { Draggable, Droppable } from 'react-beautiful-dnd'
@@ -35,6 +38,7 @@ const HeaderContainer = styled.div`
 
 const DivisionActions = styled.div`
   display: flex;
+
   > button:not(:last-child) {
     margin-right: ${grid(1)};
   }

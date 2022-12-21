@@ -1,4 +1,6 @@
 /* eslint-disable react/prop-types */
+/* stylelint-disable font-family-name-quotes,declaration-no-important */
+/* stylelint-disable string-quotes, font-family-no-missing-generic-family-keyword */
 import { findIndex, map } from 'lodash'
 import React from 'react'
 import styled from 'styled-components'
@@ -26,7 +28,8 @@ const User = styled.span`
   overflow-y: hidden;
   padding-right: ${th('gridUnit')};
   word-wrap: break-word;
-  &:after {
+
+  &::after {
     content: '. . . . . . . . . . . . . . . . . . . . '
       '. . . . . . . . . . . . . . . . . . . . '
       '. . . . . . . . . . . . . . . . . . . . '

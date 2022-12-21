@@ -10,7 +10,7 @@ export default css`
   display: block;
   font-size: 14px;
   font-weight: normal;
-  line-height: 1.42857;
+  line-height: 1.4286;
   margin-bottom: 20px;
   padding: 6px 12px;
   text-align: center;
@@ -18,6 +18,7 @@ export default css`
   vertical-align: middle;
   white-space: nowrap;
   width: 100%;
+
   &:hover {
     background-color: #404040;
   }

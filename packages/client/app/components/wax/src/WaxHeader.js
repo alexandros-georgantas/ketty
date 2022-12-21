@@ -1,16 +1,18 @@
 /* eslint-disable react/prop-types */
+/* stylelint-disable  no-descending-specificity */
 import React from 'react'
 import { th, grid } from '@pubsweet/ui-toolkit'
 import styled, { css } from 'styled-components'
 import { NavBarLink, Icons } from '../../../ui'
 
 const StyledNavLinks = styled(NavBarLink)`
-  width: 100%;
-  display: flex;
   align-items: center;
+  display: flex;
   ${props => props.position === 'center' && center};
   ${props => props.position === 'left' && left};
   ${props => props.position === 'right' && right};
+  width: 100%;
+
   &:hover {
     svg {
       fill: ${th('colorPrimary')};
@@ -20,10 +22,10 @@ const StyledNavLinks = styled(NavBarLink)`
 `
 
 const Text = styled.div`
+  overflow: hidden;
+  text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
-  text-align: center;
-  overflow: hidden;
   width: 100%;
 `
 
@@ -40,13 +42,14 @@ const right = css`
 `
 
 const Container = styled.div`
-  display: flex;
   align-items: center;
+  display: flex;
   width: 32%;
 `
 
 const Icon = styled.span`
   margin: 0 4px;
+
   > svg {
     display: block;
   }
@@ -55,12 +58,13 @@ const Icon = styled.span`
 const { previousIcon, nextIcon } = Icons
 
 const Header = styled.div`
-  display: flex;
-  padding: ${grid(1)};
-  height: ${grid(9)};
   align-items: center;
+  display: flex;
   flex-grow: 1;
+  height: ${grid(9)};
   justify-content: center;
+  padding: ${grid(1)};
+
   > div:not(:last-child) {
     margin-right: ${grid(1)};
   }

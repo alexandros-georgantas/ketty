@@ -8,22 +8,22 @@ import TemplatesGrid from './ui/src/TemplatesGrid'
 import { Loading } from '../../../ui'
 
 const Container = styled.div`
-  display: block;
   clear: both;
+  display: block;
   float: none;
-  margin: 0 auto;
   height: 100%;
+  margin: 0 auto;
   max-width: 100%;
   overflow-y: auto;
 `
 
 const InnerWrapper = styled.div`
-  display: block;
   clear: both;
+  display: block;
   float: none;
+  height: calc(100% - 80px);
   margin: 0 auto;
   max-width: 76%;
-  height: calc(100% - 80px);
 `
 
 const Template = ({

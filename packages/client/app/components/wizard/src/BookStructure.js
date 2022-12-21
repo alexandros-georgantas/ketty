@@ -19,11 +19,11 @@ const StyledContainer = styled(Container)`
 
 const Footer = styled.div`
   align-items: center;
-  justify-content: space-between;
   display: flex;
-  width: 100%;
-  margin-top: 16px;
   height: 50px;
+  justify-content: space-between;
+  margin-top: 16px;
+  width: 100%;
 `
 
 const BookStructure = ({

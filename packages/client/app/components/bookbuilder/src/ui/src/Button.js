@@ -1,4 +1,7 @@
 /* eslint-disable react/prop-types */
+
+/* stylelint-disable font-family-name-quotes,declaration-no-important */
+/* stylelint-disable string-quotes, font-family-no-missing-generic-family-keyword */
 import React from 'react'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
@@ -7,10 +10,10 @@ const Button = styled.button`
   align-items: center;
   background: none;
   border: none;
-  display: flex;
   color: #828282;
-  padding: 0;
+  display: flex;
   font-family: 'Fira Sans Condensed' !important;
+  padding: 0;
   /* padding: calc(${th('gridUnit')} / 2); */
   svg {
     svg {
@@ -18,12 +21,13 @@ const Button = styled.button`
         fill: #828282;
       }
     }
-    width: 28px;
     height: 28px;
+    width: 28px;
   }
 
   &:disabled {
     color: ${th('colorFurniture')};
+
     svg {
       path {
         fill: ${th('colorFurniture')};
@@ -31,33 +35,37 @@ const Button = styled.button`
     }
     cursor: not-allowed !important;
     font-size: ${th('fontSizeBase')} !important;
-    line-height: ${th('lineHeightBase')} !important;
     font-style: normal !important;
     font-weight: 200 !important;
+    line-height: ${th('lineHeightBase')} !important;
+  }
+
+  &:focus {
+    outline: 0;
   }
 
   &:not(:disabled):hover {
     /* background-color: ${th('colorBackgroundHue')}; */
     color: ${th('colorPrimary')};
+
     svg {
       path {
         fill: ${th('colorPrimary')};
       }
     }
   }
+
   &:not(:disabled):active {
     /* background-color: ${th('colorFurniture')}; */
     border: none;
     color: ${th('colorPrimary')};
     outline: none;
+
     svg {
       path {
         fill: ${th('colorPrimary')};
       }
     }
-  }
-  &:focus {
-    outline: 0;
   }
 `
 

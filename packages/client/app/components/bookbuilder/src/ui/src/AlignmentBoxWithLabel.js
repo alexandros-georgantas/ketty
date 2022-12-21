@@ -1,3 +1,4 @@
+/* stylelint-disable string-quotes,font-family-no-missing-generic-family-keyword */
 /* eslint-disable react/prop-types */
 import React from 'react'
 import styled from 'styled-components'
@@ -15,8 +16,8 @@ const Label = styled.span`
   color: #828282;
   font-family: 'Fira Sans Condensed';
   font-size: ${th('fontSizeBaseSmall')};
-  line-height: ${th('lineHeightBaseSmall')};
   font-style: italic;
+  line-height: ${th('lineHeightBaseSmall')};
   margin: ${({ labelPositionRight }) =>
     labelPositionRight ? '0 0 0 10px' : '0 10px 0 0'};
   order: ${({ labelPositionRight }) => (labelPositionRight ? 2 : 0)};

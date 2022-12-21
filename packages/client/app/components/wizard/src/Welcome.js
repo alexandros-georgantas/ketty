@@ -8,14 +8,15 @@ import WizardButton from './ui/WizardButton'
 import Row from './ui/Row'
 
 const CenteredContent = styled(Content)`
-  text-align: center;
   justify-content: center;
+  text-align: center;
 `
 
 const StyledRow = styled(Row)`
-  justify-content: center;
   align-items: center;
   height: auto;
+  justify-content: center;
+
   > :first-child {
     margin-right: 16px;
   }

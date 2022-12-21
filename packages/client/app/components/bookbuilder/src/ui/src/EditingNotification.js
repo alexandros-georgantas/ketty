@@ -1,21 +1,25 @@
 /* eslint-disable react/prop-types */
+
+/* stylelint-disable font-family-name-quotes,declaration-no-important */
+/* stylelint-disable string-quotes, font-family-no-missing-generic-family-keyword */
 import React from 'react'
 
 import { Action as UIAction, ActionGroup as UIActionGroup } from '@pubsweet/ui'
 import styled, { css } from 'styled-components'
 
 const underlineFade = css`
-  &:before {
-    transition: 0.2s ease;
+  &::before {
     opacity: 0;
+    transition: 0.2s ease;
   }
 
-  &:hover:before {
+  &:hover::before {
     opacity: 1;
   }
 `
 
 const underlineAnimation = css`
+  ${underlineFade};
   position: relative;
 
   &:hover,
@@ -24,62 +28,60 @@ const underlineAnimation = css`
     text-decoration: none;
   }
 
-  &:before {
-    content: '';
+  &::before {
     background-color: #0d78f2;
     bottom: 0;
+    content: '';
     display: block;
     height: 2px;
     left: 0;
-    right: 0;
     margin: 0 8px;
     position: absolute;
+    right: 0;
     visibility: hidden;
   }
 
-  &:hover:before {
+  &:hover::before {
     visibility: visible;
   }
-
-  ${underlineFade};
 `
 
 const Action = styled(UIAction)`
+  background: none !important;
   color: #0d78f2 !important;
   font-family: 'Fira Sans Condensed' !important;
   font-size: 16px;
   font-weight: normal;
+  min-width: 51px;
   text-decoration: none !important;
   text-transform: none;
-  min-width: 51px;
   transition: 0.2s ease !important;
-  background: none !important;
+
   &:hover,
   &:focus,
   &:active {
     background: none;
-    font-weight: normal;
     color: #0d78f2;
-    text-decoration: underline;
+    font-weight: normal;
     outline: 0;
+    text-decoration: underline;
   }
 `
 
 const ActionGroup = styled(UIActionGroup)`
-  flex-basis: ${({ isToplevel }) => (isToplevel ? '9.4%' : '10%')};
   align-items: center;
-  justify-content: center;
   display: flex;
+  flex-basis: ${({ isToplevel }) => (isToplevel ? '9.4%' : '10%')};
   flex-shrink: 0;
+  justify-content: center;
   /* margin-bottom: 12px;
   margin-left: 8px; */
 
   div {
     border-right: 2px solid #aaa;
     display: inline-block;
-    padding: 0 8px;
-
     ${underlineAnimation};
+    padding: 0 8px;
   }
 
   > * {

@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+/* stylelint-disable declaration-no-important */
 import React from 'react'
 import styled from 'styled-components'
 import { Button } from '../../../../../ui'

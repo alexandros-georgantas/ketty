@@ -463,9 +463,10 @@
     stylelint-order "^5.0.0"
     stylelint-processor-styled-components "^1.10.0"
 
-"@coko/server@https://gitlab.coko.foundation/cokoapps/server.git#048144d06e5dec6c295ac265a449de3fde21e704":
-  version "1.16.0"
-  resolved "https://gitlab.coko.foundation/cokoapps/server.git#048144d06e5dec6c295ac265a449de3fde21e704"
+"@coko/server@^1.17.0":
+  version "1.17.0"
+  resolved "https://registry.yarnpkg.com/@coko/server/-/server-1.17.0.tgz#091b1aee8b45e7b8dbc16e2a94ca273362776459"
+  integrity sha512-qQmZLJCN7XimJ64w5jt+IZXgfDZGhuFyCw3SC0wvZ8DMKHHHL1GzHYFMKrxIZPWU+RrsDUw40Z689cGP3eTNKw==
   dependencies:
     "@pubsweet/base-model" "^4.0.10"
     "@pubsweet/component-send-email" "^0.4.13"

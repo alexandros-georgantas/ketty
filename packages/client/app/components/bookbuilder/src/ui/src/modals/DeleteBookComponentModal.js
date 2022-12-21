@@ -1,16 +1,18 @@
 /* eslint-disable react/prop-types */
+/* stylelint-disable font-family-name-quotes,declaration-no-important */
+/* stylelint-disable string-quotes, font-family-no-missing-generic-family-keyword */
 import React from 'react'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
 import DialogModal from '../../../../../common/src/DialogModal'
 
 const Text = styled.div`
-  font-family: 'Fira Sans Condensed';
-  text-align: center;
-  line-height: ${th('lineHeightBase')};
-  width: 100%;
-  font-size: ${th('fontSizeBase')};
   color: #404040;
+  font-family: 'Fira Sans Condensed';
+  font-size: ${th('fontSizeBase')};
+  line-height: ${th('lineHeightBase')};
+  text-align: center;
+  width: 100%;
 `
 
 const DeleteBookComponentModal = props => {

@@ -13,6 +13,7 @@ export default css`
   .ProseMirror {
     ${fontWriting}
   }
+
   .outline {
     pointer-events: none;
   }

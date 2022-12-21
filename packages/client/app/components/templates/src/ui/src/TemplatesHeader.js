@@ -13,29 +13,28 @@ const { addIcon } = Icons
 
 const HeaderWrapper = styled.div`
   align-items: center;
-  justify-content: center;
-  display: flex;
-  position: sticky;
-  justify-content: center;
   background-color: white;
+  display: flex;
   height: calc(9 * ${th('gridUnit')});
-  z-index: 1;
-  top: 0;
+  justify-content: center;
   margin-bottom: calc(1 * ${th('gridUnit')});
+  position: sticky;
+  top: 0;
+  z-index: 1;
 `
 
 const Side1 = styled.div`
   align-items: center;
-  justify-content: flex-start;
   display: flex;
   flex-basis: 50%;
+  justify-content: flex-start;
 `
 
 const Side2 = styled.div`
   align-items: center;
-  justify-content: flex-end;
   display: flex;
   flex-basis: 50%;
+  justify-content: flex-end;
 `
 
 const Title = styled(H3)`
@@ -50,8 +49,8 @@ const Title = styled(H3)`
 `
 
 const InnerWrapper = styled.div`
-  flex-basis: 76%;
   display: flex;
+  flex-basis: 76%;
 `
 
 const TemplatesHeader = props => {

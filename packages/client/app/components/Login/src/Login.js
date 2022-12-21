@@ -1,6 +1,6 @@
+/* eslint-disable react/prop-types, react/destructuring-assignment */
 import React from 'react'
-import { Redirect } from 'react-router'
-import PropTypes from 'prop-types'
+import { Redirect } from 'react-router-dom'
 import { Field } from 'formik'
 import { isEmpty } from 'lodash'
 import { override } from '@pubsweet/ui-toolkit'
@@ -18,6 +18,7 @@ import styled from 'styled-components'
 const Logo = styled.div`
   ${override('Login.Logo')};
 `
+
 Logo.displayName = 'Logo'
 
 const FormContainer = styled.div`
@@ -27,6 +28,7 @@ const FormContainer = styled.div`
 const UsernameInput = props => (
   <TextField label="Username" placeholder="Username" {...props.field} />
 )
+
 const PasswordInput = props => (
   <TextField
     label="Password"
@@ -81,14 +83,5 @@ const Login = ({
       </FormContainer>
     </CenteredColumn>
   )
-
-Login.propTypes = {
-  error: PropTypes.string,
-  actions: PropTypes.object,
-  location: PropTypes.object,
-  signup: PropTypes.bool,
-  passwordReset: PropTypes.bool,
-  logo: PropTypes.string,
-}
 
 export default Login

@@ -1,4 +1,7 @@
 /* eslint-disable react/prop-types */
+
+/* stylelint-disable font-family-name-quotes,declaration-no-important */
+/* stylelint-disable string-quotes, font-family-no-missing-generic-family-keyword */
 import React from 'react'
 import { find, indexOf } from 'lodash'
 import styled from 'styled-components'
@@ -6,8 +9,6 @@ import { th } from '@pubsweet/ui-toolkit'
 import withLink from '../../../../common/src/withLink'
 
 const Container = styled.div`
-  padding: 0;
-  padding-top: 3px;
   flex-basis: ${({ lock, isToplevel }) => {
     if (lock && !isToplevel) {
       return '83%'
@@ -17,28 +18,27 @@ const Container = styled.div`
   }};
   overflow-x: hidden;
   overflow-y: hidden;
+  padding: 0;
+  padding-top: 3px;
 `
 
 const Title = styled.span`
   background-color: white;
-  padding-right: ${th('gridUnit')};
   font-family: 'Vollkorn';
-  word-wrap: break-word;
-  overflow-y: hidden;
   font-size: ${th('fontSizeHeading3')};
   line-height: 35px;
-  &:before {
-    counter-increment: ${({ showNumber, componentType }) =>
-      showNumber ? componentType : ''};
+  overflow-y: hidden;
+  padding-right: ${th('gridUnit')};
+  word-wrap: break-word;
+
+  &::before {
     content: ${({ showNumber, componentType }) =>
       showNumber ? `counter(${componentType})". "` : ''};
+    counter-increment: ${({ showNumber, componentType }) =>
+      showNumber ? componentType : ''};
   }
-  &:after {
-    float: left;
-    padding-top: 3px;
-    font-size: ${th('fontSizeBaseSmall')};
-    width: 0;
-    white-space: nowrap;
+
+  &::after {
     content: '. . . . . . . . . . . . . . . . . . . . '
       '. . . . . . . . . . . . . . . . . . . . '
       '. . . . . . . . . . . . . . . . . . . . '
@@ -51,10 +51,17 @@ const Title = styled.span`
       '. . . . . . . . . . . . . . . . . . . . '
       '. . . . . . . . . . . . . . . . . . . . '
       '. . . . . . . . . . . . . . . . . . . . ';
+    float: left;
+    font-size: ${th('fontSizeBaseSmall')};
+    padding-top: 3px;
+    white-space: nowrap;
+    width: 0;
   }
+
   a {
-    text-decoration: none !important;
     color: ${th('colorText')} !important;
+    text-decoration: none !important;
+
     &:hover {
       color: ${th('colorText')} !important;
     }

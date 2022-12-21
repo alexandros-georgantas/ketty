@@ -1,4 +1,6 @@
 /* eslint-disable react/prop-types */
+/* stylelint-disable font-family-name-quotes,declaration-no-important,color-function-notation,alpha-value-notation */
+/* stylelint-disable string-quotes, font-family-no-missing-generic-family-keyword,no-descending-specificity */
 import React, { useContext, useState, useCallback, useEffect } from 'react'
 import styled, { css, ThemeProvider } from 'styled-components'
 import PanelGroup from 'react-panelgroup'
@@ -19,6 +21,7 @@ const divider = css`
   .panelGroup {
     background: #fff;
   }
+
   .divider {
     > div {
       background: ${th('colorBorder')};
@@ -35,17 +38,15 @@ const divider = css`
 
 const Wrapper = styled.div`
   background: ${th('colorBackground')};
-  font-family: ${th('fontInterface')};
-  font-size: ${th('fontSizeBase')};
-  line-height: 16px;
   display: flex;
   flex-direction: column;
-
+  font-family: ${th('fontInterface')};
+  font-size: ${th('fontSizeBase')};
   height: 100%;
-  width: 100%;
+  line-height: 16px;
+  ${divider};
   overflow: hidden;
-
-  ${divider}
+  width: 100%;
 `
 
 const Main = styled.div`
@@ -55,12 +56,12 @@ const Main = styled.div`
 `
 
 const TopMenu = styled.div`
+  background: ${th('colorBackgroundToolBar')};
+  border-bottom: ${th('borderWidth')} ${th('borderStyle')} ${th('colorBorder')};
+  border-top: ${th('borderWidth')} ${th('borderStyle')} ${th('colorBorder')};
   display: flex;
   min-height: 40px;
   user-select: none;
-  background: ${th('colorBackgroundToolBar')};
-  border-top: ${th('borderWidth')} ${th('borderStyle')} ${th('colorBorder')};
-  border-bottom: ${th('borderWidth')} ${th('borderStyle')} ${th('colorBorder')};
 
   > div:not(:last-child) {
     border-right: ${th('borderWidth')} ${th('borderStyle')}
@@ -82,10 +83,10 @@ const TopMenu = styled.div`
 `
 
 const SideMenu = styled.div`
-  background: ${th('colorBackgroundToolBar')}
+  background: ${th('colorBackgroundToolBar')};
   border-right: ${th('borderWidth')} ${th('borderStyle')} ${th('colorBorder')};
-  min-width: 250px;
   height: calc(100% - 16px);
+  min-width: 250px;
 `
 
 const EditorArea = styled.div`
@@ -93,19 +94,18 @@ const EditorArea = styled.div`
 `
 
 const WaxSurfaceScroll = styled.div`
-  overflow-y: auto;
-  display: flex;
   box-sizing: border-box;
+  display: flex;
   height: 100%;
-  width: 100%;
-  position: absolute;
-  /* PM styles  for main content*/
   ${EditorElements};
+  overflow-y: auto;
+  position: absolute;
+  width: 100%;
 `
 
 const EditorContainer = styled.div`
-  width: 65%;
   height: 100%;
+  width: 65%;
 
   .ProseMirror {
     box-shadow: 0 0 8px #ecedf1;
@@ -117,39 +117,39 @@ const EditorContainer = styled.div`
 const CommentsContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 35%;
   height: 100%;
+  width: 35%;
 `
 
 const CommentsContainerNotes = styled.div`
   display: flex;
   flex-direction: column;
-  width: 35%;
   height: 100%;
+  width: 35%;
 `
 
 const CommentTrackToolsContainer = styled.div`
   background: white;
   box-shadow: -5px 4px 5px -2px rgba(204, 204, 204, 0.41);
   display: flex;
-  position: fixed;
-  padding-top: 8px;
   padding-left: 8px;
+  padding-top: 8px;
+  position: fixed;
   right: 30px;
   z-index: 1;
 `
 
 const CommentTrackTools = styled.div`
-  margin-left: auto;
   display: flex;
+  margin-left: auto;
   position: relative;
   z-index: 1;
 `
 
 const CommentTrackOptions = styled.div`
+  bottom: 5px;
   display: flex;
   margin-left: 10px;
-  bottom: 5px;
   position: relative;
 `
 
@@ -157,12 +157,12 @@ const NotesAreaContainer = styled.div`
   background: #fff;
   display: flex;
   flex-direction: row;
-  width: 100%;
   height: 100%;
+  ${EditorElements};
   overflow-y: scroll;
   position: absolute;
-  /* PM styles  for note content*/
-  ${EditorElements};
+  width: 100%;
+
   .ProseMirror {
     display: inline;
   }
@@ -172,19 +172,19 @@ const NotesContainer = styled.div`
   counter-reset: footnote-view;
   display: flex;
   flex-direction: column;
-  padding-bottom: ${grid(4)};
-  padding-top: 10px;
-  padding-left: ${grid(10)};
   height: 100%;
+  padding-bottom: ${grid(4)};
+  padding-left: ${grid(10)};
+  padding-top: 10px;
   width: 65%;
 `
 
 const WaxBottomRightInfo = styled.div``
 
 const InfoContainer = styled.div`
+  bottom: 1px;
   display: flex;
   position: fixed;
-  bottom: 1px;
   right: 21px;
   z-index: 999;
 `

@@ -1,9 +1,9 @@
 import styled from 'styled-components'
 
 const DraggableItemWrapper = styled.div`
+  align-items: center;
   display: flex;
   width: 100%;
-  align-items: center;
 `
 
 export default DraggableItemWrapper

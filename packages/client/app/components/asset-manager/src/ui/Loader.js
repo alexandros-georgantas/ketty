@@ -19,15 +19,18 @@ const StyledSpinner = styled.svg`
       transform: rotate(360deg);
     }
   }
+
   @keyframes dash {
     0% {
       stroke-dasharray: 1, 150;
       stroke-dashoffset: 0;
     }
+
     50% {
       stroke-dasharray: 90, 150;
       stroke-dashoffset: -35;
     }
+
     100% {
       stroke-dasharray: 90, 150;
       stroke-dashoffset: -124;

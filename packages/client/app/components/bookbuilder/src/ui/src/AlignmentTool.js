@@ -5,10 +5,10 @@ import { find } from 'lodash'
 import AlignmentBoxWithLabel from './AlignmentBoxWithLabel'
 
 const Container = styled.div`
-  display: flex;
-  justify-content: center;
   align-items: center;
+  display: flex;
   flex-basis: ${({ isToplevel }) => (isToplevel ? '9.1%' : '9.4%')};
+  justify-content: center;
 `
 
 const Separator = styled.div`
