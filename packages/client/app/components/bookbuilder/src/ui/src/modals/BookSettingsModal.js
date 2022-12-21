@@ -11,8 +11,8 @@ import FormModal from '../../../../../common/src/FormModal'
 import { Button } from '../../../../../../ui'
 
 const StyledFormik = styled(Formik)`
-  width: 100%;
   height: 100%;
+  width: 100%;
 `
 
 const StyledForm = styled.form`

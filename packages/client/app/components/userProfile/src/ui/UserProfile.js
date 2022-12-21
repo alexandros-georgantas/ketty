@@ -13,12 +13,12 @@ import TextField from './TextField'
 import Form from './Form'
 
 const Container = styled.div`
-  display: block;
   clear: both;
+  display: block;
   float: none;
+  height: 100%;
   margin: 0 auto;
   max-width: 100%;
-  height: 100%;
 `
 
 const Title = styled(H3)`
@@ -33,31 +33,31 @@ const Title = styled(H3)`
 `
 
 const InnerWrapper = styled.div`
-  display: block;
   clear: both;
+  display: block;
   float: none;
+  height: calc(100% - 80px);
   margin: 0 auto;
   max-width: 76%;
-  height: calc(100% - 80px);
 `
 
 const HeaderWrapper = styled.div`
   align-items: center;
-  justify-content: flex-start;
-  display: flex;
-  position: sticky;
   background-color: white;
+  display: flex;
   height: calc(9 * ${th('gridUnit')});
-  z-index: 1;
-  top: 0;
+  justify-content: flex-start;
   margin-bottom: calc(1 * ${th('gridUnit')});
+  position: sticky;
+  top: 0;
+  z-index: 1;
 `
 
 const SectionWrapper = styled.div`
+  align-items: center;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  align-items: center;
   justify-content: center;
 `
 

@@ -1,3 +1,4 @@
+/* stylelint-disable declaration-no-important */
 import { css } from 'styled-components'
 
 export default css`

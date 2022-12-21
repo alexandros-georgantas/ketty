@@ -9,6 +9,7 @@ const Wrapper = styled.div`
   align-items: center;
   display: flex;
   justify-content: flex-end;
+
   > button {
     margin-right: ${grid(1)};
   }

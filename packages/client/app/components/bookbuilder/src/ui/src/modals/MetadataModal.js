@@ -1,4 +1,6 @@
 /* eslint-disable react/prop-types, react/no-unused-state */
+/* stylelint-disable font-family-name-quotes,declaration-no-important */
+/* stylelint-disable string-quotes, font-family-no-missing-generic-family-keyword */
 import React from 'react'
 import styled from 'styled-components'
 import { th, grid } from '@pubsweet/ui-toolkit'
@@ -7,29 +9,29 @@ import FormModal from '../../../../../common/src/FormModal'
 import { Button } from '../../../../../../ui'
 
 const Label = styled.label`
+  color: #757575;
+  flex-basis: 30%;
   font-family: 'Fira Sans Condensed';
-  line-height: ${th('lineHeightBase')};
   font-size: ${th('fontSizeBase')};
   justify-content: flex-end;
-  flex-basis: 30%;
-  text-align: right;
+  line-height: ${th('lineHeightBase')};
   margin-right: 18px;
-  color: #757575;
+  text-align: right;
 `
 
 const Text = styled.div`
-  font-family: ${th('fontInterface')};
-  text-align: center;
-  margin-bottom: ${grid(3)};
-  line-height: ${th('lineHeightBase')};
-  width: 100%;
-  font-size: ${th('fontSizeBase')};
   color: ${th('colorText')};
+  font-family: ${th('fontInterface')};
+  font-size: ${th('fontSizeBase')};
+  line-height: ${th('lineHeightBase')};
+  margin-bottom: ${grid(3)};
+  text-align: center;
+  width: 100%;
 `
 
 const StyledFormik = styled(Formik)`
-  width: 100%;
   height: 100%;
+  width: 100%;
 `
 
 const StyledForm = styled.form`
@@ -60,19 +62,20 @@ const Footer = styled.div`
 `
 
 const Input = styled.input`
+  border: 0;
+  border-bottom: 1px dashed ${th('colorText')};
   flex-basis: 70%;
   font-family: 'Fira Sans Condensed';
-  line-height: ${th('lineHeightBase')};
   font-size: ${th('fontSizeBase')};
-  border: 0;
-  outline: 0;
+  line-height: ${th('lineHeightBase')};
   margin-bottom: calc(${th('gridUnit')});
-  border-bottom: 1px dashed ${th('colorText')};
+  outline: 0;
 
   &:focus {
-    outline: 0;
     border-bottom: 1px dashed ${th('colorPrimary')};
+    outline: 0;
   }
+
   &:placeholder-shown {
     font-size: ${th('fontSizeBase')};
     line-height: ${th('lineHeightBase')};
@@ -80,19 +83,18 @@ const Input = styled.input`
 `
 
 const Row = styled.div`
+  align-items: center;
   display: flex;
   flex-basis: 100%;
-  align-items: center;
 `
 
 const Container = styled.div`
   display: flex;
-
-  margin: 0 auto;
   flex-direction: column;
-  width: 70%;
   font-size: 18px;
   justify-content: space-evenly;
+  margin: 0 auto;
+  width: 70%;
 `
 
 class MetadataModal extends React.Component {

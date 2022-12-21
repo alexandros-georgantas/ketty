@@ -1,4 +1,6 @@
 /* eslint-disable */
+/* stylelint-disable font-family-name-quotes,declaration-no-important */
+/* stylelint-disable string-quotes, font-family-no-missing-generic-family-keyword */
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
@@ -15,13 +17,8 @@ const Wrapper = styled.div`
 `
 export class TeamManager extends React.Component {
   render() {
-    const {
-      teams,
-      searchForUsers,
-      updateTeam,
-      rules,
-      canViewAddTeamMember,
-    } = this.props
+    const { teams, searchForUsers, updateTeam, rules, canViewAddTeamMember } =
+      this.props
 
     return (
       <Wrapper>

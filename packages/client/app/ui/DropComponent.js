@@ -7,16 +7,16 @@ import NavBarLink from './NavBarLink'
 import ActionButton from './ActionButton'
 
 const Wrapper = styled.div`
+  box-shadow: ${th('boxShadow')};
   color: ${th('colorText')};
   display: flex;
   flex-direction: column;
   font-family: ${th('fontInterface')};
   font-size: ${th('fontSizeBase')};
-  max-height: 240px;
   line-height: ${th('lineHeightBase')};
-  width: 222px;
-  box-shadow: ${th('boxShadow')};
+  max-height: 240px;
   padding: ${grid(1)};
+  width: 222px;
 `
 
 const Divider = styled.hr`
@@ -25,35 +25,35 @@ const Divider = styled.hr`
 `
 
 const MainArea = styled.div`
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  overflow-y: auto;
   width: 100%;
 `
 
 const UserSection = styled.div`
-  width: 100%;
   display: flex;
   flex-direction: column;
   padding: ${grid(0.5)};
+  width: 100%;
 `
 
 const LogoutSection = styled.div`
-  width: 100%;
   display: flex;
   flex-direction: column;
+  width: 100%;
 `
 
 const Username = styled.div`
-  width: 100%;
   font-size: ${th('fontSizeBaseSmall')};
   line-height: ${th('lineHeightBaseSmall')};
+  width: 100%;
 `
 
 const UserInfo = styled.div`
-  width: 100%;
   font-weight: bold;
+  width: 100%;
 `
 
 const DropComponent = ({

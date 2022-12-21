@@ -11,6 +11,7 @@ const Wrapper = styled.div`
   height: 10%;
   justify-content: flex-start;
   width: 100%;
+
   button:not(:last-child) {
     margin-right: ${grid(1)};
   }
@@ -27,6 +28,7 @@ const WarningAlert = styled.div`
 
 const SecondaryAction = styled.span`
   cursor: pointer;
+
   &:hover {
     text-decoration: underline;
   }

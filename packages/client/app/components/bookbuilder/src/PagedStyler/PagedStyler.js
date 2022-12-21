@@ -44,6 +44,7 @@ const CodeEditorWrapper = styled.div`
 const EditorToolbar = styled.div`
   display: flex;
   justify-content: flex-end;
+
   > button:not(:last-child) {
     margin-right: ${grid(1)};
   }
@@ -52,8 +53,10 @@ const EditorToolbar = styled.div`
 const EditorArea = styled.div`
   flex-grow: 1;
   height: 95%;
+
   .react-codemirror2 {
     height: 100%;
+
     .CodeMirror {
       height: 100%;
     }
@@ -64,6 +67,7 @@ const PreviewArea = styled.div`
   height: 100%;
   max-width: 50%;
   width: 50%;
+
   iframe {
     height: 100%;
     width: 100%;

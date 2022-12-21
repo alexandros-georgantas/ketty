@@ -7,10 +7,11 @@ import { Loading } from '../../../../../ui'
 
 const GridContainer = styled.div`
   align-items: center;
-  justify-content: flex-start;
-  flex-wrap: wrap;
   display: flex;
   flex-basis: 100%;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+
   div:nth-child(3n + 3) {
     margin-right: 0;
   }

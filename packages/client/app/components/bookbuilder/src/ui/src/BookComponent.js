@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+/* stylelint-disable selector-id-pattern */
 import React from 'react'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
@@ -23,6 +24,7 @@ const StyledButton = styled(ButtonWithoutLabel)`
       visibility: ${({ includeInTOC }) =>
         includeInTOC ? 'hidden' : 'visible'};
     }
+
     #Line_2 {
       visibility: ${({ includeInTOC }) =>
         includeInTOC ? 'hidden' : 'visible'};
@@ -33,6 +35,7 @@ const StyledButton = styled(ButtonWithoutLabel)`
     #Line {
       stroke: ${({ includeInTOC }) => (includeInTOC ? th('colorPrimary') : '')};
     }
+
     #Line_2 {
       stroke: ${({ includeInTOC }) => (includeInTOC ? 'white' : '')};
     }
@@ -40,8 +43,10 @@ const StyledButton = styled(ButtonWithoutLabel)`
 `
 
 const BookComponentContainer = styled.div`
+  background-color: white;
   display: flex;
   flex-direction: column;
+  margin-bottom: calc(3 * ${th('gridUnit')});
   padding-left: ${({ shouldIndent, componentType }) => {
     if (shouldIndent) {
       if (componentType !== 'toc') {
@@ -53,32 +58,34 @@ const BookComponentContainer = styled.div`
 
     return '0'
   }};
-  margin-bottom: calc(3 * ${th('gridUnit')});
-  background-color: white;
   width: 100%;
 `
 
 const ActionsLeft = styled.div`
+  align-items: center;
   display: flex;
   flex-basis: 7%;
-  align-items: center;
   justify-content: center;
 `
 
 const GrabIcon = styled.span`
   height: calc(4 * ${th('gridUnit')});
   width: calc(4 * ${th('gridUnit')});
+
   svg {
     height: auto;
 
     padding: 0;
     width: calc(4 * ${th('gridUnit')});
+
     #outer {
       stroke: ${th('colorBackground')};
     }
+
     #inner {
       fill: ${th('colorBackground')};
     }
+
     #drag-icon {
       fill: ${th('colorFurniture')};
     }
@@ -86,32 +93,40 @@ const GrabIcon = styled.span`
 
   &:hover {
     cursor: grab;
+
     svg {
       #outer {
         stroke: ${th('colorBackground')};
       }
+
       #inner {
         fill: ${th('colorBackgroundHue')};
       }
+
       #drag-icon {
         fill: ${th('colorPrimary')};
       }
     }
   }
+
   &:active {
     cursor: grabbing;
+
     svg {
       #outer {
         stroke: ${th('colorPrimary')};
       }
+
       #inner {
         fill: ${th('colorPrimary')};
       }
+
       #drag-icon {
         fill: ${th('colorBackground')};
       }
     }
   }
+
   &:focus {
     svg {
       #outer {

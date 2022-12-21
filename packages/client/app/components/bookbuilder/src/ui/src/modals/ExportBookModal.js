@@ -65,8 +65,10 @@ const StyledButton = styled(DefaultButton)`
   color: ${({ active }) => (active ? 'white' : '#828282')};
   justify-content: center;
   width: 100px;
+
   &:hover {
     background: ${th('colorPrimary')};
+
     div {
       color: white;
     }
@@ -81,10 +83,12 @@ const StyledSelect = styled(WrappedSelect)`
     box-shadow: none;
     outline: 0;
     width: ${({ size }) => (size === 'small' ? '60px' : '200px')};
+
     &:hover {
       border-bottom: 1px solid ${th('colorPrimary')};
     }
   }
+
   .react-select__value-container {
     color: #3f3f3f;
     font-family: ${th('fontHeading')};
@@ -94,6 +98,7 @@ const StyledSelect = styled(WrappedSelect)`
     line-height: ${th('lineHeightBase')};
     padding: 0;
   }
+
   .react-select__indicator-separator {
     display: none;
   }

@@ -5,8 +5,10 @@ import styled, { keyframes, css } from 'styled-components'
 import UploadButton from './UploadButton'
 
 const animation = keyframes`
-  0%   { opacity: 1; }
-  50%  { opacity: 0; }
+  0% { opacity: 1; }
+
+  50% { opacity: 0; }
+
   100% { opacity: 1; }
 `
 

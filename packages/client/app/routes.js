@@ -33,20 +33,22 @@ const ConnectedNavigation = Connected(Navigation)
 
 const GlobalStyle = createGlobalStyle`
   html {
-     height: 100%;
-   }
+    height: 100%;
+  }
 
-   body {
-     height: 100%;
-     overflow: hidden;
-     #root,
-  #root > div {
+  body {
     height: 100%;
+    overflow: hidden;
+
+    #root,
+    #root > div {
+      height: 100%;
+    }
+
+    #root > div > div {
+      height: 100%;
+    }
   }
-  #root > div > div {
-    height: 100%;
-  }
- }
 `
 
 // const featureBookStructureEnabled = process.env.FEATURE_BOOK_STRUCTURE || false

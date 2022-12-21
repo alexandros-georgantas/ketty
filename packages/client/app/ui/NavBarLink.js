@@ -8,14 +8,14 @@ const NavBarLink = styled(Link)`
   display: inline-block;
   font-family: ${th('fontInterface')};
   font-size: ${th('fontSizeBase')};
-  line-height: ${th('lineHeightBase')};
   font-weight: ${({ active }) => (active ? 'bold' : 'normal')};
-  text-decoration: none;
+  line-height: ${th('lineHeightBase')};
   padding: ${grid(0.5)};
+  text-decoration: none;
 
   &:hover {
-    color: ${th('colorPrimary')};
     background: ${th('colorBackgroundHue')};
+    color: ${th('colorPrimary')};
   }
 
   &:link,

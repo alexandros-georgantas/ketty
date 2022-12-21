@@ -2,28 +2,28 @@ import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
 
 const Input = styled.input`
-  flex-grow: 1;
-  line-height: ${th('lineHeightBase')};
-  font-size: ${th('fontSizeBase')};
-  font-family: ${th('fontInterface')};
-  color: ${th('colorText')};
   border: 0;
+  border-bottom: 1px dashed;
+  color: ${th('colorText')};
+  flex-grow: 1;
+  font-family: ${th('fontInterface')};
+  font-size: ${th('fontSizeBase')};
+  line-height: ${th('lineHeightBase')};
+  margin-left: 4px;
+  ${({ error }) => (error ? th('colorError') : th('colorText'))};
   outline: 0;
-  margin-left:4px;
   /* margin-bottom: calc(${th('gridUnit')}); */
-  border-bottom: 1px dashed
-  border-bottom: 1px dashed
-    ${({ error }) => (error ? th('colorError') : th('colorText'))};
 
   &:focus {
-    outline: 0;
     border-bottom: 1px dashed
       ${({ error }) => (error ? th('colorError') : th('colorPrimary'))};
+    outline: 0;
   }
+
   &:placeholder-shown {
+    color: ${({ error }) => (error ? th('colorError') : th('colorText'))};
     font-size: ${th('fontSizeBase')};
     line-height: ${th('lineHeightBase')};
-    color: ${({ error }) => (error ? th('colorError') : th('colorText'))};
   }
 `
 

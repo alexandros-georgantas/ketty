@@ -24,21 +24,21 @@ import Arrow from './Arrow'
 //   padding-right: 4px;
 // `
 const FirstRow = styled.div`
-  display: flex;
-  position: absolute;
   align-items: center;
+  display: flex;
   justify-content: center;
+  position: absolute;
   top: -22px;
   width: 104px;
 `
 
 const Container = styled.div`
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
   align-self: flex-end;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
 `
 
 const WorkflowItem = ({

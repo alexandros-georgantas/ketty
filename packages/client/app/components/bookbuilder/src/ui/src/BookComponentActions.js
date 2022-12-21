@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+/* stylelint-disable string-quotes,font-family-no-missing-generic-family-keyword,declaration-no-important */
 import { get } from 'lodash'
 import React from 'react'
 import styled, { css } from 'styled-components'
@@ -7,17 +8,18 @@ import { Action as UIAction, ActionGroup as UIActionGroup } from '@pubsweet/ui'
 import EditingNotification from './EditingNotification'
 
 const underlineFade = css`
-  &:before {
-    transition: 0.2s ease;
+  &::before {
     opacity: 0;
+    transition: 0.2s ease;
   }
 
-  &:hover:before {
+  &:hover::before {
     opacity: 1;
   }
 `
 
 const underlineAnimation = css`
+  ${underlineFade};
   position: relative;
 
   &:hover,
@@ -26,48 +28,49 @@ const underlineAnimation = css`
     text-decoration: none;
   }
 
-  &:before {
-    content: '';
+  &::before {
     background-color: #0d78f2;
     bottom: 0;
+    content: '';
     display: block;
     height: 2px;
     left: 0;
-    right: 0;
     margin: 0 8px;
     position: absolute;
+    right: 0;
     visibility: hidden;
   }
 
-  &:hover:before {
+  &:hover::before {
     visibility: visible;
   }
-
-  ${underlineFade};
 `
 
 const Action = styled(UIAction)`
+  background: none !important;
   color: #0d78f2 !important;
   font-family: 'Fira Sans Condensed' !important;
   font-size: 16px;
   font-weight: normal;
+  min-width: 51px;
   text-decoration: none !important;
   text-transform: none;
   transition: 0.2s ease !important;
-  min-width: 51px;
-  background: none !important;
+
   &:hover,
   &:focus,
   &:active {
     background: none;
-    font-weight: normal;
     color: #0d78f2;
-    text-decoration: underline;
+    font-weight: normal;
     outline: 0;
+    text-decoration: underline;
   }
 `
 
 const ActionGroup = styled(UIActionGroup)`
+  align-items: center;
+  display: flex;
   flex-basis: ${({ isToplevel, lock }) => {
     if (isToplevel) {
       if (!lock) {
@@ -79,17 +82,14 @@ const ActionGroup = styled(UIActionGroup)`
 
     return '10%'
   }};
-  align-items: center;
-  justify-content: center;
-  display: flex;
   flex-shrink: 0;
+  justify-content: center;
 
   div {
     border-right: 2px solid #aaa;
     display: inline-block;
-    padding: 0 8px;
-
     ${underlineAnimation};
+    padding: 0 8px;
   }
 
   > * {
@@ -105,9 +105,9 @@ const ActionGroup = styled(UIActionGroup)`
 `
 
 const Container = styled.div`
+  align-items: center;
   display: flex;
   flex-basis: 10%;
-  align-items: center;
   justify-content: center;
 `
 

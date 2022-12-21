@@ -1,4 +1,6 @@
 /* eslint-disable react/prop-types */
+/* stylelint-disable font-family-name-quotes,declaration-no-important */
+/* stylelint-disable string-quotes, font-family-no-missing-generic-family-keyword */
 import React from 'react'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
@@ -13,6 +15,7 @@ const HeaderContainer = styled.div`
 const Title = styled.div`
   border-bottom: calc(${th('gridUnit')} / 4) solid ${th('colorFurniture')};
   margin-bottom: calc(2 * ${th('gridUnit')});
+
   div {
     font-family: 'Vollkorn';
     font-size: ${th('fontSizeHeading2')};

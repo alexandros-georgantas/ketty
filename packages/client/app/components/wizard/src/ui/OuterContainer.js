@@ -5,9 +5,9 @@ const OuterContainer = styled.div`
   align-items: center;
   display: flex;
   height: 100%;
+  justify-content: center;
   padding: calc(2 * ${th('gridUnit')});
   width: 100%;
-  justify-content: center;
 `
 
 export default OuterContainer

@@ -2,52 +2,59 @@ import React from 'react'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
 
+/* stylelint-disable font-family-no-missing-generic-family-keyword, string-quotes */
 const Button = styled.button`
   align-items: center;
-  cursor: pointer;
   background: none;
   border: none;
+  border-bottom: 1px solid ${th('colorBackground')};
   color: #828282;
+  cursor: pointer;
   display: flex;
   padding: 0;
-  border-bottom: 1px solid ${th('colorBackground')};
+
+  &:focus {
+    outline: 0;
+  }
 
   &:not(:disabled):hover {
     color: ${th('colorPrimary')};
+
     svg {
       #circle {
         fill: ${th('colorPrimary')};
       }
+
       #cross {
         fill: ${th('colorPrimary')};
       }
     }
   }
+
   &:not(:disabled):active {
     border: none;
+    border-bottom: 1px solid ${th('colorPrimary')};
     color: ${th('colorPrimary')};
     outline: none;
-    border-bottom: 1px solid ${th('colorPrimary')};
+
     svg {
       #circle {
         fill: ${th('colorPrimary')};
       }
+
       #cross {
         fill: ${th('colorPrimary')};
       }
     }
-  }
-  &:focus {
-    outline: 0;
   }
 `
 
 const Icon = styled.i`
+  align-items: center;
+  display: flex;
   height: calc(3.5 * ${th('gridUnit')});
   /* margin: 0 ${th('gridUnit')} 0 0; */
-  display: flex;
-  align-items:center;
-  justify-content: center;  
+  justify-content: center;
   padding: 0;
   width: calc(3.5 * ${th('gridUnit')});
 `

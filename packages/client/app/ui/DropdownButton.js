@@ -5,15 +5,15 @@ import styled from 'styled-components'
 import RootButton from './RootButton'
 
 const StyledIcon = styled.i`
+  display: block;
   height: 24px;
   width: 24px;
-  display: block;
 `
 
 const StyledArrow = styled.i`
+  display: block;
   height: 18px;
   width: 18px;
-  display: block;
 `
 
 const userIcon = (

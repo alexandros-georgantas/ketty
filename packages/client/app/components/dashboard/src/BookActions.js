@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+/* stylelint-disable string-quotes,font-family-no-missing-generic-family-keyword, declaration-no-important */
 import React from 'react'
 import styled, { css } from 'styled-components'
 
@@ -6,17 +7,18 @@ import styled, { css } from 'styled-components'
 import { Action as UIAction, ActionGroup as UIActionGroup } from '@pubsweet/ui'
 
 const underlineFade = css`
-  &:before {
-    transition: 0.2s ease;
+  &::before {
     opacity: 0;
+    transition: 0.2s ease;
   }
 
-  &:hover:before {
+  &:hover::before {
     opacity: 1;
   }
 `
 
 const underlineAnimation = css`
+  ${underlineFade};
   position: relative;
 
   &:hover,
@@ -25,24 +27,22 @@ const underlineAnimation = css`
     text-decoration: none;
   }
 
-  &:before {
-    content: '';
+  &::before {
     background-color: #0d78f2;
     bottom: 0;
+    content: '';
     display: block;
     height: 2px;
     left: 0;
-    right: 0;
     margin: 0 8px;
     position: absolute;
+    right: 0;
     visibility: hidden;
   }
 
-  &:hover:before {
+  &:hover::before {
     visibility: visible;
   }
-
-  ${underlineFade};
 `
 
 const Action = styled(UIAction)`
@@ -58,10 +58,10 @@ const Action = styled(UIAction)`
   &:focus,
   &:active {
     background: none;
-    font-weight: normal;
     color: #0d78f2;
-    text-decoration: underline;
+    font-weight: normal;
     outline: 0;
+    text-decoration: underline;
   }
 `
 
@@ -77,9 +77,8 @@ const ActionGroup = styled(UIActionGroup)`
   div {
     border-right: 2px solid #aaa;
     display: inline-block;
-    padding: 0 8px;
-
     ${underlineAnimation};
+    padding: 0 8px;
   }
 
   > * {

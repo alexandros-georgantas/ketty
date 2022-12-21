@@ -19,6 +19,7 @@ const Input = styled.input`
     border-bottom: 1px dashed ${th('colorPrimary')};
     outline: 0;
   }
+
   &:placeholder-shown {
     font-size: ${th('fontSizeBase')};
     line-height: ${th('lineHeightBase')};

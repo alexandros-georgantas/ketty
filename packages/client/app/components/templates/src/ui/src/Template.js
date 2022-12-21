@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+/* stylelint-disable color-function-notation,alpha-value-notation */
 import React from 'react'
 import styled from 'styled-components'
 import { th, grid } from '@pubsweet/ui-toolkit'
@@ -7,11 +8,12 @@ import { Button } from '../../../../../ui'
 
 const ButtonsContainer = styled.div`
   display: flex;
-  visibility: hidden;
   flex-direction: column;
-  width: 100%;
   height: 100%;
   padding-top: calc(2 * ${th('gridUnit')});
+  visibility: hidden;
+  width: 100%;
+
   > button {
     margin-bottom: ${grid(2)};
   }
@@ -22,30 +24,32 @@ const StyledButton = styled(Button)`
 `
 
 const ImageContainer = styled.div`
-  height: 100%;
-  width: 188px;
-  background-size: contain;
-  margin-right: calc(3 * ${th('gridUnit')});
   background-repeat: no-repeat;
+  background-size: contain;
+  height: 100%;
+  margin-right: calc(3 * ${th('gridUnit')});
   ${({ thumbnail, color }) =>
     thumbnail
       ? `background-image: url(${thumbnail.source})`
       : `background: ${color}`}
+  width: 188px;
 `
 
 const Container = styled.div`
   align-items: flex-start;
-  justify-content: flex-start;
-  position: relative;
-  margin-right: calc(1.5 * ${th('gridUnit')});
   display: flex;
   flex-basis: 32.3%;
   height: 282px;
+  justify-content: flex-start;
   margin-bottom: calc(3 * ${th('gridUnit')});
+  margin-right: calc(1.5 * ${th('gridUnit')});
+  position: relative;
+
   &:hover {
     ${ButtonsContainer} {
       visibility: visible;
     }
+
     ${ImageContainer} {
       box-shadow: inset 0 0 0 1000px rgba(9, 100, 204, 0.7);
     }
@@ -56,9 +60,9 @@ const Container = styled.div`
 
 const InfoContainer = styled.div`
   display: flex;
-  padding-top: calc(1 * ${th('gridUnit')});
   flex-direction: column;
   max-width: 140px;
+  padding-top: calc(1 * ${th('gridUnit')});
 `
 
 const Row = styled.div`

@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types,jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
+/* stylelint-disable string-quotes,font-family-no-missing-generic-family-keyword */
 import React from 'react'
 import styled, { css } from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
@@ -19,18 +20,18 @@ const triangle = css`
 `
 
 const triangleLeft = css`
-  ${triangle};
   clip-path: polygon(49% 49%, 0 0, 0 100%);
+  ${triangle};
 `
 
 const triangleUp = css`
-  ${triangle};
   clip-path: polygon(0% 100%, 50% 50%, 100% 100%);
+  ${triangle};
 `
 
 const triangleOption = css`
-  ${triangleLeft};
   left: 0;
+  ${triangleLeft};
   top: 8px;
 `
 
@@ -52,25 +53,25 @@ const Menu = styled(UIMenu)`
       border: 1px solid #666;
       box-shadow: 0 2px 10px #666;
       margin-top: 16px;
-      position: relative;
       overflow-y: unset;
+      position: relative;
       text-transform: uppercase;
       width: 100px;
 
       &::before {
-        ${triangleUp}
         left: calc(50% - 15px / 2);
+        ${triangleUp}
         top: -19px;
       }
     }
 
     div[role='option'] {
+      color: ${th('colorText')};
       cursor: pointer;
       font-family: 'Fira Sans Condensed';
-      padding: 4px 4px 4px 12px;
       font-size: ${th('fontSizeBase')};
       line-height: ${th('lineHeightBase')};
-      color: ${th('colorText')};
+      padding: 4px 4px 4px 12px;
       position: relative;
 
       &::selection {
@@ -107,19 +108,19 @@ const Menu = styled(UIMenu)`
 `
 
 const OpenerWrapper = styled.div`
-  display: flex;
   align-items: center;
+  display: flex;
   font-size: ${th('fontSizeBase')};
   line-height: ${th('lineHeightBase')};
 
   > span {
+    color: ${th('colorText')};
     font-family: 'Fira Sans Condensed';
     text-transform: uppercase;
-    color: ${th('colorText')};
 
     span {
-      cursor: pointer;
       color: ${th('colorText')};
+      cursor: pointer;
       font-weight: bold;
     }
   }

@@ -14,8 +14,8 @@ const Header = styled.div`
 const HeaderText = styled.div`
   color: ${th('colorText')};
   display: inline-block;
-  line-height: ${th('lineHeightBase')};
   font-size: ${th('fontSizeBase')};
+  line-height: ${th('lineHeightBase')};
 `
 
 const ModalHeader = props => {
