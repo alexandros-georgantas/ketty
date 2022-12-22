@@ -246,7 +246,7 @@ class Menu extends React.Component {
     this.wrapperRef = node
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.value !== this.props.value) {
       this.setState({ selected: nextProps.value })
     }
