@@ -146,7 +146,7 @@ services:
       - POSTGRES_PORT=5432
       - SERVER_PORT=${SERVICE_PAGEDJS_PORT:-3003}
       - NODE_ENV=development
-      - PUBLIC_URL=${PAGEDJS_PUBLIC_URL:-http://localhost:3003}
+      - PUBLIC_URL=http://192.168.10.6:3003
     security_opt:
       - seccomp:unconfined
     entrypoint:
