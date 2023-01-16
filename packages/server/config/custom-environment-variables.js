@@ -24,6 +24,11 @@ module.exports = {
     secret: 'PUBSWEET_SECRET',
     serveClient: 'SERVER_SERVE_CLIENT',
     externalServerURL: 'EXTERNAL_SERVER_URL',
+    publicURL: 'EXTERNAL_SERVER_URL',
+    WSServerPort: 'WS_SERVER_PORT',
+    wsHeartbeatInterval: 'WS_HEARTBEAT_INTERVAL',
+    // useWebSockets: 'USE_WEB_SOCKETS',
+    // websocketPaths: 'WEB_SOCKET_PATHS',
     db: {
       user: 'POSTGRES_USER',
       password: 'POSTGRES_PASSWORD',

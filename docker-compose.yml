@@ -94,6 +94,10 @@ services:
         '--',
         'api',
         '--',
+        'services',
+        '--',
+        'utils',
+        '--',
         'data-model',
         '--',
         'file-server',
@@ -108,12 +112,15 @@ services:
       ]
     ports:
       - ${SERVER_PORT:-3000}:${SERVER_PORT:-3000}
+      - ${WS_SERVER_PORT:-3333}:${WS_SERVER_PORT:-3333}
     environment:
       - NODE_ENV=development
       - EDITORIA_FLAVOUR=${EDITORIA_FLAVOUR:-VANILLA}
       - PUBSWEET_SECRET=${PUBSWEET_SECRET:-dev_secret}
       - EXTERNAL_SERVER_URL=${EXTERNAL_SERVER_URL:-http://server:3000}
       - SERVER_SERVE_CLIENT=false
+      # - USE_WEB_SOCKETS=true
+      # - WEB_SOCKET_PATHS=locks
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
       - POSTGRES_DB=${POSTGRES_DB:-editoria_dev}
@@ -127,6 +134,8 @@ services:
       - SERVER_PORT=${SERVER_PORT:-3000}
       - SERVER_HOST=${SERVER_HOST:-localhost}
       - SERVER_PROTOCOL=${SERVER_PROTOCOL:-http}
+      - WS_SERVER_PORT=${WS_SERVER_PORT:-8586}
+      - WS_HEARTBEAT_INTERVAL=${WS_HEARTBEAT_INTERVAL:-10000}
       - CLIENT_PROTOCOL=${CLIENT_PROTOCOL:-http}
       - CLIENT_HOST=${CLIENT_HOST:-0.0.0.0}
       - CLIENT_PORT=${CLIENT_PORT:-4000}
@@ -173,12 +182,14 @@ services:
       - ./packages/server/config:/home/node/editoria/config
       - ./packages/server/api:/home/node/editoria/api
       - ./packages/server/services:/home/node/editoria/services
+      - ./packages/server/utils:/home/node/editoria/utils
       - ./packages/server/data-model:/home/node/editoria/data-model
       - ./packages/server/file-server:/home/node/editoria/file-server
       - ./packages/server/scripts:/home/node/editoria/scripts
       - ./packages/server/common:/home/node/editoria/common
       - ./packages/server/app.js:/home/node/editoria/app.js
       - ./packages/server/startServer.js:/home/node/editoria/startServer.js
+      - ./packages/server/startWebSocketServer.js:/home/node/editoria/startWebSocketServer.js
 
   epubchecker:
     depends_on:

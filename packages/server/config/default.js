@@ -105,6 +105,8 @@ module.exports = {
     cron: {
       path: path.join(__dirname, '..', 'services', 'tempCleanUp.cron.js'),
     },
+    // useWebSockets: true,
+    // websocketPaths: 'locks',
   },
   'file-server': {
     accessKeyId: 'S3_ACCESS_KEY_ID_USER',

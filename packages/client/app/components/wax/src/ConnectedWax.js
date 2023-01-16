@@ -1,298 +1,43 @@
-/* eslint-disable no-console */
-/* eslint-disable react/prop-types */
-import React from 'react'
-import { get, sortBy, isEmpty } from 'lodash'
-import { adopt } from 'react-adopt'
-import config from 'config'
+import React, { useState, useCallback, useEffect } from 'react'
+import useWebSocket, { ReadyState } from 'react-use-websocket'
+// import useWebSocket, { ReadyState } from 'react-use-websocket'
+// import config from 'config'
 import { withRouter } from 'react-router-dom'
-import withModal from '../../common/src/withModal'
-import { Loading } from '../../../ui'
+// import WebSocket from 'isomorphic-ws'
 
-import WaxPubsweet from './WaxPubsweet'
-import {
-  getBookComponentQuery,
-  getCustomTagsQuery,
-  getWaxRulesQuery,
-  getUserTeamsQuery,
-  getSpecificFilesQuery,
-  spellCheckerQuery,
-  updateCustomTagMutation,
-  addCustomTagMutation,
-  updateBookComponentContentMutation,
-  updateBookComponentTrackChangesMutation,
-  renameBookComponentMutation,
-  lockBookComponentMutation,
-  unlockBookComponentMutation,
-  uploadFileMutation,
-  trackChangeSubscription,
-  lockChangeSubscription,
-  orderChangeSubscription,
-  customTagsSubscription,
-  workflowChangeSubscription,
-  unlockedByAdminSubscription,
-  teamMembersChangeSubscription,
-} from './queries'
+const ConnectedWax = () => {
+  const token = localStorage.getItem('token')
+  const socketUrl = 'ws://192.168.10.6:8586/locks'
 
-const mapper = {
-  getBookComponentQuery,
-  getCustomTagsQuery,
-  getWaxRulesQuery,
-  getUserTeamsQuery,
-  getSpecificFilesQuery,
-  spellCheckerQuery,
-  trackChangeSubscription,
-  lockChangeSubscription,
-  orderChangeSubscription,
-  customTagsSubscription,
-  workflowChangeSubscription,
-  unlockedByAdminSubscription,
-  teamMembersChangeSubscription,
-  updateCustomTagMutation,
-  addCustomTagMutation,
-  updateBookComponentContentMutation,
-  updateBookComponentTrackChangesMutation,
-  lockBookComponentMutation,
-  unlockBookComponentMutation,
-  uploadFileMutation,
-  renameBookComponentMutation,
-  withModal,
+  const {
+    sendMessage,
+    sendJsonMessage,
+    lastMessage,
+    lastJsonMessage,
+    readyState,
+    getWebSocket,
+  } = useWebSocket(socketUrl, {
+    onOpen: () => console.log('opened'),
+    onClose: () => console.log('closed'),
+    onMessage: msg => console.log('onMessage', msg),
+    onError: err => console.log('err', err),
+    onReconnectStop: number => console.log('onReconnectStop', number),
+    shouldReconnect: closeEvent => true,
+    queryParams: { token },
+  })
+
+  const connectionStatus = {
+    [ReadyState.CONNECTING]: 'Connecting',
+    [ReadyState.OPEN]: 'Open',
+    [ReadyState.CLOSING]: 'Closing',
+    [ReadyState.CLOSED]: 'Closed',
+    [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+  }[readyState]
+
+  console.log('status', connectionStatus)
+  console.log('ws', getWebSocket())
+
+  return <div>Hello ws</div>
 }
 
-// bug
-const getUserWithColor = (teams = []) => {
-  const team =
-    sortBy(config.authsome.teams, ['weight']).find(teamConfig =>
-      teams.some(t => t.role === teamConfig.role),
-    ) || {}
-
-  if (!isEmpty(team)) {
-    return team.color
-  }
-
-  return {
-    addition: 'royalblue',
-    deletion: 'indianred',
-  }
-}
-
-const mapProps = args => ({
-  rules: get(args.getWaxRulesQuery, 'data.getWaxRules'),
-  tags: get(args.getCustomTagsQuery, 'data.getCustomTags'),
-  bookComponent: get(args.getBookComponentQuery, 'data.getBookComponent'),
-  teams: get(args.getUserTeamsQuery, 'data.teams'),
-  updateTags: args.updateCustomTagMutation.updateCustomTag,
-  addCustomTags: args.addCustomTagMutation.addCustomTag,
-  updateBookComponentContent:
-    args.updateBookComponentContentMutation.updateContent,
-  updateBookComponentTrackChanges:
-    args.updateBookComponentTrackChangesMutation.updateTrackChanges,
-  uploadFile: args.uploadFileMutation.uploadFile,
-  renameBookComponent: args.renameBookComponentMutation.renameBookComponent,
-  lockBookComponent: args.lockBookComponentMutation.lockBookComponent,
-  unlockBookComponent: args.unlockBookComponentMutation.unlockBookComponent,
-  lockTrigger: get(
-    args.unlockedByAdminSubscription.unlocked,
-    'data.bookComponentUnlockedByAdmin',
-  ),
-  workflowTrigger: get(
-    args.workflowChangeSubscription.workflowUpdated,
-    'data.bookComponentWorkflowUpdated',
-  ),
-  onAssetManager: bookId =>
-    new Promise((resolve, reject) => {
-      const { withModal: withModalFromArgs } = args
-
-      const { showModal, hideModal } = withModalFromArgs
-
-      const handleImport = async selectedFileIds => {
-        const {
-          getSpecificFilesQuery: { client, query },
-        } = args
-
-        const { data } = await client.query({
-          query,
-          variables: { ids: selectedFileIds },
-        })
-
-        const { getSpecificFiles } = data
-
-        hideModal()
-        resolve(getSpecificFiles)
-      }
-
-      showModal('assetManagerEditor', {
-        bookId,
-        withImport: true,
-        handleImport,
-      })
-    }),
-  onUnlocked: (warning, handler) => {
-    const { withModal: withModalFromArgs } = args
-    const { showModal, hideModal } = withModalFromArgs
-
-    const onClick = () => {
-      handler()
-      hideModal()
-    }
-
-    showModal('unlockedModal', {
-      onConfirm: onClick,
-      warning,
-    })
-  },
-  onWarning: (warning, handler) => {
-    const { withModal: withModalFromArgs } = args
-    const { showModal, hideModal } = withModalFromArgs
-
-    const onClick = () => {
-      handler()
-      hideModal()
-    }
-
-    showModal('unlockedModal', {
-      onConfirm: onClick,
-      warning,
-    })
-  },
-  loading: args.getBookComponentQuery.networkStatus === 1,
-  waxLoading: args.getWaxRulesQuery.networkStatus === 1,
-  teamsLoading: args.getUserTeamsQuery.networkStatus === 1,
-  tagsLoading: args.getCustomTagsQuery.networkStatus === 1,
-  refetching:
-    args.getBookComponentQuery.networkStatus === 4 ||
-    args.getBookComponentQuery.networkStatus === 2, // possible apollo bug
-})
-
-const Composed = adopt(mapper, mapProps)
-
-const Connected = props => {
-  const { match, history, currentUser } = props
-  const { bookId, bookComponentId, mode } = match.params
-
-  return (
-    <Composed
-      bookComponentId={bookComponentId}
-      bookId={bookId}
-      currentUser={currentUser}
-    >
-      {({
-        bookComponent,
-        tags,
-        onAssetManager,
-        onUnlocked,
-        onWarning,
-        rules,
-        teams,
-        updateTags,
-        addCustomTags,
-        updateBookComponentContent,
-        updateBookComponentTrackChanges,
-        uploadFile,
-        unlockBookComponent,
-        lockBookComponent,
-        renameBookComponent,
-        loading,
-        waxLoading,
-        teamsLoading,
-        tagsLoading,
-        refetching,
-        lockTrigger,
-        workflowTrigger,
-      }) => {
-        const user = {
-          ...currentUser,
-          userColor: getUserWithColor(teams),
-          userId: currentUser.id,
-        }
-
-        if (
-          loading ||
-          waxLoading ||
-          teamsLoading ||
-          tagsLoading ||
-          !rules ||
-          !bookComponent
-        )
-          return <Loading />
-
-        let editing
-
-        const {
-          componentType,
-          divisionType,
-          id,
-          content,
-          trackChangesEnabled,
-          componentTypeOrder,
-          nextBookComponent,
-          prevBookComponent,
-          bookTitle,
-          title,
-          lock,
-          workflowStages,
-          uploading,
-          bookStructureElements,
-        } = bookComponent
-
-        if (lock && lock.userId !== user.id) {
-          editing = 'preview'
-        } else if (rules.canEditPreview) {
-          editing = 'preview'
-        } else if (rules.canEditFull) {
-          editing = 'full'
-        } else if (rules.canEditSelection) {
-          editing = 'selection'
-        } else if (rules.canEditReview) {
-          editing = 'review'
-        }
-
-        if (mode && mode === 'preview') {
-          editing = 'preview'
-        }
-
-        return (
-          <WaxPubsweet
-            addCustomTags={addCustomTags}
-            bookComponentId={id}
-            bookId={bookId}
-            bookStructureElements={bookStructureElements}
-            bookTitle={bookTitle}
-            componentType={componentType}
-            componentTypeOrder={componentTypeOrder}
-            content={content}
-            divisionType={divisionType}
-            editing={editing}
-            history={history}
-            key={id}
-            loading={loading}
-            lock={lock}
-            lockBookComponent={lockBookComponent}
-            lockTrigger={lockTrigger}
-            nextBookComponent={nextBookComponent}
-            onAssetManager={onAssetManager}
-            onUnlocked={onUnlocked}
-            onWarning={onWarning}
-            prevBookComponent={prevBookComponent}
-            renameBookComponent={renameBookComponent}
-            rules={rules}
-            tags={tags}
-            teamsLoading={teamsLoading}
-            title={title}
-            trackChangesEnabled={trackChangesEnabled}
-            unlockBookComponent={unlockBookComponent}
-            updateBookComponentContent={updateBookComponentContent}
-            updateBookComponentTrackChanges={updateBookComponentTrackChanges}
-            updateCustomTags={updateTags}
-            uploading={uploading}
-            user={user}
-            waxLoading={waxLoading}
-            workflowStages={workflowStages}
-            workflowTrigger={workflowTrigger}
-          />
-        )
-      }}
-    </Composed>
-  )
-}
-
-export default withRouter(Connected)
+export default withRouter(ConnectedWax)

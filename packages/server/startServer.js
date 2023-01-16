@@ -1,14 +1,18 @@
+const { startServer, logger } = require('@coko/server')
+
 const config = require('config')
 const get = require('lodash/get')
 const findIndex = require('lodash/findIndex')
 const axios = require('axios')
-const { startServer } = require('@coko/server')
-const { ServiceCredential } = require('./data-model/src').models
 
 const scripts = config.get('export.scripts')
 const services = config.get('services')
 
-const serviceHandshake = async (which) => {
+const { ServiceCredential } = require('./data-model/src').models
+
+const { startWSServer } = require('./startWebSocketServer')
+
+const serviceHandshake = async which => {
   if (!services) {
     throw new Error('services are undefined')
   }
@@ -51,7 +55,7 @@ const serviceHandshake = async (which) => {
         })
         resolve()
       })
-      .catch((err) => {
+      .catch(err => {
         const { response } = err
 
         if (!response) {
@@ -71,12 +75,15 @@ const init = async () => {
   try {
     await startServer()
 
+    logger.info('starting WebSockets server')
+    await startWSServer()
+
     const serviceCredentials = await ServiceCredential.query()
 
     if (serviceCredentials.length < Object.keys(services).length) {
       const serviceNames = Object.keys(services)
       await Promise.all(
-        serviceNames.map((name) => {
+        serviceNames.map(name => {
           if (findIndex(serviceCredentials, { name }) === -1) {
             return serviceHandshake(name)
           }
