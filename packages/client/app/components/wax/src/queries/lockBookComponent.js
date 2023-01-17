@@ -1,5 +1,5 @@
-import React from 'react'
-import { Mutation } from '@apollo/client/react/components'
+// import React from 'react'
+// import { Mutation } from '@apollo/client/react/components'
 import { gql } from '@apollo/client'
 
 const LOCK_BOOK_COMPONENT = gql`
@@ -19,16 +19,16 @@ const LOCK_BOOK_COMPONENT = gql`
   }
 `
 
-const lockBookComponentMutation = props => {
-  const { render } = props
+// const lockBookComponentMutation = props => {
+//   const { render } = props
 
-  return (
-    <Mutation mutation={LOCK_BOOK_COMPONENT}>
-      {(lockBookComponent, lockBookComponentResult) =>
-        render({ lockBookComponent, lockBookComponentResult })
-      }
-    </Mutation>
-  )
-}
+//   return (
+//     <Mutation mutation={LOCK_BOOK_COMPONENT}>
+//       {(lockBookComponent, lockBookComponentResult) =>
+//         render({ lockBookComponent, lockBookComponentResult })
+//       }
+//     </Mutation>
+//   )
+// }
 
-export default lockBookComponentMutation
+export default LOCK_BOOK_COMPONENT

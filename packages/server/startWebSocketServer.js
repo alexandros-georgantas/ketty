@@ -36,7 +36,7 @@ const startWSServer = async () => {
     // WS_SERVER EVENT LISTENERS SECTION
     WSServer.on('connection', async (ws, req) => {
       await establishConnection(ws, req)
-
+      console.log('OPEEEEEEEEEEEEENNNNNNNNNNNNNN')
       // INITIALIZATION SECTION
       ws.isAlive = true
       // INITIALIZATION SECTION END
@@ -44,14 +44,14 @@ const startWSServer = async () => {
       // WS EVENT LISTENERS SECTION
       ws.on('pong', () => heartbeat(ws))
 
-      ws.on('open', () => {
-        // console.log('open')
-      })
+      // ws.on('open', () => {
+      //   console.log('OPEEEEEEEEEEEEENNNNNNNNNNNNNN')
+      // })
       ws.on('message', data => {
         // console.log('ondata')
       })
       ws.on('close', data => {
-        console.log('onclose', data)
+        console.log('ONNNNNNN_CLOSEEEEEEEEEEEEEEEEE', data)
       })
       // WS EVENT LISTENERS SECTION END
     })

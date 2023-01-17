@@ -28,11 +28,6 @@ const initializeHeartbeat = async (WSServer, brokenConnectionHandler) => {
   try {
     return setInterval(() => {
       WSServer.clients.forEach(ws => {
-        console.log('client', WSServer.clients.size)
-        console.log('isAlive', ws.isAlive)
-        // logger.info('ws heartbeat')
-        // console.log('here1')
-
         if (ws.isAlive === false) {
           logger.info('ws broken')
           // console.log('broken connection')
@@ -40,9 +35,8 @@ const initializeHeartbeat = async (WSServer, brokenConnectionHandler) => {
           return brokenConnectionHandler()
         }
 
-        console.log('isAliveAfter')
         ws.isAlive = false
-        console.log('isAliveAfter', ws.isAlive)
+
         return ws.ping()
       })
     }, config['pubsweet-server'].wsHeartbeatInterval || 5000)

@@ -1,5 +1,3 @@
-import React from 'react'
-import { Mutation } from '@apollo/client/react/components'
 import { gql } from '@apollo/client'
 
 const ADD_CUSTOM_TAG = gql`
@@ -12,14 +10,14 @@ const ADD_CUSTOM_TAG = gql`
   }
 `
 
-const addCustomTagMutation = props => {
-  const { render } = props
+// const addCustomTagMutation = props => {
+//   const { render } = props
 
-  return (
-    <Mutation mutation={ADD_CUSTOM_TAG}>
-      {addCustomTag => render({ addCustomTag })}
-    </Mutation>
-  )
-}
+//   return (
+//     <Mutation mutation={ADD_CUSTOM_TAG}>
+//       {addCustomTag => render({ addCustomTag })}
+//     </Mutation>
+//   )
+// }
 
-export default addCustomTagMutation
+export default ADD_CUSTOM_TAG

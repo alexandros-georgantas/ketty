@@ -14,13 +14,13 @@ const WaxContainer = styled.div`
 `
 
 const handleUnlock = (id, unlockBookComponent, setLocked) => {
-  unlockBookComponent({
-    variables: {
-      input: {
-        id,
-      },
-    },
-  })
+  // unlockBookComponent({
+  //   variables: {
+  //     input: {
+  //       id,
+  //     },
+  //   },
+  // })
 }
 
 const handleLock = (id, lockBookComponent, setLocked) => {
@@ -324,7 +324,7 @@ const Editoria = ({
     window.addEventListener('beforeunload', onUnload)
 
     if (!isReadOnly) {
-      handleLock(bookComponentId, lockBookComponent)
+      // handleLock(bookComponentId, lockBookComponent)
     }
 
     return () => {
