@@ -1,6 +1,121 @@
-// import React from 'react'
-// import { Subscription } from '@apollo/client/react/components'
 import { gql } from '@apollo/client'
+
+const featureBookStructureEnabled =
+  (process.env.FEATURE_BOOK_STRUCTURE &&
+    JSON.parse(process.env.FEATURE_BOOK_STRUCTURE)) ||
+  false
+
+const BOOK_COMPONENT_UPDATED_SUBSCRIPTION = !featureBookStructureEnabled
+  ? gql`
+      subscription BookComponentUpdated($id: ID!) {
+        bookComponentUpdated(id: $id) {
+          id
+          divisionId
+          divisionType
+          bookTitle
+          title
+          bookId
+          hasContent
+          componentTypeOrder
+          uploading
+          componentType
+          trackChangesEnabled
+          status
+          workflowStages {
+            label
+            type
+            value
+          }
+          lock {
+            userId
+            username
+            created
+            givenName
+            tabId
+            isAdmin
+            surname
+            id
+          }
+          nextBookComponent {
+            id
+            title
+            bookId
+            lock {
+              id
+            }
+          }
+          prevBookComponent {
+            id
+            title
+            bookId
+            lock {
+              id
+            }
+          }
+          content
+        }
+      }
+    `
+  : gql`
+      subscription BookComponentUpdated($id: ID!) {
+        bookComponentUpdated(id: $id) {
+          id
+          divisionId
+          divisionType
+          bookTitle
+          title
+          bookId
+          hasContent
+          bookStructureElements {
+            groupHeader
+            items {
+              displayName
+              headingLevel
+              className
+              nestedHeadingLevel
+              isSection
+            }
+          }
+          componentTypeOrder
+          uploading
+          componentType
+          trackChangesEnabled
+          status
+          workflowStages {
+            label
+            type
+            value
+          }
+          lock {
+            userId
+            username
+            tabId
+            created
+            givenName
+            isAdmin
+            surname
+            id
+          }
+          nextBookComponent {
+            id
+            title
+            bookId
+            lock {
+              id
+            }
+          }
+          prevBookComponent {
+            id
+            title
+            bookId
+            lock {
+              id
+            }
+          }
+          content
+        }
+      }
+    `
 
 const BOOK_COMPONENT_TRACK_CHANGES_UPDATED_SUBSCRIPTION = gql`
   subscription BookComponentTrackChangesUpdated {
@@ -273,6 +388,7 @@ const BOOK_COMPONENT_TITLE_UPDATED_SUBSCRIPTION = gql`
 // }
 
 export {
+  BOOK_COMPONENT_UPDATED_SUBSCRIPTION,
   BOOK_COMPONENT_TRACK_CHANGES_UPDATED_SUBSCRIPTION,
   BOOK_COMPONENT_TITLE_UPDATED_SUBSCRIPTION,
   BOOK_COMPONENT_LOCK_UPDATED_SUBSCRIPTION,

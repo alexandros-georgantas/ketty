@@ -9,6 +9,8 @@ const map = require('lodash/map')
 const path = require('path')
 const BPromise = require('bluebird')
 
+const { withFilter } = require('graphql-subscriptions')
+
 const fs = require('fs-extra')
 
 const { logger } = require('@coko/server')
@@ -38,9 +40,11 @@ const {
   BOOK_COMPONENT_CONTENT_UPDATED,
   BOOK_COMPONENT_UPLOADING_UPDATED,
   BOOK_COMPONENT_LOCK_UPDATED,
+  BOOK_COMPONENTS_LOCK_UPDATED,
   BOOK_COMPONENT_TYPE_UPDATED,
   BOOK_COMPONENT_TOC_UPDATED,
   BOOK_COMPONENT_UNLOCKED_BY_ADMIN,
+  BOOK_COMPONENT_UPDATED,
 } = require('./consts')
 
 const {
@@ -56,6 +60,7 @@ const {
   useCaseUpdateWorkflowState,
   useCaseDeleteBookComponent,
   useCaseRenameBookComponent,
+  useCaseGetBookComponentAndAcquireLock,
   useCaseXSweet,
 } = require('../useCases')
 
@@ -82,6 +87,27 @@ const getBookComponent = async (_, { id }, ctx) => {
   }
 
   return bookComponent
+}
+
+const getBookComponentAndAcquireLock = async (_, { id, tabId }, ctx) => {
+  try {
+    const pubsub = await pubsubManager.getPubsub()
+
+    const bookComponent = await useCaseGetBookComponentAndAcquireLock(
+      id,
+      ctx.user,
+      tabId,
+    )
+
+    pubsub.publish(BOOK_COMPONENT_LOCK_UPDATED, {
+      bookComponentLockUpdated: bookComponent,
+    })
+
+    return bookComponent
+  } catch (e) {
+    logger.error(e.message)
+    throw new Error(e)
+  }
 }
 
 const ingestWordFile = async (_, { bookComponentFiles }, ctx) => {
@@ -162,6 +188,9 @@ const ingestWordFile = async (_, { bookComponentFiles }, ctx) => {
       pubsub.publish(BOOK_COMPONENT_UPLOADING_UPDATED, {
         bookComponentUploadingUpdated: updatedBookComponent,
       })
+      pubsub.publish(BOOK_COMPONENT_UPDATED, {
+        bookComponentUpdated: updatedBookComponent,
+      })
 
       // await useCaseXSweet(componentId, `${tempFilePath}/${randomFilename}`)
       return useCaseXSweet(componentId, `${tempFilePath}/${randomFilename}`)
@@ -208,6 +237,9 @@ const renameBookComponent = async (_, { input }, ctx) => {
     pubsub.publish(BOOK_COMPONENT_TITLE_UPDATED, {
       bookComponentTitleUpdated: updatedBookComponent,
     })
+    pubsub.publish(BOOK_COMPONENT_UPDATED, {
+      bookComponentUpdated: updatedBookComponent,
+    })
 
     logger.info('message BOOK_COMPONENT_TITLE_UPDATED broadcasted')
 
@@ -239,6 +271,9 @@ const deleteBookComponent = async (_, { input }, ctx) => {
 
     pubsub.publish(BOOK_COMPONENT_DELETED, {
       bookComponentDeleted: deletedBookComponent,
+    })
+    pubsub.publish(BOOK_COMPONENT_UPDATED, {
+      bookComponentUpdated: deletedBookComponent,
     })
 
     logger.info('message BOOK_COMPONENT_DELETED broadcasted')
@@ -275,7 +310,7 @@ const updateWorkflowState = async (_, { input }, ctx) => {
 
     await ctx.helpers.can(ctx.user, 'update', currentAndUpdate)
 
-    await useCaseUpdateWorkflowState(id, workflowStages)
+    await useCaseUpdateWorkflowState(id, workflowStages, ctx)
 
     const isReviewing = find(workflowStages, { type: 'review' }).value === 0
     const updatedBookComponent = await BookComponent.findById(id)
@@ -290,6 +325,10 @@ const updateWorkflowState = async (_, { input }, ctx) => {
       })
     }
 
+    pubsub.publish(BOOK_COMPONENT_UPDATED, {
+      bookComponentUpdated: updatedBookComponent,
+    })
+
     return updatedBookComponent
   } catch (e) {
     logger.error(e)
@@ -302,31 +341,17 @@ const unlockBookComponent = async (_, { input }, ctx) => {
     const pubsub = await pubsubManager.getPubsub()
     const { id: bookComponentId } = input
 
-    const locks = await Lock.query()
-      .where('foreignId', bookComponentId)
-      .andWhere('deleted', false)
-
-    await useCaseUnlockBookComponent(bookComponentId, locks)
+    await useCaseUnlockBookComponent(bookComponentId, ctx.user)
 
     const updatedBookComponent = await BookComponent.findById(bookComponentId)
 
-    const user = await User.findById(ctx.user)
-
-    if (user.admin && locks[0].userId !== ctx.user) {
-      await pubsub.publish(BOOK_COMPONENT_UNLOCKED_BY_ADMIN, {
-        bookComponentUnlockedByAdmin: {
-          bookComponentId,
-          unlocked: true,
-        },
-      })
-      await pubsub.publish(BOOK_COMPONENT_LOCK_UPDATED, {
-        bookComponentLockUpdated: updatedBookComponent,
-      })
-    } else {
-      await pubsub.publish(BOOK_COMPONENT_LOCK_UPDATED, {
-        bookComponentLockUpdated: updatedBookComponent,
-      })
-    }
+    // This should be replaced with book component updated, when refactor Book Builder
+    pubsub.publish(BOOK_COMPONENT_LOCK_UPDATED, {
+      bookComponentLockUpdated: updatedBookComponent,
+    })
+    pubsub.publish(BOOK_COMPONENT_UPDATED, {
+      bookComponentUpdated: updatedBookComponent,
+    })
 
     return updatedBookComponent
   } catch (e) {
@@ -335,16 +360,20 @@ const unlockBookComponent = async (_, { input }, ctx) => {
   }
 }
 
-const lockBookComponent = async (_, { input }, ctx) => {
+const lockBookComponent = async (_, { id, tabId }, ctx) => {
   try {
     const pubsub = await pubsubManager.getPubsub()
-    const { id } = input
-    await useCaseLockBookComponent(id, ctx.user)
+    await useCaseLockBookComponent(id, tabId, ctx.user)
 
     const bookComponent = await BookComponent.findById(id)
 
+    // This should be replaced with book component updated, when refactor Book Builder
     pubsub.publish(BOOK_COMPONENT_LOCK_UPDATED, {
       bookComponentLockUpdated: bookComponent,
+    })
+
+    pubsub.publish(BOOK_COMPONENT_UPDATED, {
+      bookComponentUpdated: bookComponent,
     })
 
     return bookComponent
@@ -377,6 +406,10 @@ const updateContent = async (_, { input }, ctx) => {
       logger.info('message BOOK_COMPONENT_WORKFLOW_UPDATED broadcasted')
     }
 
+    pubsub.publish(BOOK_COMPONENT_UPDATED, {
+      bookComponentUpdated: updatedBookComponent,
+    })
+
     return updatedBookComponent
   } catch (e) {
     logger.error(e.message)
@@ -406,6 +439,10 @@ const updatePagination = async (_, { input }, ctx) => {
 
     pubsub.publish(BOOK_COMPONENT_PAGINATION_UPDATED, {
       bookComponentPaginationUpdated: updatedBookComponent,
+    })
+
+    pubsub.publish(BOOK_COMPONENT_UPDATED, {
+      bookComponentUpdated: updatedBookComponent,
     })
 
     return updatedBookComponent
@@ -445,6 +482,10 @@ const updateTrackChanges = async (_, { input }, ctx) => {
       bookComponentTrackChangesUpdated: updatedBookComponent,
     })
 
+    pubsub.publish(BOOK_COMPONENT_UPDATED, {
+      bookComponentUpdated: updatedBookComponent,
+    })
+
     return updatedBookComponent
   } catch (e) {
     logger.error(e.message)
@@ -482,6 +523,10 @@ const updateUploading = async (_, { input }, ctx) => {
       bookComponentUploadingUpdated: updatedBookComponent,
     })
 
+    pubsub.publish(BOOK_COMPONENT_UPDATED, {
+      bookComponentUpdated: updatedBookComponent,
+    })
+
     return updatedBookComponent
   } catch (e) {
     logger.error(e.message)
@@ -501,6 +546,9 @@ const updateComponentType = async (_, { input }, ctx) => {
 
     pubsub.publish(BOOK_COMPONENT_TYPE_UPDATED, {
       bookComponentTypeUpdated: updatedBookComponent,
+    })
+    pubsub.publish(BOOK_COMPONENT_UPDATED, {
+      bookComponentUpdated: updatedBookComponent,
     })
 
     return updatedBookComponent
@@ -522,6 +570,9 @@ const toggleIncludeInTOC = async (_, { input }, ctx) => {
     pubsub.publish(BOOK_COMPONENT_TOC_UPDATED, {
       bookComponentTOCToggled: updatedBookComponent,
     })
+    pubsub.publish(BOOK_COMPONENT_UPDATED, {
+      bookComponentUpdated: updatedBookComponent,
+    })
 
     return updatedBookComponent
   } catch (e) {
@@ -533,6 +584,7 @@ const toggleIncludeInTOC = async (_, { input }, ctx) => {
 module.exports = {
   Query: {
     getBookComponent,
+    getBookComponentAndAcquireLock,
   },
   Mutation: {
     ingestWordFile,
@@ -566,6 +618,13 @@ module.exports = {
     },
     async bookId(bookComponent, _, ctx) {
       return bookComponent.bookId
+    },
+    async status(bookComponent, _, ctx) {
+      const bookComponentState = await BookComponentState.query().findOne({
+        bookComponentId: bookComponent.id,
+      })
+
+      return bookComponentState.status
     },
     async bookTitle(bookComponent, _, ctx) {
       const book = await Book.findById(bookComponent.bookId)
@@ -673,20 +732,20 @@ module.exports = {
     async lock(bookComponent, _, ctx) {
       let locked = null
 
-      const lock = await Lock.query()
-        .where('foreignId', bookComponent.id)
-        .andWhere('deleted', false)
+      const lock = await Lock.query().findOne('foreignId', bookComponent.id)
 
-      if (lock.length > 0) {
-        const user = await User.findById(lock[0].userId)
+      if (lock) {
+        const user = await User.findById(lock.userId)
         locked = {
-          created: lock[0].created,
+          created: lock.created,
+          tabId: lock.tabId,
           username: user.username,
           givenName: user.givenName,
           surname: user.surname,
           isAdmin: user.admin,
-          userId: lock[0].userId,
-          id: lock[0].id,
+          userId: lock.userId,
+          foreignId: bookComponent.id,
+          id: lock.id,
         }
       }
 
@@ -1145,6 +1204,12 @@ module.exports = {
         return pubsub.asyncIterator(BOOK_COMPONENT_LOCK_UPDATED)
       },
     },
+    bookComponentsLockUpdated: {
+      subscribe: async (payload, variables, context, info) => {
+        const pubsub = await pubsubManager.getPubsub()
+        return pubsub.asyncIterator(BOOK_COMPONENTS_LOCK_UPDATED)
+      },
+    },
     bookComponentTypeUpdated: {
       subscribe: async () => {
         const pubsub = await pubsubManager.getPubsub()
@@ -1161,6 +1226,23 @@ module.exports = {
       subscribe: async () => {
         const pubsub = await pubsubManager.getPubsub()
         return pubsub.asyncIterator(BOOK_COMPONENT_UNLOCKED_BY_ADMIN)
+      },
+    },
+    bookComponentUpdated: {
+      subscribe: async (...args) => {
+        const pubsub = await pubsubManager.getPubsub()
+
+        return withFilter(
+          () => {
+            return pubsub.asyncIterator(BOOK_COMPONENT_UPDATED)
+          },
+          (payload, variables) => {
+            const { id: clientBCId } = variables
+            const { bookComponentUpdated } = payload
+            const { id } = bookComponentUpdated
+            return clientBCId === id
+          },
+        )(...args)
       },
     },
   },

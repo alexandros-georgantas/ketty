@@ -16,6 +16,7 @@ export {
   paginationChangeSubscription,
   workflowChangeSubscription,
   lockChangeSubscription,
+  locksChangeSubscription,
   titleChangeSubscription,
   teamMembersChangeSubscription,
   productionEditorChangeSubscription,

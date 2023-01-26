@@ -16,7 +16,17 @@ const {
   Division,
   Book,
   Lock,
+  User,
 } = require('../../data-model/src').models
+
+// const UNLOCK_REASONS = {
+//   100: 'Unlocked by the admin of the system',
+//   101: 'Unlocked by the owner of the lock',
+//   102: 'Unlocked due to inactivity',
+//   103: 'Unlocked but found multiple locks',
+//   104: 'Unlocked by the system',
+//   105: 'Unlocked due to permission changes',
+// }
 
 const { isEmpty } = require('../helpers/utils')
 
@@ -33,6 +43,60 @@ const getBookComponent = async (bookComponentId, options = {}) => {
       async tr =>
         BookComponent.query(tr).where({ id: bookComponentId, deleted: false }),
       { trx, passedTrxOnly: true },
+    )
+
+    if (bookComponent.length === 0) {
+      throw new Error(
+        `book component with id: ${bookComponentId} does not exist`,
+      )
+    }
+
+    return bookComponent[0]
+  } catch (e) {
+    throw new Error(e)
+  }
+}
+
+const getBookComponentAndAcquireLock = async (
+  bookComponentId,
+  userId,
+  tabId,
+  options = {},
+) => {
+  try {
+    const { trx } = options
+    const serverIdentifier = config.get('serverIdentifier')
+
+    logger.info(`>>> fetching book component with id ${bookComponentId}`)
+
+    const bookComponent = await useTransaction(
+      async tr => {
+        const bc = await BookComponent.query(tr).where({
+          id: bookComponentId,
+          deleted: false,
+        })
+
+        const locks = await Lock.query()
+          .where('foreignId', bookComponentId)
+          .andWhere('deleted', false)
+
+        if (locks.length === 0) {
+          await Lock.query().insert({
+            foreignId: bookComponentId,
+            foreignType: 'bookComponent',
+            tabId,
+            userId,
+            serverIdentifier,
+          })
+
+          logger.info(
+            `lock acquired for book component with id ${bookComponentId} for the user with id ${userId} and tabId ${tabId}`,
+          )
+        }
+
+        return bc
+      },
+      { trx },
     )
 
     if (bookComponent.length === 0) {
@@ -451,69 +515,69 @@ const updatePagination = async (bookComponentId, pagination) => {
   }
 }
 
-const unlockBookComponent = async (bookComponentId, locks) => {
+const unlockBookComponent = async (
+  bookComponentId,
+  actingUserId = undefined,
+) => {
   try {
-    // const locks = await Lock.query()
-    //   .where('foreignId', bookComponentId)
-    //   .andWhere('deleted', false)
+    const serverIdentifier = config.get('serverIdentifier')
 
-    if (!locks || locks.length === 0) {
-      throw new Error(
-        `no lock found for the book component with id ${bookComponentId}`,
-      )
-    }
+    return useTransaction(async tr => {
+      let status = 101
 
-    let numberOfAffectedRows
-
-    if (locks.length > 1) {
-      logger.error(
-        `multiple locks found for the book component with id ${bookComponentId}`,
-      )
-
-      numberOfAffectedRows = await Lock.query()
-        .patch({
-          deleted: true,
-        })
-        .whereIn(
-          'id',
-          map(locks, lock => lock.id),
-        )
-
-      if (numberOfAffectedRows === locks.length) {
-        logger.info(
-          `all the locks deleted for book component with id ${bookComponentId}`,
-        )
-      }
-    }
-
-    const { id } = locks[0]
-
-    logger.info(
-      `lock with id ${id} found for the book component with id ${bookComponentId}`,
-    )
-
-    numberOfAffectedRows = await Lock.query()
-      .patch({
-        deleted: true,
+      const locks = await Lock.query(tr).where({
+        foreignId: bookComponentId,
+        foreignType: 'bookComponent',
+        serverIdentifier,
       })
-      .where('id', id)
 
-    logger.info(
-      `lock with id ${id} deleted for book component with id ${bookComponentId}`,
-    )
+      if (locks.length > 1) {
+        status = 103
+        logger.info(
+          `multiple locks found for book component with id ${bookComponentId} and deleted `,
+        )
+        await BookComponentState.query(tr)
+          .patch({ status })
+          .where({ bookComponentId })
 
-    return numberOfAffectedRows
+        return Lock.query(tr).delete().where({
+          foreignId: bookComponentId,
+          foreignType: 'bookComponent',
+          serverIdentifier,
+        })
+      }
+
+      logger.info(`lock for book component with id ${bookComponentId} deleted `)
+
+      if (actingUserId) {
+        const user = await User.query(tr).findById(actingUserId)
+
+        if (user.admin && locks[0].userId !== actingUserId) {
+          status = 100
+        }
+      }
+
+      await BookComponentState.query(tr)
+        .patch({ status })
+        .where({ bookComponentId })
+
+      return Lock.query(tr).delete().where({
+        foreignId: bookComponentId,
+        foreignType: 'bookComponent',
+        serverIdentifier,
+      })
+    }, {})
   } catch (e) {
     logger.error(e.message)
     throw new Error(e)
   }
 }
 
-const lockBookComponent = async (bookComponentId, userId) => {
+const lockBookComponent = async (bookComponentId, tabId, userId) => {
   try {
-    const locks = await Lock.query()
-      .where('foreignId', bookComponentId)
-      .andWhere('deleted', false)
+    const serverIdentifier = config.get('serverIdentifier')
+
+    const locks = await Lock.query().where('foreignId', bookComponentId)
 
     if (locks.length > 1) {
       logger.error(
@@ -521,13 +585,12 @@ const lockBookComponent = async (bookComponentId, userId) => {
       )
 
       await Lock.query()
-        .patch({
-          deleted: true,
-        })
+        .delete()
         .whereIn(
           'id',
           map(locks, lock => lock.id),
         )
+        .andWhere(serverIdentifier)
 
       throw new Error(
         `corrupted lock for the book component with id ${bookComponentId}, all locks deleted`,
@@ -538,7 +601,7 @@ const lockBookComponent = async (bookComponentId, userId) => {
       if (locks[0].userId !== userId) {
         const errorMsg = `There is a lock already for this book component for the user with id ${locks[0].userId}`
         logger.error(errorMsg)
-        throw new Error(errorMsg)
+        // throw new Error(errorMsg)
       }
 
       logger.info(
@@ -555,8 +618,16 @@ const lockBookComponent = async (bookComponentId, userId) => {
     const lock = await Lock.query().insert({
       foreignId: bookComponentId,
       foreignType: 'bookComponent',
+      tabId,
       userId,
+      serverIdentifier,
     })
+
+    const status = 200
+
+    await BookComponentState.query()
+      .patch({ status })
+      .where({ bookComponentId })
 
     logger.info(
       `lock acquired for book component with id ${bookComponentId} for the user with id ${userId}`,
@@ -569,7 +640,7 @@ const lockBookComponent = async (bookComponentId, userId) => {
   }
 }
 
-const updateWorkflowState = async (bookComponentId, workflowStages) => {
+const updateWorkflowState = async (bookComponentId, workflowStages, ctx) => {
   try {
     const applicationParameters = await ApplicationParameter.query().findOne({
       context: 'bookBuilder',
@@ -611,6 +682,31 @@ const updateWorkflowState = async (bookComponentId, workflowStages) => {
       } else {
         update.workflowStages = workflowStages
       }
+    }
+
+    const locks = await Lock.query().where({
+      foreignId: bookComponentId,
+      foreignType: 'bookComponent',
+    })
+
+    if (locks.length > 0) {
+      const currentBookComponent = await BookComponent.findById(bookComponentId)
+      currentBookComponent.workflowStages = update.workflowStages
+
+      ctx.helpers
+        .can(locks[0].userId, 'can view fragmentEdit', currentBookComponent)
+        .then(param => true)
+        .catch(async e => {
+          await Lock.query().delete().where({
+            foreignId: bookComponentId,
+            foreignType: 'bookComponent',
+          })
+          return BookComponentState.query()
+            .patch({ status: 105 })
+            .where({ bookComponentId })
+        })
+
+      // console.log('res', res)
     }
 
     const updatedBookComponentState =
@@ -745,6 +841,7 @@ const renameBookComponent = async (bookComponentId, title, languageIso) => {
 
 module.exports = {
   getBookComponent,
+  getBookComponentAndAcquireLock,
   updateBookComponent,
   addBookComponent,
   updateContent,

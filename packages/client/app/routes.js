@@ -12,7 +12,7 @@ import Signup from './components/Signup/src/SignupContainer'
 import UserProfile from './components/userProfile/src/ConnectedUserProfile'
 
 // Editor
-import Wax from './components/wax/src/ConnectedWax'
+import EditorPageWithData from './components/wax/src/EditorPageWithData'
 
 // Editoria
 import BookBuilder from './components/bookbuilder/src/ConnectedBookBuilder'
@@ -95,12 +95,12 @@ export default (
               path="/books/:id/book-builder"
             />
             <PrivateRoute
-              component={Wax}
+              component={EditorPageWithData}
               exact
               path="/books/:bookId/bookComponents/:bookComponentId"
             />
             <PrivateRoute
-              component={Wax}
+              component={EditorPageWithData}
               path="/books/:bookId/bookComponents/:bookComponentId/:mode"
             />
             <PrivateRoute component={GlobalTeamsManager} path="/globalTeams" />

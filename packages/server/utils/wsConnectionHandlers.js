@@ -12,11 +12,17 @@ const establishConnection = async (ws, req) => {
     const url = new URL(req.url, serverURL)
 
     const token = url.searchParams.get('token')
-    const userExists = await isAuthenticatedUser(token)
+    const bookComponentId = url.searchParams.get('bookComponentId')
+    const tabId = url.searchParams.get('tabId')
+    const user = await isAuthenticatedUser(token)
 
-    if (!userExists) {
+    if (!user) {
       ws.close()
     }
+
+    ws.userId = user.id
+    ws.bookComponentId = bookComponentId
+    ws.tabId = tabId
   } catch (e) {
     ws.close()
   }
@@ -24,15 +30,14 @@ const establishConnection = async (ws, req) => {
 
 const heartbeat = ws => (ws.isAlive = true)
 
-const initializeHeartbeat = async (WSServer, brokenConnectionHandler) => {
+const initializeHeartbeat = async WSServer => {
   try {
     return setInterval(() => {
+      console.log('# of clients', WSServer.clients.size)
       WSServer.clients.forEach(ws => {
         if (ws.isAlive === false) {
           logger.info('ws broken')
-          // console.log('broken connection')
-          ws.terminate()
-          return brokenConnectionHandler()
+          return ws.terminate()
         }
 
         ws.isAlive = false

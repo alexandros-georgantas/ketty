@@ -13,7 +13,9 @@ const { Model } = require('objection')
 
 const Base = require('../editoriaBase')
 const { model: BookComponent } = require('../bookComponent')
-const { array, booleanDefaultFalse, id, string } = require('../helpers').schema
+
+const { array, booleanDefaultFalse, id, string, integerPositive } =
+  require('../helpers').schema
 
 class BookComponentState extends Base {
   constructor(properties) {
@@ -68,6 +70,7 @@ class BookComponentState extends Base {
         runningHeadersLeft: string,
         // left loose on purpose to allow for configurability
         workflowStages: array,
+        status: integerPositive,
       },
     }
   }

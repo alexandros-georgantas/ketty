@@ -10,14 +10,4 @@ const ADD_CUSTOM_TAG = gql`
   }
 `
 
-// const addCustomTagMutation = props => {
-//   const { render } = props
-
-//   return (
-//     <Mutation mutation={ADD_CUSTOM_TAG}>
-//       {addCustomTag => render({ addCustomTag })}
-//     </Mutation>
-//   )
-// }
-
 export default ADD_CUSTOM_TAG

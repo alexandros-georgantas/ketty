@@ -4,6 +4,7 @@ module.exports = {
   tempDirectoryCleanUp: 'TEMP_DIRECTORY_CLEAN_UP',
   tempDirectoryCRONJobSchedule: 'TEMP_DIRECTORY_CRON_JOB_SCHEDULE',
   tempDirectoryCRONJobOffset: 'TEMP_DIRECTORY_CRON_JOB_OFFSET',
+  serverIdentifier: 'SERVER_IDENTIFIER',
   flavour: 'EDITORIA_FLAVOUR',
   'pubsweet-client': {
     protocol: 'CLIENT_PROTOCOL',

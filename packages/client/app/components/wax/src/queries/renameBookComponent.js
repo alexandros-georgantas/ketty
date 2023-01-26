@@ -1,5 +1,3 @@
-// import React from 'react'
-// import { Mutation } from '@apollo/client/react/components'
 import { gql } from '@apollo/client'
 
 const RENAME_BOOK_COMPONENT_TITLE = gql`
@@ -22,28 +20,16 @@ const RENAME_BOOK_COMPONENT_TITLE = gql`
         value
       }
       lock {
+        id
         userId
         username
         created
         givenName
         isAdmin
         surname
-        id
       }
     }
   }
 `
-
-// const renameBookComponentTitleMutation = props => {
-//   const { render } = props
-
-//   return (
-//     <Mutation mutation={RENAME_BOOK_COMPONENT_TITLE}>
-//       {(renameBookComponent, renameBookComponentResult) =>
-//         render({ renameBookComponent, renameBookComponentResult })
-//       }
-//     </Mutation>
-//   )
-// }
 
 export default RENAME_BOOK_COMPONENT_TITLE

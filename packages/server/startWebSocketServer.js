@@ -9,6 +9,8 @@ const {
   initializeHeartbeat,
 } = require('./utils/wsConnectionHandlers')
 
+const { unlockBookComponent } = require('./services/bookComponentLock.service')
+
 let WSServer
 
 const startWSServer = async () => {
@@ -50,16 +52,25 @@ const startWSServer = async () => {
       ws.on('message', data => {
         // console.log('ondata')
       })
-      ws.on('close', data => {
-        console.log('ONNNNNNN_CLOSEEEEEEEEEEEEEEEEE', data)
+      ws.on('close', async () => {
+        // could broken connection pass reason ?
+        return unlockBookComponent(ws.bookComponentId, ws.userId, ws.tabId)
       })
       // WS EVENT LISTENERS SECTION END
     })
-    const ha = () => console.log('unlock')
-    HEARTBEAT_INTERVAL_REFERENCE = initializeHeartbeat(WSServer, ha)
 
-    WSServer.on('close', () => {
+    HEARTBEAT_INTERVAL_REFERENCE = initializeHeartbeat(
+      WSServer,
+      unlockBookComponent,
+    )
+
+    WSServer.on('close', async () => {
       clearInterval(HEARTBEAT_INTERVAL_REFERENCE)
+      WSServer.clients.forEach(ws => {
+        logger.info('ws broken')
+        // console.log('broken connection')
+        ws.terminate()
+      })
     })
     // WS_SERVER EVENT LISTENERS SECTION END
   } catch (e) {

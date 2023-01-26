@@ -12,6 +12,8 @@ const { ServiceCredential } = require('./data-model/src').models
 
 const { startWSServer } = require('./startWebSocketServer')
 
+const { cleanUpLocks } = require('./services/bookComponentLock.service')
+
 const serviceHandshake = async which => {
   if (!services) {
     throw new Error('services are undefined')
@@ -73,6 +75,16 @@ const serviceHandshake = async which => {
 
 const init = async () => {
   try {
+    if (
+      !config.has('serverIdentifier') ||
+      config.get('serverIdentifier') === undefined
+    ) {
+      throw new Error(
+        'server identifier should be provided as env variable in order for the server to function properly',
+      )
+    }
+
+    await cleanUpLocks()
     await startServer()
 
     logger.info('starting WebSockets server')
