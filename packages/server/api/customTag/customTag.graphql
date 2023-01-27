@@ -4,12 +4,12 @@ type CustomTag {
   tagType: String!
 }
 
-input CustomTagUpdateInput {
-  id: ID!
-  label: String
-  tagType: String
-  deleted: Boolean
-}
+# input CustomTagUpdateInput {
+#   id: ID!
+#   label: String
+#   tagType: String
+#   deleted: Boolean
+# }
 
 input CustomTagAddInput {
   label: String
@@ -22,7 +22,9 @@ extend type Query {
 
 extend type Mutation {
   addCustomTag(input: CustomTagAddInput!): CustomTag!
-  updateCustomTag(input: CustomTagUpdateInput!): CustomTag!
+  # updateCustomTag(input: CustomTagUpdateInput!): CustomTag!
 }
 
-extend type Subscription { customTagUpdated: CustomTag! }
+extend type Subscription {
+  customTagsUpdated: [CustomTag!]!
+}

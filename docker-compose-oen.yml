@@ -288,7 +288,7 @@ services:
     command: [ 'node', 'server/startServer.js' ]
 
   db:
-    image: postgres:14-alpine
+    image: postgres:14.4-alpine
     ports:
       - 5432:5432
     environment:
@@ -299,7 +299,7 @@ services:
       - ./scripts/init-pgboss.sql:/docker-entrypoint-initdb.d/init-pgboss.sql
 
   db-epubchecker:
-    image: postgres:14-alpine
+    image: postgres:14.4-alpine
     environment:
       - POSTGRES_USER=epubchecker_user_dev
       - POSTGRES_DB=epubchecker_dev
@@ -308,7 +308,7 @@ services:
       - ./scripts/init-pgboss.sql:/docker-entrypoint-initdb.d/init-pgboss.sql
 
   db-icml:
-    image: postgres:14-alpine
+    image: postgres:14.4-alpine
     environment:
       - POSTGRES_USER=icml_user_dev
       - POSTGRES_DB=icml_dev
@@ -317,7 +317,7 @@ services:
       - ./scripts/init-pgboss.sql:/docker-entrypoint-initdb.d/init-pgboss.sql
 
   db-pagedjs:
-    image: postgres:14-alpine
+    image: postgres:14.4-alpine
     environment:
       - POSTGRES_USER=pagedjs_user_dev
       - POSTGRES_DB=pagedjs_dev
@@ -326,7 +326,7 @@ services:
       - ./scripts/init-pgboss.sql:/docker-entrypoint-initdb.d/init-pgboss.sql
 
   db-xsweet:
-    image: postgres:14-alpine
+    image: postgres:14.4-alpine
     environment:
       - POSTGRES_USER=xsweet_user_dev
       - POSTGRES_DB=xsweet_dev

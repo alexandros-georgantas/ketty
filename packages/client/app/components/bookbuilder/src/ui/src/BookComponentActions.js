@@ -143,7 +143,8 @@ const BookComponentActions = ({
     if (uploading) return
 
     if (preview) {
-      history.push(`/books/${bookId}/bookComponents/${bookComponentId}/preview`)
+      // history.push(`/books/${bookId}/bookComponents/${bookComponentId}/preview`)
+      history.push(`/books/${bookId}/bookComponents/${bookComponentId}`)
     } else {
       history.push(`/books/${bookId}/bookComponents/${bookComponentId}`)
     }

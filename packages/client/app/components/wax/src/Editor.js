@@ -11,6 +11,10 @@ const WaxContainer = styled.div`
   width: 100%;
 `
 
+const editoriaLayoutWithReadOnly = (props, isReadOnly) => (
+  <EditoriaLayout {...props} isReadOnly={isReadOnly} />
+)
+
 const UniverseWrapper = styled.div``
 
 const featureBookStructureEnabled =
@@ -207,7 +211,7 @@ const Editor = ({
           config={configWax}
           fileUpload={() => true}
           key={bookComponentId}
-          layout={EditoriaLayout}
+          layout={props => editoriaLayoutWithReadOnly(props, isReadOnly)}
           onChange={onPeriodicBookComponentContentChange}
           placeholder="Type Something..."
           readonly={isReadOnly}

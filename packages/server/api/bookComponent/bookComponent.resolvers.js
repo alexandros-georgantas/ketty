@@ -214,6 +214,12 @@ const addBookComponent = async (_, { input }, ctx, info) => {
       title,
     )
 
+    const updatedBook = await Book.findById(bookId)
+
+    pubsub.publish(`BOOK_UPDATED`, {
+      bookUpdated: updatedBook,
+    })
+
     pubsub.publish(BOOK_COMPONENT_ADDED, {
       bookComponentAdded: newBookComponent,
     })
@@ -233,6 +239,12 @@ const renameBookComponent = async (_, { input }, ctx) => {
     await useCaseRenameBookComponent(id, title, 'en')
 
     const updatedBookComponent = await BookComponent.findById(id)
+
+    const updatedBook = await Book.findById(updatedBookComponent.bookId)
+
+    pubsub.publish(`BOOK_UPDATED`, {
+      bookUpdated: updatedBook,
+    })
 
     pubsub.publish(BOOK_COMPONENT_TITLE_UPDATED, {
       bookComponentTitleUpdated: updatedBookComponent,
@@ -268,6 +280,12 @@ const deleteBookComponent = async (_, { input }, ctx) => {
     await ctx.helpers.can(ctx.user, 'update', currentAndUpdate)
 
     const deletedBookComponent = await useCaseDeleteBookComponent(bookComponent)
+
+    const updatedBook = await Book.findById(bookComponent.bookId)
+
+    pubsub.publish(`BOOK_UPDATED`, {
+      bookUpdated: updatedBook,
+    })
 
     pubsub.publish(BOOK_COMPONENT_DELETED, {
       bookComponentDeleted: deletedBookComponent,
@@ -635,30 +653,6 @@ module.exports = {
 
       return bookTranslation[0].title
     },
-    async nextBookComponent(bookComponent, _, ctx) {
-      const orderedComponent = await getOrderedBookComponents(bookComponent)
-
-      const excludeBookComponent = await BookComponent.query().whereIn(
-        'componentType',
-        ['toc', 'endnotes'],
-      )
-
-      const transformed = excludeBookComponent.map(bc => bc.id)
-
-      const newOrderedComponent = difference(orderedComponent, transformed)
-
-      const current = newOrderedComponent.findIndex(
-        comp => comp === bookComponent.id,
-      )
-
-      try {
-        const next = newOrderedComponent[current + 1]
-        const nextBookComponent = await BookComponent.findById(next)
-        return nextBookComponent
-      } catch (e) {
-        return null
-      }
-    },
     async runningHeadersRight(bookComponent, _, ctx) {
       const bookComponentState = await bookComponent.getBookComponentState()
       return bookComponentState.runningHeadersRight
@@ -666,30 +660,6 @@ module.exports = {
     async runningHeadersLeft(bookComponent, _, ctx) {
       const bookComponentState = await bookComponent.getBookComponentState()
       return bookComponentState.runningHeadersLeft
-    },
-    async prevBookComponent(bookComponent, _, ctx) {
-      const orderedComponent = await getOrderedBookComponents(bookComponent)
-
-      const excludeBookComponent = await BookComponent.query().whereIn(
-        'componentType',
-        ['toc', 'endnotes'],
-      )
-
-      const transformed = excludeBookComponent.map(bc => bc.id)
-
-      const newOrderedComponent = difference(orderedComponent, transformed)
-
-      const current = newOrderedComponent.findIndex(
-        comp => comp === bookComponent.id,
-      )
-
-      try {
-        const prev = newOrderedComponent[current - 1]
-        const prevBookComponent = await BookComponent.findById(prev)
-        return prevBookComponent
-      } catch (e) {
-        return null
-      }
     },
     async divisionType(bookComponent, _, ctx) {
       const division = await Division.findById(bookComponent.divisionId)

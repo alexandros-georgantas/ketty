@@ -13,10 +13,7 @@ const GET_BOOK_COMPONENT = !featureBookStructureEnabled
           divisionId
           divisionType
           status
-          bookTitle
           title
-          bookId
-          hasContent
           componentTypeOrder
           uploading
           componentType
@@ -36,22 +33,6 @@ const GET_BOOK_COMPONENT = !featureBookStructureEnabled
             surname
             id
           }
-          nextBookComponent {
-            id
-            title
-            bookId
-            lock {
-              id
-            }
-          }
-          prevBookComponent {
-            id
-            title
-            bookId
-            lock {
-              id
-            }
-          }
           content
         }
       }
@@ -63,10 +44,7 @@ const GET_BOOK_COMPONENT = !featureBookStructureEnabled
           divisionId
           divisionType
           status
-          bookTitle
           title
-          bookId
-          hasContent
           bookStructureElements {
             groupHeader
             items {
@@ -95,22 +73,6 @@ const GET_BOOK_COMPONENT = !featureBookStructureEnabled
             isAdmin
             surname
             id
-          }
-          nextBookComponent {
-            id
-            title
-            bookId
-            lock {
-              id
-            }
-          }
-          prevBookComponent {
-            id
-            title
-            bookId
-            lock {
-              id
-            }
           }
           content
         }

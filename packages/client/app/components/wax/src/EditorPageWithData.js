@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useLazyQuery } from '@apollo/client'
-
 import uuid from 'uuid/v4'
 
 import {
+  GET_BOOK,
   GET_BOOK_COMPONENT,
   GET_CUSTOM_TAGS,
   GET_SPECIFIC_FILES,
@@ -15,11 +15,12 @@ import {
   UPDATE_BOOK_COMPONENT_TRACK_CHANGES,
   RENAME_BOOK_COMPONENT_TITLE,
   LOCK_BOOK_COMPONENT,
+  BOOK_UPDATED_SUBSCRIPTION,
   BOOK_COMPONENT_UPDATED_SUBSCRIPTION,
+  CUSTOM_TAGS_UPDATED_SUBSCRIPTION,
 } from './queries'
 
 import getUserTrackChangeColor from './helpers/getUserTrackChangeColor'
-
 import ModalContext from '../../common/src/ModalContext'
 import { Loading } from '../../../ui'
 import EditorPage from './EditorPage'
@@ -32,8 +33,7 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
 
   const [tabId, setTabId] = useState(uuid())
   const [isOnline, setIsOnline] = useState(navigator.onLine)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [errors, setErrors] = useState([])
+  // const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     // Update network status
@@ -58,15 +58,24 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
    * QUERIES SECTION START
    */
   const {
-    subscribeToMore,
+    subscribeToMore: subscribeToMoreForBook,
+    loading: bookLoading,
+    error: bookError,
+    data: bookData,
+  } = useQuery(GET_BOOK, {
+    variables: { id: bookId },
+  })
+
+  const {
+    subscribeToMore: subscribeToMoreForBookComponent,
     loading: bookComponentLoading,
     error: bookComponentError,
     data: bookComponentData,
   } = useQuery(GET_BOOK_COMPONENT, {
     variables: { id: bookComponentId },
-    fetchPolicy: 'network-only',
   })
 
+  // TODO: get this info from current user
   const {
     loading: waxRulesLoading,
     error: waxRulesError,
@@ -77,15 +86,19 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
     fetchPolicy: 'network-only',
   })
 
+  // TODO: get this info from current user
   const {
     loading: userTeamsLoading,
     error: userTeamsError,
     data: userTeamsData,
   } = useQuery(GET_USER_TEAM, {
     variables: { users: [currentUser.id] },
+    pollInterval: 5000,
+    fetchPolicy: 'network-only',
   })
 
   const {
+    subscribeToMore: subscribeToMoreForCustomTags,
     loading: customTagsLoading,
     error: customTagsError,
     data: customTagsData,
@@ -121,44 +134,6 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
   )
   /**
    * MUTATIONS SECTION END
-   */
-
-  /**
-   * ERROR HANDLING SECTION START
-   */
-  useEffect(() => {
-    if (bookComponentError) {
-      console.error(bookComponentError)
-    } else if (waxRulesError) {
-      console.error(waxRulesError)
-    } else if (userTeamsError) {
-      console.error(userTeamsError)
-    } else if (customTagsError) {
-      console.error(customTagsError)
-    } else if (updateContentError) {
-      console.error(updateContentError)
-    } else if (lockBookComponentError) {
-      console.error(lockBookComponentError)
-    } else if (renameBookComponentError) {
-      console.error(renameBookComponentError)
-    } else if (updateTrackChangesError) {
-      console.error(updateTrackChangesError)
-    } else if (addCustomTagError) {
-      console.error(addCustomTagError)
-    }
-  }, [
-    bookComponentError,
-    waxRulesError,
-    userTeamsError,
-    customTagsError,
-    updateContentError,
-    lockBookComponentError,
-    renameBookComponentError,
-    updateTrackChangesError,
-    addCustomTagError,
-  ])
-  /**
-   * ERROR HANDLING SECTION END
    */
 
   /**
@@ -240,8 +215,24 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
     })
   }
 
+  const onBookUpdated = () => {
+    return subscribeToMoreForBook({
+      document: BOOK_UPDATED_SUBSCRIPTION,
+      variables: { id: bookId },
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev
+        const { data } = subscriptionData
+        const { bookUpdated } = data
+
+        return {
+          getBook: bookUpdated,
+        }
+      },
+    })
+  }
+
   const onBookComponentUpdated = () => {
-    return subscribeToMore({
+    return subscribeToMoreForBookComponent({
       document: BOOK_COMPONENT_UPDATED_SUBSCRIPTION,
       variables: { id: bookComponentId },
       updateQuery: (prev, { subscriptionData }) => {
@@ -256,16 +247,31 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
     })
   }
 
+  const onCustomTagsUpdated = () => {
+    return subscribeToMoreForCustomTags({
+      document: CUSTOM_TAGS_UPDATED_SUBSCRIPTION,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev
+        const { data } = subscriptionData
+        const { customTagsUpdated } = data
+
+        return {
+          getCustomTags: customTagsUpdated,
+        }
+      },
+    })
+  }
+
   const onTriggerModal = (withConfirm, msg, url = undefined) => {
-    if (isModalOpen) {
-      hideModal()
-      setIsModalOpen(false)
-    }
+    // if (isModalOpen) {
+    //   hideModal()
+    //   setIsModalOpen(false)
+    // }
 
     if (withConfirm) {
       const onConfirm = () => {
         hideModal()
-        setIsModalOpen(false)
+        // setIsModalOpen(false)
         history.push(url)
       }
 
@@ -273,27 +279,54 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
         onConfirm,
         warning: msg,
       })
-      setIsModalOpen(true)
+      // setIsModalOpen(true)
     } else {
       showModal('editorModal', {
         noActions: true,
         warning: msg,
       })
-      setIsModalOpen(true)
+      // setIsModalOpen(true)
     }
   }
 
   const onHideModal = () => {
-    if (isModalOpen) {
-      hideModal()
-      setIsModalOpen(false)
-    }
+    hideModal()
+    // if (isModalOpen) {
+    //   setIsModalOpen(false)
+    // }
   }
   /**
    * HANDLERS SECTION END
    */
 
+  /**
+   * ERRORS HANDLING SECTION START
+   */
+  // if (
+  //   bookComponentError ||
+  //   bookError ||
+  //   waxRulesError ||
+  //   userTeamsError ||
+  //   customTagsError ||
+  //   updateContentError ||
+  //   lockBookComponentError ||
+  //   renameBookComponentError ||
+  //   updateTrackChangesError ||
+  //   addCustomTagError
+  // ) {
+  //   onTriggerModal(
+  //     true,
+  //     `Something went wrong! Please inform your system's administrator`,
+  //     `/books/${bookId}/book-builder`,
+  //   )
+  // }
+
+  /**
+   * ERRORS HANDLING SECTION END
+   */
+
   if (
+    bookLoading ||
     bookComponentLoading ||
     waxRulesLoading ||
     userTeamsLoading ||
@@ -301,6 +334,7 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
   )
     return <Loading />
 
+  const { getBook: book } = bookData
   const { getBookComponent: bookComponent } = bookComponentData
   const { teams } = userTeamsData
   const { getCustomTags: tags } = customTagsData
@@ -314,6 +348,7 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
 
   return (
     <EditorPage
+      book={book}
       bookComponent={bookComponent}
       hideModal={hideModal}
       history={history}
@@ -331,6 +366,8 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
       setTabId={setTabId}
       showModal={showModal}
       subscribeToBookComponentUpdates={onBookComponentUpdated}
+      subscribeToBookUpdates={onBookUpdated}
+      subscribeToCustomTagsUpdates={onCustomTagsUpdated}
       tabId={tabId}
       tags={tags}
       user={user}
@@ -343,6 +380,7 @@ const WithModal = props => {
     <ModalContext.Consumer>
       {({ hideModal, showModal, data = {}, modals, modalKey }) => {
         const ModalComponent = modals[modalKey]
+
         return (
           <>
             {modalKey && (

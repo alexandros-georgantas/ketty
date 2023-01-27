@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 import debounce from 'lodash/debounce'
+import findIndex from 'lodash/findIndex'
 import uuid from 'uuid/v4'
 import Editor from './Editor'
 import usePrevious from './helpers/usePrevious'
@@ -16,9 +17,8 @@ const UNLOCK_REASONS = {
 }
 
 const EditorPage = props => {
-  console.log('props', props)
-
   const {
+    book,
     onCustomTagAdd,
     history,
     onTriggerModal,
@@ -28,6 +28,8 @@ const EditorPage = props => {
     onBookComponentLock,
     onBookComponentTitleChange,
     subscribeToBookComponentUpdates,
+    subscribeToBookUpdates,
+    subscribeToCustomTagsUpdates,
     rules,
     setTabId,
     tabId,
@@ -44,19 +46,37 @@ const EditorPage = props => {
     divisionType,
     id,
     content,
-    bookId,
     trackChangesEnabled,
     componentTypeOrder,
-    nextBookComponent,
-    prevBookComponent,
     status,
-    bookTitle,
     title,
     lock,
-    workflowStages,
     uploading,
     bookStructureElements,
   } = bookComponent
+
+  const { divisions, id: bookId, title: bookTitle } = book
+
+  const flatBookComponents = []
+
+  divisions.forEach(division => {
+    const { bookComponents } = division
+    bookComponents.forEach(bookComponent => {
+      const { componentType } = bookComponent
+
+      if (componentType !== 'toc' && componentType !== 'endnotes') {
+        flatBookComponents.push(bookComponent)
+      }
+    })
+  })
+
+  const currentBookComponentIndex = findIndex(flatBookComponents, { id })
+
+  const nextBookComponent =
+    flatBookComponents[currentBookComponentIndex + 1] || null
+
+  const prevBookComponent =
+    flatBookComponents[currentBookComponentIndex - 1] || null
 
   let editorMode
 
@@ -103,7 +123,7 @@ const EditorPage = props => {
     }
   }, 2000)
 
-  const { getWebSocket } = useWebSocket(
+  const { getWebSocket, readyState } = useWebSocket(
     socketUrl,
     {
       onOpen: () => {
@@ -140,11 +160,27 @@ const EditorPage = props => {
     editorMode !== 'preview', // ########## ######### ######## 1 check if that works as expected
   )
 
+  const connectionStatus = {
+    [ReadyState.CONNECTING]: 'Connecting',
+    [ReadyState.OPEN]: 'Open',
+    [ReadyState.CLOSING]: 'Closing',
+    [ReadyState.CLOSED]: 'Closed',
+    [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+  }[readyState]
+
+  const previousConnectionStatus = usePrevious(connectionStatus)
+
   useEffect(() => {
-    const unsubscribe = subscribeToBookComponentUpdates()
+    const unsubscribeFromBookComponentUpdates =
+      subscribeToBookComponentUpdates()
+
+    const unsubscribeFromBookUpdates = subscribeToBookUpdates()
+    const unsubscribeFromCustomTagsUpdates = subscribeToCustomTagsUpdates()
 
     return () => {
-      unsubscribe()
+      unsubscribeFromBookUpdates()
+      unsubscribeFromBookComponentUpdates()
+      unsubscribeFromCustomTagsUpdates()
 
       if (getWebSocket()) {
         getWebSocket().close()
@@ -156,26 +192,40 @@ const EditorPage = props => {
   }, [])
 
   useEffect(() => {
+    console.log('current', connectionStatus)
+    console.log('previous', previousConnectionStatus)
+
+    if (
+      previousConnectionStatus === 'Connecting' &&
+      connectionStatus === 'Open'
+    ) {
+      onHideModal()
+    }
+  }, [connectionStatus])
+
+  useEffect(() => {
     if (editorMode === 'preview') {
       const openWS = getWebSocket()
-      console.log('whatttt2', openWS)
 
       if (openWS) {
-        console.log('whatttt3', openWS)
         openWS.close()
       }
     }
 
-    if (editorMode !== 'preview') {
+    if (
+      previousEditorMode === 'preview' &&
+      (editorMode === 'full' || editorMode === 'review')
+    ) {
       const openWS = getWebSocket()
-      console.log('whatttt', openWS)
 
-      // this is for the case that something were the previous editor mode was preview and the new one is full
-      // this will allow websocket to reconnect
-      if (openWS && openWS.readyState === 3) {
-        // ########## ######### ######## 2 check if that is needed due to 1
+      if (openWS && connectionStatus === 'Closed') {
         setTabId(uuid())
       }
+
+      onTriggerModal(
+        true,
+        'You have gained edit access for this book component!',
+      )
     }
   }, [editorMode])
 
@@ -200,8 +250,6 @@ const EditorPage = props => {
 
   useEffect(() => {
     if (uploading) {
-      console.log('accessing while uploading case')
-
       onTriggerModal(
         true,
         'Uploading in progress, you will be redirected back to Book Builder',
@@ -212,8 +260,6 @@ const EditorPage = props => {
 
   useEffect(() => {
     if (!canAccessBook) {
-      console.log('accessing without book permission case')
-
       onTriggerModal(
         true,
         'You have no permissions to access this book. You will be redirected back to the dashboard',

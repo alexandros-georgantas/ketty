@@ -68,8 +68,6 @@ type BookComponent {
   divisionId: ID!
   divisionType: String
   lock: Lock
-  nextBookComponent: BookComponent
-  prevBookComponent: BookComponent
   pagination: Pagination!
   archived: Boolean!
   workflowStages: [WorkFlowItem]

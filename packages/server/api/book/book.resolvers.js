@@ -1,9 +1,11 @@
+const { withFilter } = require('graphql-subscriptions')
 const { pubsubManager, logger } = require('@coko/server')
 const map = require('lodash/map')
 
 const {
   BOOK_CREATED,
   BOOK_DELETED,
+  BOOK_UPDATED,
   BOOK_RENAMED,
   BOOK_ARCHIVED,
   BOOK_METADATA_UPDATED,
@@ -75,6 +77,10 @@ const renameBook = async (_, { id, title }, ctx) => {
     const renamedBook = await useCaseRenameBook(id, title)
 
     logger.info('book resolver: broadcasting renamed book to clients')
+
+    pubsub.publish(BOOK_UPDATED, {
+      bookUpdated: renamedBook,
+    })
 
     pubsub.publish(BOOK_RENAMED, {
       bookRenamed: renamedBook.id,
@@ -376,7 +382,7 @@ module.exports = {
       let productionEditors = []
 
       if (productionEditorsTeam && productionEditorsTeam.members.length > 0) {
-        productionEditors = map(productionEditorsTeam.members, (teamMember) => {
+        productionEditors = map(productionEditorsTeam.members, teamMember => {
           const { givenName, surname } = teamMember
           return `${givenName} ${surname}`
         })
@@ -390,6 +396,23 @@ module.exports = {
       subscribe: async () => {
         const pubsub = await pubsubManager.getPubsub()
         return pubsub.asyncIterator(BOOK_CREATED)
+      },
+    },
+    bookUpdated: {
+      subscribe: async (...args) => {
+        const pubsub = await pubsubManager.getPubsub()
+
+        return withFilter(
+          () => {
+            return pubsub.asyncIterator(BOOK_UPDATED)
+          },
+          (payload, variables) => {
+            const { id: bookId } = variables
+            const { bookUpdated } = payload
+            const { id } = bookUpdated
+            return bookId === id
+          },
+        )(...args)
       },
     },
     bookArchived: {

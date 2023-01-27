@@ -1,25 +1,13 @@
-// // const { logger } = require('@coko/server')
-const config = require('config')
-// const {
-//   establishConnection,
-//   heartbeat,
-// } = require('../utils/wsConnectionHandlers')
-
-// const bookComponentLockService = async WSServer => {
-
-// }
-
-// module.exports = { bookComponentLockService }
 const { pubsubManager, useTransaction, logger } = require('@coko/server')
+const config = require('config')
 
-const { BookComponent, Lock, BookComponentState } =
+const { Book, BookComponent, Lock, BookComponentState } =
   require('../data-model/src').models
 
-const unlockBookComponent = async (bookComponentId, userId, tabId, reason) => {
+const unlockBookComponent = async (bookComponentId, userId, tabId) => {
   try {
     const serverIdentifier = config.get('serverIdentifier')
     const pubsub = await pubsubManager.getPubsub()
-    console.log('unlcoked')
 
     const updatedBookComponent = await useTransaction(async tr => {
       await Lock.query(tr)
@@ -33,11 +21,14 @@ const unlockBookComponent = async (bookComponentId, userId, tabId, reason) => {
       return BookComponent.findById(bookComponentId)
     }, {})
 
+    const updatedBook = await Book.findById(updatedBookComponent.bookId)
+
     pubsub.publish('BOOK_COMPONENT_UPDATED', {
       bookComponentUpdated: updatedBookComponent,
     })
-    pubsub.publish('BOOK_COMPONENT_LOCK_UPDATED', {
-      bookComponentLockUpdated: updatedBookComponent,
+
+    pubsub.publish('BOOK_UPDATED', {
+      bookUpdated: updatedBook,
     })
     return true
   } catch (e) {
@@ -50,13 +41,9 @@ const cleanUpLocks = async () => {
   const serverIdentifier = config.get('serverIdentifier')
   logger.info(`executing locks clean-up procedure`)
 
-  //   console.log('ti ginetai edo', pubsub)
-
-  const unlockedBookComponents = await useTransaction(async tr => {
+  await useTransaction(async tr => {
     const locks = await Lock.query(tr).where({ serverIdentifier })
-    console.log('ee', locks)
     const bookComponentIds = locks.map(lock => lock.foreignId)
-    console.log('e2', bookComponentIds)
 
     if (bookComponentIds.length > 0) {
       const lockedBookComponents = await BookComponent.query(tr).whereIn(
@@ -64,31 +51,42 @@ const cleanUpLocks = async () => {
         bookComponentIds,
       )
 
-      const affectedRows = await Lock.query(tr)
-        .delete()
-        .where({ serverIdentifier })
+      await Promise.all(
+        lockedBookComponents.map(async lockedBookComponent => {
+          const { id: bookComponentId } = lockedBookComponent
+          await Lock.query(tr).delete().where({
+            serverIdentifier,
+            foreignId: bookComponentId,
+            foreignType: 'bookComponent',
+          })
 
-      await BookComponentState.query(tr)
-        .patch({ status: 104 })
-        .whereIn('bookComponentId', bookComponentIds)
+          await BookComponentState.query(tr)
+            .patch({ status: 104 })
+            .where({ bookComponentId })
 
-      logger.info(`cleaned up ${affectedRows} lock/s`)
-      return lockedBookComponents
+          const updatedBookComponent = await BookComponent.query(tr).findById(
+            bookComponentId,
+          )
+
+          const updatedBook = await Book.query(tr).findById(
+            updatedBookComponent.bookId,
+          )
+
+          setTimeout(() => {
+            logger.info(`broadcasting unlocked event`)
+            pubsub.publish('BOOK_COMPONENT_UPDATED', {
+              bookComponentUpdated: updatedBookComponent,
+            })
+            pubsub.publish('BOOK_UPDATED', {
+              bookUpdated: updatedBook,
+            })
+          }, 15000)
+
+          return true
+        }),
+      )
     }
-
-    return []
   }, {})
-
-  if (unlockedBookComponents.length > 0) {
-    console.log('before broadcast', unlockedBookComponents)
-
-    setTimeout(() => {
-      console.log('now')
-      return pubsub.publish('BOOK_COMPONENTS_LOCK_UPDATED', {
-        bookComponentsLockUpdated: unlockedBookComponents,
-      })
-    }, 15000)
-  }
 
   return false
 }

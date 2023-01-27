@@ -3,6 +3,7 @@ import ModalContext from './ModalContext'
 
 const withModal = props => {
   const { render } = props
+  console.log('props', props)
 
   return (
     <ModalContext.Consumer>

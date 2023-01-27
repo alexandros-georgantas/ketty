@@ -103,7 +103,7 @@ module.exports = {
       email: 'ADMIN_EMAIL',
     },
     cron: {
-      path: path.join(__dirname, '..', 'services', 'tempCleanUp.cron.js'),
+      path: path.join(__dirname, '..', 'services', 'cron.service.js'),
     },
     // useWebSockets: true,
     // websocketPaths: 'locks',

@@ -31,7 +31,6 @@ const Connected = WrappedComponent =>
       <Composed>
         {({ loading, currentUser, applicationParameter, client }) => {
           if (loading) return null
-
           return (
             <WrappedComponent
               applicationParameter={applicationParameter}
