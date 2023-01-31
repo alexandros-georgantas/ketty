@@ -60,7 +60,7 @@ const Navigation = props => {
 
   return (
     <NavBar
-      brand={<StyledLogo alt="Editoria" src="/assets/editoria.png" />}
+      brand={<StyledLogo alt="Editoria" src="/editoria.png" />}
       itemsLeft={itemsLeft}
       itemsRight={
         <Dropdown

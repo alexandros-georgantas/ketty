@@ -61,7 +61,7 @@ module.exports = webpackEnv => {
     },
     output: {
       path: output,
-      publicPath: isEnvDevelopment ? '/' : '/assets/',
+      publicPath: '/',
       filename: isEnvProduction
         ? 'js/[name].[contenthash:8].js'
         : isEnvDevelopment && 'js/bundle.js',

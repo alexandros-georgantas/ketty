@@ -316,11 +316,14 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
     updateTrackChangesError ||
     addCustomTagError
   ) {
-    onTriggerModal(
-      true,
+    console.error(
       `Something went wrong! Please inform your system's administrator`,
-      `/books/${bookId}/book-builder`,
     )
+    // onTriggerModal(
+    //   true,
+    //   `Something went wrong! Please inform your system's administrator`,
+    //   `/books/${bookId}/book-builder`,
+    // )
   }
 
   /**
