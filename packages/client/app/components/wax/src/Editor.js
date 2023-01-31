@@ -2,6 +2,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Wax } from 'wax-prosemirror-core'
+
 import { EditoriaLayout } from '../layout'
 import { defaultConfig, OENConfigWax } from '../config'
 import WaxHeader from './WaxHeader'
@@ -31,6 +32,7 @@ const Editor = ({
   bookId,
   prevBookComponent,
   bookComponentId,
+  setTabId,
   content,
   trackChangesEnabled,
   editorMode,
@@ -203,6 +205,7 @@ const Editor = ({
         id={bookComponentId}
         nextBookComponent={nextBookComponent}
         prevBookComponent={prevBookComponent}
+        setTabId={setTabId}
         title={title}
       />
       <WaxContainer>

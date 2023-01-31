@@ -3,6 +3,8 @@
 import React from 'react'
 import { th, grid } from '@pubsweet/ui-toolkit'
 import styled, { css } from 'styled-components'
+import uuid from 'uuid/v4'
+
 import { NavBarLink, Icons } from '../../../ui'
 
 const StyledNavLinks = styled(NavBarLink)`
@@ -70,10 +72,10 @@ const Header = styled.div`
   }
 `
 
-const createUrl = (bookId, bookComponentId, hasLock) => {
-  if (hasLock) {
-    return `/books/${bookId}/bookComponents/${bookComponentId}/preview`
-  }
+const createUrl = (bookId, bookComponentId) => {
+  // if (hasLock) {
+  //   return `/books/${bookId}/bookComponents/${bookComponentId}/preview`
+  // }
 
   return `/books/${bookId}/bookComponents/${bookComponentId}`
 }
@@ -84,37 +86,50 @@ const WaxHeader = ({
   bookId,
   bookTitle,
   title,
-}) => (
-  <Header>
-    <Container>
-      {prevBookComponent && (
-        <StyledNavLinks
-          position="left"
-          to={createUrl(bookId, prevBookComponent.id, prevBookComponent.lock)}
-        >
-          <Icon>{previousIcon}</Icon>
-          <Text>{`${prevBookComponent.title || 'Untitled'}`}</Text>
+  setTabId,
+}) => {
+  return (
+    <Header>
+      <Container>
+        {prevBookComponent && (
+          <StyledNavLinks
+            onClick={e => {
+              // e.preventDefault()
+              setTabId(uuid())
+              console.log('clicked back')
+            }}
+            position="left"
+            to={createUrl(bookId, prevBookComponent.id)}
+          >
+            <Icon>{previousIcon}</Icon>
+            <Text>{`${prevBookComponent.title || 'Untitled'}`}</Text>
+          </StyledNavLinks>
+        )}
+      </Container>
+      <Container>
+        <StyledNavLinks position="center" to={`/books/${bookId}/book-builder`}>
+          <Text>{`${bookTitle} - ${title || 'Untitled'}`}</Text>
         </StyledNavLinks>
-      )}
-    </Container>
-    <Container>
-      <StyledNavLinks position="center" to={`/books/${bookId}/book-builder`}>
-        <Text>{`${bookTitle} - ${title || 'Untitled'}`}</Text>
-      </StyledNavLinks>
-    </Container>
+      </Container>
 
-    <Container>
-      {nextBookComponent && (
-        <StyledNavLinks
-          position="right"
-          to={createUrl(bookId, nextBookComponent.id, nextBookComponent.lock)}
-        >
-          <Text>{`${nextBookComponent.title || 'Untitled'}`}</Text>
-          <Icon>{nextIcon}</Icon>
-        </StyledNavLinks>
-      )}
-    </Container>
-  </Header>
-)
+      <Container>
+        {nextBookComponent && (
+          <StyledNavLinks
+            onClick={e => {
+              // e.preventDefault()
+              setTabId(uuid())
+              console.log('clicked next')
+            }}
+            position="right"
+            to={createUrl(bookId, nextBookComponent.id, nextBookComponent.lock)}
+          >
+            <Text>{`${nextBookComponent.title || 'Untitled'}`}</Text>
+            <Icon>{nextIcon}</Icon>
+          </StyledNavLinks>
+        )}
+      </Container>
+    </Header>
+  )
+}
 
 export default WaxHeader

@@ -24,7 +24,6 @@ const flavour =
   process.env.EDITORIA_FLAVOUR && process.env.EDITORIA_FLAVOUR === 'BOOKSPRINTS'
     ? 'BOOKSPRINTS'
     : 'VANILLA'
-// const featureBookStructureEnabled = process.env.FEATURE_BOOK_STRUCTURE || false
 
 const featureBookStructureEnabled =
   (process.env.FEATURE_BOOK_STRUCTURE &&
@@ -105,8 +104,6 @@ module.exports = {
     cron: {
       path: path.join(__dirname, '..', 'services', 'cron.service.js'),
     },
-    // useWebSockets: true,
-    // websocketPaths: 'locks',
   },
   'file-server': {
     accessKeyId: 'S3_ACCESS_KEY_ID_USER',

@@ -28,8 +28,6 @@ module.exports = {
     publicURL: 'EXTERNAL_SERVER_URL',
     WSServerPort: 'WS_SERVER_PORT',
     wsHeartbeatInterval: 'WS_HEARTBEAT_INTERVAL',
-    // useWebSockets: 'USE_WEB_SOCKETS',
-    // websocketPaths: 'WEB_SOCKET_PATHS',
     db: {
       user: 'POSTGRES_USER',
       password: 'POSTGRES_PASSWORD',

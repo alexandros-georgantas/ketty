@@ -21,6 +21,7 @@ module.exports = webpackEnv => {
   const isEnvDevelopment = webpackEnv === 'development'
   const isEnvProduction = webpackEnv === 'production'
   const serverProtocol = process.env.SERVER_PROTOCOL
+  const locksWSURL = process.env.LOCKS_WS_URL
 
   // const featureBookStructure = process.env.FEATURE_BOOK_STRUCTURE || false
   const featureBookStructure =
@@ -99,6 +100,7 @@ module.exports = webpackEnv => {
         serverPort,
         featureBookStructure,
         featureUploadDOCXFiles,
+        locksWSURL,
       },
     }),
   }

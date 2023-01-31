@@ -16018,10 +16018,10 @@ watchpack@^1.6.0, watchpack@^1.7.4:
     chokidar "^3.4.1"
     watchpack-chokidar2 "^2.0.1"
 
-wax-prosemirror-core@0.7.6, wax-prosemirror-core@^0.7.6:
-  version "0.7.6"
-  resolved "https://registry.yarnpkg.com/wax-prosemirror-core/-/wax-prosemirror-core-0.7.6.tgz#8487f3321ee044a6a301ff948f182d9cfa0d146c"
-  integrity sha512-6UEg6blqFoT3EUpj89WJXvO0bU4nrAm4XZqsSOPSLUnL/UB8anHR8yC470kT91NPdMVFle7PUz0P3erLsEp81g==
+wax-prosemirror-core@0.7.10, wax-prosemirror-core@^0.7.10:
+  version "0.7.10"
+  resolved "https://registry.yarnpkg.com/wax-prosemirror-core/-/wax-prosemirror-core-0.7.10.tgz#c0a1af82b998732c979a308e8b8f344316ab6700"
+  integrity sha512-0Isz9hfkXSFUdgCZZXQb6aLLYuF1P2SUGD54kjccB3F4X6XsH/SzBZ3ljoiRuP+kEc3Y5XKaHk+KmztpLKOqtg==
   dependencies:
     "@pubsweet/ui-toolkit" "^2.3.1"
     deepmerge "^4.2.2"
@@ -16046,10 +16046,10 @@ wax-prosemirror-core@0.7.6, wax-prosemirror-core@^0.7.6:
     styled-components "^5.3.0"
     uuid "^7.0.3"
 
-wax-prosemirror-services@0.7.6:
-  version "0.7.6"
-  resolved "https://registry.yarnpkg.com/wax-prosemirror-services/-/wax-prosemirror-services-0.7.6.tgz#fff74aa7a69ae677abbfc8312679900d785c5904"
-  integrity sha512-ZGaX/dUosTWrhKomL29EBtIZFn+/totoQk3yvqwm4U0es2LEZ5QzAI44QOHNQUlyNeSEvZRfhSCG0oXSmxHaFg==
+wax-prosemirror-services@0.7.10:
+  version "0.7.10"
+  resolved "https://registry.yarnpkg.com/wax-prosemirror-services/-/wax-prosemirror-services-0.7.10.tgz#daff3fbcc82ba795b6b3b79b762727b58dbdbddb"
+  integrity sha512-WO87nPucLqfx/6ttlnj7RC5+Rda8rOkjBS/iRHz+Wqo7bSVrcm/pjzCvvETD/7r/7UTqQ1aOohdSel/xW2QM7w==
   dependencies:
     "@pubsweet/ui-toolkit" "^2.3.1"
     highlight.js "^10.1.1"
@@ -16075,7 +16075,7 @@ wax-prosemirror-services@0.7.6:
     use-deep-compare-effect "^1.3.1"
     use-dynamic-refs "^1.0.0"
     uuid "^7.0.3"
-    wax-prosemirror-core "^0.7.6"
+    wax-prosemirror-core "^0.7.10"
     y-prosemirror "^1.2.0"
     y-protocols "^1.0.1"
     y-webrtc "^10.2.0"

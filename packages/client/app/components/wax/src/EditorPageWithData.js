@@ -32,8 +32,8 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
   const { bookId, bookComponentId, mode } = params
 
   const [tabId, setTabId] = useState(uuid())
-  const [isOnline, setIsOnline] = useState(navigator.onLine)
   // const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isOnline, setIsOnline] = useState(navigator.onLine)
 
   useEffect(() => {
     // Update network status
@@ -73,6 +73,7 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
     data: bookComponentData,
   } = useQuery(GET_BOOK_COMPONENT, {
     variables: { id: bookComponentId },
+    fetchPolicy: 'network-only', // this is due to quick header navigation in Wax. When going back there are potential cached data about lock and an unlock subscription message will not have the chance to arrive in time
   })
 
   // TODO: get this info from current user
@@ -239,6 +240,7 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
         if (!subscriptionData.data) return prev
         const { data } = subscriptionData
         const { bookComponentUpdated } = data
+        console.log('in subscription', bookComponentUpdated)
 
         return {
           getBookComponent: bookComponentUpdated,
@@ -302,24 +304,24 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
   /**
    * ERRORS HANDLING SECTION START
    */
-  // if (
-  //   bookComponentError ||
-  //   bookError ||
-  //   waxRulesError ||
-  //   userTeamsError ||
-  //   customTagsError ||
-  //   updateContentError ||
-  //   lockBookComponentError ||
-  //   renameBookComponentError ||
-  //   updateTrackChangesError ||
-  //   addCustomTagError
-  // ) {
-  //   onTriggerModal(
-  //     true,
-  //     `Something went wrong! Please inform your system's administrator`,
-  //     `/books/${bookId}/book-builder`,
-  //   )
-  // }
+  if (
+    bookComponentError ||
+    bookError ||
+    waxRulesError ||
+    userTeamsError ||
+    customTagsError ||
+    updateContentError ||
+    lockBookComponentError ||
+    renameBookComponentError ||
+    updateTrackChangesError ||
+    addCustomTagError
+  ) {
+    onTriggerModal(
+      true,
+      `Something went wrong! Please inform your system's administrator`,
+      `/books/${bookId}/book-builder`,
+    )
+  }
 
   /**
    * ERRORS HANDLING SECTION END
@@ -346,6 +348,7 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
     userId: currentUser.id,
   }
 
+  console.log('TABID', tabId)
   return (
     <EditorPage
       book={book}

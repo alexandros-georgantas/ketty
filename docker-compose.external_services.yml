@@ -108,7 +108,7 @@ services:
   icml:
     depends_on:
       - db-icml
-    image: cokoapps/icml:1.1.2
+    image: cokoapps/icml:1.2.0
     ports:
       - ${SERVICE_ICML_PORT:-3002}:${SERVICE_ICML_PORT:-3002}
     environment:
@@ -134,7 +134,7 @@ services:
   pagedjs:
     depends_on:
       - db-pagedjs
-    image: cokoapps/pagedjs:1.4.6
+    image: cokoapps/pagedjs:1.4.7
     ports:
       - ${SERVICE_PAGEDJS_PORT:-3003}:${SERVICE_PAGEDJS_PORT:-3003}
     environment:

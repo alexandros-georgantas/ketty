@@ -108,10 +108,10 @@ const EditorContainer = styled.div`
   width: 65%;
 
   .ProseMirror {
-    user-select: ${({ isReadOnly }) => (isReadOnly ? 'none' : 'default')};
     box-shadow: 0 0 8px #ecedf1;
     min-height: 98%;
     padding: ${grid(10)};
+    user-select: ${({ isReadOnly }) => (isReadOnly ? 'none' : 'default')};
   }
 `
 
@@ -262,7 +262,6 @@ const EditoriaLayout = props => {
   )
 
   useEffect(() => {}, [delayedShowedNotes])
-
   return (
     <ThemeProvider theme={cokoTheme}>
       <Wrapper id="wax-container" style={fullScreenStyles}>

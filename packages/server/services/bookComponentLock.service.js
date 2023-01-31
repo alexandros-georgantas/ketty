@@ -10,6 +10,7 @@ const unlockBookComponent = async (bookComponentId, userId, tabId) => {
     const pubsub = await pubsubManager.getPubsub()
 
     const updatedBookComponent = await useTransaction(async tr => {
+      console.log('server remove lock', tabId)
       await Lock.query(tr)
         .delete()
         .where({ foreignId: bookComponentId, userId, tabId, serverIdentifier })
@@ -22,7 +23,7 @@ const unlockBookComponent = async (bookComponentId, userId, tabId) => {
     }, {})
 
     const updatedBook = await Book.findById(updatedBookComponent.bookId)
-
+    console.log('server broadcast', tabId)
     pubsub.publish('BOOK_COMPONENT_UPDATED', {
       bookComponentUpdated: updatedBookComponent,
     })

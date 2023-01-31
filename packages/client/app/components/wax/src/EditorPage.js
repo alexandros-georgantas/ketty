@@ -93,6 +93,7 @@ const EditorPage = props => {
   } else if (lock && lock.userId !== user.id) {
     editorMode = 'preview'
   } else if (lock && lock.userId === user.id && tabId !== lock.tabId) {
+    console.log('hereAAAAAAAA', lock)
     editorMode = 'preview'
   } else if (canEditPreview) {
     editorMode = 'preview'
@@ -109,7 +110,7 @@ const EditorPage = props => {
   const previousLock = usePrevious(lock)
   const previousEditorMode = usePrevious(editorMode)
   const token = localStorage.getItem('token')
-  const socketUrl = 'ws://192.168.10.6:8586/locks'
+  const socketUrl = process.env.LOCKS_WS_URL
 
   const onPeriodicBookComponentTitleChange = debounce(changedTitle => {
     if (editorMode === 'full') {
@@ -318,6 +319,7 @@ const EditorPage = props => {
       onPeriodicBookComponentTitleChange={onPeriodicBookComponentTitleChange}
       prevBookComponent={prevBookComponent}
       rules={rules}
+      setTabId={setTabId}
       tags={tags}
       title={title}
       trackChangesEnabled={trackChangesEnabled}
