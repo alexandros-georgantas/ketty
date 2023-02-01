@@ -145,8 +145,11 @@ const EditorPage = props => {
             : `Unfortunately, something happened and our server is unreachable at this moment. The application does not support offline mode. In the meantime, we are trying to reconnect to our server and if we succeed this modal will disappear and you will be able to continue what you were doing. So, if you want just wait a bit :)`
 
         // setOnReconnectError(true)
+        if (previousEditorMode !== 'preview' && editorMode === 'preview') {
+          return
+        }
 
-        return onTriggerModal(true, msg, `/books/${bookId}/book-builder`)
+        onTriggerModal(true, msg, `/books/${bookId}/book-builder`)
       },
       onReconnectStop: number => {
         return onTriggerModal(
