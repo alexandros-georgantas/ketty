@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 import debounce from 'lodash/debounce'
 import findIndex from 'lodash/findIndex'
@@ -56,7 +56,7 @@ const EditorPage = props => {
   } = bookComponent
 
   const { divisions, id: bookId, title: bookTitle } = book
-  // const [onReconnectError, setOnReconnectError] = useState(false)
+  const [onReconnectError, setOnReconnectError] = useState(false)
 
   const flatBookComponents = []
 
@@ -130,24 +130,22 @@ const EditorPage = props => {
     {
       onOpen: () => {
         if (editorMode !== 'preview') {
-          console.log('1')
           onBookComponentLock()
         }
       },
       onClose: what => console.log('closed', what),
       onMessage: msg => console.log('onMessage', msg),
-      onError: err => {
-        console.log('ERRRRRRRR', err)
-
+      onError: () => {
         const msg =
           editorMode !== 'preview'
             ? `Unfortunately, something happened and our server is unreachable at this moment. The application does not support offline mode thus your lock will be released. In the meantime, we are trying to reconnect to our server and if this book component is not locked by any other user, you will get back your lock automatically which will allow you to continue editing. So, if you want just wait a bit :)`
             : `Unfortunately, something happened and our server is unreachable at this moment. The application does not support offline mode. In the meantime, we are trying to reconnect to our server and if we succeed this modal will disappear and you will be able to continue what you were doing. So, if you want just wait a bit :)`
 
-        // setOnReconnectError(true)
-        if (previousEditorMode !== 'preview' && editorMode === 'preview') {
-          return
-        }
+        setOnReconnectError(true)
+
+        // if (previousEditorMode !== 'preview' && editorMode === 'preview') {
+        //   return
+        // }
 
         onTriggerModal(true, msg, `/books/${bookId}/book-builder`)
       },
@@ -159,13 +157,12 @@ const EditorPage = props => {
         )
       },
       shouldReconnect: closeEvent => {
-        console.log('SHOULD RECONNECT', closeEvent)
         return editorMode !== 'preview'
       },
       queryParams: { token, bookComponentId: bookComponent.id, tabId },
-      reconnectInterval: 10000,
-      reconnectAttempts: 10,
-      share: false,
+      reconnectInterval: 5000,
+      reconnectAttempts: 7,
+      share: true,
     },
     editorMode !== 'preview', // ########## ######### ######## 1 check if that works as expected
   )
@@ -192,10 +189,10 @@ const EditorPage = props => {
       unsubscribeFromBookComponentUpdates()
       unsubscribeFromCustomTagsUpdates()
 
-      if (getWebSocket() && connectionStatus === 'Open') {
-        console.log('AAAAAAAAAAAAAAAAAAAAAAAAA1', connectionStatus)
-        getWebSocket().close()
-      }
+      // if (getWebSocket() && connectionStatus === 'Open') {
+      //   console.log('AAAAAAAAAAAAAAAAAAAAAAAAA1', connectionStatus)
+      //   // getWebSocket().close()
+      // }
 
       onPeriodicBookComponentContentChange.cancel()
       onPeriodicBookComponentTitleChange.cancel()
@@ -203,38 +200,35 @@ const EditorPage = props => {
   }, [])
 
   useEffect(() => {
-    console.log('current', connectionStatus)
-    console.log('previous', previousConnectionStatus)
-
     if (
       previousConnectionStatus === 'Connecting' &&
       connectionStatus === 'Open'
     ) {
-      if (previousEditorMode !== 'preview' && editorMode === 'preview') {
-        const openWS = getWebSocket()
+      // if (previousEditorMode !== 'preview' && editorMode === 'preview') {
+      //   // const openWS = getWebSocket()
 
-        if (openWS && connectionStatus === 'Open') {
-          console.log('AAAAAAAAAAAAAAAAAAAAAAAAA2', connectionStatus)
-          openWS.close()
-        }
-      }
-
-      // if (onReconnectError) {
-      onHideModal()
-      //   setOnReconnectError(false)
+      //   // if (openWS && connectionStatus === 'Open') {
+      //   //   console.log('AAAAAAAAAAAAAAAAAAAAAAAAA2', connectionStatus)
+      //   //   // openWS.close()
+      //   // }
       // }
+
+      if (onReconnectError) {
+        onHideModal()
+        setOnReconnectError(false)
+      }
     }
   }, [connectionStatus])
 
   useEffect(() => {
-    if (editorMode === 'preview') {
-      const openWS = getWebSocket()
+    // if (editorMode === 'preview') {
+    //   const openWS = getWebSocket()
 
-      if (openWS && connectionStatus === 'Open') {
-        console.log('AAAAAAAAAAAAAAAAAAAAAAAAA3', connectionStatus)
-        openWS.close()
-      }
-    }
+    //   if (openWS && connectionStatus === 'Open') {
+    //     console.log('AAAAAAAAAAAAAAAAAAAAAAAAA3', connectionStatus)
+    //     // openWS.close()
+    //   }
+    // }
 
     if (
       previousEditorMode === 'preview' &&
