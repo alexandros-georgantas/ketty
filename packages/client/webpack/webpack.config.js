@@ -23,12 +23,10 @@ module.exports = webpackEnv => {
   const serverProtocol = process.env.SERVER_PROTOCOL
   const locksWSURL = process.env.LOCKS_WS_URL
 
-  // const featureBookStructure = process.env.FEATURE_BOOK_STRUCTURE || false
   const featureBookStructure =
     (process.env.FEATURE_BOOK_STRUCTURE &&
       JSON.parse(process.env.FEATURE_BOOK_STRUCTURE)) ||
     false
-  // const featureUploadDOCXFiles = process.env.FEATURE_UPLOAD_DOCX_FILES || true
 
   const featureUploadDOCXFiles =
     (process.env.FEATURE_UPLOAD_DOCX_FILES &&

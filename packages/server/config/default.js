@@ -11,15 +11,6 @@ const waxVanilla = require('./modules/waxConfigVanilla')
 const waxBooksprints = require('./modules/waxConfigBooksprints')
 const permissions = require('./permissions')
 
-// const logger = new winston.createLogger({
-//   transports: [
-//     new winston.transports.Console({
-//       colorize: true,
-//       handleExceptions: true,
-//       humanReadableUnhandledException: true,
-//     }),
-//   ],
-// })
 const flavour =
   process.env.EDITORIA_FLAVOUR && process.env.EDITORIA_FLAVOUR === 'BOOKSPRINTS'
     ? 'BOOKSPRINTS'
@@ -87,8 +78,7 @@ module.exports = {
     serveClient: false,
     graphiql: true,
     tokenExpiresIn: '360 days',
-    externalServerURL: undefined,
-    // logger,
+    publicURL: undefined,
     port: 3000,
     protocol: 'http',
     host: 'localhost',

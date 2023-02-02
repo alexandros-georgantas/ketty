@@ -310,18 +310,9 @@ const xsweetHandler = async (bookComponentId, filePath) => {
     const { responseToken, id: serviceCallbackTokenId } = serviceCallbackToken
     form.append('responseToken', responseToken)
     form.append('serviceCallbackTokenId', serviceCallbackTokenId)
-    // const serveClient = config.get('pubsweet-server.serveClient')
-    const externalServerURL = config.get('pubsweet-server.externalServerURL')
+    const publicURL = config.get('pubsweet-server.publicURL')
 
-    let url = config.get('pubsweet-server.baseUrl')
-
-    // if (serveClient && serveClient === 'true') {
-    if (externalServerURL && externalServerURL !== 'null') {
-      url = externalServerURL
-    }
-    // }
-
-    form.append('callbackURL', url)
+    form.append('callbackURL', publicURL)
 
     return new Promise((resolve, reject) => {
       axios({

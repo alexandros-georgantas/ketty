@@ -147,7 +147,7 @@ const EditorPage = props => {
         //   return
         // }
 
-        onTriggerModal(true, msg, `/books/${bookId}/book-builder`)
+        onTriggerModal(false, msg)
       },
       onReconnectStop: number => {
         return onTriggerModal(

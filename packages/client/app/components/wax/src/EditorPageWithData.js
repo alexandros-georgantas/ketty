@@ -33,21 +33,23 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
 
   const [tabId, setTabId] = useState(uuid())
   // const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isOnline, setIsOnline] = useState(navigator.onLine)
+  const [isOnline, setIsOnline] = useState(true)
 
   useEffect(() => {
-    // Update network status
-    const handleStatusChange = () => {
-      setIsOnline(navigator.onLine)
+    const handleStatusChange = value => {
+      if (value === 'online') {
+        setIsOnline(true)
+      } else {
+        setIsOnline(false)
+      }
     }
 
     // Listen to the online status
-    window.addEventListener('online', handleStatusChange)
+    window.addEventListener('online', () => handleStatusChange('online'))
 
     // Listen to the offline status
-    window.addEventListener('offline', handleStatusChange)
+    window.addEventListener('offline', () => handleStatusChange('offline'))
 
-    // Specify how to clean up after this effect for performance improvement
     return () => {
       window.removeEventListener('online', handleStatusChange)
       window.removeEventListener('offline', handleStatusChange)

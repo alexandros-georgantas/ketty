@@ -74,15 +74,9 @@ const searchForUsers = async (search, exclude, options = {}) => {
               const fullname = `${user.givenName} ${user.surname}`
 
               if (
-                (get(user, 'username', '')
-                  .toLowerCase()
-                  .includes(searchLow) ||
-                  get(user, 'surname', '')
-                    .toLowerCase()
-                    .includes(searchLow) ||
-                  get(user, 'email', '')
-                    .toLowerCase()
-                    .includes(searchLow) ||
+                (get(user, 'username', '').toLowerCase().includes(searchLow) ||
+                  get(user, 'surname', '').toLowerCase().includes(searchLow) ||
+                  get(user, 'email', '').toLowerCase().includes(searchLow) ||
                   fullname.toLowerCase().includes(searchLow)) &&
                 !includes(exclude, user.id)
               ) {
@@ -92,12 +86,8 @@ const searchForUsers = async (search, exclude, options = {}) => {
                 res.push(user)
               }
             } else if (
-              (get(user, 'username', '')
-                .toLowerCase()
-                .includes(searchLow) ||
-                get(user, 'email', '')
-                  .toLowerCase()
-                  .includes(searchLow)) &&
+              (get(user, 'username', '').toLowerCase().includes(searchLow) ||
+                get(user, 'email', '').toLowerCase().includes(searchLow)) &&
               !includes(exclude, user.id)
             ) {
               logger.info(
@@ -233,22 +223,7 @@ const sendPasswordResetEmail = async (username, options = {}) => {
     const { trx } = options
     return useTransaction(
       async tr => {
-        const serveClient = config.get('pubsweet-server.serveClient')
-
-        const externalServerURL = config.get(
-          'pubsweet-server.externalServerURL',
-        )
-
-        let url = config.get('pubsweet-server.baseUrl')
-
-        if (serveClient && serveClient === 'true') {
-          if (externalServerURL && externalServerURL !== 'null') {
-            url = externalServerURL
-          } else {
-            const { protocol, host, port } = config.get('pubsweet-client')
-            url = `${protocol}://${host}${port ? `:${port}` : ''}`
-          }
-        }
+        const url = config.get('pubsweet-server.clientURL')
 
         const configSender = config.get('mailer.from')
 
