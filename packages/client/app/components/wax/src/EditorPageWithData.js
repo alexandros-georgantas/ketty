@@ -45,10 +45,16 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
     }
 
     // Listen to the online status
-    window.addEventListener('online', () => handleStatusChange('online'))
+    window.addEventListener('online', () => {
+      console.log('online is triggered')
+      handleStatusChange('online')
+    })
 
     // Listen to the offline status
-    window.addEventListener('offline', () => handleStatusChange('offline'))
+    window.addEventListener('offline', () => {
+      console.log('offline is triggered')
+      handleStatusChange('offline')
+    })
 
     return () => {
       window.removeEventListener('online', handleStatusChange)
@@ -94,10 +100,12 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
     loading: userTeamsLoading,
     error: userTeamsError,
     data: userTeamsData,
+    networkStatus,
   } = useQuery(GET_USER_TEAM, {
     variables: { users: [currentUser.id] },
     pollInterval: 5000,
     fetchPolicy: 'network-only',
+    // notifyOnNetworkStatusChange: true,
   })
 
   const {
@@ -320,6 +328,7 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
   ) {
     console.error(
       `Something went wrong! Please inform your system's administrator`,
+      bookComponentError,
     )
     // onTriggerModal(
     //   true,
@@ -327,10 +336,19 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
     //   `/books/${bookId}/book-builder`,
     // )
   }
-
   /**
    * ERRORS HANDLING SECTION END
    */
+
+  // useEffect(() => {
+  //   if (networkStatus === 8 && isOnline) {
+  //     setIsOnline(false)
+  //   }
+
+  //   if (networkStatus === 7 && !isOnline) {
+  //     setIsOnline(true)
+  //   }
+  // }, [networkStatus])
 
   if (
     bookLoading ||
@@ -354,6 +372,7 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
   }
 
   console.log('TABID', tabId)
+  console.log('networkStatus', networkStatus, bookComponentLoading)
   return (
     <EditorPage
       book={book}

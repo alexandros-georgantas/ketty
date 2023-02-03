@@ -9,11 +9,12 @@ create table service_callback_token (
   deleted boolean default false,
   -- foreign
   book_component_id uuid not null references book_component,
-  service_credential_id uuid not null references service_credential,
+  -- service_credential_id uuid not null references service_credential,
 
   -- own
   response_token text,
 
   -- constraints
-  unique(book_component_id, response_token, service_credential_id)
+  -- unique(book_component_id, response_token, service_credential_id)
+  unique(book_component_id, response_token)
 );

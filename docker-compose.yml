@@ -137,6 +137,7 @@ services:
       - SERVER_PROTOCOL=${SERVER_PROTOCOL:-http}
       - WS_SERVER_PORT=${WS_SERVER_PORT:-8586}
       - WS_HEARTBEAT_INTERVAL=${WS_HEARTBEAT_INTERVAL:-10000}
+      - FAIL-SAFE_UNLOCKING_INTERVAL=${FAIL-SAFE_UNLOCKING_INTERVAL:-10000}
       - CLIENT_PROTOCOL=${CLIENT_PROTOCOL:-http}
       - CLIENT_HOST=${CLIENT_HOST:-0.0.0.0}
       - CLIENT_PORT=${CLIENT_PORT:-4000}
@@ -276,7 +277,7 @@ services:
   xsweet:
     depends_on:
       - db-xsweet
-    image: cokoapps/xsweet:1.1.3
+    image: cokoapps/xsweet:2.1.2
     ports:
       - ${SERVICE_XSWEET_PORT:-3004}:${SERVICE_XSWEET_PORT:-3004}
     environment:

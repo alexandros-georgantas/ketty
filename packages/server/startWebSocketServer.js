@@ -7,6 +7,7 @@ const {
   establishConnection,
   heartbeat,
   initializeHeartbeat,
+  initializeFailSafeUnlocking,
 } = require('./utils/wsConnectionHandlers')
 
 const { unlockBookComponent } = require('./services/bookComponentLock.service')
@@ -15,6 +16,7 @@ let WSServer
 
 const startWSServer = async () => {
   let HEARTBEAT_INTERVAL_REFERENCE
+  let FAILSAFE_UNLOCK_REFERENCE
 
   try {
     if (!WSServer) {
@@ -37,38 +39,36 @@ const startWSServer = async () => {
 
     // WS_SERVER EVENT LISTENERS SECTION
     WSServer.on('connection', async (ws, req) => {
-      await establishConnection(ws, req)
-      console.log('OPEEEEEEEEEEEEENNNNNNNNNNNNNN')
       // INITIALIZATION SECTION
+      await establishConnection(ws, req)
       ws.isAlive = true
       // INITIALIZATION SECTION END
 
       // WS EVENT LISTENERS SECTION
       ws.on('pong', () => heartbeat(ws))
 
-      // ws.on('open', () => {
-      //   console.log('OPEEEEEEEEEEEEENNNNNNNNNNNNNN')
-      // })
-      ws.on('message', data => {
-        // console.log('ondata')
+      ws.on('open', () => {
+        logger.info(
+          `WS open event for book component with id ${ws.bookComponentId}, tabId ${ws.tabId} and userId ${ws.userId}`,
+        )
       })
       ws.on('close', async () => {
-        // could broken connection pass reason ?
+        logger.info(
+          `WS close event for book component with id ${ws.bookComponentId}, tabId ${ws.tabId} and userId ${ws.userId}`,
+        )
         return unlockBookComponent(ws.bookComponentId, ws.userId, ws.tabId)
       })
       // WS EVENT LISTENERS SECTION END
     })
 
-    HEARTBEAT_INTERVAL_REFERENCE = initializeHeartbeat(
-      WSServer,
-      unlockBookComponent,
-    )
+    HEARTBEAT_INTERVAL_REFERENCE = initializeHeartbeat(WSServer)
+    FAILSAFE_UNLOCK_REFERENCE = initializeFailSafeUnlocking(WSServer)
 
     WSServer.on('close', async () => {
       clearInterval(HEARTBEAT_INTERVAL_REFERENCE)
+      clearInterval(FAILSAFE_UNLOCK_REFERENCE)
+      logger.info('###### WS SERVER IS CLOSING ######')
       WSServer.clients.forEach(ws => {
-        logger.info('ws broken')
-        // console.log('broken connection')
         ws.terminate()
       })
     })
@@ -76,6 +76,10 @@ const startWSServer = async () => {
   } catch (e) {
     if (HEARTBEAT_INTERVAL_REFERENCE) {
       clearInterval(HEARTBEAT_INTERVAL_REFERENCE)
+    }
+
+    if (FAILSAFE_UNLOCK_REFERENCE) {
+      clearInterval(FAILSAFE_UNLOCK_REFERENCE)
     }
 
     throw new Error(e)

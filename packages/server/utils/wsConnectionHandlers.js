@@ -3,6 +3,11 @@ const config = require('config')
 const { logger } = require('@coko/server')
 const { isAuthenticatedUser } = require('./wsAuthentication')
 
+const {
+  unlockOrphanLocks,
+  cleanUpLocks,
+} = require('../services/bookComponentLock.service')
+
 const establishConnection = async (ws, req) => {
   try {
     const serverURL = config.has('pubsweet-server.publicURL')
@@ -32,11 +37,18 @@ const heartbeat = ws => (ws.isAlive = true)
 
 const initializeHeartbeat = async WSServer => {
   try {
-    return setInterval(() => {
-      console.log('# of clients', WSServer.clients.size)
+    return setInterval(async () => {
+      logger.info(`######### WS HEARTBEAT #########`)
+      logger.info(
+        `current connected clients via WS are ${WSServer.clients.size}`,
+      )
+
       WSServer.clients.forEach(ws => {
         if (ws.isAlive === false) {
-          logger.info('ws broken')
+          logger.info(`######### BROKEN CONNECTION DETECTED #########`)
+          logger.info(
+            `ws connection is broken for book component with id ${ws.bookComponentId} and userId ${ws.userId}`,
+          )
           return ws.terminate()
         }
 
@@ -50,4 +62,36 @@ const initializeHeartbeat = async WSServer => {
   }
 }
 
-module.exports = { establishConnection, heartbeat, initializeHeartbeat }
+const initializeFailSafeUnlocking = async WSServer => {
+  try {
+    return setInterval(async () => {
+      logger.info(`######### UNLOCKING FAIL-SAFE #########`)
+      logger.info(
+        `current connected clients via WS are ${WSServer.clients.size}`,
+      )
+      const lockedBookComponentIds = []
+      WSServer.clients.forEach(ws => {
+        lockedBookComponentIds.push(ws.bookComponentId)
+      })
+
+      if (lockedBookComponentIds.length === 0) {
+        await cleanUpLocks(true)
+      }
+
+      if (lockedBookComponentIds.length > 0) {
+        await unlockOrphanLocks(lockedBookComponentIds)
+      }
+
+      return true
+    }, config['pubsweet-server'].failSafeUnlockingInterval || 5000)
+  } catch (e) {
+    throw new Error(e)
+  }
+}
+
+module.exports = {
+  establishConnection,
+  heartbeat,
+  initializeHeartbeat,
+  initializeFailSafeUnlocking,
+}

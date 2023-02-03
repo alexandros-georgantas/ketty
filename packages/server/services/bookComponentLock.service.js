@@ -10,11 +10,15 @@ const unlockBookComponent = async (bookComponentId, userId, tabId) => {
     const pubsub = await pubsubManager.getPubsub()
 
     const updatedBookComponent = await useTransaction(async tr => {
-      console.log('server remove lock', tabId)
-      await Lock.query(tr)
-        .delete()
-        .where({ foreignId: bookComponentId, userId, tabId, serverIdentifier })
+      logger.info(
+        `server remove lock for book component ${bookComponentId} with tabId ${tabId} and user ${userId}`,
+      )
 
+      const affectedRows = await Lock.query(tr)
+        .delete()
+        .where({ foreignId: bookComponentId, userId, serverIdentifier })
+
+      logger.info(`locks removed ${affectedRows}`)
       await BookComponentState.query(tr)
         .patch({ status: 200 })
         .where({ bookComponentId })
@@ -23,7 +27,6 @@ const unlockBookComponent = async (bookComponentId, userId, tabId) => {
     }, {})
 
     const updatedBook = await Book.findById(updatedBookComponent.bookId)
-    console.log('server broadcast', tabId)
     pubsub.publish('BOOK_COMPONENT_UPDATED', {
       bookComponentUpdated: updatedBookComponent,
     })
@@ -37,59 +40,156 @@ const unlockBookComponent = async (bookComponentId, userId, tabId) => {
   }
 }
 
-const cleanUpLocks = async () => {
-  const pubsub = await pubsubManager.getPubsub()
-  const serverIdentifier = config.get('serverIdentifier')
-  logger.info(`executing locks clean-up procedure`)
+const unlockOrphanLocks = async bookComponentIdsWithLock => {
+  try {
+    const pubsub = await pubsubManager.getPubsub()
+    const serverIdentifier = config.get('serverIdentifier')
+    logger.info(`executing locks clean-up procedure for orphan locks`)
+    let removeCounter = 0
 
-  await useTransaction(async tr => {
-    const locks = await Lock.query(tr).where({ serverIdentifier })
-    const bookComponentIds = locks.map(lock => lock.foreignId)
+    await useTransaction(async tr => {
+      const orphanLocks = await Lock.query(tr)
+        .whereNotIn('foreignId', bookComponentIdsWithLock)
+        .andWhere({ serverIdentifier })
 
-    if (bookComponentIds.length > 0) {
-      const lockedBookComponents = await BookComponent.query(tr).whereIn(
-        'id',
-        bookComponentIds,
-      )
+      const orphanBookComponentIds = orphanLocks.map(lock => lock.foreignId)
 
-      await Promise.all(
-        lockedBookComponents.map(async lockedBookComponent => {
-          const { id: bookComponentId } = lockedBookComponent
-          await Lock.query(tr).delete().where({
-            serverIdentifier,
-            foreignId: bookComponentId,
-            foreignType: 'bookComponent',
-          })
+      if (orphanBookComponentIds.length > 0) {
+        logger.info(`found ${orphanBookComponentIds.length} orphan locks`)
 
-          await BookComponentState.query(tr)
-            .patch({ status: 104 })
-            .where({ bookComponentId })
+        const orphanLockedBookComponents = await BookComponent.query(
+          tr,
+        ).whereIn('id', orphanBookComponentIds)
 
-          const updatedBookComponent = await BookComponent.query(tr).findById(
-            bookComponentId,
-          )
+        await Promise.all(
+          orphanLockedBookComponents.map(async lockedBookComponent => {
+            const { id: bookComponentId } = lockedBookComponent
 
-          const updatedBook = await Book.query(tr).findById(
-            updatedBookComponent.bookId,
-          )
-
-          setTimeout(() => {
-            logger.info(`broadcasting unlocked event`)
-            pubsub.publish('BOOK_COMPONENT_UPDATED', {
-              bookComponentUpdated: updatedBookComponent,
+            const affected = await Lock.query(tr).delete().where({
+              serverIdentifier,
+              foreignId: bookComponentId,
+              foreignType: 'bookComponent',
             })
-            pubsub.publish('BOOK_UPDATED', {
-              bookUpdated: updatedBook,
-            })
-          }, 15000)
 
-          return true
-        }),
-      )
-    }
-  }, {})
+            if (affected === 1) {
+              removeCounter += 1
+            }
 
-  return false
+            await BookComponentState.query(tr)
+              .patch({ status: 104 })
+              .where({ bookComponentId })
+
+            const updatedBookComponent = await BookComponent.query(tr).findById(
+              bookComponentId,
+            )
+
+            const updatedBook = await Book.query(tr).findById(
+              updatedBookComponent.bookId,
+            )
+
+            setTimeout(() => {
+              logger.info(`broadcasting unlocked event`)
+              pubsub.publish('BOOK_COMPONENT_UPDATED', {
+                bookComponentUpdated: updatedBookComponent,
+              })
+              pubsub.publish('BOOK_UPDATED', {
+                bookUpdated: updatedBook,
+              })
+            }, 15000)
+
+            return true
+          }),
+        )
+        logger.info(
+          `removed ${removeCounter} out of ${orphanBookComponentIds.length} orphan locks`,
+        )
+      }
+    }, {})
+
+    return false
+  } catch (e) {
+    throw new Error(e)
+  }
 }
 
-module.exports = { unlockBookComponent, cleanUpLocks }
+const cleanUpLocks = async (immediate = false) => {
+  try {
+    const pubsub = await pubsubManager.getPubsub()
+    const serverIdentifier = config.get('serverIdentifier')
+    logger.info(`executing locks clean-up procedure`)
+    let removeCounter = 0
+
+    await useTransaction(async tr => {
+      const locks = await Lock.query(tr).where({ serverIdentifier })
+      const bookComponentIds = locks.map(lock => lock.foreignId)
+
+      if (bookComponentIds.length > 0) {
+        const lockedBookComponents = await BookComponent.query(tr).whereIn(
+          'id',
+          bookComponentIds,
+        )
+
+        logger.info(`found ${locks.length} idle locks`)
+
+        await Promise.all(
+          lockedBookComponents.map(async lockedBookComponent => {
+            const { id: bookComponentId } = lockedBookComponent
+
+            const affected = await Lock.query(tr).delete().where({
+              serverIdentifier,
+              foreignId: bookComponentId,
+              foreignType: 'bookComponent',
+            })
+
+            if (affected === 1) {
+              removeCounter += 1
+            }
+
+            await BookComponentState.query(tr)
+              .patch({ status: 104 })
+              .where({ bookComponentId })
+
+            const updatedBookComponent = await BookComponent.query(tr).findById(
+              bookComponentId,
+            )
+
+            const updatedBook = await Book.query(tr).findById(
+              updatedBookComponent.bookId,
+            )
+
+            if (!immediate) {
+              setTimeout(() => {
+                logger.info(`broadcasting unlocked event`)
+                pubsub.publish('BOOK_COMPONENT_UPDATED', {
+                  bookComponentUpdated: updatedBookComponent,
+                })
+                pubsub.publish('BOOK_UPDATED', {
+                  bookUpdated: updatedBook,
+                })
+              }, 15000)
+            } else {
+              logger.info(`broadcasting unlocked event`)
+              pubsub.publish('BOOK_COMPONENT_UPDATED', {
+                bookComponentUpdated: updatedBookComponent,
+              })
+              pubsub.publish('BOOK_UPDATED', {
+                bookUpdated: updatedBook,
+              })
+            }
+
+            return true
+          }),
+        )
+        logger.info(
+          `removed ${removeCounter} out of ${locks.length} idle locks`,
+        )
+      }
+    }, {})
+
+    return false
+  } catch (e) {
+    throw new Error(e)
+  }
+}
+
+module.exports = { unlockBookComponent, cleanUpLocks, unlockOrphanLocks }
