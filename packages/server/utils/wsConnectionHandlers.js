@@ -38,14 +38,14 @@ const heartbeat = ws => (ws.isAlive = true)
 const initializeHeartbeat = async WSServer => {
   try {
     return setInterval(async () => {
-      logger.info(`######### WS HEARTBEAT #########`)
+      logger.info(`############ WS HEARTBEAT ############`)
       logger.info(
         `current connected clients via WS are ${WSServer.clients.size}`,
       )
 
       WSServer.clients.forEach(ws => {
         if (ws.isAlive === false) {
-          logger.info(`######### BROKEN CONNECTION DETECTED #########`)
+          logger.info(`########### BROKEN CONNECTION DETECTED ###########`)
           logger.info(
             `ws connection is broken for book component with id ${ws.bookComponentId} and userId ${ws.userId}`,
           )
@@ -56,6 +56,7 @@ const initializeHeartbeat = async WSServer => {
 
         return ws.ping()
       })
+      logger.info(`########## WS HEARTBEAT END ##########`)
     }, config['pubsweet-server'].wsHeartbeatInterval || 5000)
   } catch (e) {
     throw new Error(e)
@@ -65,7 +66,7 @@ const initializeHeartbeat = async WSServer => {
 const initializeFailSafeUnlocking = async WSServer => {
   try {
     return setInterval(async () => {
-      logger.info(`######### UNLOCKING FAIL-SAFE #########`)
+      logger.info(`########### LOCK FAIL-SAFE ###########`)
       logger.info(
         `current connected clients via WS are ${WSServer.clients.size}`,
       )
@@ -82,6 +83,7 @@ const initializeFailSafeUnlocking = async WSServer => {
         await unlockOrphanLocks(lockedBookComponentIds)
       }
 
+      logger.info(`######### LOCK FAIL-SAFE END #########`)
       return true
     }, config['pubsweet-server'].failSafeUnlockingInterval || 5000)
   } catch (e) {

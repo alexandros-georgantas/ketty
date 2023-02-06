@@ -39,6 +39,10 @@ const EditorPage = props => {
     onHideModal,
     onAssetManager,
     user,
+    setStopTrying,
+    setOnReconnectError,
+    stopTrying,
+    onReconnectError,
   } = props
 
   const {
@@ -56,7 +60,6 @@ const EditorPage = props => {
   } = bookComponent
 
   const { divisions, id: bookId, title: bookTitle } = book
-  const [onReconnectError, setOnReconnectError] = useState(false)
 
   const flatBookComponents = []
 
@@ -135,37 +138,28 @@ const EditorPage = props => {
       },
       onClose: what => console.log('closed', what),
       onMessage: msg => console.log('onMessage', msg),
-      onError: () => {
-        const msg =
-          editorMode !== 'preview'
-            ? `Unfortunately, something happened and our server is unreachable at this moment. The application does not support offline mode thus your lock will be released. In the meantime, we are trying to reconnect to our server and if this book component is not locked by any other user, you will get back your lock automatically which will allow you to continue editing. So, if you want just wait a bit :)`
-            : `Unfortunately, something happened and our server is unreachable at this moment. The application does not support offline mode. In the meantime, we are trying to reconnect to our server and if we succeed this modal will disappear and you will be able to continue what you were doing. So, if you want just wait a bit :)`
-
+      onError: err => {
+        console.log('aaaaaa', err)
         setOnReconnectError(true)
-
-        // if (previousEditorMode !== 'preview' && editorMode === 'preview') {
-        //   return
-        // }
-
-        onTriggerModal(false, msg)
+        console.error(err)
       },
       onReconnectStop: number => {
-        return onTriggerModal(
-          true,
-          `That's embarrassing but our server is down for quite some time. Please try to contact your server administrator in order to resolve this issue.`,
-          `/books/${bookId}/book-builder`,
-        )
+        setOnReconnectError(false)
+        setStopTrying(true)
+        console.log('eeeeeeeeee', number)
       },
-      shouldReconnect: closeEvent => {
-        return editorMode !== 'preview'
+      shouldReconnect: () => {
+        return editorMode !== 'preview' && !stopTrying
       },
       queryParams: { token, bookComponentId: bookComponent.id, tabId },
-      reconnectInterval: 5000,
-      reconnectAttempts: 7,
+      reconnectInterval: 7000,
+      reconnectAttempts: 5,
       share: true,
     },
-    editorMode !== 'preview', // ########## ######### ######## 1 check if that works as expected
+    editorMode !== 'preview' && !stopTrying, // ########## ######### ######## 1 check if that works as expected
   )
+
+  console.log('stopstrying', stopTrying)
 
   const connectionStatus = {
     [ReadyState.CONNECTING]: 'Connecting',
@@ -196,6 +190,9 @@ const EditorPage = props => {
 
       onPeriodicBookComponentContentChange.cancel()
       onPeriodicBookComponentTitleChange.cancel()
+      console.log('eeee unmount1', stopTrying, isOnline)
+
+      onHideModal()
     }
   }, [])
 
@@ -213,7 +210,7 @@ const EditorPage = props => {
       //   // }
       // }
 
-      if (onReconnectError) {
+      if (onReconnectError && !stopTrying) {
         onHideModal()
         setOnReconnectError(false)
       }
@@ -290,16 +287,42 @@ const EditorPage = props => {
     if (!isOnline) {
       const msg =
         editorMode !== 'preview'
-          ? `You've lost your internet connectivity. The application does not support offline mode thus your lock will be released. Please check again later when your connectivity issue will be resolved`
-          : `You've lost your internet connectivity. The application does not support offline mode. Please check again later when your connectivity issue will be resolved`
+          ? `Unfortunately, something happened and our server is unreachable at this moment. The application does not support offline mode thus your lock will be released. In the meantime, we are trying to reconnect to our server and if this book component is not locked by any other user, you will get back your lock automatically which will allow you to continue editing. So, if you want just wait a bit :)`
+          : `Unfortunately, something happened and our server is unreachable at this moment. The application does not support offline mode. In the meantime, we are trying to reconnect to our server and if we succeed this modal will disappear and you will be able to continue what you were doing. So, if you want just wait a bit :)`
+
+      // setOnReconnectError(true)
+
+      // if (previousEditorMode !== 'preview' && editorMode === 'preview') {
+      //   return
+      // }
+      setTimeout(() => {
+        if (!isOnline) {
+          setStopTrying(true)
+        }
+      }, 35000)
+      // onTriggerModal(false, msg)
+      // const msg =
+      //   editorMode !== 'preview'
+      //     ? `You've lost your internet connectivity. The application does not support offline mode thus your lock will be released. Please check again later when your connectivity issue will be resolved`
+      //     : `You've lost your internet connectivity. The application does not support offline mode. Please check again later when your connectivity issue will be resolved`
 
       onTriggerModal(false, msg)
     }
 
-    if (!previousIsOnline && isOnline) {
+    if (!previousIsOnline && isOnline && !stopTrying) {
       onHideModal()
     }
   }, [isOnline])
+
+  useEffect(() => {
+    if (stopTrying) {
+      onTriggerModal(
+        false,
+        `That's embarrassing but our server is down for quite some time. Please try to contact your server administrator in order to resolve this issue.`,
+        // `/books/${bookId}/book-builder`,
+      )
+    }
+  }, [stopTrying])
 
   useEffect(() => {
     if (

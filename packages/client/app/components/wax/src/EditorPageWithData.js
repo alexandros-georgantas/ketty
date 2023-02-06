@@ -34,33 +34,35 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
   const [tabId, setTabId] = useState(uuid())
   // const [isModalOpen, setIsModalOpen] = useState(false)
   const [isOnline, setIsOnline] = useState(true)
+  const [onReconnectError, setOnReconnectError] = useState(false)
+  const [stopTrying, setStopTrying] = useState(false)
 
-  useEffect(() => {
-    const handleStatusChange = value => {
-      if (value === 'online') {
-        setIsOnline(true)
-      } else {
-        setIsOnline(false)
-      }
-    }
+  // useEffect(() => {
+  //   const handleStatusChange = value => {
+  //     if (value === 'online') {
+  //       setIsOnline(true)
+  //     } else {
+  //       setIsOnline(false)
+  //     }
+  //   }
 
-    // Listen to the online status
-    window.addEventListener('online', () => {
-      console.log('online is triggered')
-      handleStatusChange('online')
-    })
+  //   // Listen to the online status
+  //   window.addEventListener('online', () => {
+  //     console.log('online is triggered')
+  //     handleStatusChange('online')
+  //   })
 
-    // Listen to the offline status
-    window.addEventListener('offline', () => {
-      console.log('offline is triggered')
-      handleStatusChange('offline')
-    })
+  //   // Listen to the offline status
+  //   window.addEventListener('offline', () => {
+  //     console.log('offline is triggered')
+  //     handleStatusChange('offline')
+  //   })
 
-    return () => {
-      window.removeEventListener('online', handleStatusChange)
-      window.removeEventListener('offline', handleStatusChange)
-    }
-  }, [isOnline])
+  //   return () => {
+  //     window.removeEventListener('online', handleStatusChange)
+  //     window.removeEventListener('offline', handleStatusChange)
+  //   }
+  // }, [isOnline])
 
   /**
    * QUERIES SECTION START
@@ -340,15 +342,15 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
    * ERRORS HANDLING SECTION END
    */
 
-  // useEffect(() => {
-  //   if (networkStatus === 8 && isOnline) {
-  //     setIsOnline(false)
-  //   }
+  useEffect(() => {
+    if (networkStatus === 8 && isOnline) {
+      setIsOnline(false)
+    }
 
-  //   if (networkStatus === 7 && !isOnline) {
-  //     setIsOnline(true)
-  //   }
-  // }, [networkStatus])
+    if (networkStatus === 7 && !isOnline) {
+      setIsOnline(true)
+    }
+  }, [networkStatus])
 
   if (
     bookLoading ||
@@ -388,10 +390,14 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
       onBookComponentTrackChangesChange={onBookComponentTrackChangesChange}
       onCustomTagAdd={onCustomTagAdd}
       onHideModal={onHideModal}
+      onReconnectError={onReconnectError}
       onTriggerModal={onTriggerModal}
       rules={rules}
+      setOnReconnectError={setOnReconnectError}
+      setStopTrying={setStopTrying}
       setTabId={setTabId}
       showModal={showModal}
+      stopTrying={stopTrying}
       subscribeToBookComponentUpdates={onBookComponentUpdated}
       subscribeToBookUpdates={onBookUpdated}
       subscribeToCustomTagsUpdates={onCustomTagsUpdated}

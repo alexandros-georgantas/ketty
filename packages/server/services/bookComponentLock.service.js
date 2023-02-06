@@ -16,7 +16,7 @@ const unlockBookComponent = async (bookComponentId, userId, tabId) => {
 
       const affectedRows = await Lock.query(tr)
         .delete()
-        .where({ foreignId: bookComponentId, userId, serverIdentifier })
+        .where({ foreignId: bookComponentId, userId, tabId, serverIdentifier })
 
       logger.info(`locks removed ${affectedRows}`)
       await BookComponentState.query(tr)

@@ -28,7 +28,7 @@ module.exports = {
     clientURL: 'PUBLIC_CLIENT_URL',
     WSServerPort: 'WS_SERVER_PORT',
     wsHeartbeatInterval: 'WS_HEARTBEAT_INTERVAL',
-    failSafeUnlockingInterval: 'FAIL-SAFE_UNLOCKING_INTERVAL',
+    failSafeUnlockingInterval: 'FAIL_SAFE_UNLOCKING_INTERVAL',
     db: {
       user: 'POSTGRES_USER',
       password: 'POSTGRES_PASSWORD',
