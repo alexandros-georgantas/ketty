@@ -149,7 +149,7 @@ const mapProps = args => ({
   },
   onBookSettings: book => {
     const {
-      withModalFromArgs,
+      withModal: withModalFromArgs,
       updateRunningHeadersMutation: updateRunningHeadersMutationFromArgs,
     } = args
 

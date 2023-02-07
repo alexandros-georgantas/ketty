@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useLazyQuery } from '@apollo/client'
@@ -32,37 +33,7 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
   const { bookId, bookComponentId, mode } = params
 
   const [tabId, setTabId] = useState(uuid())
-  // const [isModalOpen, setIsModalOpen] = useState(false)
   const [isOnline, setIsOnline] = useState(true)
-  const [onReconnectError, setOnReconnectError] = useState(false)
-  const [stopTrying, setStopTrying] = useState(false)
-
-  // useEffect(() => {
-  //   const handleStatusChange = value => {
-  //     if (value === 'online') {
-  //       setIsOnline(true)
-  //     } else {
-  //       setIsOnline(false)
-  //     }
-  //   }
-
-  //   // Listen to the online status
-  //   window.addEventListener('online', () => {
-  //     console.log('online is triggered')
-  //     handleStatusChange('online')
-  //   })
-
-  //   // Listen to the offline status
-  //   window.addEventListener('offline', () => {
-  //     console.log('offline is triggered')
-  //     handleStatusChange('offline')
-  //   })
-
-  //   return () => {
-  //     window.removeEventListener('online', handleStatusChange)
-  //     window.removeEventListener('offline', handleStatusChange)
-  //   }
-  // }, [isOnline])
 
   /**
    * QUERIES SECTION START
@@ -107,7 +78,6 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
     variables: { users: [currentUser.id] },
     pollInterval: 5000,
     fetchPolicy: 'network-only',
-    // notifyOnNetworkStatusChange: true,
   })
 
   const {
@@ -252,7 +222,6 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
         if (!subscriptionData.data) return prev
         const { data } = subscriptionData
         const { bookComponentUpdated } = data
-        console.log('in subscription', bookComponentUpdated)
 
         return {
           getBookComponent: bookComponentUpdated,
@@ -277,15 +246,9 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
   }
 
   const onTriggerModal = (withConfirm, msg, url = undefined) => {
-    // if (isModalOpen) {
-    //   hideModal()
-    //   setIsModalOpen(false)
-    // }
-
     if (withConfirm) {
       const onConfirm = () => {
         hideModal()
-        // setIsModalOpen(false)
         history.push(url)
       }
 
@@ -293,21 +256,16 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
         onConfirm,
         warning: msg,
       })
-      // setIsModalOpen(true)
     } else {
       showModal('editorModal', {
         noActions: true,
         warning: msg,
       })
-      // setIsModalOpen(true)
     }
   }
 
   const onHideModal = () => {
     hideModal()
-    // if (isModalOpen) {
-    //   setIsModalOpen(false)
-    // }
   }
   /**
    * HANDLERS SECTION END
@@ -332,11 +290,6 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
       `Something went wrong! Please inform your system's administrator`,
       bookComponentError,
     )
-    // onTriggerModal(
-    //   true,
-    //   `Something went wrong! Please inform your system's administrator`,
-    //   `/books/${bookId}/book-builder`,
-    // )
   }
   /**
    * ERRORS HANDLING SECTION END
@@ -373,8 +326,6 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
     userId: currentUser.id,
   }
 
-  console.log('TABID', tabId)
-  console.log('networkStatus', networkStatus, bookComponentLoading)
   return (
     <EditorPage
       book={book}
@@ -390,14 +341,10 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
       onBookComponentTrackChangesChange={onBookComponentTrackChangesChange}
       onCustomTagAdd={onCustomTagAdd}
       onHideModal={onHideModal}
-      onReconnectError={onReconnectError}
       onTriggerModal={onTriggerModal}
       rules={rules}
-      setOnReconnectError={setOnReconnectError}
-      setStopTrying={setStopTrying}
       setTabId={setTabId}
       showModal={showModal}
-      stopTrying={stopTrying}
       subscribeToBookComponentUpdates={onBookComponentUpdated}
       subscribeToBookUpdates={onBookUpdated}
       subscribeToCustomTagsUpdates={onCustomTagsUpdated}

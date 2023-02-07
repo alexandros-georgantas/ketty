@@ -85,7 +85,7 @@ const initializeFailSafeUnlocking = async WSServer => {
 
       logger.info(`######### LOCK FAIL-SAFE END #########`)
       return true
-    }, config['pubsweet-server'].failSafeUnlockingInterval || 5000)
+    }, config['pubsweet-server'].failSafeUnlockingInterval || 7000)
   } catch (e) {
     throw new Error(e)
   }

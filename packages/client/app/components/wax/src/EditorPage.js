@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+/* eslint-disable react/prop-types */
+import React, { useEffect } from 'react'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 import debounce from 'lodash/debounce'
 import findIndex from 'lodash/findIndex'
@@ -39,10 +40,6 @@ const EditorPage = props => {
     onHideModal,
     onAssetManager,
     user,
-    setStopTrying,
-    setOnReconnectError,
-    stopTrying,
-    onReconnectError,
   } = props
 
   const {
@@ -65,11 +62,11 @@ const EditorPage = props => {
 
   divisions.forEach(division => {
     const { bookComponents } = division
-    bookComponents.forEach(bookComponent => {
-      const { componentType } = bookComponent
+    bookComponents.forEach(bC => {
+      const { compType } = bC
 
-      if (componentType !== 'toc' && componentType !== 'endnotes') {
-        flatBookComponents.push(bookComponent)
+      if (compType !== 'toc' && compType !== 'endnotes') {
+        flatBookComponents.push(bC)
       }
     })
   })
@@ -97,7 +94,6 @@ const EditorPage = props => {
   } else if (lock && lock.userId !== user.id) {
     editorMode = 'preview'
   } else if (lock && lock.userId === user.id && tabId !== lock.tabId) {
-    console.log('hereAAAAAAAA', lock)
     editorMode = 'preview'
   } else if (canEditPreview) {
     editorMode = 'preview'
@@ -109,7 +105,6 @@ const EditorPage = props => {
     editorMode = 'preview'
   }
 
-  console.log('editorMode', editorMode)
   const previousIsOnline = usePrevious(isOnline)
   const previousLock = usePrevious(lock)
   const previousEditorMode = usePrevious(editorMode)
@@ -136,30 +131,19 @@ const EditorPage = props => {
           onBookComponentLock()
         }
       },
-      onClose: what => console.log('closed', what),
-      onMessage: msg => console.log('onMessage', msg),
       onError: err => {
-        console.log('aaaaaa', err)
-        setOnReconnectError(true)
         console.error(err)
       },
-      onReconnectStop: number => {
-        setOnReconnectError(false)
-        setStopTrying(true)
-        console.log('eeeeeeeeee', number)
-      },
       shouldReconnect: () => {
-        return editorMode !== 'preview' && !stopTrying
+        return editorMode !== 'preview'
       },
       queryParams: { token, bookComponentId: bookComponent.id, tabId },
-      reconnectInterval: 7000,
-      reconnectAttempts: 5,
       share: true,
+      reconnectAttempts: 100,
+      reconnectInterval: 10000,
     },
-    editorMode !== 'preview' && !stopTrying, // ########## ######### ######## 1 check if that works as expected
+    editorMode !== 'preview', // ########## ######### ######## 1 check if that works as expected
   )
-
-  console.log('stopstrying', stopTrying)
 
   const connectionStatus = {
     [ReadyState.CONNECTING]: 'Connecting',
@@ -183,14 +167,8 @@ const EditorPage = props => {
       unsubscribeFromBookComponentUpdates()
       unsubscribeFromCustomTagsUpdates()
 
-      // if (getWebSocket() && connectionStatus === 'Open') {
-      //   console.log('AAAAAAAAAAAAAAAAAAAAAAAAA1', connectionStatus)
-      //   // getWebSocket().close()
-      // }
-
       onPeriodicBookComponentContentChange.cancel()
       onPeriodicBookComponentTitleChange.cancel()
-      console.log('eeee unmount1', stopTrying, isOnline)
 
       onHideModal()
     }
@@ -201,48 +179,11 @@ const EditorPage = props => {
       previousConnectionStatus === 'Connecting' &&
       connectionStatus === 'Open'
     ) {
-      // if (previousEditorMode !== 'preview' && editorMode === 'preview') {
-      //   // const openWS = getWebSocket()
-
-      //   // if (openWS && connectionStatus === 'Open') {
-      //   //   console.log('AAAAAAAAAAAAAAAAAAAAAAAAA2', connectionStatus)
-      //   //   // openWS.close()
-      //   // }
-      // }
-
-      if (onReconnectError && !stopTrying) {
+      if (!previousIsOnline && isOnline) {
         onHideModal()
-        setOnReconnectError(false)
       }
     }
   }, [connectionStatus])
-
-  useEffect(() => {
-    // if (editorMode === 'preview') {
-    //   const openWS = getWebSocket()
-
-    //   if (openWS && connectionStatus === 'Open') {
-    //     console.log('AAAAAAAAAAAAAAAAAAAAAAAAA3', connectionStatus)
-    //     // openWS.close()
-    //   }
-    // }
-
-    if (
-      previousEditorMode === 'preview' &&
-      (editorMode === 'full' || editorMode === 'review')
-    ) {
-      const openWS = getWebSocket()
-
-      if (openWS && connectionStatus === 'Closed') {
-        setTabId(uuid())
-      }
-
-      onTriggerModal(
-        true,
-        'You have gained edit access for this book component!',
-      )
-    }
-  }, [editorMode])
 
   useEffect(() => {
     if (
@@ -290,49 +231,37 @@ const EditorPage = props => {
           ? `Unfortunately, something happened and our server is unreachable at this moment. The application does not support offline mode thus your lock will be released. In the meantime, we are trying to reconnect to our server and if this book component is not locked by any other user, you will get back your lock automatically which will allow you to continue editing. So, if you want just wait a bit :)`
           : `Unfortunately, something happened and our server is unreachable at this moment. The application does not support offline mode. In the meantime, we are trying to reconnect to our server and if we succeed this modal will disappear and you will be able to continue what you were doing. So, if you want just wait a bit :)`
 
-      // setOnReconnectError(true)
-
-      // if (previousEditorMode !== 'preview' && editorMode === 'preview') {
-      //   return
-      // }
-      setTimeout(() => {
-        if (!isOnline) {
-          setStopTrying(true)
-        }
-      }, 35000)
-      // onTriggerModal(false, msg)
-      // const msg =
-      //   editorMode !== 'preview'
-      //     ? `You've lost your internet connectivity. The application does not support offline mode thus your lock will be released. Please check again later when your connectivity issue will be resolved`
-      //     : `You've lost your internet connectivity. The application does not support offline mode. Please check again later when your connectivity issue will be resolved`
-
       onTriggerModal(false, msg)
     }
 
-    if (!previousIsOnline && isOnline && !stopTrying) {
+    if (!previousIsOnline && isOnline) {
       onHideModal()
     }
   }, [isOnline])
-
-  useEffect(() => {
-    if (stopTrying) {
-      onTriggerModal(
-        false,
-        `That's embarrassing but our server is down for quite some time. Please try to contact your server administrator in order to resolve this issue.`,
-        // `/books/${bookId}/book-builder`,
-      )
-    }
-  }, [stopTrying])
 
   useEffect(() => {
     if (
       previousEditorMode === 'preview' &&
       (editorMode === 'full' || editorMode === 'review')
     ) {
+      const openWS = getWebSocket()
+
+      if (openWS && connectionStatus === 'Closed') {
+        setTabId(uuid())
+      }
+
       onTriggerModal(
         true,
         'You have gained edit access for this book component!',
       )
+    }
+
+    if (
+      (previousEditorMode === 'full' || previousEditorMode === 'review') &&
+      editorMode === 'preview' &&
+      status === 200
+    ) {
+      onTriggerModal(true, 'You have lost edit access for this book component!')
     }
   }, [editorMode])
 

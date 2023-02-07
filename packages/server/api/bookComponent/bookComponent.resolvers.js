@@ -770,354 +770,479 @@ module.exports = {
       return state.includeInToc
     },
     async bookStructureElements(bookComponent, _, ctx) {
-      const book = await Book.findById(bookComponent.bookId)
-      const hasThreeLevels = book.bookStructure.levels.length > 2
-      let bookStructureElements
+      // const book = await Book.findById(bookComponent.bookId)
 
-      if (!hasThreeLevels) {
-        bookStructureElements = [
-          {
-            groupHeader: 'Core Elements',
-            items: [
-              {
-                displayName: 'Section',
-                className: 'section',
-                headingLevel: 2,
-                nestedHeadingLevel: undefined,
-                isSection: true,
-              },
-            ],
-          },
-          {
-            groupHeader: 'Openers',
-            items: [
-              {
-                displayName: 'Introduction',
-                className: 'introduction',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Outline',
-                className: 'outline',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Learning Objectives',
-                className: 'learning-objectives',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Focus Questions',
-                className: 'focus-questions',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Content Opener Image',
-                className: 'content-opener-image',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-            ],
-          },
-          {
-            groupHeader: 'Openers and Closers',
-            items: [
-              {
-                displayName: 'Key Terms',
-                className: 'key-terms',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Self-reflection Activities',
-                className: 'self-reflection-activities',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-            ],
-          },
-          {
-            groupHeader: 'Closers',
-            items: [
-              {
-                displayName: 'Review Activity',
-                className: 'review-activity',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Summary',
-                className: 'summary',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'References',
-                className: 'references',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Bibliography',
-                className: 'bibliography',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Further Reading',
-                className: 'further-reading',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-            ],
-          },
-        ]
-      } else if (
-        findIndex(book.bookStructure.levels, {
-          type: bookComponent.componentType,
-        }) > 0
-      ) {
-        bookStructureElements = [
-          {
-            groupHeader: 'Core Elements',
-            items: [
-              {
-                displayName:
-                  book.bookStructure.levels[
-                    book.bookStructure.levels.length - 2
-                  ].displayName,
-                className:
-                  book.bookStructure.levels[
-                    book.bookStructure.levels.length - 2
-                  ].type,
-                headingLevel: 2,
-                nestedHeadingLevel: undefined,
-                isSection: true,
-              },
-            ],
-          },
-          {
-            groupHeader: 'Openers',
-            items: [
-              {
-                displayName: 'Introduction',
-                className: 'introduction',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Outline',
-                className: 'outline',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Learning Objectives',
-                className: 'learning-objectives',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Focus Questions',
-                className: 'focus-questions',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Content Opener Image',
-                className: 'content-opener-image',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-            ],
-          },
-          {
-            groupHeader: 'Openers and Closers',
-            items: [
-              {
-                displayName: 'Key Terms',
-                className: 'key-terms',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Self-reflection Activities',
-                className: 'self-reflection-activities',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-            ],
-          },
-          {
-            groupHeader: 'Closers',
-            items: [
-              {
-                displayName: 'Review Activity',
-                className: 'review-activity',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Summary',
-                className: 'summary',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'References',
-                className: 'references',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Bibliography',
-                className: 'bibliography',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Further Reading',
-                className: 'further-reading',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-            ],
-          },
-        ]
-      } else {
-        bookStructureElements = [
-          {
-            groupHeader: 'Openers',
-            items: [
-              {
-                displayName: 'Introduction',
-                className: 'introduction',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Outline',
-                className: 'outline',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Learning Objectives',
-                className: 'learning-objectives',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Focus Questions',
-                className: 'focus-questions',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Content Opener Image',
-                className: 'content-opener-image',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-            ],
-          },
-          {
-            groupHeader: 'Openers and Closers',
-            items: [
-              {
-                displayName: 'Key Terms',
-                className: 'key-terms',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Self-reflection Activities',
-                className: 'self-reflection-activities',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-            ],
-          },
-          {
-            groupHeader: 'Closers',
-            items: [
-              {
-                displayName: 'Review Activity',
-                className: 'review-activity',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Summary',
-                className: 'summary',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'References',
-                className: 'references',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Bibliography',
-                className: 'bibliography',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-              {
-                displayName: 'Further Reading',
-                className: 'further-reading',
-                headingLevel: 2,
-                nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
-                isSection: false,
-              },
-            ],
-          },
-        ]
+      const book = await Book.findById(bookComponent.bookId)
+
+      const hasThreeLevels = book.bookStructure.levels.length > 2
+
+      const bookStructureElements = [
+        {
+          groupHeader: 'Openers',
+          items: [
+            {
+              displayName: 'Introduction',
+              className: 'introduction',
+              headingLevel: 2,
+              nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+              isSection: false,
+            },
+            {
+              displayName: 'Outline',
+              className: 'outline',
+              headingLevel: 2,
+              nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+              isSection: false,
+            },
+            {
+              displayName: 'Learning Objectives',
+              className: 'learning-objectives',
+              headingLevel: 2,
+              nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+              isSection: false,
+            },
+            {
+              displayName: 'Focus Questions',
+              className: 'focus-questions',
+              headingLevel: 2,
+              nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+              isSection: false,
+            },
+            {
+              displayName: 'Content Opener Image',
+              className: 'content-opener-image',
+              headingLevel: 2,
+              nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+              isSection: false,
+            },
+          ],
+        },
+        {
+          groupHeader: 'Openers and Closers',
+          items: [
+            {
+              displayName: 'Key Terms List',
+              className: 'key-terms',
+              headingLevel: 2,
+              nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+              isSection: false,
+            },
+            {
+              displayName: 'Self-reflection Activities',
+              className: 'self-reflection-activities',
+              headingLevel: 2,
+              nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+              isSection: false,
+            },
+          ],
+        },
+        {
+          groupHeader: 'Closers',
+          items: [
+            {
+              displayName: 'Review Activity',
+              className: 'review-activity',
+              headingLevel: 2,
+              nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+              isSection: false,
+            },
+            {
+              displayName: 'Summary',
+              className: 'summary',
+              headingLevel: 2,
+              nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+              isSection: false,
+            },
+            {
+              displayName: 'References',
+              className: 'references',
+              headingLevel: 2,
+              nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+              isSection: false,
+            },
+            {
+              displayName: 'Bibliography',
+              className: 'bibliography',
+              headingLevel: 2,
+              nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+              isSection: false,
+            },
+            {
+              displayName: 'Further Reading',
+              className: 'further-reading',
+              headingLevel: 2,
+              nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+              isSection: false,
+            },
+          ],
+        },
+      ]
+
+      if (bookComponent.componentType === 'chapter') {
+        bookStructureElements.unshift({
+          groupHeader: 'Core Elements',
+          items: [
+            {
+              displayName: 'Section',
+              className: 'section',
+              headingLevel: 2,
+              nestedHeadingLevel: 3,
+              isSection: true,
+            },
+          ],
+        })
       }
 
       return bookStructureElements
     },
+
+    //   const hasThreeLevels = book.bookStructure.levels.length > 2
+    //   let bookStructureElements
+
+    //   if (!hasThreeLevels) {
+    //     bookStructureElements = [
+    //       {
+    //         groupHeader: 'Core Elements',
+    //         items: [
+    //           {
+    //             displayName: 'Section',
+    //             className: 'section',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: undefined,
+    //             isSection: true,
+    //           },
+    //         ],
+    //       },
+    //       {
+    //         groupHeader: 'Openers',
+    //         items: [
+    //           {
+    //             displayName: 'Introduction',
+    //             className: 'introduction',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Outline',
+    //             className: 'outline',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Learning Objectives',
+    //             className: 'learning-objectives',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Focus Questions',
+    //             className: 'focus-questions',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Content Opener Image',
+    //             className: 'content-opener-image',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //         ],
+    //       },
+    //       {
+    //         groupHeader: 'Openers and Closers',
+    //         items: [
+    //           {
+    //             displayName: 'Key Terms List',
+    //             className: 'key-terms',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Self-reflection Activities',
+    //             className: 'self-reflection-activities',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //         ],
+    //       },
+    //       {
+    //         groupHeader: 'Closers',
+    //         items: [
+    //           {
+    //             displayName: 'Review Activity',
+    //             className: 'review-activity',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Summary',
+    //             className: 'summary',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'References',
+    //             className: 'references',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Bibliography',
+    //             className: 'bibliography',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Further Reading',
+    //             className: 'further-reading',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //         ],
+    //       },
+    //     ]
+    //   } else if (
+    //     findIndex(book.bookStructure.levels, {
+    //       type: bookComponent.componentType,
+    //     }) > 0
+    //   ) {
+    //     bookStructureElements = [
+    //       {
+    //         groupHeader: 'Core Elements',
+    //         items: [
+    //           {
+    //             displayName:
+    //               book.bookStructure.levels[
+    //                 book.bookStructure.levels.length - 2
+    //               ].displayName,
+    //             className:
+    //               book.bookStructure.levels[
+    //                 book.bookStructure.levels.length - 2
+    //               ].type,
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: undefined,
+    //             isSection: true,
+    //           },
+    //         ],
+    //       },
+    //       {
+    //         groupHeader: 'Openers',
+    //         items: [
+    //           {
+    //             displayName: 'Introduction',
+    //             className: 'introduction',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Outline',
+    //             className: 'outline',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Learning Objectives',
+    //             className: 'learning-objectives',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Focus Questions',
+    //             className: 'focus-questions',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Content Opener Image',
+    //             className: 'content-opener-image',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //         ],
+    //       },
+    //       {
+    //         groupHeader: 'Openers and Closers',
+    //         items: [
+    //           {
+    //             displayName: 'Key Terms List',
+    //             className: 'key-terms',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Self-reflection Activities',
+    //             className: 'self-reflection-activities',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //         ],
+    //       },
+    //       {
+    //         groupHeader: 'Closers',
+    //         items: [
+    //           {
+    //             displayName: 'Review Activity',
+    //             className: 'review-activity',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Summary',
+    //             className: 'summary',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'References',
+    //             className: 'references',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Bibliography',
+    //             className: 'bibliography',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Further Reading',
+    //             className: 'further-reading',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //         ],
+    //       },
+    //     ]
+    //   } else {
+    //     bookStructureElements = [
+    //       {
+    //         groupHeader: 'Openers',
+    //         items: [
+    //           {
+    //             displayName: 'Introduction',
+    //             className: 'introduction',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Outline',
+    //             className: 'outline',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Learning Objectives',
+    //             className: 'learning-objectives',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Focus Questions',
+    //             className: 'focus-questions',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Content Opener Image',
+    //             className: 'content-opener-image',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //         ],
+    //       },
+    //       {
+    //         groupHeader: 'Openers and Closers',
+    //         items: [
+    //           {
+    //             displayName: 'Key Terms List',
+    //             className: 'key-terms',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Self-reflection Activities',
+    //             className: 'self-reflection-activities',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //         ],
+    //       },
+    //       {
+    //         groupHeader: 'Closers',
+    //         items: [
+    //           {
+    //             displayName: 'Review Activity',
+    //             className: 'review-activity',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Summary',
+    //             className: 'summary',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'References',
+    //             className: 'references',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Bibliography',
+    //             className: 'bibliography',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //           {
+    //             displayName: 'Further Reading',
+    //             className: 'further-reading',
+    //             headingLevel: 2,
+    //             nestedHeadingLevel: hasThreeLevels ? 3 : undefined,
+    //             isSection: false,
+    //           },
+    //         ],
+    //       },
+    //     ]
+    //   }
+
+    //   return bookStructureElements
+    // },
   },
   Subscription: {
     bookComponentAdded: {

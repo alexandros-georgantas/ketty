@@ -16,7 +16,9 @@ const editoriaLayoutWithReadOnly = (props, isReadOnly) => (
   <EditoriaLayout {...props} isReadOnly={isReadOnly} />
 )
 
-const UniverseWrapper = styled.div``
+const UniverseWrapper = styled.div`
+  height: 100%;
+`
 
 const featureBookStructureEnabled =
   (process.env.FEATURE_BOOK_STRUCTURE &&

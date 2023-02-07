@@ -277,8 +277,8 @@ const Opener = props => {
   )
 }
 
-const Footer = (handleSave, divisions, divisionType) => () => {
-  const [text, setText] = useState(null)
+const Footer = (handleSave, divisions, divisionType, setText, text) => () => {
+  // const [text, setText] = useState(null)
 
   const createJsonConfig = text => {
     divisions.map(division => {
@@ -314,7 +314,10 @@ const Footer = (handleSave, divisions, divisionType) => () => {
             />
             <Action
               disabled={disabled === ''}
-              onClick={() => handleSave(createJsonConfig(text))}
+              onClick={() => {
+                handleSave(createJsonConfig(text))
+                setText(null)
+              }}
             >
               Save
             </Action>
@@ -337,6 +340,7 @@ const ComponentTypeMenu = ({
     context: 'bookBuilder',
     area: 'divisions',
   })
+  const [text, setText] = useState(null)
 
   const division = find(divisions, { name: divisionType })
   // These should be served by server. Refactor when you have time
@@ -400,7 +404,13 @@ const ComponentTypeMenu = ({
     <Menu
       onChange={handleChangeComponentType}
       options={options}
-      renderFooter={Footer(addComponentType, divisions, divisionType)}
+      renderFooter={Footer(
+        addComponentType,
+        divisions,
+        divisionType,
+        setText,
+        text,
+      )}
       renderOpener={Opener}
       value={componentType}
     />

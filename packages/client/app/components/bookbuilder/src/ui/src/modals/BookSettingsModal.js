@@ -18,14 +18,14 @@ const StyledFormik = styled(Formik)`
 const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
+  height: calc(100% - 30px);
   width: 100%;
 `
 
 const Body = styled.div`
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
+  height: 100%;
   justify-content: center;
   width: 100%;
 `
@@ -83,8 +83,9 @@ const StyledTable = styled.table`
   font-family: ${th('fontHeading')};
   font-size: ${th('fontSizeBaseSmall')};
   font-weight: normal;
-  height: 100px;
+  height: 100%;
   line-height: ${th('lineHeightBaseSmall')};
+  overflow-y: auto;
   width: 100%;
 `
 
@@ -112,6 +113,7 @@ const StyledTD = styled.td`
 
 const TableContainer = styled.div`
   flex-grow: 1;
+  height: calc(100% - 32px);
   margin-bottom: 8px;
   overflow-y: auto;
 `
@@ -234,7 +236,9 @@ class BookSettings extends React.Component {
                     <StyledTBody>
                       {bcs.map(bc => (
                         <StyledTR key={bc.id}>
-                          <StyledTD align="left">{bc.title}</StyledTD>
+                          <StyledTD align="left">
+                            {bc.title || 'Untitled'}
+                          </StyledTD>
                           <StyledTD align="left">
                             <Input
                               align="left"

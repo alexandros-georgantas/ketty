@@ -114,7 +114,7 @@ const unlockOrphanLocks = async bookComponentIdsWithLock => {
 
 const cleanUpLocks = async (immediate = false) => {
   try {
-    const pubsub = await pubsubManager.getPubsub()
+    // const pubsub = await pubsubManager.getPubsub()
     const serverIdentifier = config.get('serverIdentifier')
     logger.info(`executing locks clean-up procedure`)
     let removeCounter = 0
@@ -149,33 +149,33 @@ const cleanUpLocks = async (immediate = false) => {
               .patch({ status: 104 })
               .where({ bookComponentId })
 
-            const updatedBookComponent = await BookComponent.query(tr).findById(
-              bookComponentId,
-            )
+            // const updatedBookComponent = await BookComponent.query(tr).findById(
+            //   bookComponentId,
+            // )
 
-            const updatedBook = await Book.query(tr).findById(
-              updatedBookComponent.bookId,
-            )
+            // const updatedBook = await Book.query(tr).findById(
+            //   updatedBookComponent.bookId,
+            // )
 
-            if (!immediate) {
-              setTimeout(() => {
-                logger.info(`broadcasting unlocked event`)
-                pubsub.publish('BOOK_COMPONENT_UPDATED', {
-                  bookComponentUpdated: updatedBookComponent,
-                })
-                pubsub.publish('BOOK_UPDATED', {
-                  bookUpdated: updatedBook,
-                })
-              }, 15000)
-            } else {
-              logger.info(`broadcasting unlocked event`)
-              pubsub.publish('BOOK_COMPONENT_UPDATED', {
-                bookComponentUpdated: updatedBookComponent,
-              })
-              pubsub.publish('BOOK_UPDATED', {
-                bookUpdated: updatedBook,
-              })
-            }
+            // if (!immediate) {
+            //   setTimeout(() => {
+            //     logger.info(`broadcasting unlocked event`)
+            //     pubsub.publish('BOOK_COMPONENT_UPDATED', {
+            //       bookComponentUpdated: updatedBookComponent,
+            //     })
+            //     pubsub.publish('BOOK_UPDATED', {
+            //       bookUpdated: updatedBook,
+            //     })
+            //   }, 15000)
+            // } else {
+            //   logger.info(`broadcasting unlocked event`)
+            //   pubsub.publish('BOOK_COMPONENT_UPDATED', {
+            //     bookComponentUpdated: updatedBookComponent,
+            //   })
+            //   pubsub.publish('BOOK_UPDATED', {
+            //     bookUpdated: updatedBook,
+            //   })
+            // }
 
             return true
           }),

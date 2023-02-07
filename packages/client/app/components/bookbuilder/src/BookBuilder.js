@@ -9,8 +9,13 @@ import {
   DivisionsArea,
 } from './ui'
 
-const { metadataIcon, assetManagerIcon, bookExportIcon, teamManagerIcon } =
-  Icons
+const {
+  metadataIcon,
+  assetManagerIcon,
+  bookExportIcon,
+  teamManagerIcon,
+  bookSettingIcon,
+} = Icons
 
 // const Container = styled.div`
 //   clear: both;
@@ -121,13 +126,13 @@ const BookBuilder = ({
       onClick={() => onExportBook(book, book.title, history)}
       title="Export Book"
     />,
-    // <Button
-    //   icon={bookSettingIcon}
-    //   key={3}
-    //   label="Book Settings"
-    //   onClick={() => onBookSettings(book)}
-    //   title="Book Settings"
-    // />,
+    <Button
+      icon={bookSettingIcon}
+      key={3}
+      label="Book Settings"
+      onClick={() => onBookSettings(book)}
+      title="Book Settings"
+    />,
   ]
 
   if (canViewTeamManager) {
