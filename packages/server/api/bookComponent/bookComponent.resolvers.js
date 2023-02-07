@@ -1,6 +1,5 @@
 const findIndex = require('lodash/findIndex')
 const find = require('lodash/find')
-const difference = require('lodash/difference')
 const concat = require('lodash/concat')
 const flattenDeep = require('lodash/flattenDeep')
 const groupBy = require('lodash/groupBy')
@@ -63,21 +62,6 @@ const {
   useCaseGetBookComponentAndAcquireLock,
   useCaseXSweet,
 } = require('../useCases')
-
-const getOrderedBookComponents = async bookComponent => {
-  const divisions = await Division.findByField(
-    'bookId',
-    bookComponent.bookId,
-  ).orderByRaw(
-    `label='${'Frontmatter'}' desc, label='${'Body'}' desc, label='${'Backmatter'}' desc`,
-  )
-
-  const orderedComponent = flattenDeep(
-    concat([...map(divisions, division => division.bookComponents)]),
-  )
-
-  return orderedComponent
-}
 
 const getBookComponent = async (_, { id }, ctx) => {
   const bookComponent = await BookComponent.findById(id)

@@ -1,5 +1,4 @@
-const { pubsubManager, logger } = require('@coko/server')
-const express = require('express')
+const { pubsubManager } = require('@coko/server')
 const fs = require('fs')
 const fse = require('fs-extra')
 const config = require('config')

@@ -173,7 +173,7 @@ const xsweetHandler = async (bookComponentId, filePath) => {
     form.append('responseToken', responseToken)
     form.append('serviceCallbackTokenId', serviceCallbackTokenId)
     const publicURL = config.get('pubsweet-server.publicURL')
-    console.log('publicURL', publicURL)
+
     form.append('callbackURL', `${publicURL}/api/xsweet`)
 
     return new Promise((resolve, reject) => {
