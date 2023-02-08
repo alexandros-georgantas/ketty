@@ -793,12 +793,8 @@ class EditoriaMode {
       this.getStageType(bookComponent, 'clean_up').value === 0
 
     const collection = { id: bookComponent.bookId }
-    console.log('AAAAAAAAA1', bookComponent)
-    console.log('AAAAAAAAA2', isEditingSate)
-    console.log('AAAAAAAAA3', isCleanUpSate)
 
     if (await this.isAssignedProductionEditor(collection)) {
-      console.log('isAssignedProductionEditor')
       return true
     }
 
@@ -806,7 +802,6 @@ class EditoriaMode {
       (await this.isAssignedCopyEditor(collection)) &&
       (isEditingSate || isCleanUpSate)
     ) {
-      console.log('isAssignedCopyEditor and isEditingSate or isCleanUpSate')
       return true
     }
 

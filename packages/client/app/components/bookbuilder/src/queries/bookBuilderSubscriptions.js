@@ -325,7 +325,6 @@ const lockChangeSubscription = props => {
 
   const triggerRefetch = () => {
     if (pauseUpdates) return
-    console.log('bb lock change')
     refetch()
   }
 
@@ -358,7 +357,6 @@ const locksChangeSubscription = props => {
 
   const triggerRefetch = () => {
     if (pauseUpdates) return
-    console.log('bbs lock change')
     refetch()
   }
 

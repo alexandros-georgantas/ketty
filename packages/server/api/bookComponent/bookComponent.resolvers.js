@@ -1,10 +1,7 @@
 const findIndex = require('lodash/findIndex')
 const find = require('lodash/find')
-const concat = require('lodash/concat')
-const flattenDeep = require('lodash/flattenDeep')
 const groupBy = require('lodash/groupBy')
 const pullAll = require('lodash/pullAll')
-const map = require('lodash/map')
 const path = require('path')
 const BPromise = require('bluebird')
 

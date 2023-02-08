@@ -94,9 +94,7 @@ const WaxHeader = ({
         {prevBookComponent && (
           <StyledNavLinks
             onClick={e => {
-              // e.preventDefault()
               setTabId(uuid())
-              console.log('clicked back')
             }}
             position="left"
             to={createUrl(bookId, prevBookComponent.id)}
@@ -116,9 +114,7 @@ const WaxHeader = ({
         {nextBookComponent && (
           <StyledNavLinks
             onClick={e => {
-              // e.preventDefault()
               setTabId(uuid())
-              console.log('clicked next')
             }}
             position="right"
             to={createUrl(bookId, nextBookComponent.id, nextBookComponent.lock)}

@@ -165,8 +165,8 @@ const NotesAreaContainer = styled.div`
   width: 100%;
 
   .ProseMirror {
-    user-select: ${({ isReadOnly }) => (isReadOnly ? 'none' : 'default')};
     display: inline;
+    user-select: ${({ isReadOnly }) => (isReadOnly ? 'none' : 'default')};
   }
 `
 
