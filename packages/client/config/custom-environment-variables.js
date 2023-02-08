@@ -1,7 +1,7 @@
 module.exports = {
   featureBookStructure: 'FEATURE_BOOK_STRUCTURE',
   featureUploadDOCXFiles: 'FEATURE_UPLOAD_DOCX_FILES',
-  flavour: 'EDITORIA_FLAVOUR',
+  flavour: 'KETIDA_FLAVOUR',
   'pubsweet-client': {
     protocol: 'CLIENT_PROTOCOL',
     host: 'CLIENT_HOST',

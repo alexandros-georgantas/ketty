@@ -14,7 +14,7 @@ import UserProfile from './components/userProfile/src/ConnectedUserProfile'
 // Editor
 import EditorPageWithData from './components/wax/src/EditorPageWithData'
 
-// Editoria
+// Ketida
 import BookBuilder from './components/bookbuilder/src/ConnectedBookBuilder'
 
 import BookStructurePage from './components/wizard/src/BookStructure.page'

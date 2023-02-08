@@ -2,10 +2,10 @@
   "name": "client",
   "version": "0.0.1",
   "private": false,
-  "description": "Editoria Platform frontend",
+  "description": "Ketida Platform frontend",
   "repository": {
     "type": "git",
-    "url": "git@gitlab.coko.foundation:editoria/editoria.git"
+    "url": "git@gitlab.coko.foundation:ketida/ketida.git"
   },
   "license": "MIT",
   "author": "Yannis Barlas, Alexandros Georgantas",
