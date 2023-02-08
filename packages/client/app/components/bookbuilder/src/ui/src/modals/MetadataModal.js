@@ -249,7 +249,7 @@ class MetadataModal extends React.Component {
                     onBlur={handleBlur}
                     onChange={handleChange}
                     type="text"
-                    value={values.isbnL}
+                    value={values.issnL}
                   />
                   {errors.issnL && touched.issnL && errors.issnL}
                 </Row>
