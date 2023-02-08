@@ -3,6 +3,7 @@ const cleanDataIdAttributes = require('./cleanDataIdAttributes')
 const vivliostyleDecorator = require('./vivliostyleDecorator')
 const epubDecorator = require('./epubDecorator')
 const fixFontFaceUrls = require('./fixFontFaceUrls')
+const { convertedContent } = require('./texToValidHTML')
 
 module.exports = {
   cleanHTML,
@@ -10,4 +11,5 @@ module.exports = {
   vivliostyleDecorator,
   epubDecorator,
   fixFontFaceUrls,
+  convertedContent,
 }

@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 const cheerio = require('cheerio')
 const fs = require('fs-extra')
 const path = require('path')
@@ -10,7 +11,7 @@ const { epubArchiver } = require('./epubArchiver')
 const {
   cleanHTML,
   cleanDataIdAttributes,
-  // vivliostyleDecorator,
+  convertedContent,
 } = require('./converters')
 
 const { generateContainer } = require('./htmlGenerators')
@@ -105,6 +106,7 @@ const ExporterService = async (
       }
     }
 
+    const bookComponentsWithMath = []
     const shouldMathML = fileExtension === 'epub'
     book.divisions.forEach((division, divisionId) => {
       let counter = 0
@@ -133,7 +135,7 @@ const ExporterService = async (
               bookComponent,
               notesType,
               tocComponent,
-              shouldMathML,
+              bookComponentsWithMath,
               endnotesComponent,
               levelMapper[levelIndex],
             )
@@ -144,7 +146,7 @@ const ExporterService = async (
               bookComponent,
               notesType,
               tocComponent,
-              shouldMathML,
+              bookComponentsWithMath,
               endnotesComponent,
             )
           }
@@ -155,12 +157,12 @@ const ExporterService = async (
             bookComponent,
             notesType,
             tocComponent,
-            shouldMathML,
+            bookComponentsWithMath,
             endnotesComponent,
           )
         }
 
-        const { hasMath, content } = cleanedContent
+        const { content, hasMath } = cleanedContent
         /* eslint-disable no-param-reassign */
         bookComponent.hasMath = hasMath
         bookComponent.content = cleanDataIdAttributes(content)
@@ -168,6 +170,23 @@ const ExporterService = async (
         counter += 1
       })
     })
+
+    for (let i = 0; i < bookComponentsWithMath.length; i += 1) {
+      const division = book.divisions.get(bookComponentsWithMath[i].division)
+
+      const bookComponentWithMath = division.bookComponents.get(
+        bookComponentsWithMath[i].bookComponentId,
+      )
+
+      const target = shouldMathML ? 'mml' : 'svg'
+
+      const contentAfter = await convertedContent(
+        bookComponentWithMath.content,
+        target,
+      )
+
+      bookComponentWithMath.content = contentAfter
+    }
 
     // Gathering and executing scripts defined by user
     if (fileExtension === 'epub') {

@@ -1,13 +1,13 @@
 const hljs = require('highlight.js')
 const cheerio = require('cheerio')
-const katex = require('katex')
+const find = require('lodash/find')
 
 module.exports = (
   container,
   bookComponent,
   notesType,
   tocComponent,
-  shouldMathML,
+  bookComponentsWithMath,
   endnotesComponent = undefined,
   level = undefined,
 ) => {
@@ -40,8 +40,30 @@ module.exports = (
   }
 
   if (componentType === 'endnotes') {
+    $('math-inline').each((i, elem) => {
+      const found = find(bookComponentsWithMath, {
+        bookComponentId: 'endnotes',
+      })
+
+      if (!found) {
+        bookComponentsWithMath.push({ bookComponentId: 'endnotes', division })
+      }
+
+      hasMath = true
+    })
+
+    $('math-display').each(async (i, elem) => {
+      const found = find(bookComponentsWithMath, {
+        bookComponentId: 'endnotes',
+      })
+
+      if (!found) {
+        bookComponentsWithMath.push({ bookComponentId: 'endnotes', division })
+      }
+
+      hasMath = true
+    })
     return { content: $('body').html(), hasMath }
-    // return $('body').html()
   }
 
   let chapterEndnotes
@@ -67,28 +89,22 @@ module.exports = (
   })
 
   $('math-inline').each((i, elem) => {
-    const $elem = $(elem)
+    const found = find(bookComponentsWithMath, { bookComponentId: id })
 
-    const html = katex.renderToString($elem.text(), {
-      output: shouldMathML ? 'mathml' : 'html',
-    })
+    if (!found) {
+      bookComponentsWithMath.push({ bookComponentId: id, division })
+    }
 
-    const span = $('<span/>').attr('class', 'math-node').html(html)
-
-    $elem.replaceWith(span)
     hasMath = true
   })
 
-  $('math-display').each((i, elem) => {
-    const $elem = $(elem)
+  $('math-display').each(async (i, elem) => {
+    const found = find(bookComponentsWithMath, { bookComponentId: id })
 
-    const html = katex.renderToString($elem.text(), {
-      output: shouldMathML ? 'mathml' : 'html',
-    })
+    if (!found) {
+      bookComponentsWithMath.push({ bookComponentId: id, division })
+    }
 
-    const div = $('<div/>').attr('class', 'math-node').html(html)
-
-    $elem.replaceWith(div)
     hasMath = true
   })
 
