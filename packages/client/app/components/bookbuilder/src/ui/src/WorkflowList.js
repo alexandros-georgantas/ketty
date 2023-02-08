@@ -23,6 +23,11 @@ const Container = styled.div`
   }
 `
 
+const featureBookStructureEnabled =
+  (process.env.FEATURE_BOOK_STRUCTURE &&
+    JSON.parse(process.env.FEATURE_BOOK_STRUCTURE)) ||
+  false
+
 const WorkflowList = ({
   bookId,
   bookComponentId,
@@ -41,7 +46,13 @@ const WorkflowList = ({
     area: 'stages',
   })
 
-  const lastItem = last(stageItems).type
+  const clonedStageItems = JSON.parse(JSON.stringify(stageItems))
+
+  if (featureBookStructureEnabled) {
+    clonedStageItems.splice(0, 1)
+  }
+
+  const lastItem = last(clonedStageItems).type
 
   const getCurrentValue = (currentObjects, type) => {
     const currentObject = find(currentObjects, ['type', type])
@@ -54,8 +65,8 @@ const WorkflowList = ({
 
   const progressOrder = []
 
-  for (let i = 0; i < stageItems.length; i += 1) {
-    progressOrder.push(stageItems[i].type)
+  for (let i = 0; i < clonedStageItems.length; i += 1) {
+    progressOrder.push(clonedStageItems[i].type)
   }
 
   const renderStateItem = (
@@ -83,7 +94,7 @@ const WorkflowList = ({
     />
   )
 
-  const items = map(stageItems, stageItem => {
+  const items = map(clonedStageItems, stageItem => {
     const { type } = stageItem
 
     const currentValueIndex = indexOf(

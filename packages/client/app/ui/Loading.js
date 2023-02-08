@@ -12,7 +12,7 @@ const Wrapper = styled.div`
 `
 
 const Spinner = styled.div`
-  background: url('/assets/loader.gif');
+  background: url('/loader.gif');
   height: 50px;
   width: 50px;
 `

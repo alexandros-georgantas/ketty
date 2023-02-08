@@ -14,10 +14,9 @@ class ServiceCallbackToken extends Base {
   static get schema() {
     return {
       type: 'object',
-      required: ['bookComponentId', 'serviceCredentialId', 'responseToken'],
+      required: ['bookComponentId', 'responseToken'],
       properties: {
         bookComponentId: id,
-        serviceCredentialId: id,
         responseToken: stringNotEmpty,
       },
     }

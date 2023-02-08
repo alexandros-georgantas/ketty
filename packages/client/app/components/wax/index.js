@@ -1,7 +1,7 @@
-const ConnectedWax = require('./src/ConnectedWax')
+const EditorPageWithData = require('./src/EditorPageWithData')
 
 module.exports = {
   frontend: {
-    components: [() => ConnectedWax],
+    components: [() => EditorPageWithData],
   },
 }

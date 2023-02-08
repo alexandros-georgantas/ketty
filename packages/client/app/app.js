@@ -28,7 +28,7 @@ import ExportBookModal from './components/bookbuilder/src/ui/src/modals/ExportBo
 import MetadataModal from './components/bookbuilder/src/ui/src/modals/MetadataModal'
 import WorkflowModal from './components/bookbuilder/src/ui/src/modals/WorkflowModal'
 import BookSettingsModal from './components/bookbuilder/src/ui/src/modals/BookSettingsModal'
-import UnlockedModal from './components/wax/src/modals/UnlockedModal'
+import EditorModal from './components/wax/src/modals/EditorModal'
 import CreateTemplateModal from './components/templates/src/ui/src/modals/TemplateModal'
 import UpdateTemplateModal from './components/templates/src/ui/src/modals/ConnectedUpdateTemplateModal'
 import DeleteTemplateModal from './components/templates/src/ui/src/modals/DeleteTemplateModal'
@@ -61,7 +61,7 @@ let modals = {
   metadataModal: MetadataModal,
   workflowModal: WorkflowModal,
   errorModal: ErrorModal,
-  unlockedModal: UnlockedModal,
+  editorModal: EditorModal,
   createTemplateModal: CreateTemplateModal,
   updateTemplateModal: UpdateTemplateModal,
   deleteTemplateModal: DeleteTemplateModal,
@@ -86,7 +86,7 @@ if (featureBookStructureEnabled) {
     metadataModal: MetadataModal,
     workflowModal: WorkflowModal,
     errorModal: ErrorModal,
-    unlockedModal: UnlockedModal,
+    editorModal: EditorModal,
     createTemplateModal: CreateTemplateModal,
     updateTemplateModal: UpdateTemplateModal,
     deleteTemplateModal: DeleteTemplateModal,

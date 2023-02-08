@@ -12,7 +12,7 @@ import Signup from './components/Signup/src/SignupContainer'
 import UserProfile from './components/userProfile/src/ConnectedUserProfile'
 
 // Editor
-import Wax from './components/wax/src/ConnectedWax'
+import EditorPageWithData from './components/wax/src/EditorPageWithData'
 
 // Editoria
 import BookBuilder from './components/bookbuilder/src/ConnectedBookBuilder'
@@ -64,11 +64,11 @@ export default (
       <Redirect exact path="/" to="/books" />
       <Route
         path="/login"
-        render={props => <Login {...props} logo="/assets/editoria.png" />}
+        render={props => <Login {...props} logo="/editoria.png" />}
       />
       <Route
         path="/signup"
-        render={props => <Signup {...props} logo="/assets/editoria.png" />}
+        render={props => <Signup {...props} logo="/editoria.png" />}
       />
       <Route component={PasswordReset} path="/password-reset" />
       <PageLayout>
@@ -95,12 +95,12 @@ export default (
               path="/books/:id/book-builder"
             />
             <PrivateRoute
-              component={Wax}
+              component={EditorPageWithData}
               exact
               path="/books/:bookId/bookComponents/:bookComponentId"
             />
             <PrivateRoute
-              component={Wax}
+              component={EditorPageWithData}
               path="/books/:bookId/bookComponents/:bookComponentId/:mode"
             />
             <PrivateRoute component={GlobalTeamsManager} path="/globalTeams" />

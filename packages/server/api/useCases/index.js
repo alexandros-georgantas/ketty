@@ -33,6 +33,8 @@ module.exports = {
   useCaseDeleteBookComponent: bookComponent.deleteBookComponent,
   useCaseRenameBookComponent: bookComponent.renameBookComponent,
   useCaseGetBookComponent: bookComponent.getBookComponent,
+  useCaseGetBookComponentAndAcquireLock:
+    bookComponent.getBookComponentAndAcquireLock,
   useCaseUpdateBookComponent: bookComponent.updateBookComponent,
   useCaseGetBookCollection: bookCollection.getBookCollection,
   useCaseGetBookCollections: bookCollection.getBookCollections,

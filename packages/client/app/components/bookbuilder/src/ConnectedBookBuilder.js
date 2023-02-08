@@ -29,6 +29,7 @@ import {
   paginationChangeSubscription,
   workflowChangeSubscription,
   lockChangeSubscription,
+  locksChangeSubscription,
   titleChangeSubscription,
   productionEditorChangeSubscription,
   componentTypeChangeSubscription,
@@ -50,6 +51,7 @@ const mapper = {
   getTemplatesQuery,
   getBookBuilderRulesQuery,
   lockChangeSubscription,
+  locksChangeSubscription,
   orderChangeSubscription,
   bookRenamedSubscription,
   bookComponentAddedSubscription,
@@ -147,7 +149,7 @@ const mapProps = args => ({
   },
   onBookSettings: book => {
     const {
-      withModalFromArgs,
+      withModal: withModalFromArgs,
       updateRunningHeadersMutation: updateRunningHeadersMutationFromArgs,
     } = args
 

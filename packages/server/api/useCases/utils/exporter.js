@@ -32,15 +32,11 @@ const { epubcheckerHandler, icmlHandler, pdfHandler } = require('../services')
 const levelMapper = { 0: 'one', 1: 'two', 2: 'three' }
 
 const getURL = relativePath => {
-  const serverProtocol = process.env.SERVER_PROTOCOL
-  const serverHost = process.env.SERVER_HOST
-  const serverPort = process.env.SERVER_PORT
+  const publicURL = config.has('pubsweet-server.publicURL')
+    ? config.get('pubsweet-server.publicURL')
+    : undefined
 
-  const serverUrl = `${serverProtocol}://${serverHost}${
-    serverPort ? `:${serverPort}` : ''
-  }`
-
-  return `${serverUrl}/${relativePath}`
+  return `${publicURL}/${relativePath}`
 }
 
 const ExporterService = async (

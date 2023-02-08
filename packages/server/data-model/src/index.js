@@ -15,7 +15,6 @@ const team = require('./team')
 const teamMember = require('./teamMember')
 const user = require('./user')
 const lock = require('./lock')
-const serviceCredential = require('./serviceCredential')
 const serviceCallbackToken = require('./serviceCallbackToken')
 const { models } = require('./dataloader')
 
@@ -40,7 +39,6 @@ module.exports = {
   lock,
   loader,
   template,
-  serviceCredential,
   serviceCallbackToken,
   models: {
     ApplicationParameter: applicationParameter.model,
@@ -61,7 +59,6 @@ module.exports = {
     User: user.model,
     Lock: lock.model,
     loader,
-    ServiceCredential: serviceCredential.model,
     ServiceCallbackToken: serviceCallbackToken.model,
   },
 }

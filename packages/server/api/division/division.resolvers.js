@@ -24,6 +24,10 @@ const updateBookComponentOrder = async (
       index,
     )
 
+    pubsub.publish(`BOOK_UPDATED`, {
+      bookUpdated: book,
+    })
+
     pubsub.publish(BOOK_COMPONENT_ORDER_UPDATED, {
       bookComponentOrderUpdated: book,
     })

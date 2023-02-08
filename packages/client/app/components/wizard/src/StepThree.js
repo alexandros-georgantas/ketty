@@ -24,7 +24,7 @@ const openersAndClosersDictionary = {
   learningObjectives: 'Learning Objectives',
   contentOpenerImage: 'Content Opener Image',
   focusQuestions: 'Focus Questions',
-  keyTerms: 'Key Terms',
+  keyTerms: 'Key Terms List',
   selfReflectionActivity: 'Self-Reflection Activity',
   reviewActivity: 'Review Activity',
   summary: 'Summary',
@@ -666,91 +666,11 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                       </DraggableItem>
                     </Padder>
                   )}
-                  {levelsInternal[2] && expandedLevels[0] && (
-                    <Padder level={levelsInternal.length === 3 ? 1 : 3}>
-                      {levelsInternal.length === 3 ? (
-                        <Droppable
-                          droppableId={`${levelsInternal[2].type}_${levelsInternal[2].id}`}
-                          key={`${levelsInternal[2].type}_${levelsInternal[2].id}`}
-                          type="openers_and_closers"
-                        >
-                          {(providedL0, snapshotL0) => {
-                            const { isDraggingOver, draggingOverWith } =
-                              snapshotL0
-
-                            const notDifferentTypes =
-                              draggingOverWith &&
-                              draggingOverWith.split('_')[0] === 'item' &&
-                              (draggingOverWith.split('_')[1] ===
-                                levelsInternal[2].type ||
-                                levelsInternal[2].type.includes(
-                                  draggingOverWith?.split('_')[1],
-                                ) ||
-                                draggingOverWith
-                                  ?.split('_')[1]
-                                  ?.includes(levelsInternal[2].type))
-
-                            const isPlaceholder =
-                              draggingOverWith &&
-                              draggingOverWith.split('_')[0] !== 'item'
-
-                            const allowed =
-                              showDropIndicators.levelThree ||
-                              (isDraggingOver &&
-                                (notDifferentTypes || isPlaceholder))
-
-                            return (
-                              <DraggableArea
-                                {...providedL0.droppableProps}
-                                ref={providedL0.innerRef}
-                                style={getListStyleLevel(allowed, 0)}
-                              >
-                                {levelsInternal[2].contentStructure &&
-                                  levelsInternal[2].contentStructure.map(
-                                    (item, indx) => (
-                                      <Draggable
-                                        draggableId={`item_${levelsInternal[2].type}_${levelsInternal[2].id}_${item.id}`}
-                                        index={indx}
-                                        key={`item_${levelsInternal[2].type}_${levelsInternal[2].id}_${item.id}`}
-                                      >
-                                        {(providedL1, _) => (
-                                          <DraggableItemWrapper
-                                            ref={providedL1.innerRef}
-                                            {...providedL1.draggableProps}
-                                          >
-                                            <DraggableItem
-                                              active={false}
-                                              dragHandleProps={
-                                                providedL1.dragHandleProps
-                                              }
-                                              headerActionComponents={renderTitleActions(
-                                                `${levelsInternal[2].id}_${item.id}`,
-                                                item.type === 'mainContent',
-                                              )}
-                                              headerComponent={
-                                                <div>{item.displayName}</div>
-                                              }
-                                            />
-                                          </DraggableItemWrapper>
-                                        )}
-                                      </Draggable>
-                                    ),
-                                  )}
-                                {providedL0.placeholder}
-                              </DraggableArea>
-                            )
-                          }}
-                        </Droppable>
-                      ) : (
-                        <DraggableItem
-                          active={expandedLevels[2]}
-                          externalHandler={expandedLevelsHandler}
-                          headerComponent={
-                            <div>{levelsInternal[2].displayName}</div>
-                          }
-                          isAccordion
-                          level={2}
-                        >
+                  {levelsInternal[2] &&
+                    expandedLevels[0] &&
+                    expandedLevels[1] && (
+                      <Padder level={levelsInternal.length === 3 ? 1 : 3}>
+                        {levelsInternal.length === 3 ? (
                           <Droppable
                             droppableId={`${levelsInternal[2].type}_${levelsInternal[2].id}`}
                             key={`${levelsInternal[2].type}_${levelsInternal[2].id}`}
@@ -785,7 +705,7 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                                 <DraggableArea
                                   {...providedL0.droppableProps}
                                   ref={providedL0.innerRef}
-                                  style={getListStyleLevel(allowed, 2)}
+                                  style={getListStyleLevel(allowed, 0)}
                                 >
                                   {levelsInternal[2].contentStructure &&
                                     levelsInternal[2].contentStructure.map(
@@ -823,10 +743,94 @@ const StepThree = ({ bookStructure, updateLevelContentStructure }) => (
                               )
                             }}
                           </Droppable>
-                        </DraggableItem>
-                      )}
-                    </Padder>
-                  )}
+                        ) : (
+                          <DraggableItem
+                            active={expandedLevels[2]}
+                            externalHandler={expandedLevelsHandler}
+                            headerComponent={
+                              <div>{levelsInternal[2].displayName}</div>
+                            }
+                            isAccordion
+                            level={2}
+                          >
+                            <Droppable
+                              droppableId={`${levelsInternal[2].type}_${levelsInternal[2].id}`}
+                              key={`${levelsInternal[2].type}_${levelsInternal[2].id}`}
+                              type="openers_and_closers"
+                            >
+                              {(providedL0, snapshotL0) => {
+                                const { isDraggingOver, draggingOverWith } =
+                                  snapshotL0
+
+                                const notDifferentTypes =
+                                  draggingOverWith &&
+                                  draggingOverWith.split('_')[0] === 'item' &&
+                                  (draggingOverWith.split('_')[1] ===
+                                    levelsInternal[2].type ||
+                                    levelsInternal[2].type.includes(
+                                      draggingOverWith?.split('_')[1],
+                                    ) ||
+                                    draggingOverWith
+                                      ?.split('_')[1]
+                                      ?.includes(levelsInternal[2].type))
+
+                                const isPlaceholder =
+                                  draggingOverWith &&
+                                  draggingOverWith.split('_')[0] !== 'item'
+
+                                const allowed =
+                                  showDropIndicators.levelThree ||
+                                  (isDraggingOver &&
+                                    (notDifferentTypes || isPlaceholder))
+
+                                return (
+                                  <DraggableArea
+                                    {...providedL0.droppableProps}
+                                    ref={providedL0.innerRef}
+                                    style={getListStyleLevel(allowed, 2)}
+                                  >
+                                    {levelsInternal[2].contentStructure &&
+                                      levelsInternal[2].contentStructure.map(
+                                        (item, indx) => (
+                                          <Draggable
+                                            draggableId={`item_${levelsInternal[2].type}_${levelsInternal[2].id}_${item.id}`}
+                                            index={indx}
+                                            key={`item_${levelsInternal[2].type}_${levelsInternal[2].id}_${item.id}`}
+                                          >
+                                            {(providedL1, _) => (
+                                              <DraggableItemWrapper
+                                                ref={providedL1.innerRef}
+                                                {...providedL1.draggableProps}
+                                              >
+                                                <DraggableItem
+                                                  active={false}
+                                                  dragHandleProps={
+                                                    providedL1.dragHandleProps
+                                                  }
+                                                  headerActionComponents={renderTitleActions(
+                                                    `${levelsInternal[2].id}_${item.id}`,
+                                                    item.type === 'mainContent',
+                                                  )}
+                                                  headerComponent={
+                                                    <div>
+                                                      {item.displayName}
+                                                    </div>
+                                                  }
+                                                />
+                                              </DraggableItemWrapper>
+                                            )}
+                                          </Draggable>
+                                        ),
+                                      )}
+                                    {providedL0.placeholder}
+                                  </DraggableArea>
+                                )
+                              }}
+                            </Droppable>
+                          </DraggableItem>
+                        )}
+                      </Padder>
+                    )}
                   {levelsInternal[3] &&
                     expandedLevels[0] &&
                     expandedLevels[1] && (

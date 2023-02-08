@@ -111,6 +111,7 @@ const EditorContainer = styled.div`
     box-shadow: 0 0 8px #ecedf1;
     min-height: 98%;
     padding: ${grid(10)};
+    user-select: ${({ isReadOnly }) => (isReadOnly ? 'none' : 'default')};
   }
 `
 
@@ -165,6 +166,7 @@ const NotesAreaContainer = styled.div`
 
   .ProseMirror {
     display: inline;
+    user-select: ${({ isReadOnly }) => (isReadOnly ? 'none' : 'default')};
   }
 `
 
@@ -214,7 +216,9 @@ const RightArea = ComponentPlugin('rightArea')
 const CommentTrackToolBar = ComponentPlugin('commentTrackToolBar')
 const BottomRightInfo = ComponentPlugin('BottomRightInfo')
 
-const EditoriaLayout = ({ editor }) => {
+const EditoriaLayout = props => {
+  const { editor, isReadOnly } = props
+
   const {
     pmViews: { main },
     options,
@@ -258,7 +262,6 @@ const EditoriaLayout = ({ editor }) => {
   )
 
   useEffect(() => {}, [delayedShowedNotes])
-
   return (
     <ThemeProvider theme={cokoTheme}>
       <Wrapper id="wax-container" style={fullScreenStyles}>
@@ -281,7 +284,9 @@ const EditoriaLayout = ({ editor }) => {
               ]}
             >
               <WaxSurfaceScroll>
-                <EditorContainer>{editor}</EditorContainer>
+                <EditorContainer isReadOnly={isReadOnly}>
+                  {editor}
+                </EditorContainer>
                 <CommentsContainer>
                   <CommentTrackToolsContainer>
                     <CommentTrackTools>
@@ -297,7 +302,7 @@ const EditoriaLayout = ({ editor }) => {
               </WaxSurfaceScroll>
 
               {hasNotes && (
-                <NotesAreaContainer>
+                <NotesAreaContainer isReadOnly={isReadOnly}>
                   <NotesContainer id="notes-container">
                     <NotesArea view={main} />
                   </NotesContainer>

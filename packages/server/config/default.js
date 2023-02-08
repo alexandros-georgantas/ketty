@@ -11,20 +11,10 @@ const waxVanilla = require('./modules/waxConfigVanilla')
 const waxBooksprints = require('./modules/waxConfigBooksprints')
 const permissions = require('./permissions')
 
-// const logger = new winston.createLogger({
-//   transports: [
-//     new winston.transports.Console({
-//       colorize: true,
-//       handleExceptions: true,
-//       humanReadableUnhandledException: true,
-//     }),
-//   ],
-// })
 const flavour =
   process.env.EDITORIA_FLAVOUR && process.env.EDITORIA_FLAVOUR === 'BOOKSPRINTS'
     ? 'BOOKSPRINTS'
     : 'VANILLA'
-// const featureBookStructureEnabled = process.env.FEATURE_BOOK_STRUCTURE || false
 
 const featureBookStructureEnabled =
   (process.env.FEATURE_BOOK_STRUCTURE &&
@@ -88,8 +78,7 @@ module.exports = {
     serveClient: false,
     graphiql: true,
     tokenExpiresIn: '360 days',
-    externalServerURL: undefined,
-    // logger,
+    publicURL: undefined,
     port: 3000,
     protocol: 'http',
     host: 'localhost',
@@ -103,7 +92,7 @@ module.exports = {
       email: 'ADMIN_EMAIL',
     },
     cron: {
-      path: path.join(__dirname, '..', 'services', 'tempCleanUp.cron.js'),
+      path: path.join(__dirname, '..', 'services', 'cron.service.js'),
     },
   },
   'file-server': {

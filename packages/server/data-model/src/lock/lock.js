@@ -25,11 +25,13 @@ class Lock extends Base {
   static get schema() {
     return {
       type: 'object',
-      required: ['foreignId', 'foreignType', 'userId'],
+      required: ['foreignId', 'foreignType', 'userId', 'tabId'],
       properties: {
         foreignId: id,
         foreignType,
         userId: id,
+        tabId: id,
+        serverIdentifier: id,
       },
     }
   }

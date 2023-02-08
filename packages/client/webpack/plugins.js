@@ -5,8 +5,6 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const CompressionPlugin = require('compression-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
-const isDevelopment = process.env.NODE_ENV === 'development'
-
 module.exports = (opts = {}) => {
   const plugins = []
 
@@ -45,6 +43,7 @@ module.exports = (opts = {}) => {
       'process.env.SERVER_HOST': `"${opts.clientEnv.serverHost}"`,
       'process.env.SERVER_PORT': `"${opts.clientEnv.serverPort}"`,
       'process.env.FEATURE_BOOK_STRUCTURE': opts.clientEnv.featureBookStructure,
+      'process.env.LOCKS_WS_URL': `"${opts.clientEnv.locksWSURL}"`,
       'process.env.FEATURE_UPLOAD_DOCX_FILES':
         opts.clientEnv.featureUploadDOCXFiles,
     }),
@@ -65,11 +64,7 @@ module.exports = (opts = {}) => {
     )
   }
 
-  if (isDevelopment) {
-    plugins.push(new CopyWebpackPlugin([{ from: '../public', to: 'assets/' }]))
-  } else {
-    plugins.push(new CopyWebpackPlugin([{ from: '../public' }]))
-  }
+  plugins.push(new CopyWebpackPlugin([{ from: '../public' }]))
 
   plugins.push(
     new webpack.optimize.AggressiveMergingPlugin(),

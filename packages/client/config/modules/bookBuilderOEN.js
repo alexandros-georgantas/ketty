@@ -66,6 +66,12 @@ module.exports = {
           visibleInHeader: false,
         },
         {
+          value: 'copyrights',
+          title: 'Copyrights',
+          predefined: true,
+          visibleInHeader: false,
+        },
+        {
           value: 'cover',
           title: 'Cover',
           predefined: true,

@@ -21,13 +21,12 @@ module.exports = webpackEnv => {
   const isEnvDevelopment = webpackEnv === 'development'
   const isEnvProduction = webpackEnv === 'production'
   const serverProtocol = process.env.SERVER_PROTOCOL
+  const locksWSURL = process.env.LOCKS_WS_URL
 
-  // const featureBookStructure = process.env.FEATURE_BOOK_STRUCTURE || false
   const featureBookStructure =
     (process.env.FEATURE_BOOK_STRUCTURE &&
       JSON.parse(process.env.FEATURE_BOOK_STRUCTURE)) ||
     false
-  // const featureUploadDOCXFiles = process.env.FEATURE_UPLOAD_DOCX_FILES || true
 
   const featureUploadDOCXFiles =
     (process.env.FEATURE_UPLOAD_DOCX_FILES &&
@@ -60,7 +59,7 @@ module.exports = webpackEnv => {
     },
     output: {
       path: output,
-      publicPath: isEnvDevelopment ? '/' : '/assets/',
+      publicPath: '/',
       filename: isEnvProduction
         ? 'js/[name].[contenthash:8].js'
         : isEnvDevelopment && 'js/bundle.js',
@@ -99,6 +98,7 @@ module.exports = webpackEnv => {
         serverPort,
         featureBookStructure,
         featureUploadDOCXFiles,
+        locksWSURL,
       },
     }),
   }

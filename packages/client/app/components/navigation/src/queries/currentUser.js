@@ -12,6 +12,13 @@ const CURRENT_USER = gql`
       admin
       givenName
       surname
+      # teams {
+      #   id
+      #   role
+      #   object {
+      #     objectId
+      #   }
+      # }
     }
   }
 `

@@ -1,5 +1,4 @@
-import React from 'react'
-import { ApolloConsumer, gql } from '@apollo/client'
+import { gql } from '@apollo/client'
 
 const GET_SPECIFIC_FILES = gql`
   query GetSpecificFilesQuery($ids: [ID!]!) {
@@ -12,14 +11,4 @@ const GET_SPECIFIC_FILES = gql`
   }
 `
 
-const getSpecificFilesQuery = props => {
-  const { render } = props
-  return (
-    <ApolloConsumer>
-      {client => render({ client, query: GET_SPECIFIC_FILES })}
-    </ApolloConsumer>
-  )
-}
-
-export { GET_SPECIFIC_FILES }
-export default getSpecificFilesQuery
+export default GET_SPECIFIC_FILES

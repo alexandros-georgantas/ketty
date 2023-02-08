@@ -1,5 +1,4 @@
-const { pubsubManager, logger } = require('@coko/server')
-const express = require('express')
+const { pubsubManager } = require('@coko/server')
 const fs = require('fs')
 const fse = require('fs-extra')
 const config = require('config')
@@ -16,42 +15,10 @@ const readFile = location =>
     })
   })
 
-const { BookComponent, Lock, ServiceCallbackToken } =
+const { BookComponent, ServiceCallbackToken } =
   require('../../data-model/src').models
 
-const { useCaseUnlockBookComponent } = require('../useCases')
-
-const {
-  BOOK_COMPONENT_UPLOADING_UPDATED,
-  BOOK_COMPONENT_LOCK_UPDATED,
-} = require('../bookComponent/consts')
-
-const unlockHandler = async (userId, bookComponentId) => {
-  const bookComponentLock = await Lock.query().where({
-    foreignId: bookComponentId,
-    deleted: false,
-  })
-
-  if (bookComponentLock.length === 0) {
-    logger.info('nothing to unlock')
-    return false
-  }
-
-  const { userId: userLock } = bookComponentLock[0]
-
-  if (userId !== userLock) {
-    logger.info('lock taken by another user')
-  } else {
-    const pubsub = await pubsubManager.getPubsub()
-    await useCaseUnlockBookComponent(bookComponentId)
-    const updatedBookComponent = await BookComponent.findById(bookComponentId)
-    await pubsub.publish(BOOK_COMPONENT_LOCK_UPDATED, {
-      bookComponentLockUpdated: updatedBookComponent,
-    })
-  }
-
-  return true
-}
+const { BOOK_COMPONENT_UPLOADING_UPDATED } = require('../bookComponent/consts')
 
 const {
   useCaseUpdateBookComponentContent,
@@ -66,8 +33,7 @@ const Controllers = app => {
       const { body } = req
 
       const {
-        bookComponentId,
-        serviceCredentialId,
+        objectId: bookComponentId,
         responseToken,
         convertedContent,
         serviceCallbackTokenId,
@@ -90,7 +56,6 @@ const Controllers = app => {
         id: serviceCallbackTokenId,
         responseToken,
         bookComponentId,
-        serviceCredentialId,
       })
 
       if (serviceCallbackToken.length !== 1) {
@@ -116,20 +81,13 @@ const Controllers = app => {
         msg: 'ok',
       })
     } catch (error) {
-      // the service does not care if something went wrong in editoria
+      // the service will not care if something went wrong in Ketida
       res.status(200).json({
         msg: 'ok',
       })
       // throw something which will only be displayed in server's logs
       throw new Error(error)
     }
-  })
-  app.use('/api/unlockBeacon', express.text(), async (req, res, next) => {
-    const { body } = req
-    const data = body && JSON.parse(req.body)
-    const { uid: userId, bbid: bookComponentId } = data
-    setTimeout(() => unlockHandler(userId, bookComponentId), 1000)
-    return res.status(200).end()
   })
   app.use('/api/fileserver/cleanup/:scope/:hash', async (req, res, next) => {
     const { scope, hash } = req.params

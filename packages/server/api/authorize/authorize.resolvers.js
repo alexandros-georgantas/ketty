@@ -17,6 +17,9 @@ const {
 } = require('./consts')
 
 const executeMultipleAuthorizeRules = async (ctx, value, rules) => {
+  // console.log('1', value)
+  // console.log('2', rules)
+
   const permissions = await Promise.all(
     map(rules, (rule, variable) =>
       ctx.helpers

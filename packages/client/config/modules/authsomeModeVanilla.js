@@ -152,8 +152,8 @@ class EditoriaMode {
         case 'team':
           id = object.object.id //eslint-disable-line
           break
-        default:
-          id = object.id //eslint-disable-line
+        default: //eslint-disable-line
+          id = object.id
           break
       }
     }
@@ -346,7 +346,7 @@ class EditoriaMode {
         return true
       }
 
- if (await this.isAssignedCopyEditor(collection)) {
+      if (await this.isAssignedCopyEditor(collection)) {
         if (Object.keys(diff).length === 1) {
           // TODO
           // if (
@@ -431,7 +431,7 @@ class EditoriaMode {
         return false
       }
 
- if (await this.isAuthor(collection)) {
+      if (await this.isAuthor(collection)) {
         if (Object.keys(diff).length === 1) {
           // TODO
           // if (
@@ -497,14 +497,14 @@ class EditoriaMode {
         return true
       }
 
- if (
+      if (
         (await this.isAssignedCopyEditor(book)) &&
         (isEditingSate || isCleaningUpSate)
       ) {
         return true
       }
 
- if ((await this.isAuthor(book)) && isReviewingSate) {
+      if ((await this.isAuthor(book)) && isReviewingSate) {
         return true
       }
     }
@@ -523,7 +523,7 @@ class EditoriaMode {
         return true
       }
 
- if (await this.isAssignedCopyEditor(collection)) {
+      if (await this.isAssignedCopyEditor(collection)) {
         let condition = false
 
         switch (progressType) {
@@ -565,7 +565,7 @@ class EditoriaMode {
         return condition
       }
 
- if (await this.isAuthor(collection)) {
+      if (await this.isAuthor(collection)) {
         let condition = false
 
         switch (progressType) {
@@ -618,7 +618,7 @@ class EditoriaMode {
         return true
       }
 
- if (await this.isAssignedCopyEditor(collection)) {
+      if (await this.isAssignedCopyEditor(collection)) {
         let condition = false
 
         switch (progressType) {
@@ -672,7 +672,7 @@ class EditoriaMode {
         return condition
       }
 
- if (await this.isAuthor(collection)) {
+      if (await this.isAuthor(collection)) {
         const condition = false
         return condition
       }
@@ -708,7 +708,7 @@ class EditoriaMode {
         return true
       }
 
- if (await this.isAssignedCopyEditor(collection)) {
+      if (await this.isAssignedCopyEditor(collection)) {
         let condition = false
 
         switch (progressType) {
@@ -759,7 +759,7 @@ class EditoriaMode {
         return condition
       }
 
- if (await this.isAuthor(collection)) {
+      if (await this.isAuthor(collection)) {
         let condition = false
 
         switch (progressType) {
@@ -798,7 +798,7 @@ class EditoriaMode {
       return true
     }
 
- if (
+    if (
       (await this.isAssignedCopyEditor(collection)) &&
       (isEditingSate || isCleanUpSate)
     ) {

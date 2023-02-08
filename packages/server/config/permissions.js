@@ -59,7 +59,7 @@ const permissions = {
     toggleIncludeInTOC: isAuthenticated,
     createBookCollection: isAuthenticated,
     addCustomTag: isAuthenticated,
-    updateCustomTag: isAuthenticated,
+    // updateCustomTag: isAuthenticated,
     updateBookComponentOrder: isAuthenticated,
     uploadFiles: isAuthenticated,
     updateFile: isAuthenticated,

@@ -75,6 +75,23 @@ const BOOK_COMPONENT_LOCK_UPDATED_SUBSCRIPTION = gql`
   }
 `
 
+const BOOK_COMPONENTS_LOCK_UPDATED_SUBSCRIPTION = gql`
+  subscription BookComponentsLockUpdated {
+    bookComponentsLockUpdated {
+      id
+      lock {
+        id
+        userId
+        username
+        created
+        givenName
+        isAdmin
+        surname
+      }
+    }
+  }
+`
+
 const BOOK_COMPONENT_TITLE_UPDATED_SUBSCRIPTION = gql`
   subscription BookComponentTitleUpdated {
     bookComponentTitleUpdated {
@@ -333,6 +350,38 @@ const lockChangeSubscription = props => {
   )
 }
 
+const locksChangeSubscription = props => {
+  const { render, getBookQuery, statefull } = props
+  const { pauseUpdates } = statefull
+  const { refetch } = getBookQuery
+
+  const triggerRefetch = () => {
+    if (pauseUpdates) return
+    refetch()
+  }
+
+  // if (!getBookQuery.data) {
+  //   return null
+  // }
+  // const { divisions } = getBookQuery.data.getBook
+  // const subscribeToBookComponents = []
+  // divisions.forEach(division => {
+  //   division.bookComponents.forEach(item => {
+  //     subscribeToBookComponents.push(item.id)
+  //   })
+  // })
+
+  return (
+    <Subscription
+      onSubscriptionData={triggerRefetch}
+      subscription={BOOK_COMPONENTS_LOCK_UPDATED_SUBSCRIPTION}
+      // variables={{ bookComponentIds: subscribeToBookComponents }}
+    >
+      {render}
+    </Subscription>
+  )
+}
+
 const titleChangeSubscription = props => {
   const { render, getBookQuery, statefull } = props
   const { pauseUpdates } = statefull
@@ -471,6 +520,7 @@ export {
   paginationChangeSubscription,
   workflowChangeSubscription,
   lockChangeSubscription,
+  locksChangeSubscription,
   titleChangeSubscription,
   teamMembersChangeSubscription,
   productionEditorChangeSubscription,
