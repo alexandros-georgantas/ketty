@@ -110,9 +110,7 @@ const TEAM_MEMBERS_UPDATED_SUBSCRIPTION = gql`
 
 const METADATA_UPDATED_SUBSCRIPTION = gql`
   subscription BookMetadataUpdated {
-    bookMetadataUpdated {
-      id
-    }
+    bookMetadataUpdated
   }
 `
 

@@ -705,8 +705,6 @@ const updateWorkflowState = async (bookComponentId, workflowStages, ctx) => {
             .patch({ status: 105 })
             .where({ bookComponentId })
         })
-
-      // console.log('res', res)
     }
 
     const updatedBookComponentState =
