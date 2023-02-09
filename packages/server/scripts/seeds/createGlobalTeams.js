@@ -1,7 +1,7 @@
 const { logger } = require('@coko/server')
 
 const {
-  editoriaDataModel: {
+  ketidaDataModel: {
     models: { Team },
   },
 } = require('../../data-model')

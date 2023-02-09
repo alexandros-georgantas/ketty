@@ -3,9 +3,9 @@ const get = require('lodash/get')
 const assign = require('lodash/assign')
 
 const config = require('config')
-const { editoriaDataModel } = require('../data-model')
+const { ketidaDataModel } = require('../data-model')
 
-const { models } = editoriaDataModel
+const { models } = ketidaDataModel
 
 const {
   Book,

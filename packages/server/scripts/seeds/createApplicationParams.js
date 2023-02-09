@@ -17,7 +17,7 @@ const featureBookStructureEnabled =
     JSON.parse(process.env.FEATURE_BOOK_STRUCTURE)) ||
   false
 
-const flavour = process.env.EDITORIA_FLAVOUR
+const flavour = process.env.KETIDA_FLAVOUR
 
 const truncate = async () => {
   await db.raw(`truncate table application_parameter cascade`)
@@ -28,7 +28,7 @@ const createApplicationParams = async () => {
   try {
     if (!flavour) {
       throw new Error(
-        'env variable EDITORIA_FLAVOUR is needed in order to continue',
+        'env variable KETIDA_FLAVOUR is needed in order to continue',
       )
     }
 

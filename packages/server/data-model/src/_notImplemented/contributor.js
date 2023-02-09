@@ -7,7 +7,7 @@
 // TO DO -- how about a user id in case a contributor is a user?
 // we wouldn't need fullName and email in that case
 
-const Base = require('../editoriaBase')
+const Base = require('../ketidaBase')
 const { email, string } = require('../helpers').schema
 
 class Contributor extends Base {

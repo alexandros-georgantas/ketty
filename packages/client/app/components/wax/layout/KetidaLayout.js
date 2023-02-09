@@ -216,7 +216,7 @@ const RightArea = ComponentPlugin('rightArea')
 const CommentTrackToolBar = ComponentPlugin('commentTrackToolBar')
 const BottomRightInfo = ComponentPlugin('BottomRightInfo')
 
-const EditoriaLayout = props => {
+const KetidaLayout = props => {
   const { editor, isReadOnly } = props
 
   const {
@@ -324,4 +324,4 @@ const EditoriaLayout = props => {
   )
 }
 
-export default EditoriaLayout
+export default KetidaLayout

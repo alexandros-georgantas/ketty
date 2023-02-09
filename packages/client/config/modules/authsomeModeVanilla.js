@@ -6,9 +6,9 @@ const {
   findIndex,
 } = require('lodash')
 
-class EditoriaMode {
+class KetidaMode {
   /**
-   * Creates a new instance of EditoriaMode
+   * Creates a new instance of KetidaMode
    *
    * @param {string} userId A user's UUID
    * @param {string} operation The operation you're authorizing for
@@ -18,7 +18,7 @@ class EditoriaMode {
    */
   constructor(userId, operation, object, context) {
     this.userId = userId
-    this.operation = EditoriaMode.mapOperation(operation)
+    this.operation = KetidaMode.mapOperation(operation)
     this.object = object
     this.context = context
     this.backend = true
@@ -315,7 +315,7 @@ class EditoriaMode {
     const wasReviewingSate = this.getStageType(current, 'review').value === 0
     const wasCleaningUpSate = this.getStageType(current, 'clean_up').value === 0
 
-    const diff = Object.assign(EditoriaMode.difference(update, current), {
+    const diff = Object.assign(KetidaMode.difference(update, current), {
       workflowStages: differenceWith(
         update.workflowStages,
         current.workflowStages,
@@ -900,7 +900,7 @@ module.exports = {
     return decision
   },
   create: async (userId, operation, object, context) => {
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     mode.backend = true
 
     if (
@@ -923,7 +923,7 @@ module.exports = {
     return false
   },
   update: (userId, operation, object, context) => {
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     mode.backend = true
     let data
 
@@ -957,7 +957,7 @@ module.exports = {
   },
   delete: false,
   read: (userId, operation, object, context) => {
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     mode.backend = true
 
     if (object === 'Book' || object === 'Team' || object === 'BookCollection') {
@@ -989,116 +989,116 @@ module.exports = {
   'can view nav links': (userId, operation, object, context) => false,
   'can add books': (userId, operation, object, context) => {
     // DONE
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canCreateBook()
   },
   'can rename books': (userId, operation, object, context) => {
     // DONE
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canInteractWithBooks()
   },
   'can archive books': (userId, operation, object, context) => {
     // DONE
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canInteractWithBooks()
   },
   'can delete books': (userId, operation, object, context) => {
     // DONE
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canInteractWithBooks()
   },
   'can access book': (userId, operation, object, context) => {
     // DONE
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canReadBook()
   },
   'can view teamManager': (userId, operation, object, context) => {
     // DONE
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canInteractWithBooks()
   },
   'can assign members': (userId, operation, object, context) => {
     // DONE
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canInteractWithBooks()
   },
   'can view addComponent': (userId, operation, object, context) => {
     // DONE
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canInteractWithBookComponents()
   },
   'can view deleteComponent': (userId, operation, object, context) => {
     // TODO
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canInteractWithBookComponents()
   },
   'can view uploadButton': (userId, operation, object, context) => {
     // DONE
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canInteractWithBookComponents()
   },
   'can view alignmentTool': (userId, operation, object, context) => {
     // DONE
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canInteractWithBookComponents()
   },
   'can view fragmentEdit': (userId, operation, object, context) => {
     // TODO
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canFragmentEdit()
   },
   'can view stateList': (userId, operation, object, context) => true, // DONE
   'can reorder bookComponents': (userId, operation, object, context) => {
     // DONE
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canInteractWithBookComponents()
   },
   'can change progressList': (userId, operation, object, context) => {
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canChangeProgress()
   },
   'can change progressList left': (userId, operation, object, context) => {
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canChangeProgressLeft()
   },
   'can change progressList right': (userId, operation, object, context) => {
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canChangeProgressRight()
   },
   'can use for editing': (userId, operation, object, context) => {
     // TODO
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canFragmentEdit()
   },
   'can view multipleFilesUpload': (userId, operation, object, context) => {
     // DONE
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canInteractWithBookComponents()
   },
   'can remove team member': (userId, operation, object, context) => {
     // DONE
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canRemoveTeamMember()
   },
   // TODO: refactor to use productionEditor property of collection
   'collection:create': (userId, operation, object, context) => {
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return object.collection.owners.includes(userId) || mode.canBroadcastEvent()
   },
   'collection:patch': (userId, operation, object, context) =>
-    // const mode = new EditoriaMode(userId, operation, object, context)
+    // const mode = new KetidaMode(userId, operation, object, context)
     true,
   'collection:delete': (userId, operation, object, context) => true,
   'fragment:create': (userId, operation, object, context) => {
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canBroadcastEvent()
   },
   'fragment:patch': (userId, operation, object, context) => {
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canBroadcastFragmentPatchEvent()
   },
   'can go': (userId, operation, object, context) => {
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canGo()
   },
   'fragment:delete': (userId, operation, object, context) => true,
@@ -1113,19 +1113,19 @@ module.exports = {
     // }
     true,
   'can toggle track changes': (userId, operation, object, context) => {
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canToggleTrackChanges()
   },
   'can edit full': (userId, operation, object, context) => {
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canEditFull()
   },
   'can edit selection': (userId, operation, object, context) => {
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canEditSelection()
   },
   'can edit preview': (userId, operation, object, context) => {
-    const mode = new EditoriaMode(userId, operation, object, context)
+    const mode = new KetidaMode(userId, operation, object, context)
     return mode.canEditReview()
   },
   // TODO: protect ink endpoint

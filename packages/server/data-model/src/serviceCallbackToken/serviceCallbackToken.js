@@ -1,4 +1,4 @@
-const Base = require('../editoriaBase')
+const Base = require('../ketidaBase')
 const { stringNotEmpty, id } = require('../helpers').schema
 
 class ServiceCallbackToken extends Base {

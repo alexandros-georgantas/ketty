@@ -5,7 +5,7 @@ create table book_component_translation (
   created timestamp with time zone not null default current_timestamp,
   updated timestamp with time zone,
 
-  -- editoria base
+  -- ketida base
   deleted boolean default false,
 
   -- translation

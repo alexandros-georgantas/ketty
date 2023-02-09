@@ -1,7 +1,7 @@
 module.exports = {
-  layout: 'editoria',
+  layout: 'ketida',
   lockWhenEditing: true,
-  theme: 'editoria',
+  theme: 'ketida',
   autoSave: true,
   frontmatter: {
     default: {

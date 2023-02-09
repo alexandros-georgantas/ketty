@@ -3,7 +3,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { Wax } from 'wax-prosemirror-core'
 
-import { EditoriaLayout } from '../layout'
+import { KetidaLayout } from '../layout'
 import { defaultConfig, OENConfigWax } from '../config'
 import WaxHeader from './WaxHeader'
 
@@ -12,8 +12,8 @@ const WaxContainer = styled.div`
   width: 100%;
 `
 
-const editoriaLayoutWithReadOnly = (props, isReadOnly) => (
-  <EditoriaLayout {...props} isReadOnly={isReadOnly} />
+const ketidaLayoutWithReadOnly = (props, isReadOnly) => (
+  <KetidaLayout {...props} isReadOnly={isReadOnly} />
 )
 
 const UniverseWrapper = styled.div`
@@ -216,7 +216,7 @@ const Editor = ({
           config={configWax}
           fileUpload={() => true}
           key={bookComponentId}
-          layout={props => editoriaLayoutWithReadOnly(props, isReadOnly)}
+          layout={props => ketidaLayoutWithReadOnly(props, isReadOnly)}
           onChange={onPeriodicBookComponentContentChange}
           placeholder="Type Something..."
           readonly={isReadOnly}

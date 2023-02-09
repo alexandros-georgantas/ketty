@@ -1,6 +1,6 @@
 const { Model } = require('objection')
 const remove = require('lodash/remove')
-const Base = require('../editoriaBase')
+const Base = require('../ketidaBase')
 
 const { id, stringNotEmpty, string, targetType, notesType } =
   require('../helpers').schema

@@ -47,7 +47,7 @@ export class BookBuilderModal extends React.Component {
           Use with caution.
         </div>
       )
-      // } else if (action === 'EditoriaTeamManager') {
+      // } else if (action === 'KetidaTeamManager') {
       //   // TODO -- ESPECIALLY THIS ONE
       //   modalBodyText = (
       //     <div>

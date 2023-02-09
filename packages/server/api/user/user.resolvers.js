@@ -17,7 +17,7 @@ const searchForUsers = async (_, { search, exclude }, ctx, info) => {
   }
 }
 
-const createEditoriaUser = async (_, { input }, ctx, info) => {
+const createKetidaUser = async (_, { input }, ctx, info) => {
   try {
     const { username, givenName, surname, email, password } = input
     logger.info('user resolver: executing createUser use case')
@@ -61,7 +61,7 @@ const sendPasswordResetEmail = async (_, { username }, ctx) => {
 module.exports = {
   Mutation: {
     searchForUsers,
-    createEditoriaUser,
+    createKetidaUser,
     updatePassword,
     updatePersonalInformation,
     sendPasswordResetEmail,

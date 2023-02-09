@@ -44,6 +44,7 @@ import {
   CustomTagService,
 } from 'wax-prosemirror-services'
 
+// change in wax
 import { EditoriaSchema } from 'wax-prosemirror-core'
 
 import invisibles, { hardBreak } from '@guardian/prosemirror-invisibles'

@@ -12,7 +12,7 @@ const waxBooksprints = require('./modules/waxConfigBooksprints')
 const permissions = require('./permissions')
 
 const flavour =
-  process.env.EDITORIA_FLAVOUR && process.env.EDITORIA_FLAVOUR === 'BOOKSPRINTS'
+  process.env.KETIDA_FLAVOUR && process.env.KETIDA_FLAVOUR === 'BOOKSPRINTS'
     ? 'BOOKSPRINTS'
     : 'VANILLA'
 
@@ -44,7 +44,7 @@ module.exports = {
     path: 'password-reset',
   },
   mailer: {
-    from: 'info@editoria.com',
+    from: 'info@ketida.com',
     path: path.join(__dirname, 'mailer'),
   },
   permissions,

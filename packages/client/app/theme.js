@@ -6,7 +6,6 @@ import 'fontsource-merriweather'
 import 'typeface-vollkorn'
 import 'typeface-inter'
 
-
 import { theme } from '@coko/client'
 
 import {
@@ -19,19 +18,19 @@ import {
   LogoLink,
 } from './elements'
 
-const editoriaTheme = clone(theme)
+const ketidaTheme = clone(theme)
 
-editoriaTheme.fontInterface = 'Fira Sans'
-editoriaTheme.fontHeading = 'Fira Sans Condensed'
-editoriaTheme.fontReading = 'Vollkorn'
-editoriaTheme.colorBackgroundTabs = '#e1ebff'
-editoriaTheme.colorBackgroundToolBar = '#fff'
-editoriaTheme.fontWriting = 'Merriweather'
-editoriaTheme.fontTools = 'Inter'
-editoriaTheme.colorSelection = '#C5D7FE'
-editoriaTheme.colorBackgroundButton = '#0042C7'
+ketidaTheme.fontInterface = 'Fira Sans'
+ketidaTheme.fontHeading = 'Fira Sans Condensed'
+ketidaTheme.fontReading = 'Vollkorn'
+ketidaTheme.colorBackgroundTabs = '#e1ebff'
+ketidaTheme.colorBackgroundToolBar = '#fff'
+ketidaTheme.fontWriting = 'Merriweather'
+ketidaTheme.fontTools = 'Inter'
+ketidaTheme.colorSelection = '#C5D7FE'
+ketidaTheme.colorBackgroundButton = '#0042C7'
 
-editoriaTheme.cssOverrides = {
+ketidaTheme.cssOverrides = {
   ui: {
     TextField,
     H1: Heading.H1,
@@ -47,4 +46,4 @@ editoriaTheme.cssOverrides = {
   },
 }
 
-export default editoriaTheme
+export default ketidaTheme

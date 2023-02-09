@@ -5,7 +5,7 @@ create table service_callback_token (
   created timestamp with time zone not null default current_timestamp,
   updated timestamp with time zone,
 
-  -- editoria base
+  -- ketida base
   deleted boolean default false,
   -- foreign
   book_component_id uuid not null references book_component,

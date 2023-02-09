@@ -66,7 +66,7 @@ const permissions = {
     deleteFiles: isAuthenticated,
     updateTeamMembers: isAuthenticated,
     searchForUsers: isAuthenticated,
-    updateEditoriaUser: isAuthenticated,
+    updateKetidaUser: isAuthenticated,
     updatePassword: isAuthenticated,
     updatePersonalInformation: isAuthenticated,
     updateUsername: isAuthenticated,

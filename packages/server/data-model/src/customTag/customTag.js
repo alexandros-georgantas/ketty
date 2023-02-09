@@ -1,4 +1,4 @@
-const Base = require('../editoriaBase')
+const Base = require('../ketidaBase')
 
 const { string } = require('../helpers').schema
 

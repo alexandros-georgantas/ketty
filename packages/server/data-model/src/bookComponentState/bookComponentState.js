@@ -11,7 +11,7 @@
 
 const { Model } = require('objection')
 
-const Base = require('../editoriaBase')
+const Base = require('../ketidaBase')
 const { model: BookComponent } = require('../bookComponent')
 
 const { array, booleanDefaultFalse, id, string, integerPositive } =

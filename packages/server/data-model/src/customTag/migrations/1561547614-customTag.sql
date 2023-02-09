@@ -4,7 +4,7 @@ create table custom_tag (
   type text not null,
   created timestamp with time zone not null default current_timestamp,
   updated timestamp with time zone,
-  -- editoria base
+  -- ketida base
   deleted boolean default false,
   -- own
   label text,

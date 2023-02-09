@@ -1,6 +1,6 @@
 // TO DO -- review foreign id and foreign type
 
-const Base = require('../editoriaBase')
+const Base = require('../ketidaBase')
 const { id } = require('../helpers').schema
 
 const foreignType = {

@@ -5,7 +5,7 @@
 // const map = require('lodash/map')
 
 // const {
-//   editoriaDataModel: {
+//   ketidaDataModel: {
 //     models: { User },
 //   },
 // } = require('../../data-model')

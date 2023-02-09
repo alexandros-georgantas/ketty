@@ -1,13 +1,13 @@
 /*
   An extension of pubsweet's base model with some bells and whistles.
-  All other Editoria models will (and should) extend this class.
+  All other Ketida models will (and should) extend this class.
 */
 
 const team = require('@pubsweet/model-team')
 
-const TeamMember = team.models[1].model
+const Team = team.models[0].model
 
-class EditoriaTeamMember extends TeamMember {
+class KetidaTeam extends Team {
   $beforeInsert() {
     super.$beforeInsert()
     this.deleted = false
@@ -24,6 +24,17 @@ class EditoriaTeamMember extends TeamMember {
       },
     }
   }
+
+  // get members() {
+  //   if (!this.members) {
+  //     return []
+  //   }
+  //   return this.member
+  // }
+
+  static async findById(id) {
+    return this.find(id)
+  }
 }
 
-module.exports = EditoriaTeamMember
+module.exports = KetidaTeam

@@ -1,21 +1,21 @@
-type EditoriaTeamMember {
+type KetidaTeamMember {
   id: ID
   user: User
 }
-type EditoriaTeam {
+type KetidaTeam {
   id: ID!
   type: String!
   name: String!
   role: String!
   objectId: ID
   objectType: String
-  members: [EditoriaTeamMember!]
+  members: [KetidaTeamMember!]
   global: Boolean
 }
 
 extend type Query {
-  getBookTeams(bookId: ID!): [EditoriaTeam]!
-  getGlobalTeams: [EditoriaTeam]!
+  getBookTeams(bookId: ID!): [KetidaTeam]!
+  getGlobalTeams: [KetidaTeam]!
 }
 
 type TeamSub {
@@ -27,7 +27,7 @@ type TeamSub {
 }
 
 extend type Mutation {
-  updateTeamMembers(id: String!, input: TeamInput!): EditoriaTeam!
+  updateTeamMembers(id: String!, input: TeamInput!): KetidaTeam!
 }
 
 extend type Subscription {

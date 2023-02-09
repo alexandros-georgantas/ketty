@@ -1,8 +1,8 @@
 const { logger } = require('@coko/server')
 const map = require('lodash/map')
-const { editoriaDataModel } = require('../data-model')
+const { ketidaDataModel } = require('../data-model')
 
-const { models } = editoriaDataModel
+const { models } = ketidaDataModel
 
 const { BookComponentState } = models
 
