@@ -222,7 +222,7 @@ services:
   icml:
     depends_on:
       - db-icml
-    image: cokoapps/icml:1.2.0
+    image: cokoapps/icml:1.2.1
     ports:
       - ${SERVICE_ICML_PORT:-3002}:${SERVICE_ICML_PORT:-3002}
     environment:

@@ -102,7 +102,7 @@ const ingestWordFile = async (_, { bookComponentFiles }, ctx) => {
 
       const tempFilePath = path.join(`${process.cwd()}`, 'uploads', 'temp')
       const randomFilename = `${crypto.randomBytes(32).toString('hex')}.docx`
-      fs.ensureDir(tempFilePath)
+      await fs.ensureDir(tempFilePath)
 
       await writeLocallyFromReadStream(
         tempFilePath,
