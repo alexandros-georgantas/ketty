@@ -10,12 +10,12 @@
  * */
 
 /*
-  Model representing an activity in Editoria.
+  Model representing an activity in Ketida.
   Activities are flexible by definition and could be any CRUD operation on any
   object.
 */
 
-const Base = require('../editoriaBase')
+const Base = require('../ketidaBase')
 const { foreignType, id, object } = require('../helpers').schema
 
 class Activity extends Base {

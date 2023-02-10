@@ -2,10 +2,10 @@
   "name": "server",
   "version": "0.0.1",
   "private": false,
-  "description": "Editoria Platform backend",
+  "description": "Ketida Platform backend",
   "repository": {
     "type": "git",
-    "url": "git@gitlab.coko.foundation:editoria/editoria.git"
+    "url": "git@gitlab.coko.foundation:ketida/ketida.git"
   },
   "license": "MIT",
   "author": "Yannis Barlas, Alexandros Georgantas, Kuldeep Upreti",

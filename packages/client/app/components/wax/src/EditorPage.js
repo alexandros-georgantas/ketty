@@ -139,8 +139,8 @@ const EditorPage = props => {
       },
       queryParams: { token, bookComponentId: bookComponent.id, tabId },
       share: true,
-      reconnectAttempts: 100,
-      reconnectInterval: 10000,
+      reconnectAttempts: 5000,
+      reconnectInterval: 5000,
     },
     editorMode !== 'preview', // ########## ######### ######## 1 check if that works as expected
   )
@@ -228,8 +228,8 @@ const EditorPage = props => {
     if (!isOnline) {
       const msg =
         editorMode !== 'preview'
-          ? `Unfortunately, something happened and our server is unreachable at this moment. The application does not support offline mode thus your lock will be released. In the meantime, we are trying to reconnect to our server and if this book component is not locked by any other user, you will get back your lock automatically which will allow you to continue editing. So, if you want just wait a bit :)`
-          : `Unfortunately, something happened and our server is unreachable at this moment. The application does not support offline mode. In the meantime, we are trying to reconnect to our server and if we succeed this modal will disappear and you will be able to continue what you were doing. So, if you want just wait a bit :)`
+          ? `Unfortunately, something happened and our server is unreachable at this moment. Don't worry your work up until this point is safe. However, as the application does not support offline mode your lock will be released. Please try again later`
+          : `Unfortunately, something happened and our server is unreachable at this moment. Don't worry your work up until this point is safe. Please try again later`
 
       onTriggerModal(false, msg)
     }
@@ -252,7 +252,7 @@ const EditorPage = props => {
 
       onTriggerModal(
         true,
-        'You have gained edit access for this book component!',
+        'You have gained WRITE access for this book component!',
       )
     }
 
@@ -261,7 +261,7 @@ const EditorPage = props => {
       editorMode === 'preview' &&
       status === 200
     ) {
-      onTriggerModal(true, 'You have lost edit access for this book component!')
+      onTriggerModal(true, 'You are in READ ONLY mode for this book component!')
     }
   }, [editorMode])
 

@@ -8,7 +8,7 @@ create table file_translation
   updated timestamp
   with time zone,
 
-  -- editoria base
+  -- ketida base
   deleted boolean default false,
 
   -- translation

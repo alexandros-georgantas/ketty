@@ -4,7 +4,7 @@ const User = user.model
 
 const { ValidationError } = require('@pubsweet/errors')
 
-class EditoriaUser extends User {
+class KetidaUser extends User {
   static get schema() {
     return {
       type: 'object',
@@ -73,4 +73,4 @@ class EditoriaUser extends User {
   }
 }
 
-module.exports = EditoriaUser
+module.exports = KetidaUser

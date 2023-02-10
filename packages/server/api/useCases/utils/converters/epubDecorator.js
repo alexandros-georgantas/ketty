@@ -1,6 +1,6 @@
 const cheerio = require('cheerio')
 
-const editoriaToEPUBPropertiesMapper = {
+const ketidaToEPUBPropertiesMapper = {
   front: 'frontmatter',
   back: 'backmatter',
   body: 'bodymatter',
@@ -13,7 +13,7 @@ const editoriaToEPUBPropertiesMapper = {
   endnotes: 'endnotes',
 }
 
-const editoriaExtra = {
+const ketidaExtra = {
   halftitle: 'halftitlepage',
   titlepage: 'titlepage',
 }
@@ -39,30 +39,28 @@ module.exports = (
     .attr('type', 'text/css')
     .attr('rel', 'stylesheet')
     .appendTo('head')
-  $('<title/>')
-    .text(bookTitle)
-    .prependTo('head')
+  $('<title/>').text(bookTitle).prependTo('head')
   $('body').attr({
     'xml:lang': 'en',
-    'epub:type': editoriaToEPUBPropertiesMapper[division],
+    'epub:type': ketidaToEPUBPropertiesMapper[division],
     lang: 'en',
   })
   $('nav').attr({
-    'epub:type': editoriaToEPUBPropertiesMapper[componentType],
-    role: `doc-${editoriaToEPUBPropertiesMapper[componentType]}`,
+    'epub:type': ketidaToEPUBPropertiesMapper[componentType],
+    role: `doc-${ketidaToEPUBPropertiesMapper[componentType]}`,
   })
 
   if (componentType !== 'toc') {
-    if (editoriaToEPUBPropertiesMapper[componentType]) {
+    if (ketidaToEPUBPropertiesMapper[componentType]) {
       $('section').attr({
-        'epub:type': editoriaToEPUBPropertiesMapper[componentType],
-        role: `doc-${editoriaToEPUBPropertiesMapper[componentType]}`,
+        'epub:type': ketidaToEPUBPropertiesMapper[componentType],
+        role: `doc-${ketidaToEPUBPropertiesMapper[componentType]}`,
       })
     }
 
-    if (editoriaExtra[componentType]) {
+    if (ketidaExtra[componentType]) {
       $('section').attr({
-        'epub:type': editoriaToEPUBPropertiesMapper[componentType],
+        'epub:type': ketidaToEPUBPropertiesMapper[componentType],
       })
     }
   }

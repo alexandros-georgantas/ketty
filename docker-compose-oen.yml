@@ -28,7 +28,7 @@ services:
       - SERVER_SERVE_CLIENT=true
       - CLIENT_WS_MIN_TIMEOUT=3000
       - CLIENT_WS_TIMEOUT=30000
-      - LOCKS_WS_URL=${LOCKS_WS_URL}
+      - LOCKS_WS_URL=${LOCKS_WS_URL:-ws://localhost:3333/locks}
     volumes:
       - ./packages/client/app:/home/node/app/app
       - ./packages/client/config:/home/node/app/config
@@ -113,17 +113,17 @@ services:
     environment:
       - NODE_ENV=development
       - SERVER_IDENTIFIER=${SERVER_IDENTIFIER:-0a3cf3f0-98b6-11ed-87cd-0800200c9a66}
-      - EDITORIA_FLAVOUR=${EDITORIA_FLAVOUR:-VANILLA}
+      - KETIDA_FLAVOUR=${KETIDA_FLAVOUR:-VANILLA}
       - PUBSWEET_SECRET=${PUBSWEET_SECRET:-dev_secret}
       - PUBLIC_SERVER_URL=${PUBLIC_SERVER_URL:-http://server:3000}
       - PUBLIC_CLIENT_URL=${PUBLIC_CLIENT_URL:-http://0.0.0.0:4000}
       - SERVER_SERVE_CLIENT=false
-      - WS_SERVER_PORT=${WS_SERVER_PORT:-8586}
+      - WS_SERVER_PORT=${WS_SERVER_PORT:-3333}
       - WS_HEARTBEAT_INTERVAL=${WS_HEARTBEAT_INTERVAL:-10000}
       - FAIL_SAFE_UNLOCKING_INTERVAL=${FAIL_SAFE_UNLOCKING_INTERVAL:-12000}
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
-      - POSTGRES_DB=${POSTGRES_DB:-editoria_dev}
+      - POSTGRES_DB=${POSTGRES_DB:-ketida_dev}
       - POSTGRES_USER=${POSTGRES_USER:-dev_user}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_user_password}
       - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
@@ -147,7 +147,7 @@ services:
       - S3_PORT=${S3_PORT:-9000}
       - S3_ACCESS_KEY_ID_ADMIN=${S3_ACCESS_KEY_ID_ADMIN:-admin}
       - S3_SECRET_ACCESS_KEY_ADMIN=${S3_SECRET_ACCESS_KEY_ADMIN:-superSecretAdminPassword}
-      - S3_ACCESS_KEY_ID_USER=${S3_ACCESS_KEY_ID_USER:-editoria}
+      - S3_ACCESS_KEY_ID_USER=${S3_ACCESS_KEY_ID_USER:-ketida}
       - S3_SECRET_ACCESS_KEY_USER=${S3_SECRET_ACCESS_KEY_USER:-superSecretUserPassword}
       - S3_BUCKET=${S3_BUCKET:-uploads}
       - SERVICE_EPUB_CHECKER_CLIENT_ID=59a3392b-0c4f-4318-bbe2-f86eff6d3de4
@@ -177,15 +177,18 @@ services:
       - TEMP_DIRECTORY_CLEAN_UP=${TEMP_DIRECTORY_CLEAN_UP:-true}
 
     volumes:
-      - ./packages/server/config:/home/node/editoria/config
-      - ./packages/server/api:/home/node/editoria/api
-      - ./packages/server/data-model:/home/node/editoria/data-model
-      - ./packages/server/file-server:/home/node/editoria/file-server
-      - ./packages/server/scripts:/home/node/editoria/scripts
-      - ./packages/server/common:/home/node/editoria/common
-      - ./packages/server/app.js:/home/node/editoria/app.js
-      - ./packages/server/startServer.js:/home/node/editoria/startServer.js
-
+      - ./packages/server/config:/home/node/ketida/config
+      - ./packages/server/api:/home/node/ketida/api
+      - ./packages/server/data-model:/home/node/ketida/data-model
+      - ./packages/server/file-server:/home/node/ketida/file-server
+      - ./packages/server/scripts:/home/node/ketida/scripts
+      - ./packages/server/common:/home/node/ketida/common
+      - ./packages/server/app.js:/home/node/ketida/app.js
+      - ./packages/server/startServer.js:/home/node/ketida/startServer.js
+      - ./packages/server/startWebSocketServer.js:/home/node/ketida/startWebSocketServer.js
+      - ./packages/server/utils/wsAuthentication.js:/home/node/ketida/utils/wsAuthentication.js
+      - ./packages/server/utils/wsConnectionHandlers.js:/home/node/ketida/utils/wsConnectionHandlers.js
+      - ./packages/server/services/bookComponentLock.service.js:/home/node/ketida/services/bookComponentLock.service.js
   epubchecker:
     depends_on:
       - db-epubchecker
@@ -213,7 +216,7 @@ services:
   icml:
     depends_on:
       - db-icml
-    image: cokoapps/icml:1.2.0
+    image: cokoapps/icml:1.2.1
     ports:
       - ${SERVICE_ICML_PORT:-3002}:${SERVICE_ICML_PORT:-3002}
     environment:
@@ -298,7 +301,7 @@ services:
     ports:
       - 5432:5432
     environment:
-      - POSTGRES_DB=${POSTGRES_DB:-editoria_dev}
+      - POSTGRES_DB=${POSTGRES_DB:-ketida_dev}
       - POSTGRES_USER=${POSTGRES_USER:-dev_user}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_user_password}
     volumes:
@@ -369,6 +372,6 @@ services:
       s3:
         condition: service_healthy
     entrypoint: >
-      /bin/sh -c " /usr/bin/mc config host add editoria ${S3_PROTOCOL:-http}://${S3_HOST:-s3}:${S3_PORT:-9000} ${S3_ACCESS_KEY_ID_ADMIN:-admin} ${S3_SECRET_ACCESS_KEY_ADMIN:-superSecretAdminPassword}; /usr/bin/mc admin user add editoria/ ${S3_ACCESS_KEY_ID_USER:-editoria} ${S3_SECRET_ACCESS_KEY_USER:-superSecretUserPassword}; /usr/bin/mc admin user enable editoria/ ${S3_ACCESS_KEY_ID_USER:-editoria}; /usr/bin/mc mb editoria/${S3_BUCKET:-uploads}; /usr/bin/mc admin policy set editoria/ readwrite user=${S3_ACCESS_KEY_ID_USER:-editoria}; exit 0; "
+      /bin/sh -c " /usr/bin/mc config host add ketida ${S3_PROTOCOL:-http}://${S3_HOST:-s3}:${S3_PORT:-9000} ${S3_ACCESS_KEY_ID_ADMIN:-admin} ${S3_SECRET_ACCESS_KEY_ADMIN:-superSecretAdminPassword}; /usr/bin/mc admin user add ketida/ ${S3_ACCESS_KEY_ID_USER:-ketida} ${S3_SECRET_ACCESS_KEY_USER:-superSecretUserPassword}; /usr/bin/mc admin user enable ketida/ ${S3_ACCESS_KEY_ID_USER:-ketida}; /usr/bin/mc mb ketida/${S3_BUCKET:-uploads}; /usr/bin/mc admin policy set ketida/ readwrite user=${S3_ACCESS_KEY_ID_USER:-ketida}; exit 0; "
 volumes:
   minio_storage:

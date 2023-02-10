@@ -117,7 +117,6 @@ cron.schedule('*/10 * * * *', async () => {
             const associatedLock = find(locks, {
               serverIdentifier,
               foreignId: bookComponentId,
-              foreignType: 'bookComponent',
             })
 
             const { created } = associatedLock
@@ -134,7 +133,6 @@ cron.schedule('*/10 * * * *', async () => {
               await Lock.query(tr).delete().where({
                 serverIdentifier,
                 foreignId: bookComponentId,
-                foreignType: 'bookComponent',
               })
 
               await BookComponentState.query(tr)

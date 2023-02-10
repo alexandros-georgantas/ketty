@@ -85,7 +85,7 @@ module.exports = {
   useCaseGetGlobalTeams: team.getGlobalTeams,
   useCaseGetTeamMembers: team.getTeamMembers,
   useCaseSearchForUsers: user.searchForUsers,
-  useCaseCreateUser: user.createEditoriaUser,
+  useCaseCreateUser: user.createKetidaUser,
   useCaseUpdatePassword: user.updatePassword,
   useCaseUpdatePersonalInformation: user.updatePersonalInformation,
   useCaseSendPasswordResetEmail: user.sendPasswordResetEmail,

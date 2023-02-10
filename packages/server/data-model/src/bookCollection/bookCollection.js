@@ -4,7 +4,7 @@
 
 const { Model } = require('objection')
 
-const Base = require('../editoriaBase')
+const Base = require('../ketidaBase')
 
 class BookCollection extends Base {
   constructor(properties) {

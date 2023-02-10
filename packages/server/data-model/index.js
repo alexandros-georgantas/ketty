@@ -1,5 +1,5 @@
-const editoriaDataModel = require('./src')
+const ketidaDataModel = require('./src')
 
 module.exports = {
-  editoriaDataModel,
+  ketidaDataModel,
 }

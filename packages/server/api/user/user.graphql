@@ -3,7 +3,7 @@ extend type User {
   surname: String
 }
 
-input EditoriaUserInput {
+input KetidaUserInput {
   username: String!
   email: String!
   password: String!
@@ -27,8 +27,8 @@ input UpdatePasswordInput {
 
 extend type Mutation {
   searchForUsers(search: String!, exclude: [ID]!): [User]!
-  createEditoriaUser(input: EditoriaUserInput): User!
-  updateEditoriaUser(id: ID, input: EditoriaUserInput): User!
+  createKetidaUser(input: KetidaUserInput): User!
+  updateKetidaUser(id: ID, input: KetidaUserInput): User!
   updatePassword(input: UpdatePasswordInput): ID!
   updatePersonalInformation(input: UpdatePersonalInformationInput!): User!
   updateUsername(input: UpdateUsernameInput!): User!

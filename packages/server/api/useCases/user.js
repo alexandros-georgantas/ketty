@@ -107,7 +107,7 @@ const searchForUsers = async (search, exclude, options = {}) => {
   }
 }
 
-const createEditoriaUser = async (
+const createKetidaUser = async (
   username,
   givenName,
   surname,
@@ -289,7 +289,7 @@ const sendPasswordResetEmail = async (username, options = {}) => {
 
 module.exports = {
   searchForUsers,
-  createEditoriaUser,
+  createKetidaUser,
   updatePassword,
   updatePersonalInformation,
   sendPasswordResetEmail,

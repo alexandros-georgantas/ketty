@@ -1,6 +1,6 @@
 /* eslint-disable jest/no-commented-out-tests */
 // const {
-//   editoriaDataModel: {
+//   ketidaDataModel: {
 //     models: { User },
 //   },
 // } = require('../../data-model')

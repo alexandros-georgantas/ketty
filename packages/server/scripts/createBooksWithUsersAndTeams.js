@@ -4,9 +4,9 @@ const keys = require('lodash/keys')
 const map = require('lodash/map')
 const config = require('config')
 
-const { editoriaDataModel } = require('../data-model')
+const { ketidaDataModel } = require('../data-model')
 
-const { models } = editoriaDataModel
+const { models } = ketidaDataModel
 
 const {
   User,

@@ -1,7 +1,7 @@
 const { logger, useTransaction } = require('@coko/server')
 
 const {
-  editoriaDataModel: {
+  ketidaDataModel: {
     models: { BookCollection, BookCollectionTranslation },
   },
 } = require('../../data-model')
@@ -12,13 +12,12 @@ const createBookCollection = async trx => {
   logger.info(`books collection created with id: ${createdBookCollection.id}`)
   logger.info('>>> creating a new books collection translation')
 
-  const createdBookCollectionTranslation = await BookCollectionTranslation.query(
-    trx,
-  ).insert({
-    collectionId: createdBookCollection.id,
-    languageIso: 'en',
-    title: 'Books',
-  })
+  const createdBookCollectionTranslation =
+    await BookCollectionTranslation.query(trx).insert({
+      collectionId: createdBookCollection.id,
+      languageIso: 'en',
+      title: 'Books',
+    })
 
   logger.info(
     `books collection translation created with id: ${createdBookCollectionTranslation.id}`,

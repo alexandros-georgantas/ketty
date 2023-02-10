@@ -14,7 +14,7 @@ import UserProfile from './components/userProfile/src/ConnectedUserProfile'
 // Editor
 import EditorPageWithData from './components/wax/src/EditorPageWithData'
 
-// Editoria
+// Ketida
 import BookBuilder from './components/bookbuilder/src/ConnectedBookBuilder'
 
 import BookStructurePage from './components/wizard/src/BookStructure.page'
@@ -64,11 +64,11 @@ export default (
       <Redirect exact path="/" to="/books" />
       <Route
         path="/login"
-        render={props => <Login {...props} logo="/editoria.png" />}
+        render={props => <Login {...props} logo="/ketida.png" />}
       />
       <Route
         path="/signup"
-        render={props => <Signup {...props} logo="/editoria.png" />}
+        render={props => <Signup {...props} logo="/ketida.png" />}
       />
       <Route component={PasswordReset} path="/password-reset" />
       <PageLayout>

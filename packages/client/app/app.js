@@ -37,7 +37,6 @@ import theme from './theme'
 
 import routes from './routes'
 
-// const featureBookStructureEnabled = process.env.FEATURE_BOOK_STRUCTURE || false
 const featureBookStructureEnabled =
   (process.env.FEATURE_BOOK_STRUCTURE &&
     JSON.parse(process.env.FEATURE_BOOK_STRUCTURE)) ||

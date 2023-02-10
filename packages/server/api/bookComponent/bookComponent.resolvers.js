@@ -39,7 +39,6 @@ const {
   BOOK_COMPONENTS_LOCK_UPDATED,
   BOOK_COMPONENT_TYPE_UPDATED,
   BOOK_COMPONENT_TOC_UPDATED,
-  BOOK_COMPONENT_UNLOCKED_BY_ADMIN,
   BOOK_COMPONENT_UPDATED,
 } = require('./consts')
 
@@ -103,7 +102,7 @@ const ingestWordFile = async (_, { bookComponentFiles }, ctx) => {
 
       const tempFilePath = path.join(`${process.cwd()}`, 'uploads', 'temp')
       const randomFilename = `${crypto.randomBytes(32).toString('hex')}.docx`
-      fs.ensureDir(tempFilePath)
+      await fs.ensureDir(tempFilePath)
 
       await writeLocallyFromReadStream(
         tempFilePath,
@@ -359,10 +358,10 @@ const unlockBookComponent = async (_, { input }, ctx) => {
   }
 }
 
-const lockBookComponent = async (_, { id, tabId }, ctx) => {
+const lockBookComponent = async (_, { id, tabId, userAgent }, ctx) => {
   try {
     const pubsub = await pubsubManager.getPubsub()
-    await useCaseLockBookComponent(id, tabId, ctx.user)
+    await useCaseLockBookComponent(id, tabId, userAgent, ctx.user)
 
     const bookComponent = await BookComponent.findById(id)
 
@@ -1296,12 +1295,6 @@ module.exports = {
       subscribe: async () => {
         const pubsub = await pubsubManager.getPubsub()
         return pubsub.asyncIterator(BOOK_COMPONENT_TOC_UPDATED)
-      },
-    },
-    bookComponentUnlockedByAdmin: {
-      subscribe: async () => {
-        const pubsub = await pubsubManager.getPubsub()
-        return pubsub.asyncIterator(BOOK_COMPONENT_UNLOCKED_BY_ADMIN)
       },
     },
     bookComponentUpdated: {

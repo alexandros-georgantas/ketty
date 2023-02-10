@@ -31,6 +31,10 @@ const unlockBookComponent = async (bookComponentId, userId, tabId) => {
       bookComponentUpdated: updatedBookComponent,
     })
 
+    pubsub.publish('BOOK_COMPONENT_LOCK_UPDATED', {
+      bookComponentLockUpdated: updatedBookComponent,
+    })
+
     pubsub.publish('BOOK_UPDATED', {
       bookUpdated: updatedBook,
     })
@@ -92,6 +96,9 @@ const unlockOrphanLocks = async bookComponentIdsWithLock => {
               pubsub.publish('BOOK_COMPONENT_UPDATED', {
                 bookComponentUpdated: updatedBookComponent,
               })
+              pubsub.publish('BOOK_COMPONENT_LOCK_UPDATED', {
+                bookComponentLockUpdated: updatedBookComponent,
+              })
               pubsub.publish('BOOK_UPDATED', {
                 bookUpdated: updatedBook,
               })
@@ -114,7 +121,7 @@ const unlockOrphanLocks = async bookComponentIdsWithLock => {
 
 const cleanUpLocks = async (immediate = false) => {
   try {
-    // const pubsub = await pubsubManager.getPubsub()
+    const pubsub = await pubsubManager.getPubsub()
     const serverIdentifier = config.get('serverIdentifier')
     logger.info(`executing locks clean-up procedure`)
     let removeCounter = 0
@@ -149,14 +156,24 @@ const cleanUpLocks = async (immediate = false) => {
               .patch({ status: 104 })
               .where({ bookComponentId })
 
-            // const updatedBookComponent = await BookComponent.query(tr).findById(
-            //   bookComponentId,
-            // )
+            const updatedBookComponent = await BookComponent.query(tr).findById(
+              bookComponentId,
+            )
 
-            // const updatedBook = await Book.query(tr).findById(
-            //   updatedBookComponent.bookId,
-            // )
+            const updatedBook = await Book.query(tr).findById(
+              updatedBookComponent.bookId,
+            )
 
+            logger.info(`broadcasting unlocked event`)
+            pubsub.publish('BOOK_COMPONENT_UPDATED', {
+              bookComponentUpdated: updatedBookComponent,
+            })
+            pubsub.publish('BOOK_UPDATED', {
+              bookUpdated: updatedBook,
+            })
+            pubsub.publish('BOOK_COMPONENT_LOCK_UPDATED', {
+              bookComponentLockUpdated: updatedBookComponent,
+            })
             // if (!immediate) {
             //   setTimeout(() => {
             //     logger.info(`broadcasting unlocked event`)

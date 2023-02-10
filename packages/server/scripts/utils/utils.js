@@ -6,15 +6,12 @@ const path = require('path')
 const fs = require('fs-extra')
 const mime = require('mime-types')
 
-const { editoriaDataModel } = require('../../data-model')
+const { ketidaDataModel } = require('../../data-model')
 const { dirContents } = require('../../api/helpers/utils')
 
-const {
-  useCaseCreateFile,
-  useCaseUploadFile,
-} = require('../../api/useCases')
+const { useCaseCreateFile, useCaseUploadFile } = require('../../api/useCases')
 
-const { models } = editoriaDataModel
+const { models } = ketidaDataModel
 
 const { Template } = models
 

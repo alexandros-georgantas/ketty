@@ -14,7 +14,7 @@
 
 const { Model } = require('objection')
 
-const Base = require('../editoriaBase')
+const Base = require('../ketidaBase')
 const { arrayOfIds, id, stringNotEmpty } = require('../helpers').schema
 
 class Division extends Base {

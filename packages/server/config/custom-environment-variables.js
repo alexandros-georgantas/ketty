@@ -5,7 +5,7 @@ module.exports = {
   tempDirectoryCRONJobSchedule: 'TEMP_DIRECTORY_CRON_JOB_SCHEDULE',
   tempDirectoryCRONJobOffset: 'TEMP_DIRECTORY_CRON_JOB_OFFSET',
   serverIdentifier: 'SERVER_IDENTIFIER',
-  flavour: 'EDITORIA_FLAVOUR',
+  flavour: 'KETIDA_FLAVOUR',
   'pubsweet-client': {
     protocol: 'CLIENT_PROTOCOL',
     host: 'CLIENT_HOST',

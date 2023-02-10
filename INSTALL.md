@@ -9,8 +9,8 @@
 
 ### For development
 
-Create the development environment file under `editoria/config`.  
-eg. `editoria/config/development.env`
+Create the development environment file under `ketida/config`.  
+eg. `ketida/config/development.env`
 
 Within your environment files, export the variables you want:
 
@@ -34,30 +34,30 @@ add the following lines in your etc/hosts file of your OS
 127.0.0.1 pagedjs
 ```
 
-On the root of the editoria folder run:
+On the root of the ketida folder run:
 
 ```
 docker-compose up
 ```
 
-After some time Editoria's client app will be available on `localhost:4000`
+After some time Ketida's client app will be available on `localhost:4000`
 
 If you haven’t set any username/password in your environment file, a default user with administration rights will be created.
 
-You’ll be able to log into Editoria using those credentials:
+You’ll be able to log into Ketida using those credentials:
 
 login: `admin`
 password: `password`
 
 ### For production
 
-Create the production environment file under `editoria/config`.  
-eg. `editoria/config/production.env`
+Create the production environment file under `ketida/config`.  
+eg. `ketida/config/production.env`
 
 Within your environment files, export the variables you want:
 
 ```sh
-export EDITORIA_FLAVOUR=VANILLA (proper values are VANILLA or BOOKSPRINTS)
+export KETIDA_FLAVOUR=VANILLA (proper values are VANILLA or BOOKSPRINTS)
 export PUBSWEET_SECRET=
 export POSTGRES_USER=
 export SERVE_CLIENT=true
@@ -117,10 +117,10 @@ Import the environment variables into the current shell session:
 source <your-env-file>
 ```
 
-On the root of the editoria folder run:
+On the root of the ketida folder run:
 
 ```
 docker-compose -f docker-compose.production.yml up
 ```
 
-After some time Editoria's client app will be available on server url you have declared in your env file
+After some time Ketida's client app will be available on server url you have declared in your env file

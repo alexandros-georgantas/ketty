@@ -132,7 +132,6 @@ const getBookQuery = props => {
   return (
     <Query
       fetchPolicy="network-only"
-      notifyOnNetworkStatusChange
       pollInterval={2000}
       query={GET_BOOK}
       variables={{ id }}

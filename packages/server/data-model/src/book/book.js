@@ -1,16 +1,11 @@
 const { Model } = require('objection')
 const uuid = require('uuid/v4')
 
-const Base = require('../editoriaBase')
+const Base = require('../ketidaBase')
 const { model: BookCollection } = require('../bookCollection')
 
-const {
-  booleanDefaultFalse,
-  id,
-  string,
-  year,
-  booleanDefaultTrue,
-} = require('../helpers').schema
+const { booleanDefaultFalse, id, string, year, booleanDefaultTrue } =
+  require('../helpers').schema
 
 const outlineItem = {
   type: 'object',
@@ -154,9 +149,8 @@ class Book extends Base {
 
         level.contentStructure.forEach((contentItem, itemIndex) => {
           if (!contentItem.id) {
-            this.bookStructure.levels[index].contentStructure[
-              itemIndex
-            ].id = uuid()
+            this.bookStructure.levels[index].contentStructure[itemIndex].id =
+              uuid()
           }
         })
       })

@@ -72,7 +72,7 @@ module.exports = {
   Mutation: {
     updateTeamMembers,
   },
-  EditoriaTeam: {
+  KetidaTeam: {
     async members(team, _, ctx) {
       return useCaseGetTeamMembers(team.id, {}, true)
     },

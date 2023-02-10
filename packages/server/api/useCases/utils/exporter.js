@@ -37,6 +37,11 @@ const getURL = relativePath => {
     ? config.get('pubsweet-server.publicURL')
     : undefined
 
+  // temp code for solving docker networking for macOS
+  if (process.env.NODE_ENV !== 'production') {
+    return `${publicURL.replace('server', 'localhost')}/${relativePath}`
+  }
+
   return `${publicURL}/${relativePath}`
 }
 
@@ -68,8 +73,6 @@ const ExporterService = async (
     } else {
       notesType = icmlNotes
     }
-
-    // let resultPath
 
     // The produced representation of the book holds two Map data types one
     // for the division and one for the book components of each division to

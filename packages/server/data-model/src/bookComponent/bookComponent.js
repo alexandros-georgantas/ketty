@@ -9,7 +9,7 @@
 const { Model } = require('objection')
 const uuid = require('uuid/v4')
 
-const Base = require('../editoriaBase')
+const Base = require('../ketidaBase')
 
 const { boolean, booleanDefaultFalse, id, integerPositive, string } =
   require('../helpers').schema

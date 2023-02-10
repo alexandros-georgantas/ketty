@@ -1,12 +1,13 @@
 /*
   An extension of pubsweet's base model with some bells and whistles.
-  All other Editoria models will (and should) extend this class.
+  All other Ketida models will (and should) extend this class.
 */
 
-const { BaseModel } = require('@coko/server')
-// const each = require('lodash/each')
+const team = require('@pubsweet/model-team')
 
-class EditoriaBase extends BaseModel {
+const TeamMember = team.models[1].model
+
+class KetidaTeamMember extends TeamMember {
   $beforeInsert() {
     super.$beforeInsert()
     this.deleted = false
@@ -23,10 +24,6 @@ class EditoriaBase extends BaseModel {
       },
     }
   }
-
-  static async findById(id) {
-    return this.find(id)
-  }
 }
 
-module.exports = EditoriaBase
+module.exports = KetidaTeamMember

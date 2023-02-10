@@ -2,10 +2,10 @@
   "name": "client",
   "version": "0.0.1",
   "private": false,
-  "description": "Editoria Platform frontend",
+  "description": "Ketida Platform frontend",
   "repository": {
     "type": "git",
-    "url": "git@gitlab.coko.foundation:editoria/editoria.git"
+    "url": "git@gitlab.coko.foundation:ketida/ketida.git"
   },
   "license": "MIT",
   "author": "Yannis Barlas, Alexandros Georgantas",
@@ -95,8 +95,8 @@
     "typeface-vollkorn": "^1.1.13",
     "url-loader": "1.1.2",
     "uuid": "^3.3.2",
-    "wax-prosemirror-core": "0.7.21",
-    "wax-prosemirror-services": "0.7.21",
+    "wax-prosemirror-core": "0.7.22",
+    "wax-prosemirror-services": "0.7.22",
     "webpack": "4.39.3",
     "webpack-cli": "3.3.6",
     "webpack-dev-server": "3.7.2",

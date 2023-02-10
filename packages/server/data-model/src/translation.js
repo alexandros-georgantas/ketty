@@ -1,4 +1,4 @@
-const Base = require('./editoriaBase')
+const Base = require('./ketidaBase')
 const { language } = require('./helpers').schema
 
 class Translation extends Base {

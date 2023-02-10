@@ -66,14 +66,14 @@ module.exports = {
           visibleInHeader: false,
         },
         {
-          value: 'copyrights',
-          title: 'Copyrights',
+          value: 'cover',
+          title: 'Cover',
           predefined: true,
           visibleInHeader: false,
         },
         {
-          value: 'cover',
-          title: 'Cover',
+          value: 'copyright-page',
+          title: 'Copyright Page',
           predefined: true,
           visibleInHeader: false,
         },

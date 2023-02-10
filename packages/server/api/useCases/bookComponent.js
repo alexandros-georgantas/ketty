@@ -573,7 +573,7 @@ const unlockBookComponent = async (
   }
 }
 
-const lockBookComponent = async (bookComponentId, tabId, userId) => {
+const lockBookComponent = async (bookComponentId, tabId, userAgent, userId) => {
   try {
     const serverIdentifier = config.get('serverIdentifier')
 
@@ -618,6 +618,7 @@ const lockBookComponent = async (bookComponentId, tabId, userId) => {
     const lock = await Lock.query().insert({
       foreignId: bookComponentId,
       foreignType: 'bookComponent',
+      userAgent,
       tabId,
       userId,
       serverIdentifier,
@@ -705,8 +706,6 @@ const updateWorkflowState = async (bookComponentId, workflowStages, ctx) => {
             .patch({ status: 105 })
             .where({ bookComponentId })
         })
-
-      // console.log('res', res)
     }
 
     const updatedBookComponentState =

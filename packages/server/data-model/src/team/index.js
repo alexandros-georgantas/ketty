@@ -1,4 +1,4 @@
-const model = require('../editoriaTeam')
+const model = require('../ketidaTeam')
 
 module.exports = {
   model,

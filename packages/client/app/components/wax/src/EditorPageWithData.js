@@ -190,10 +190,12 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
   }
 
   const onBookComponentLock = () => {
+    const userAgent = window.navigator.userAgent || null
     lockBookComponent({
       variables: {
         id: bookComponentId,
         tabId,
+        userAgent,
       },
     })
   }
@@ -288,9 +290,9 @@ const EditorPageWithData = ({ currentUser, showModal, hideModal }) => {
   ) {
     console.error(
       `Something went wrong! Please inform your system's administrator`,
-      bookComponentError,
     )
   }
+
   /**
    * ERRORS HANDLING SECTION END
    */

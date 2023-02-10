@@ -2,10 +2,10 @@
 
 ### I'm getting user errors running `yarn start:postgres` or `yarn server`
 
-It's crucial to use the same user when installing Editoria and running the Editoria database services. These commands are:
+It's crucial to use the same user when installing Ketida and running the Ketida database services. These commands are:
 
-- Running `yarn` from Editoria's root directory. This installs Editoria and its dependencies
-- Running `yarn start:postgres` for the first time sets up a database to use with Editoria. This configures a database that expects that the same user that is running this command has also run `yarn` from Editoria's root directory.
+- Running `yarn` from Ketida's root directory. This installs Ketida and its dependencies
+- Running `yarn start:postgres` for the first time sets up a database to use with Ketida. This configures a database that expects that the same user that is running this command has also run `yarn` from Ketida's root directory.
 
 If you see user errors running `yarn start:postgres` or `yarn server`, your best bet is to clear the existing database as well as your node_modules and start installing the app from the beginning.
 
@@ -33,9 +33,9 @@ This should free up the port so the Docker database services can run on it.
 
 To be sure that your changes in `<profile>.env` are registered, you need to reset your docker containers and source `<your-env-file>`. To do so, you can follow these steps:
 
-- Kill any running instances of Editoria app
+- Kill any running instances of Ketida app
 
-- On editoria-app root folder perform:
+- On ketida-app root folder perform:
 
 ```
 docker-compose down
@@ -59,45 +59,41 @@ docker-compose rm -fv
 
 These values are needed in order the docker container which hosts the PostrgesDB of the application to be initialized correctly.
 
-### How can I access the epub file?
-
-EPUB files are created and stored in the `uploads` directory (`editoria/packages/editoria-app/uploads`) every time the book is exported with the "EXPORT BOOK" button on the top right of the book. Be sure to sort by created date to ensure you're getting the most recent file.
-
-### Does the HTML out of Editoria support accessibility including the use of Alt tags?
+### Does the HTML out of Ketida support accessibility including the use of Alt tags?
 
 We are working with Benetech to fully understand and plan for accessibility. This development is on our development roadmap.
 
-### Does Editoria support multiple languages?
+### Does Ketida support multiple languages?
 
-Yes. Editoria supports any language supported by the user’s browser. Editoria also supports special characters. This said, language support is an area that needs thorough testing for the many edge cases and rare cases that exist. This is an ideal opportunity for a community member to show leadership and help organize and optimize.
+Yes. Ketida supports any language supported by the user’s browser. Ketida also supports special characters. This said, language support is an area that needs thorough testing for the many edge cases and rare cases that exist. This is an ideal opportunity for a community member to show leadership and help organize and optimize.
 
-### Does Editoria include an asset manager for images and multimedia files that may need to be inserted into text?
+### Does Ketida include an asset manager for images and multimedia files that may need to be inserted into text?
 
 This is on our development roadmap.
 
-### Can Editoria integrate with other tools and services?
+### Can Ketida integrate with other tools and services?
 
-Yes. Editoria’s architecture is all API-orientated and can be easily extended for third party service integration. For more information, visit https://editoria.pub
+Yes. Ketida’s architecture is all API-orientated and can be easily extended for third party service integration. For more information, visit https://Ketida.pub
 
 ### Can notes be moved to backmatter (rather than footnotes)?
 
-At this moment no, but it is on the Editoria roadmap. Options will include same page, back of book, or margin notes.
+At this moment no, but it is on the Ketida roadmap. Options will include same page, back of book, or margin notes.
 
-### What’s the cost to use Editoria?
+### What’s the cost to use Ketida?
 
-Using the code to create an instance of Editoria truly is free. Our hope is that organizations that find it useful, will contribute the customizations and additional development code back so that others can use it. We also hope that adopters will help organize and attend community gatherings and participate in discussion and problem solving with the community.
+Using the code to create an instance of Ketida truly is free. Our hope is that organizations that find it useful, will contribute the customizations and additional development code back so that others can use it. We also hope that adopters will help organize and attend community gatherings and participate in discussion and problem solving with the community.
 
-### Does Editoria generate and export EPUB3?
+### Does Ketida generate and export EPUB3?
 
 Yes, currently however it is not available via the user interface. This is on our development roadmap.
 
-### Can Editoria export BITS XML (or other) for chapter files and books?
+### Can Ketida export BITS XML (or other) for chapter files and books?
 
 It can. The first conversion is from .docx to HTML, and from there, it’s up to presses to decide what to do with the highly structured, source HTML.
 
-### Can I use Editoria for journals workflow?
+### Can I use Ketida for journals workflow?
 
-It’s possible, but would not be ideal. Coko has developed an open-source tool that is optimized for journals workflow, called xPub. xPub, like Editoria, is modular, so that organizations can develop their own non-hardcoded workflows, mixing and matching modules that other organizations have developed and shared, or create and integrate their own. More at https://coko.foundation/use-cases/
+It’s possible, but would not be ideal. Coko has developed an open-source tool that is optimized for journals workflow, called xPub. xPub, like Ketida, is modular, so that organizations can develop their own non-hardcoded workflows, mixing and matching modules that other organizations have developed and shared, or create and integrate their own. More at https://coko.foundation/use-cases/
 
 ### How do my .docx filenames affect how they upload?
 
