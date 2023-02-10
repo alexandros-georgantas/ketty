@@ -1,4 +1,6 @@
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from 'react'
+import { useHistory } from 'react-router-dom'
 import { get } from 'lodash'
 import { adopt } from 'react-adopt'
 
@@ -182,6 +184,21 @@ const mapProps = args => ({
       templateName,
     })
   },
+  onAccessWarningModal: history => {
+    const { withModal: withModalFromArgs } = args
+
+    const { showModal, hideModal } = withModalFromArgs
+
+    const onConfirm = () => {
+      history.goBack()
+      hideModal()
+    }
+
+    showModal('warningModal', {
+      onConfirm,
+      warning: `You don't have access to visit this page, you will be redirected back`,
+    })
+  },
   refetching:
     args.getTemplatesQuery.networkStatus === 4 ||
     args.getTemplatesQuery.networkStatus === 2, // possible apollo bug
@@ -189,18 +206,21 @@ const mapProps = args => ({
 
 const Composed = adopt(mapper, mapProps)
 
-const Connected = () => (
+const Connected = ({ currentUser }) => (
   <Composed>
     {({
       templates,
       onCreateTemplate,
       onUpdateTemplate,
+      onAccessWarningModal,
       onDeleteTemplate,
       onChangeSort,
       refetching,
       loading,
       createTemplate,
     }) => {
+      const history = useHistory()
+
       const [sortingParams, setSortingParams] = useState({
         ascending: true,
         sortKey: 'name',
@@ -212,7 +232,10 @@ const Connected = () => (
       return (
         <Templates
           createTemplate={createTemplate}
+          currentUser={currentUser}
+          history={history}
           loading={loading}
+          onAccessWarningModal={onAccessWarningModal}
           onCreateTemplate={onCreateTemplate}
           onDeleteTemplate={onDeleteTemplate}
           onUpdateTemplate={onUpdateTemplate}

@@ -573,7 +573,7 @@ const unlockBookComponent = async (
   }
 }
 
-const lockBookComponent = async (bookComponentId, tabId, userId) => {
+const lockBookComponent = async (bookComponentId, tabId, userAgent, userId) => {
   try {
     const serverIdentifier = config.get('serverIdentifier')
 
@@ -618,6 +618,7 @@ const lockBookComponent = async (bookComponentId, tabId, userId) => {
     const lock = await Lock.query().insert({
       foreignId: bookComponentId,
       foreignType: 'bookComponent',
+      userAgent,
       tabId,
       userId,
       serverIdentifier,

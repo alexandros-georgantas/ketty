@@ -1,7 +1,7 @@
 // TO DO -- review foreign id and foreign type
 
 const Base = require('../ketidaBase')
-const { id } = require('../helpers').schema
+const { id, string } = require('../helpers').schema
 
 const foreignType = {
   type: 'string',
@@ -25,10 +25,11 @@ class Lock extends Base {
   static get schema() {
     return {
       type: 'object',
-      required: ['foreignId', 'foreignType', 'userId', 'tabId'],
+      required: ['foreignId', 'userId', 'tabId'],
       properties: {
         foreignId: id,
         foreignType,
+        userAgent: string,
         userId: id,
         tabId: id,
         serverIdentifier: id,

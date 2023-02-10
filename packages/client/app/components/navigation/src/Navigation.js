@@ -12,7 +12,12 @@ const StyledLogo = styled.img`
   width: ${grid(4)};
 `
 
-const navLinksBuilder = location => {
+const featureBookStructureEnabled =
+  (process.env.FEATURE_BOOK_STRUCTURE &&
+    JSON.parse(process.env.FEATURE_BOOK_STRUCTURE)) ||
+  false
+
+const navLinksBuilder = (location, isAdmin) => {
   const navLinksLeft = []
 
   const inDashboard =
@@ -27,6 +32,27 @@ const navLinksBuilder = location => {
       Books
     </NavBarLink>,
   )
+
+  if (featureBookStructureEnabled) {
+    if (isAdmin) {
+      const inTemplates =
+        (location.pathname.match(/templates/g) &&
+          location.pathname.match(/templates/g).length === 1) ||
+        false
+
+      navLinksLeft.push(
+        <NavBarLink
+          active={inTemplates.toString()}
+          key="nav-templates"
+          to="/templates"
+        >
+          Templates
+        </NavBarLink>,
+      )
+    }
+
+    return navLinksLeft
+  }
 
   const inTemplates =
     (location.pathname.match(/templates/g) &&
@@ -49,14 +75,13 @@ const navLinksBuilder = location => {
 const Navigation = props => {
   const { currentUser, location, client, logoutUser } = props
   const dropdownItems = [{ link: '/profile', label: 'Profile' }]
-
-  if (currentUser === null) return null
+  if (!currentUser) return null
 
   if (currentUser && currentUser.admin) {
     dropdownItems.push({ link: '/globalTeams', label: 'Team Manager' })
   }
 
-  const itemsLeft = navLinksBuilder(location)
+  const itemsLeft = navLinksBuilder(location, currentUser.admin)
 
   return (
     <NavBar

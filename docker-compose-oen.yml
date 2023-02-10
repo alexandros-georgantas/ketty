@@ -115,7 +115,7 @@ services:
       - SERVER_IDENTIFIER=${SERVER_IDENTIFIER:-0a3cf3f0-98b6-11ed-87cd-0800200c9a66}
       - KETIDA_FLAVOUR=${KETIDA_FLAVOUR:-VANILLA}
       - PUBSWEET_SECRET=${PUBSWEET_SECRET:-dev_secret}
-      - PUBLIC_SERVER_URL=${PUBLIC_SERVER_URL:-http://localhost:3000}
+      - PUBLIC_SERVER_URL=${PUBLIC_SERVER_URL:-http://server:3000}
       - PUBLIC_CLIENT_URL=${PUBLIC_CLIENT_URL:-http://0.0.0.0:4000}
       - SERVER_SERVE_CLIENT=false
       - WS_SERVER_PORT=${WS_SERVER_PORT:-3333}
@@ -185,7 +185,10 @@ services:
       - ./packages/server/common:/home/node/ketida/common
       - ./packages/server/app.js:/home/node/ketida/app.js
       - ./packages/server/startServer.js:/home/node/ketida/startServer.js
-
+      - ./packages/server/startWebSocketServer.js:/home/node/ketida/startWebSocketServer.js
+      - ./packages/server/utils/wsAuthentication.js:/home/node/ketida/utils/wsAuthentication.js
+      - ./packages/server/utils/wsConnectionHandlers.js:/home/node/ketida/utils/wsConnectionHandlers.js
+      - ./packages/server/services/bookComponentLock.service.js:/home/node/ketida/services/bookComponentLock.service.js
   epubchecker:
     depends_on:
       - db-epubchecker

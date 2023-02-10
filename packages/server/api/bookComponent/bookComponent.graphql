@@ -19,17 +19,23 @@ type Lock {
   foreignType: String
   surname: String
   tabId: ID!
+  userAgent: String!
   userId: ID
   id: ID!
 }
 
-type UnlockedByAdmin {
-  bookComponentId: ID!
-  unlocked: Boolean!
-}
-
 input LockInput {
-  userId: ID!
+  created: Date
+  username: String
+  isAdmin: Boolean
+  givenName: String
+  foreignId: ID
+  foreignType: String
+  surname: String
+  tabId: ID!
+  userAgent: String!
+  userId: ID
+  id: ID!
 }
 
 type WorkFlowItem {
@@ -130,7 +136,7 @@ extend type Mutation {
   updateWorkflowState(input: UpdateBookComponentInput): BookComponent!
   updatePagination(input: UpdateBookComponentInput): BookComponent!
   unlockBookComponent(input: UpdateBookComponentInput): BookComponent!
-  lockBookComponent(id: ID!, tabId: ID!): BookComponent!
+  lockBookComponent(id: ID!, tabId: ID!, userAgent: String!): BookComponent!
   updateTrackChanges(input: UpdateBookComponentInput): BookComponent!
   updateContent(input: UpdateBookComponentInput): BookComponent!
   updateComponentType(input: UpdateBookComponentInput): BookComponent!
@@ -152,5 +158,4 @@ extend type Subscription {
   bookComponentTypeUpdated: BookComponent!
   bookComponentUploadingUpdated: BookComponent!
   bookComponentTOCToggled: BookComponent!
-  bookComponentUnlockedByAdmin: UnlockedByAdmin!
 }

@@ -43,6 +43,7 @@ const getBookBuilderRulesQuery = props => {
   return (
     <Query
       fetchPolicy="network-only"
+      pollInterval={2000}
       query={GET_BOOKBUILDER_RULES}
       variables={{ id }}
     >

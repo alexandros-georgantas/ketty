@@ -62,33 +62,13 @@ const BOOK_COMPONENT_LOCK_UPDATED_SUBSCRIPTION = gql`
   subscription BookComponentLockUpdated {
     bookComponentLockUpdated {
       id
-      lock {
-        id
-        userId
-        username
-        created
-        givenName
-        isAdmin
-        surname
-      }
     }
   }
 `
 
 const BOOK_COMPONENTS_LOCK_UPDATED_SUBSCRIPTION = gql`
   subscription BookComponentsLockUpdated {
-    bookComponentsLockUpdated {
-      id
-      lock {
-        id
-        userId
-        username
-        created
-        givenName
-        isAdmin
-        surname
-      }
-    }
+    bookComponentsLockUpdated
   }
 `
 
