@@ -7,12 +7,14 @@ const {
   createBookCollection,
   createGlobalTeams,
   createTemplates,
+  // createUsers,
 } = require('./seeds')
 
 const adminUser = config.get('pubsweet-server.admin')
 
 const runner = async () => {
   try {
+    // await createUsers()
     await createAdminUser({
       ...adminUser,
       admin: true,

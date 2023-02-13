@@ -3,6 +3,7 @@ const createApplicationParams = require('./createApplicationParams')
 const createBookCollection = require('./createBookCollection')
 const createGlobalTeams = require('./createGlobalTeams')
 const createTemplates = require('./createTemplates')
+const createUsers = require('./createUsers')
 
 module.exports = {
   createAdminUser,
@@ -10,4 +11,5 @@ module.exports = {
   createBookCollection,
   createGlobalTeams,
   createTemplates,
+  createUsers,
 }

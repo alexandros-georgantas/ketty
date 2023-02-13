@@ -22,7 +22,6 @@ type TeamSub {
   objectId: ID
   teamId: ID!
   role: String!
-  members: [User]!
   global: Boolean!
 }
 
