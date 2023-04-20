@@ -18,4 +18,4 @@ To report a bug, [open a GitLab issue](https://gitlab.coko.foundation/ketida/ket
 
 ## Contribute
 
-Join our [chat channel](https://mattermost.coko.foundation/coko/channels/ketida) to discuss contributing. More detail will be added here soon about community contributions to Ketida. 
+Contributions are welcome! Please read our [Community Products Collaboration Guidelines](https://docs.coko.foundation/s/community-collab) and join our [chat channel](https://mattermost.coko.foundation/coko/channels/ketida). 
