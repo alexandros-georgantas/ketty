@@ -1,5 +1,0 @@
-const CUSTOM_TAGS_UPDATED = 'CUSTOM_TAG_UPDATED'
-
-module.exports = {
-  CUSTOM_TAGS_UPDATED,
-}
