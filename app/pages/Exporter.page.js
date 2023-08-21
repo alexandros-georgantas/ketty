@@ -57,8 +57,15 @@ const PreviewerPage = () => {
   const [exportFormat, setExportFormat] = useState('pdf')
   const [previewConfiguration, setPreviewConfiguration] = useState(undefined)
 
-  const [additionalExportOptions, setAdditionalExportOptions] =
-    useState(undefined)
+  const defaultContentSelection = {
+    includeTOC: true,
+    includeCopyrights: true,
+    includeTitlePage: true,
+  }
+
+  const [additionalExportOptions, setAdditionalExportOptions] = useState(
+    defaultContentSelection,
+  )
 
   const [currentSelectedTemplate, setCurrentSelectedTemplate] =
     useState(undefined)

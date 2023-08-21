@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Paragraph } from 'antd'
+import { Paragraph } from '../ui/common/Typography'
 import Modal from '../ui/common/Modal'
 
 const showUnauthorizedAccessModal = callback => {
