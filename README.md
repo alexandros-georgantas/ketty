@@ -24,5 +24,3 @@ Ketida has separate server and client applications. Refer to the following pages
 
 - the [Ketida server README](https://gitlab.coko.foundation/ketida/server/-/blob/main/README.md)
 - the [Ketida server installation docs](https://gitlab.coko.foundation/ketida/server/-/blob/main/INSTALL.md)
-- the [Vanilla client README](https://gitlab.coko.foundation/ketida/vanilla-client/-/blob/main/README.md)
-- the [Vanilla client installation docs](https://gitlab.coko.foundation/ketida/vanilla-client/-/blob/main/INSTALL.md)

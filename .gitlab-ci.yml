@@ -1,0 +1,39 @@
+variables:
+  IMAGE_ORG: cokoapps
+  STORYBOOK_IMAGE_NAME: lulu-storybook
+
+stages:
+  - build_production
+  - deploy
+
+build_storybook:
+  stage: build_production
+  image: docker:23
+  services:
+    - docker:23-dind
+  before_script:
+    - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
+  script:
+    - if [ -z "$DOCKERHUB_USERNAME" ] || [ -z "$DOCKERHUB_PASSWORD" ]; then echo "Not pushing" && exit 0; fi
+    - docker pull $IMAGE_ORG/$STORYBOOK_IMAGE_NAME:latest || true
+    - docker build --cache-from $IMAGE_ORG/$STORYBOOK_IMAGE_NAME:latest --tag $IMAGE_ORG/$STORYBOOK_IMAGE_NAME:$CI_COMMIT_SHA --tag $IMAGE_ORG/$STORYBOOK_IMAGE_NAME:latest . -f Dockerfile-storybook-deploy
+    - docker push $IMAGE_ORG/$STORYBOOK_IMAGE_NAME:$CI_COMMIT_SHA
+    - docker push $IMAGE_ORG/$STORYBOOK_IMAGE_NAME:latest
+  only:
+    - main
+
+deploy storybook:
+  image: debian:bullseye-slim
+  stage: deploy
+  before_script:
+    - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$STORYBOOK_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh && touch ~/.ssh/known_hosts
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -p $STORYBOOK_SSH_PORT $STORYBOOK_SSH_URL >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - ssh ${STORYBOOK_SSH_USER}@${STORYBOOK_SSH_URL} -p ${STORYBOOK_SSH_PORT} "docker pull cokoapps/$STORYBOOK_IMAGE_NAME:latest && sudo systemctl restart lulustorybook.service"
+  only:
+    - main

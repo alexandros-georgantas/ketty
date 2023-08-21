@@ -1,0 +1,108 @@
+import React, { useState, useEffect } from 'react'
+import { Button, Row, Space, Typography, Upload as AntUpload } from 'antd'
+import { CloseOutlined } from '@ant-design/icons'
+import styled from 'styled-components'
+import PropTypes from 'prop-types'
+
+const { Text } = Typography
+const { Dragger } = AntUpload
+
+const StyledDragger = styled(Dragger)`
+  .ant-upload-drag {
+    min-height: 300px;
+    padding: 0 50px;
+  }
+
+  .ant-upload-drag-container {
+    display: block;
+    height: 100%;
+    width: 100%;
+  }
+
+  .ant-upload-btn {
+    display: flex;
+    justify-content: center;
+    min-height: 300px;
+  }
+`
+
+const FileInfoText = styled(Text)`
+  text-align: left;
+  width: 80%;
+`
+
+const StyledSpace = styled(Space)`
+  display: flex;
+`
+
+const Upload = props => {
+  const { multiple, onFilesChange } = props
+
+  const [files, setFiles] = useState([])
+
+  useEffect(() => {
+    onFilesChange(files)
+  }, [files])
+
+  const onFileSelect = ({ file }) => {
+    if (multiple) {
+      setFiles(prevFiles => [...prevFiles, file])
+    } else {
+      setFiles([file])
+    }
+  }
+
+  const onClickRemove = (evt, file) => {
+    evt.stopPropagation()
+    removeFile(file)
+  }
+
+  const removeFile = fileToRemove => {
+    setFiles(files.filter(file => file.uid !== fileToRemove.uid))
+  }
+
+  return (
+    <StyledDragger
+      {...props}
+      action=""
+      customRequest={onFileSelect}
+      showUploadList={false}
+    >
+      <StyledSpace direction="vertical" size="middle">
+        <Text>
+          Drag and drop files, or <Text underline>Browse</Text>
+        </Text>
+        {files.length > 0 &&
+          files.map(file => (
+            <Row
+              align="middle"
+              justify="space-between"
+              key={file.uid}
+              span={24}
+            >
+              <FileInfoText ellipsis={{ tooltip: file.name }} strong>
+                {file.name}
+              </FileInfoText>
+              <Button
+                icon={<CloseOutlined />}
+                onClick={evt => onClickRemove(evt, file)}
+                type="link"
+              />
+            </Row>
+          ))}
+      </StyledSpace>
+    </StyledDragger>
+  )
+}
+
+Upload.propTypes = {
+  multiple: PropTypes.bool,
+  onFilesChange: PropTypes.func,
+}
+
+Upload.defaultProps = {
+  multiple: false,
+  onFilesChange: () => {},
+}
+
+export default Upload
