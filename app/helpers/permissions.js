@@ -14,6 +14,9 @@ const isCollaborator = (bookId, user) => hasRole(user, 'collaborator', bookId)
 
 const hasEditAccess = (bookId, user) => {
   const { teams } = user
+  if (user.admin) return !!user.admin
+
+  if (hasRole(user, 'owner', bookId)) return true
 
   const bookTeam = teams?.find(
     team => team.objectId === bookId && team.role === 'collaborator',
@@ -23,11 +26,11 @@ const hasEditAccess = (bookId, user) => {
     member => member.user?.id === user.id,
   )
 
-  return teamMember?.status && teamMember.status === 'write'
+  return !!teamMember?.status && teamMember.status === 'write'
 }
 
 const isAdmin = user => {
-  return user.admin
+  return !!user.admin
 }
 
 module.exports = {

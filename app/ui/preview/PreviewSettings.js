@@ -205,7 +205,7 @@ const PreviewSettings = props => {
               <Label>{name.charAt(0).toUpperCase() + name.slice(1)}</Label>
             </StyledListItem>
           )}
-          showPagination={false}
+          // showPagination={false}
         />
       </Section>
 
