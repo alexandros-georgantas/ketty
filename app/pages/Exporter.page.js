@@ -315,6 +315,25 @@ const PreviewerPage = () => {
 
         errorModal.destroy()
       },
+      okButtonProps: { style: { backgroundColor: 'black' } },
+      maskClosable: false,
+      width: 570,
+      bodyStyle: {
+        marginRight: 38,
+        textAlign: 'justify',
+      },
+    })
+  }
+
+  const showErrorModalWithText = errorMessage => {
+    const warningModal = Modal.warning()
+    return warningModal.update({
+      title: 'Error',
+      content: <Paragraph>{errorMessage}</Paragraph>,
+      onOk() {
+        warningModal.destroy()
+      },
+      okButtonProps: { style: { backgroundColor: 'black' } },
       maskClosable: false,
       width: 570,
       bodyStyle: {
@@ -378,6 +397,21 @@ const PreviewerPage = () => {
       undefined,
       associatedTemplatesData,
     )
+
+    let bookComponents
+
+    if (associatedTemplatesData) {
+      bookComponents = associatedTemplatesData.getBook.divisions.find(
+        item => item.label === 'Body',
+      ).bookComponents
+    }
+
+    if (bookComponents && bookComponents.length === 0) {
+      const errorMessage =
+        'You must add content to your book before a valid EPUB can be produced.'
+
+      return showErrorModalWithText(errorMessage)
+    }
 
     if (currentSelectedTemplate.templateId && exportFormat === 'epub') {
       return bookExport({
