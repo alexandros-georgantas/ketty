@@ -53,7 +53,7 @@ const LicenseTypes = props => {
         disabled={currentValue?.SA || !canChangeMetadata}
         onChange={handleNdChange}
       >
-        NoDerivactives (ND)
+        NoDerivatives (ND)
       </Checkbox>
     </Wrapper>
   )

@@ -36,10 +36,11 @@ const BookTitlePage = () => {
     },
   })
 
-  const canRename =
-    isAdmin(currentUser) ||
-    isOwner(bookId, currentUser) ||
-    hasEditAccess(bookId, currentUser)
+  const canRename = currentUser
+    ? isAdmin(currentUser) ||
+      isOwner(bookId, currentUser) ||
+      hasEditAccess(bookId, currentUser)
+    : false
 
   const onClickContinue = title => {
     if (!canRename) {
@@ -49,7 +50,7 @@ const BookTitlePage = () => {
     return renameBook({ variables: { id: bookId, title } })
   }
 
-  if (loading) return <Spin spinning />
+  if (!currentUser && loading) return <Spin spinning />
 
   if (!canRename) {
     showUnauthorizedActionModal(true, redirectToDashboard)

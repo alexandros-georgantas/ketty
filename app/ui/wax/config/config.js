@@ -8,8 +8,6 @@ import {
   LinkService,
   ListsService,
   ListToolGroupService,
-  TablesService,
-  // TableToolGroupService,
   BaseService,
   BaseToolGroupService,
   DisplayBlockLevelService,
@@ -20,11 +18,12 @@ import {
   SpecialCharactersToolGroupService,
   BlockDropDownToolGroupService,
   FindAndReplaceService,
-  // FindAndReplaceToolGroupService,
   FullScreenService,
   FullScreenToolGroupService,
   TitleToolGroupService,
 } from 'wax-prosemirror-services'
+
+import { TablesService, tableEditing, columnResizing } from 'wax-table-service'
 
 import charactersList from './charactersList'
 
@@ -36,18 +35,8 @@ export default {
         { name: 'Base', exclude: ['Save'] },
         'BlockDropDown',
         'TitleTool',
+        'Tables',
         { name: 'Lists', exclude: ['JoinUp'] },
-        // {
-        //   name: 'Text',
-        //   exclude: [
-        //     'ExtractPoetry',
-        //     'ExtractProse',
-        //     'ParagraphContinued',
-        //     'Subscript',
-        //     'SourceNote',
-        //     'Paragraph',
-        //   ],
-        // },
         'Images',
         {
           name: 'Annotations',
@@ -65,9 +54,9 @@ export default {
       ],
     },
   ],
-
   SchemaService: DefaultSchema,
   SpecialCharactersService: charactersList,
+  PmPlugins: [tableEditing(), columnResizing()],
 
   services: [
     new InlineAnnotationsService(),
@@ -79,7 +68,6 @@ export default {
     new ListsService(),
     new ListToolGroupService(),
     new TablesService(),
-    // new TableToolGroupService(),
     new BaseService(),
     new BaseToolGroupService(),
     new DisplayBlockLevelService(),
@@ -90,7 +78,6 @@ export default {
     new SpecialCharactersToolGroupService(),
     new BlockDropDownToolGroupService(),
     new FindAndReplaceService(),
-    // new FindAndReplaceToolGroupService(),
     new FullScreenService(),
     new FullScreenToolGroupService(),
   ],

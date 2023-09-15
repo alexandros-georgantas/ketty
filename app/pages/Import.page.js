@@ -6,9 +6,9 @@ import { useCurrentUser } from '@coko/client'
 
 import { INGEST_WORD_FILES } from '../graphql'
 import Import from '../ui/import/Import'
+import Spin from '../ui/common/Spin'
 
 import { isOwner, hasEditAccess, isAdmin } from '../helpers/permissions'
-
 import {
   showUnauthorizedActionModal,
   showGenericErrorModal,
@@ -34,10 +34,11 @@ const ImportPage = () => {
 
   const { currentUser } = useCurrentUser()
 
-  const canImport =
-    isAdmin(currentUser) ||
-    isOwner(bookId, currentUser) ||
-    hasEditAccess(bookId, currentUser)
+  const canImport = currentUser
+    ? isAdmin(currentUser) ||
+      isOwner(bookId, currentUser) ||
+      hasEditAccess(bookId, currentUser)
+    : false
 
   const onClickContinue = files => {
     if (!canImport) {
@@ -57,6 +58,8 @@ const ImportPage = () => {
       },
     })
   }
+
+  if (!currentUser) return <Spin spinning />
 
   if (!canImport) {
     showUnauthorizedActionModal(true, redirectToDashboard)

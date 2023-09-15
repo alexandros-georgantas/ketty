@@ -7,7 +7,7 @@ import {
   Switch,
   useHistory,
   Redirect,
-  useParams,
+  // useParams,
 } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -39,8 +39,8 @@ import {
 } from './pages'
 
 import { CURRENT_USER } from './graphql'
-import { isOwner, isCollaborator, isAdmin } from './helpers/permissions'
-import { showUnauthorizedAccessModal } from './helpers/commonModals'
+// import { isOwner, isCollaborator, isAdmin } from './helpers/permissions'
+// import { showUnauthorizedAccessModal } from './helpers/commonModals'
 
 const LayoutWrapper = styled.div`
   display: flex;
@@ -234,30 +234,32 @@ const RequireVerifiedUser = ({ children }) => {
   return children
 }
 
-const RequireTeamMembership = ({ children }) => {
-  const { currentUser } = useCurrentUser()
-  const { bookId } = useParams()
+// Find a better way for doing that
+// const RequireTeamMembership = ({ children }) => {
+//   const { currentUser } = useCurrentUser()
+//   const { bookId } = useParams()
 
-  if (bookId) {
-    const canAccess =
-      isAdmin(currentUser) ||
-      isOwner(bookId, currentUser) ||
-      isCollaborator(bookId, currentUser)
+//   if (bookId) {
+//     const canAccess =
+//       isAdmin(currentUser) ||
+//       isOwner(bookId, currentUser) ||
+//       isCollaborator(bookId, currentUser)
 
-    if (!canAccess) {
-      showUnauthorizedAccessModal()
-      return <Redirect to="/dashboard" />
-    }
-  }
+//     if (!canAccess) {
+//       showUnauthorizedAccessModal()
+//       return <Redirect to="/dashboard" />
+//     }
+//   }
 
-  return children
-}
+//   return children
+// }
 
 const Authenticated = ({ children }) => {
   return (
     <RequireAuth notAuthenticatedRedirectTo="/login">
       <RequireVerifiedUser>
-        <RequireTeamMembership>{children}</RequireTeamMembership>
+        {/* <RequireTeamMembership>{children}</RequireTeamMembership> */}
+        {children}
       </RequireVerifiedUser>
     </RequireAuth>
   )
