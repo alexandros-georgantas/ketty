@@ -198,7 +198,7 @@ const PreviewSettings = props => {
           itemLayout="horizontal"
           renderItem={({ id, thumbnail, name }) => (
             <StyledListItem
-              onClick={() => handleChangeTemplate(id)}
+              onClick={() => !processInProgress && handleChangeTemplate(id)}
               selected={id === selectedTemplate}
             >
               <Avatar shape="square" size="large" src={thumbnail?.url} />
