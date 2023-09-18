@@ -2,12 +2,17 @@ import React, { useEffect, useState } from 'react'
 
 import useWebSocket from 'react-use-websocket'
 import { useHistory, useParams } from 'react-router-dom'
-import { useQuery, useMutation, useSubscription } from '@apollo/client'
+import {
+  useQuery,
+  useLazyQuery,
+  useMutation,
+  useSubscription,
+} from '@apollo/client'
 import find from 'lodash/find'
 import debounce from 'lodash/debounce'
 import { uuid, useCurrentUser } from '@coko/client'
 import { webSocketServerUrl } from '@coko/client/dist/helpers/getUrl'
-
+import styled from 'styled-components'
 import {
   GET_ENTIRE_BOOK,
   RENAME_BOOK_COMPONENT_TITLE,
@@ -23,6 +28,8 @@ import {
   UPDATE_SUBTITLE,
   BOOK_UPDATED_SUBSCRIPTION,
   USER_UPDATED_SUBSCRIPTION,
+  GET_BOOK_COMPONENT,
+  USE_CHATGPT,
 } from '../graphql'
 
 import { isOwner, hasEditAccess, isAdmin } from '../helpers/permissions'
@@ -32,17 +39,28 @@ import {
   showChangeInPermissionsModal,
 } from '../helpers/commonModals'
 
-import { Editor, Modal, Paragraph, Form } from '../ui'
+import { Editor, Modal, Paragraph, Form, Spin } from '../ui'
 
 import { BookMetadataForm } from '../ui/bookMetadata'
 
+const StyledSpin = styled(Spin)`
+  display: grid;
+  height: 100vh;
+  place-content: center;
+`
+
 const ProducerPage = () => {
   // INITIALIZATION SECTION START
+
   const history = useHistory()
   const params = useParams()
   const [tabId] = useState(uuid())
   const [isOnline, setIsOnline] = useState(true)
   const [editorMode, setEditorMode] = useState(undefined)
+
+  const [selectedBookComponentContent, setSelectedBookComponentContent] =
+    useState(undefined)
+
   const { currentUser } = useCurrentUser()
   const token = localStorage.getItem('token')
   const [form] = Form.useForm()
@@ -72,6 +90,35 @@ const ProducerPage = () => {
       id: bookId,
     },
   })
+
+  const [getBookComponent, { loading: bookComponentLoading }] = useLazyQuery(
+    GET_BOOK_COMPONENT,
+    {
+      fetchPolicy: 'network-only',
+      onCompleted: ({ getBookComponent: bookComponentResponse }) => {
+        setSelectedBookComponentContent(bookComponentResponse?.content)
+      },
+      onError: () => showGenericErrorModal(),
+    },
+  )
+
+  const [chatGPT] = useLazyQuery(USE_CHATGPT, {
+    fetchPolicy: 'network-only',
+    onError: () => showGenericErrorModal(),
+  })
+
+  const queryAI = input =>
+    new Promise((resolve, reject) => {
+      chatGPT({ variables: { input } })
+        .then(({ data }) => {
+          const { chatGPT: res } = data
+          resolve(res)
+        })
+        .catch(() =>
+          reject(new Error('Your request could not be processed for now')),
+        )
+    })
+
   // QUERIES SECTION END
 
   // SUBSCRIPTIONS SECTION START
@@ -154,6 +201,7 @@ const ProducerPage = () => {
 
       if (selectedChapterId && selectedChapterId === deletedId) {
         setSelectedChapterId(undefined)
+        setSelectedBookComponentContent(undefined)
       }
     },
     onError: err => {
@@ -472,8 +520,10 @@ const ProducerPage = () => {
     } else if (isAlreadySelected) {
       setSelectedChapterId(undefined)
       setEditorMode(undefined)
+      setSelectedBookComponentContent(undefined)
     } else {
       setSelectedChapterId(chapterId)
+      getBookComponent({ variables: { id: chapterId } })
     }
   }
 
@@ -680,7 +730,7 @@ const ProducerPage = () => {
   }, [editorMode])
   // EFFECTS SECTION END
 
-  if (loading) return null
+  if (loading || bookComponentLoading) return <StyledSpin spinning />
 
   return (
     <Editor
@@ -703,6 +753,8 @@ const ProducerPage = () => {
       }
       onReorderChapter={onReorderChapter}
       onUploadChapter={onUploadChapter}
+      queryAI={queryAI}
+      selectedBookComponentContent={selectedBookComponentContent}
       selectedChapterId={selectedChapterId}
       subtitle={bookQueryData?.getBook.subtitle}
       title={bookQueryData?.getBook.title}

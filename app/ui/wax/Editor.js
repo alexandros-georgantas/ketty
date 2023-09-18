@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Wax } from 'wax-prosemirror-core'
 import { LuluLayout } from './layout'
 import { defaultConfig } from './config'
-import find from 'lodash/find'
+// import find from 'lodash/find'
 import debounce from 'lodash/debounce'
 import { LuluWaxContext } from './luluWaxContext'
 
@@ -22,7 +22,9 @@ const EditorWrapper = ({
   onReorderChapter,
   onUploadChapter,
   onClickBookMetadata,
+  queryAI,
   bookMetadataValues,
+  selectedBookComponentContent,
   canEdit,
 }) => {
   const [luluWax, setLuluWax] = useState({
@@ -78,9 +80,12 @@ const EditorWrapper = ({
     updateTitle: periodicTitleChanges,
   }
   defaultConfig.ImageService = { showAlt: true }
-  const found = find(chapters, {
-    id: selectedChapterId,
-  })
+  defaultConfig.AskAiContentService = {
+    AskAiContentTransformation: queryAI,
+  }
+  // const found = find(chapters, {
+  //   id: selectedChapterId,
+  // })
 
   return (
     <LuluWaxContext.Provider value={{ luluWax, setLuluWax }}>
@@ -91,7 +96,7 @@ const EditorWrapper = ({
         layout={LuluLayout}
         onChange={onPeriodicBookComponentContentChange}
         readonly={isReadOnly}
-        value={found?.content || ''}
+        value={selectedBookComponentContent || ''}
       />
     </LuluWaxContext.Provider>
   )

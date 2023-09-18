@@ -111,9 +111,28 @@ const showGenericErrorModal = callback => {
   })
 }
 
+const onInfoModal = errorMessage => {
+  const warningModal = Modal.warning()
+  return warningModal.update({
+    title: 'Error',
+    content: <Paragraph>{errorMessage}</Paragraph>,
+    onOk() {
+      warningModal.destroy()
+    },
+    okButtonProps: { style: { backgroundColor: 'black' } },
+    maskClosable: false,
+    width: 570,
+    bodyStyle: {
+      marginRight: 38,
+      textAlign: 'justify',
+    },
+  })
+}
+
 export {
   showUnauthorizedAccessModal,
   showGenericErrorModal,
   showUnauthorizedActionModal,
   showChangeInPermissionsModal,
+  onInfoModal,
 }
