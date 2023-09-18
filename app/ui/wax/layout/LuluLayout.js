@@ -59,6 +59,10 @@ const EditorContainer = styled.div`
     min-height: 100%;
     padding: ${grid(10)};
 
+    table > caption {
+      caption-side: top;
+    }
+
     &:focus-visible {
       outline: none;
     }

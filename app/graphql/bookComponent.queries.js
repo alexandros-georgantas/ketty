@@ -29,7 +29,7 @@ const CREATE_BOOK_COMPONENT = gql`
           id
           title
           divisionId
-          content
+          # content
           componentType
           trackChangesEnabled
           uploading
@@ -50,13 +50,38 @@ const CREATE_BOOK_COMPONENT = gql`
   }
 `
 
+const GET_BOOK_COMPONENT = gql`
+  query GetBookComponent($id: ID!) {
+    getBookComponent(id: $id) {
+      id
+      title
+      divisionId
+      content
+      componentType
+      trackChangesEnabled
+      uploading
+      status
+      lock {
+        userId
+        created
+        givenNames
+        tabId
+        foreignId
+        isAdmin
+        surname
+        id
+      }
+    }
+  }
+`
+
 const UPDATE_BOOK_COMPONENT_CONTENT = gql`
   mutation UpdateBookComponentContent($input: UpdateBookComponentInput!) {
     updateContent(input: $input) {
       id
       title
       divisionId
-      content
+      # content
       componentType
       trackChangesEnabled
       uploading
@@ -81,7 +106,7 @@ const RENAME_BOOK_COMPONENT_TITLE = gql`
       id
       title
       divisionId
-      content
+      # content
       componentType
       trackChangesEnabled
       uploading
@@ -130,7 +155,7 @@ const DELETE_BOOK_COMPONENT = gql`
           id
           title
           divisionId
-          content
+          # content
           componentType
           trackChangesEnabled
           uploading
@@ -186,7 +211,7 @@ const UPDATE_BOOK_COMPONENTS_ORDER = gql`
           id
           title
           divisionId
-          content
+          # content
           componentType
           trackChangesEnabled
           uploading
@@ -245,6 +270,12 @@ const UNLOCK_BOOK_COMPONENT = gql`
   }
 `
 
+const USE_CHATGPT = gql`
+  query ChatGPT($input: String!) {
+    chatGPT(input: $input)
+  }
+`
+
 // const BOOK_COMPONENT_UPDATED_SUBSCRIPTION = gql`
 //   subscription BookComponentUpdated($id: ID!) {
 //     bookComponentUpdated(id: $id)
@@ -252,6 +283,7 @@ const UNLOCK_BOOK_COMPONENT = gql`
 // `
 
 export {
+  GET_BOOK_COMPONENT,
   CREATE_BOOK_COMPONENT,
   UPDATE_BOOK_COMPONENT_CONTENT,
   RENAME_BOOK_COMPONENT_TITLE,
@@ -259,5 +291,6 @@ export {
   UPDATE_BOOK_COMPONENTS_ORDER,
   LOCK_BOOK_COMPONENT,
   UNLOCK_BOOK_COMPONENT,
+  USE_CHATGPT,
   // BOOK_COMPONENT_UPDATED_SUBSCRIPTION,
 }

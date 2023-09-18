@@ -1,4 +1,6 @@
 import { DefaultSchema } from 'wax-prosemirror-core'
+// import axios from 'axios'
+// import { useLazyQuery } from '@apollo/client'
 
 import {
   InlineAnnotationsService,
@@ -21,11 +23,15 @@ import {
   FullScreenService,
   FullScreenToolGroupService,
   TitleToolGroupService,
+  disallowPasteImagesPlugin,
+  AskAiContentService,
 } from 'wax-prosemirror-services'
 
 import { TablesService, tableEditing, columnResizing } from 'wax-table-service'
 
 import charactersList from './charactersList'
+
+import { onInfoModal } from '../../../helpers/commonModals'
 
 export default {
   MenuService: [
@@ -56,12 +62,21 @@ export default {
   ],
   SchemaService: DefaultSchema,
   SpecialCharactersService: charactersList,
-  PmPlugins: [tableEditing(), columnResizing()],
+  PmPlugins: [
+    tableEditing(),
+    columnResizing(),
+    disallowPasteImagesPlugin(() =>
+      onInfoModal(
+        `Pasting external images is not supported. Please use platform's Asset Manager infrastructure`,
+      ),
+    ),
+  ],
 
   services: [
     new InlineAnnotationsService(),
     new TitleToolGroupService(),
     new AnnotationToolGroupService(),
+    new AskAiContentService(),
     new ImageService(),
     new ImageToolGroupService(),
     new LinkService(),
