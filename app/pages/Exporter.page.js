@@ -432,6 +432,23 @@ const PreviewerPage = () => {
 
   const changeExportFormatHandler = selectedFormat => {
     setExportFormat(selectedFormat)
+
+    if (previewLink) setPreviewLink(undefined)
+
+    if (selectedFormat === 'pdf') {
+      const currentSelectedTemplate = findAssociatedTemplate(
+        selectedFormat,
+        trimSize,
+        associatedTemplatesData,
+      )
+
+      if (currentSelectedTemplate) {
+        triggerPreviewCreation(
+          currentSelectedTemplate.templateId,
+          currentSelectedTemplate.additionalExportOptions,
+        )
+      }
+    }
   }
 
   // This applies only for the case of pdf
