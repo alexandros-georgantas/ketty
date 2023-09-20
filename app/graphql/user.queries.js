@@ -6,6 +6,7 @@ const CURRENT_USER = gql`
       id
       displayName
       username
+      admin
       teams {
         id
         role

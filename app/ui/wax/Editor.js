@@ -2,11 +2,21 @@
 import React, { useEffect, useState } from 'react'
 import { Wax } from 'wax-prosemirror-core'
 import { LuluLayout } from './layout'
-import { defaultConfig } from './config'
-import find from 'lodash/find'
+import defaultConfig from './config/config'
+import configWithAi from './config/configWithAI'
+// import find from 'lodash/find'
 import debounce from 'lodash/debounce'
 import { LuluWaxContext } from './luluWaxContext'
 
+import { Switch } from 'antd'
+import styled from 'styled-components'
+
+const Wrapper = styled.div`
+  align-items: center;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+`
 const EditorWrapper = ({
   title,
   subtitle,
@@ -14,15 +24,20 @@ const EditorWrapper = ({
   onPeriodicBookComponentContentChange,
   isReadOnly,
   onImageUpload,
-  selectedChapterId,
+  // selectedChapterId,
   onBookComponentTitleChange,
   onAddChapter,
   onChapterClick,
+  chatGPTEnabled,
+  setChatGPTEnabled,
   onDeleteChapter,
   onReorderChapter,
   onUploadChapter,
   onClickBookMetadata,
+  queryAI,
   bookMetadataValues,
+  selectedChapter,
+  // selectedBookComponentContent,
   canEdit,
 }) => {
   const [luluWax, setLuluWax] = useState({
@@ -31,6 +46,7 @@ const EditorWrapper = ({
     onDeleteChapter,
     onReorderChapter,
     chapters,
+    selectedChapter,
     onUploadChapter,
     canEdit,
     title,
@@ -55,7 +71,8 @@ const EditorWrapper = ({
       title,
       subtitle,
       chapters,
-      selectedChapterId,
+      selectedChapter,
+
       onAddChapter,
       onChapterClick,
       onDeleteChapter,
@@ -65,35 +82,45 @@ const EditorWrapper = ({
       bookMetadataValues,
       canEdit,
     })
-  }, [
-    title,
-    subtitle,
-    chapters,
-    selectedChapterId,
-    bookMetadataValues,
-    canEdit,
-  ])
+  }, [title, subtitle, chapters, selectedChapter, bookMetadataValues, canEdit])
+  const selectedConfig = chatGPTEnabled ? configWithAi : defaultConfig
 
-  defaultConfig.TitleService = {
+  selectedConfig.TitleService = {
     updateTitle: periodicTitleChanges,
   }
-  defaultConfig.ImageService = { showAlt: true }
-  const found = find(chapters, {
-    id: selectedChapterId,
-  })
+  selectedConfig.ImageService = { showAlt: true }
+  if (chatGPTEnabled) {
+    selectedConfig.AskAiContentService = {
+      AskAiContentTransformation: queryAI,
+    }
+  }
+
+  // const found = find(chapters, {
+  //   id: selectedChapterId,
+  // })
 
   return (
-    <LuluWaxContext.Provider value={{ luluWax, setLuluWax }}>
-      <Wax
-        config={defaultConfig}
-        fileUpload={onImageUpload}
-        key={`${selectedChapterId}-${isReadOnly}`}
-        layout={LuluLayout}
-        onChange={onPeriodicBookComponentContentChange}
-        readonly={isReadOnly}
-        value={found?.content || ''}
-      />
-    </LuluWaxContext.Provider>
+    <>
+      <Wrapper>
+        <Switch
+          checkedChildren="AI ON"
+          unCheckedChildren="AI OFF"
+          checked={chatGPTEnabled}
+          onChange={() => setChatGPTEnabled(!chatGPTEnabled)}
+        />
+      </Wrapper>
+      <LuluWaxContext.Provider value={{ luluWax, setLuluWax }}>
+        <Wax
+          config={selectedConfig}
+          fileUpload={onImageUpload}
+          key={`${selectedChapter?.id}-${isReadOnly}-${chatGPTEnabled}`}
+          layout={LuluLayout}
+          onChange={onPeriodicBookComponentContentChange}
+          readonly={isReadOnly}
+          value={selectedChapter?.content || ''}
+        />
+      </LuluWaxContext.Provider>
+    </>
   )
 }
 

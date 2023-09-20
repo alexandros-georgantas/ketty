@@ -80,7 +80,7 @@ const BookPanel = props => {
     chapters,
     onDeleteChapter,
     onChapterClick,
-    selectedChapterId,
+    selectedChapter,
     onReorderChapter,
     title,
     subtitle,
@@ -124,7 +124,7 @@ const BookPanel = props => {
           onChapterClick={onChapterClick}
           onDeleteChapter={onDeleteChapter}
           onReorderChapter={onReorderChapter}
-          selectedChapterId={selectedChapterId}
+          selectedChapterId={selectedChapter?.id}
         />
       </ChaptersArea>
     </LeftPanelWrapper>
@@ -142,7 +142,10 @@ BookPanel.propTypes = {
     }),
   ).isRequired,
   onDeleteChapter: PropTypes.func.isRequired,
-  selectedChapterId: PropTypes.string,
+  selectedChapter: PropTypes.shape({
+    id: PropTypes.string,
+    content: PropTypes.string,
+  }),
   onAddChapter: PropTypes.func.isRequired,
   onChapterClick: PropTypes.func.isRequired,
   onUploadChapter: PropTypes.func.isRequired,
@@ -176,7 +179,7 @@ BookPanel.propTypes = {
   // onErrorBookMetadata: PropTypes.func.isRequired,
 }
 BookPanel.defaultProps = {
-  selectedChapterId: undefined,
+  selectedChapter: undefined,
   title: null,
   subtitle: null,
 }

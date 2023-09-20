@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
@@ -98,16 +98,16 @@ const Header = props => {
   } = props
 
   const curatedDropdownItems = [{ key: 'logout', label: 'Logout' }]
-  const [navLeftCurrentSelected, setNavLeftCurrentSelected] = useState([])
-  const [navRightCurrentSelected, setNavRightCurrentSelected] = useState([])
+  // const [navLeftCurrentSelected, setNavLeftCurrentSelected] = useState([])
+  // const [navRightCurrentSelected, setNavRightCurrentSelected] = useState([])
 
-  const navRightSelectHandler = e => {
-    setNavRightCurrentSelected([])
-  }
+  // const navRightSelectHandler = e => {
+  //   setNavRightCurrentSelected([])
+  // }
 
-  const navLeftSelectHandler = e => {
-    setNavLeftCurrentSelected([])
-  }
+  // const navLeftSelectHandler = e => {
+  //   setNavLeftCurrentSelected([])
+  // }
 
   if (!isEmpty(dropdownItems)) {
     curatedDropdownItems.unshift({
@@ -198,9 +198,9 @@ const Header = props => {
               disabledOverflow
               items={navItemsLeft}
               mode="horizontal"
-              onClick={navLeftSelectHandler}
+              // onClick={navLeftSelectHandler}
               selectable={false}
-              selectedKeys={navLeftCurrentSelected}
+              // selectedKeys={navLeftCurrentSelected}
               style={{ borderBottom: 'none' }}
             />
           )}
@@ -211,9 +211,9 @@ const Header = props => {
               disabledOverflow
               items={navItemsRight}
               mode="horizontal"
-              onClick={navRightSelectHandler}
+              // onClick={navRightSelectHandler}
               selectable={false}
-              selectedKeys={navRightCurrentSelected}
+              // selectedKeys={navRightCurrentSelected}
               style={{ borderBottom: 'none' }}
             />
           )}
