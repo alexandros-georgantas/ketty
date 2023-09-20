@@ -29,7 +29,6 @@ import {
   BOOK_UPDATED_SUBSCRIPTION,
   USER_UPDATED_SUBSCRIPTION,
   GET_BOOK_COMPONENT,
-  USE_CHATGPT,
 } from '../graphql'
 
 import { isOwner, hasEditAccess, isAdmin } from '../helpers/permissions'
@@ -101,23 +100,6 @@ const ProducerPage = () => {
       onError: () => showGenericErrorModal(),
     },
   )
-
-  const [chatGPT] = useLazyQuery(USE_CHATGPT, {
-    fetchPolicy: 'network-only',
-    onError: () => showGenericErrorModal(),
-  })
-
-  const queryAI = input =>
-    new Promise((resolve, reject) => {
-      chatGPT({ variables: { input } })
-        .then(({ data }) => {
-          const { chatGPT: res } = data
-          resolve(res)
-        })
-        .catch(() =>
-          reject(new Error('Your request could not be processed for now')),
-        )
-    })
 
   // QUERIES SECTION END
 
@@ -753,7 +735,6 @@ const ProducerPage = () => {
       }
       onReorderChapter={onReorderChapter}
       onUploadChapter={onUploadChapter}
-      queryAI={queryAI}
       selectedBookComponentContent={selectedBookComponentContent}
       selectedChapterId={selectedChapterId}
       subtitle={bookQueryData?.getBook.subtitle}

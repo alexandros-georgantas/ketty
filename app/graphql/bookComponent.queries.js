@@ -270,11 +270,11 @@ const UNLOCK_BOOK_COMPONENT = gql`
   }
 `
 
-const USE_CHATGPT = gql`
-  query ChatGPT($input: String!) {
-    chatGPT(input: $input)
-  }
-`
+// const USE_CHATGPT = gql`
+//   query ChatGPT($input: String!) {
+//     chatGPT(input: $input)
+//   }
+// `
 
 // const BOOK_COMPONENT_UPDATED_SUBSCRIPTION = gql`
 //   subscription BookComponentUpdated($id: ID!) {
@@ -291,6 +291,6 @@ export {
   UPDATE_BOOK_COMPONENTS_ORDER,
   LOCK_BOOK_COMPONENT,
   UNLOCK_BOOK_COMPONENT,
-  USE_CHATGPT,
+  // USE_CHATGPT,
   // BOOK_COMPONENT_UPDATED_SUBSCRIPTION,
 }

@@ -1,6 +1,4 @@
 import { DefaultSchema } from 'wax-prosemirror-core'
-// import axios from 'axios'
-// import { useLazyQuery } from '@apollo/client'
 
 import {
   InlineAnnotationsService,
@@ -24,7 +22,6 @@ import {
   FullScreenToolGroupService,
   TitleToolGroupService,
   disallowPasteImagesPlugin,
-  AskAiContentService,
 } from 'wax-prosemirror-services'
 
 import { TablesService, tableEditing, columnResizing } from 'wax-table-service'
@@ -76,7 +73,6 @@ export default {
     new InlineAnnotationsService(),
     new TitleToolGroupService(),
     new AnnotationToolGroupService(),
-    new AskAiContentService(),
     new ImageService(),
     new ImageToolGroupService(),
     new LinkService(),
