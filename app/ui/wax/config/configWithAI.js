@@ -24,7 +24,7 @@ import {
   FullScreenToolGroupService,
   TitleToolGroupService,
   disallowPasteImagesPlugin,
-  // AskAiContentService,
+  AskAiContentService,
 } from 'wax-prosemirror-services'
 
 import { TablesService, tableEditing, columnResizing } from 'wax-table-service'
@@ -76,7 +76,7 @@ export default {
     new InlineAnnotationsService(),
     new TitleToolGroupService(),
     new AnnotationToolGroupService(),
-    // new AskAiContentService(),
+    new AskAiContentService(),
     new ImageService(),
     new ImageToolGroupService(),
     new LinkService(),

@@ -37,6 +37,7 @@ import {
   showUnauthorizedActionModal,
   showGenericErrorModal,
   showChangeInPermissionsModal,
+  onInfoModal,
 } from '../helpers/commonModals'
 
 import { Editor, Modal, Paragraph, Form, Spin } from '../ui'
@@ -57,16 +58,18 @@ const ProducerPage = () => {
   const [tabId] = useState(uuid())
   const [isOnline, setIsOnline] = useState(true)
   const [editorMode, setEditorMode] = useState(undefined)
+  const [chatGPTEnabled, setChatGPTEnabled] = useState(false)
 
-  const [selectedBookComponentContent, setSelectedBookComponentContent] =
-    useState(undefined)
+  const [selectedChapter, setSelectedChapter] = useState(undefined)
+  // const [selectedBookComponentContent, setSelectedBookComponentContent] =
+  //   useState(undefined)
 
   const { currentUser } = useCurrentUser()
   const token = localStorage.getItem('token')
   const [form] = Form.useForm()
 
   const [chapterList, setChapterList] = useState([]) // needed for snappier UI instead of waiting for servers response regarding new order
-  const [selectedChapterId, setSelectedChapterId] = useState(undefined)
+  // const [selectedChapterId, setSelectedChapterId] = useState(undefined)
 
   const { bookId } = params
 
@@ -96,7 +99,12 @@ const ProducerPage = () => {
     {
       fetchPolicy: 'network-only',
       onCompleted: ({ getBookComponent: bookComponentResponse }) => {
-        setSelectedBookComponentContent(bookComponentResponse?.content)
+        if (selectedChapter?.id) {
+          setSelectedChapter({
+            content: bookComponentResponse?.content,
+            id: selectedChapter.id,
+          })
+        }
       },
       onError: () => showGenericErrorModal(),
     },
@@ -104,19 +112,22 @@ const ProducerPage = () => {
 
   const [chatGPT] = useLazyQuery(USE_CHATGPT, {
     fetchPolicy: 'network-only',
-    onError: () => showGenericErrorModal(),
+    onError: err => {
+      if (err.toString().includes('Missing access key')) {
+        onInfoModal('Access key is missing or invalid')
+      } else {
+        showGenericErrorModal()
+      }
+    },
   })
 
   const queryAI = input =>
     new Promise((resolve, reject) => {
-      chatGPT({ variables: { input } })
-        .then(({ data }) => {
-          const { chatGPT: res } = data
-          resolve(res)
-        })
-        .catch(() =>
-          reject(new Error('Your request could not be processed for now')),
-        )
+      chatGPT({ variables: { input } }).then(({ data }) => {
+        if (!data) return resolve(null)
+        const { chatGPT: res } = data
+        return resolve(res)
+      })
     })
 
   // QUERIES SECTION END
@@ -198,10 +209,10 @@ const ProducerPage = () => {
     onCompleted: (_, { variables }) => {
       const { input } = variables
       const { id: deletedId } = input
+      // const { id } = selectedChapter
 
-      if (selectedChapterId && selectedChapterId === deletedId) {
-        setSelectedChapterId(undefined)
-        setSelectedBookComponentContent(undefined)
+      if (selectedChapter?.id && selectedChapter?.id === deletedId) {
+        setSelectedChapter(undefined)
       }
     },
     onError: err => {
@@ -269,11 +280,11 @@ const ProducerPage = () => {
   }
 
   const onBookComponentContentChange = content => {
-    if (selectedChapterId && canModify) {
+    if (selectedChapter?.id && canModify) {
       updateContent({
         variables: {
           input: {
-            id: selectedChapterId,
+            id: selectedChapter.id,
             content,
           },
         },
@@ -306,11 +317,13 @@ const ProducerPage = () => {
   }
 
   const onBookComponentTitleChange = title => {
-    if (selectedChapterId && canModify) {
+    // const { id } = selectedChapter
+
+    if (selectedChapter?.id && canModify) {
       renameBookComponent({
         variables: {
           input: {
-            id: selectedChapterId,
+            id: selectedChapter.id,
             title,
           },
         },
@@ -478,11 +491,13 @@ const ProducerPage = () => {
   }
 
   const onBookComponentLock = () => {
-    if (selectedChapterId && canModify) {
+    // const { id } = selectedChapter
+
+    if (selectedChapter?.id && canModify) {
       const userAgent = window.navigator.userAgent || null
       lockBookComponent({
         variables: {
-          id: selectedChapterId,
+          id: selectedChapter.id,
           tabId,
           userAgent,
         },
@@ -509,22 +524,27 @@ const ProducerPage = () => {
   }
 
   const onChapterClick = chapterId => {
+    // const { id } = selectedChapter
+
     const found = find(bookQueryData?.getBook?.divisions[1].bookComponents, {
       id: chapterId,
     })
 
-    const isAlreadySelected = chapterId === selectedChapterId
+    const isAlreadySelected = chapterId === selectedChapter?.id
 
     if (found.uploading) {
       showUploadingModal()
-    } else if (isAlreadySelected) {
-      setSelectedChapterId(undefined)
-      setEditorMode(undefined)
-      setSelectedBookComponentContent(undefined)
-    } else {
-      setSelectedChapterId(chapterId)
-      getBookComponent({ variables: { id: chapterId } })
+      return
     }
+
+    if (isAlreadySelected) {
+      setSelectedChapter(undefined)
+      setEditorMode(undefined)
+      return
+    }
+
+    setSelectedChapter({ id: chapterId })
+    getBookComponent({ variables: { id: chapterId } })
   }
 
   const onUploadChapter = () => {
@@ -620,14 +640,14 @@ const ProducerPage = () => {
       },
       queryParams: {
         token,
-        bookComponentId: selectedChapterId,
+        bookComponentId: selectedChapter?.id,
         tabId,
       },
       share: false,
       reconnectAttempts: 5000,
       reconnectInterval: 5000,
     },
-    selectedChapterId !== undefined && editorMode && editorMode !== 'preview',
+    selectedChapter?.id !== undefined && editorMode && editorMode !== 'preview',
   )
   // WEBSOCKET SECTION END
 
@@ -669,9 +689,9 @@ const ProducerPage = () => {
 
       // the below is for the case where a user has the lock of a chapter and at the same time another user is in read only mode for that chapter.
       // When the lock is release from the initial user then the read-only user will take it
-      if (selectedChapterId) {
+      if (selectedChapter?.id) {
         const found = find(bookQueryData.getBook.divisions[1].bookComponents, {
-          id: selectedChapterId,
+          id: selectedChapter?.id,
         })
 
         const { lock } = found
@@ -684,9 +704,9 @@ const ProducerPage = () => {
   }, [bookQueryData?.getBook?.divisions[1].bookComponents])
 
   useEffect(() => {
-    if (selectedChapterId) {
+    if (selectedChapter?.id) {
       const found = find(bookQueryData.getBook.divisions[1].bookComponents, {
-        id: selectedChapterId,
+        id: selectedChapter?.id,
       })
 
       const { lock } = found
@@ -703,13 +723,13 @@ const ProducerPage = () => {
         setEditorMode('full')
       }
     }
-  }, [selectedChapterId, canModify])
+  }, [selectedChapter?.id, canModify])
 
   useEffect(() => {
     if (editorMode && editorMode === 'preview') {
-      if (selectedChapterId) {
+      if (selectedChapter?.id) {
         const found = find(bookQueryData.getBook.divisions[1].bookComponents, {
-          id: selectedChapterId,
+          id: selectedChapter?.id,
         })
 
         const { lock } = found
@@ -737,8 +757,9 @@ const ProducerPage = () => {
       bookMetadataValues={bookQueryData?.getBook.podMetadata}
       canEdit={canModify}
       chapters={chapterList}
+      chatGPTEnabled={chatGPTEnabled}
       isReadOnly={
-        !selectedChapterId ||
+        !selectedChapter?.id ||
         (editorMode && editorMode === 'preview') ||
         !canModify
       }
@@ -754,8 +775,10 @@ const ProducerPage = () => {
       onReorderChapter={onReorderChapter}
       onUploadChapter={onUploadChapter}
       queryAI={queryAI}
-      selectedBookComponentContent={selectedBookComponentContent}
-      selectedChapterId={selectedChapterId}
+      selectedChapter={selectedChapter}
+      // selectedBookComponentContent={selectedBookComponentContent}
+      // selectedChapterId={selectedChapterId}
+      setChatGPTEnabled={setChatGPTEnabled}
       subtitle={bookQueryData?.getBook.subtitle}
       title={bookQueryData?.getBook.title}
     />

@@ -114,7 +114,7 @@ const showGenericErrorModal = callback => {
 const onInfoModal = errorMessage => {
   const warningModal = Modal.warning()
   return warningModal.update({
-    title: 'Error',
+    title: 'Warning',
     content: <Paragraph>{errorMessage}</Paragraph>,
     onOk() {
       warningModal.destroy()

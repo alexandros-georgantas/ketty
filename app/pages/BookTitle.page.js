@@ -2,6 +2,7 @@ import React from 'react'
 import { useQuery, useMutation } from '@apollo/client'
 import { useHistory, useParams } from 'react-router-dom'
 import { useCurrentUser } from '@coko/client'
+import styled from 'styled-components'
 import { GET_BOOK, RENAME_BOOK } from '../graphql'
 import { isOwner, hasEditAccess, isAdmin } from '../helpers/permissions'
 import {
@@ -11,6 +12,14 @@ import {
 
 import BookTitle from '../ui/BookTitle'
 import Spin from '../ui/common/Spin'
+
+const StyledSpin = styled(Spin)`
+  display: grid;
+  height: calc(100% - 48px);
+  place-content: center;
+`
+
+const Loader = () => <StyledSpin spinning />
 
 const BookTitlePage = () => {
   const { bookId } = useParams()
@@ -25,16 +34,19 @@ const BookTitlePage = () => {
     },
   })
 
-  const [renameBook] = useMutation(RENAME_BOOK, {
-    onCompleted: () => history.replace(`/books/${bookId}/producer`), // replace instead of push. this will take user to dashboard when click back instead of return to the rename page
-    onError: err => {
-      if (err.toString().includes('Not Authorised')) {
-        return showUnauthorizedActionModal(true, redirectToDashboard)
-      }
+  const [renameBook, { loading: renameBookLoading }] = useMutation(
+    RENAME_BOOK,
+    {
+      onCompleted: () => history.replace(`/books/${bookId}/producer`), // replace instead of push. this will take user to dashboard when click back instead of return to the rename page
+      onError: err => {
+        if (err.toString().includes('Not Authorised')) {
+          return showUnauthorizedActionModal(true, redirectToDashboard)
+        }
 
-      return showGenericErrorModal(redirectToDashboard)
+        return showGenericErrorModal(redirectToDashboard)
+      },
     },
-  })
+  )
 
   const canRename = currentUser
     ? isAdmin(currentUser) ||
@@ -50,7 +62,7 @@ const BookTitlePage = () => {
     return renameBook({ variables: { id: bookId, title } })
   }
 
-  if (!currentUser && loading) return <Spin spinning />
+  if ((!currentUser && loading) || renameBookLoading) return <Loader />
 
   if (!canRename) {
     showUnauthorizedActionModal(true, redirectToDashboard)
