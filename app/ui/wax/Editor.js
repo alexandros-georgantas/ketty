@@ -4,7 +4,6 @@ import { Wax } from 'wax-prosemirror-core'
 import { LuluLayout } from './layout'
 import defaultConfig from './config/config'
 import configWithAi from './config/configWithAI'
-// import find from 'lodash/find'
 import debounce from 'lodash/debounce'
 import { LuluWaxContext } from './luluWaxContext'
 
@@ -24,12 +23,12 @@ const EditorWrapper = ({
   onPeriodicBookComponentContentChange,
   isReadOnly,
   onImageUpload,
-  // selectedChapterId,
   onBookComponentTitleChange,
   onAddChapter,
   onChapterClick,
+  bookComponentContent,
   chatGPTEnabled,
-  setChatGPTEnabled,
+  onAIToggle,
   onDeleteChapter,
   onReorderChapter,
   onUploadChapter,
@@ -37,7 +36,6 @@ const EditorWrapper = ({
   queryAI,
   bookMetadataValues,
   selectedChapter,
-  // selectedBookComponentContent,
   canEdit,
 }) => {
   const [luluWax, setLuluWax] = useState({
@@ -72,7 +70,6 @@ const EditorWrapper = ({
       subtitle,
       chapters,
       selectedChapter,
-
       onAddChapter,
       onChapterClick,
       onDeleteChapter,
@@ -95,10 +92,6 @@ const EditorWrapper = ({
     }
   }
 
-  // const found = find(chapters, {
-  //   id: selectedChapterId,
-  // })
-
   return (
     <>
       <Wrapper>
@@ -106,7 +99,7 @@ const EditorWrapper = ({
           checkedChildren="AI ON"
           unCheckedChildren="AI OFF"
           checked={chatGPTEnabled}
-          onChange={() => setChatGPTEnabled(!chatGPTEnabled)}
+          onChange={onAIToggle}
         />
       </Wrapper>
       <LuluWaxContext.Provider value={{ luluWax, setLuluWax }}>
@@ -117,7 +110,7 @@ const EditorWrapper = ({
           layout={LuluLayout}
           onChange={onPeriodicBookComponentContentChange}
           readonly={isReadOnly}
-          value={selectedChapter?.content || ''}
+          value={bookComponentContent || ''}
         />
       </LuluWaxContext.Provider>
     </>

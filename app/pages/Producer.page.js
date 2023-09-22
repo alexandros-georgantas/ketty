@@ -50,27 +50,36 @@ const StyledSpin = styled(Spin)`
   place-content: center;
 `
 
+const calculateEditorMode = (lock, canModify, currentUser, tabId) => {
+  if (
+    (lock && lock.userId !== currentUser.id) ||
+    (lock && lock.userId === currentUser.id && tabId !== lock.tabId) ||
+    !canModify
+  ) {
+    return 'preview'
+  }
+
+  if (!lock && canModify) {
+    return 'full'
+  }
+
+  return lock && lock.userId === currentUser.id && tabId === lock.tabId
+    ? 'full'
+    : 'preview'
+}
+
 const ProducerPage = () => {
   // INITIALIZATION SECTION START
-
   const history = useHistory()
   const params = useParams()
   const [tabId] = useState(uuid())
   const [isOnline, setIsOnline] = useState(true)
-  const [editorMode, setEditorMode] = useState(undefined)
   const [chatGPTEnabled, setChatGPTEnabled] = useState(false)
-
   const [selectedChapter, setSelectedChapter] = useState(undefined)
-  // const [selectedBookComponentContent, setSelectedBookComponentContent] =
-  //   useState(undefined)
 
   const { currentUser } = useCurrentUser()
   const token = localStorage.getItem('token')
   const [form] = Form.useForm()
-
-  const [chapterList, setChapterList] = useState([]) // needed for snappier UI instead of waiting for servers response regarding new order
-  // const [selectedChapterId, setSelectedChapterId] = useState(undefined)
-
   const { bookId } = params
 
   const canModify =
@@ -94,18 +103,12 @@ const ProducerPage = () => {
     },
   })
 
-  const [getBookComponent, { loading: bookComponentLoading }] = useLazyQuery(
+  const { loading: bookComponentLoading, data: bookComponentData } = useQuery(
     GET_BOOK_COMPONENT,
     {
       fetchPolicy: 'network-only',
-      onCompleted: ({ getBookComponent: bookComponentResponse }) => {
-        if (selectedChapter?.id) {
-          setSelectedChapter({
-            content: bookComponentResponse?.content,
-            id: selectedChapter.id,
-          })
-        }
-      },
+      skip: !selectedChapter?.id,
+      variables: { id: selectedChapter?.id },
       onError: () => showGenericErrorModal(),
     },
   )
@@ -209,7 +212,6 @@ const ProducerPage = () => {
     onCompleted: (_, { variables }) => {
       const { input } = variables
       const { id: deletedId } = input
-      // const { id } = selectedChapter
 
       if (selectedChapter?.id && selectedChapter?.id === deletedId) {
         setSelectedChapter(undefined)
@@ -224,9 +226,8 @@ const ProducerPage = () => {
     },
   })
 
-  const [updateBookComponentsOrder] = useMutation(
-    UPDATE_BOOK_COMPONENTS_ORDER,
-    {
+  const [updateBookComponentsOrder, { loading: changeOrderInProgress }] =
+    useMutation(UPDATE_BOOK_COMPONENTS_ORDER, {
       refetchQueries: [GET_ENTIRE_BOOK],
       onError: err => {
         if (err.toString().includes('Not Authorised')) {
@@ -235,8 +236,7 @@ const ProducerPage = () => {
           showGenericErrorModal()
         }
       },
-    },
-  )
+    })
 
   const [ingestWordFile] = useMutation(INGEST_WORD_FILES, {
     refetchQueries: [GET_ENTIRE_BOOK],
@@ -264,7 +264,6 @@ const ProducerPage = () => {
   })
 
   const [upload] = useMutation(UPLOAD_FILES)
-
   // MUTATIONS SECTION END
 
   // HANDLERS SECTION START
@@ -317,8 +316,6 @@ const ProducerPage = () => {
   }
 
   const onBookComponentTitleChange = title => {
-    // const { id } = selectedChapter
-
     if (selectedChapter?.id && canModify) {
       renameBookComponent({
         variables: {
@@ -335,17 +332,6 @@ const ProducerPage = () => {
     if (!canModify) {
       showUnauthorizedActionModal(false)
       return
-    }
-
-    const found = find(chapterList, { id: bookComponentId })
-
-    if (found) {
-      const { lock } = found
-
-      if (lock && lock.userId !== currentUser.id) {
-        showUnauthorizedActionModal(false)
-        return
-      }
     }
 
     deleteBookComponent({
@@ -422,12 +408,6 @@ const ProducerPage = () => {
       ),
       onOk() {
         form.submit()
-        // .validateFields()
-        // .then(values => {
-        //   onSubmitBookMetadata(values, form)
-        //   metadataModal.destroy()
-        // })
-        // .catch(err => console.error(err))
       },
       okButtonProps: {
         style: { backgroundColor: canModify ? 'black' : '' },
@@ -490,9 +470,42 @@ const ProducerPage = () => {
     })
   }
 
-  const onBookComponentLock = () => {
-    // const { id } = selectedChapter
+  const showAIToggleModal = () => {
+    const warningModal = Modal.confirm()
+    return warningModal.update({
+      title: 'Warning',
+      content: (
+        <Paragraph>
+          If you have a chapter selected, after this action you will have to
+          selected again.
+        </Paragraph>
+      ),
+      maskClosable: false,
+      onOk() {
+        if (selectedChapter) {
+          setSelectedChapter(undefined)
+        }
 
+        setChatGPTEnabled(!chatGPTEnabled)
+        warningModal.destroy()
+      },
+      onCancel() {
+        warningModal.destroy()
+      },
+      okButtonProps: { style: { backgroundColor: 'black' } },
+      width: 570,
+      bodyStyle: {
+        marginRight: 38,
+        textAlign: 'justify',
+      },
+    })
+  }
+
+  const onAIToggle = () => {
+    showAIToggleModal()
+  }
+
+  const onBookComponentLock = () => {
     if (selectedChapter?.id && canModify) {
       const userAgent = window.navigator.userAgent || null
       lockBookComponent({
@@ -511,9 +524,10 @@ const ProducerPage = () => {
       return
     }
 
-    if (JSON.stringify(newChapterList) !== JSON.stringify(chapterList)) {
-      setChapterList(newChapterList)
-
+    if (
+      JSON.stringify(newChapterList) !==
+      JSON.stringify(bookQueryData.getBook.divisions[1].bookComponents)
+    ) {
       updateBookComponentsOrder({
         variables: {
           targetDivisionId: bookQueryData.getBook.divisions[1].id,
@@ -524,8 +538,6 @@ const ProducerPage = () => {
   }
 
   const onChapterClick = chapterId => {
-    // const { id } = selectedChapter
-
     const found = find(bookQueryData?.getBook?.divisions[1].bookComponents, {
       id: chapterId,
     })
@@ -539,12 +551,10 @@ const ProducerPage = () => {
 
     if (isAlreadySelected) {
       setSelectedChapter(undefined)
-      setEditorMode(undefined)
       return
     }
 
     setSelectedChapter({ id: chapterId })
-    getBookComponent({ variables: { id: chapterId } })
   }
 
   const onUploadChapter = () => {
@@ -621,10 +631,22 @@ const ProducerPage = () => {
       }
     })
   }
+
   // HANDLERS SECTION END
+  const bookComponent =
+    !loading &&
+    selectedChapter?.id &&
+    find(bookQueryData.getBook.divisions[1].bookComponents, {
+      id: selectedChapter.id,
+    })
+
+  const editorMode =
+    !loading &&
+    selectedChapter?.id &&
+    calculateEditorMode(bookComponent?.lock, canModify, currentUser, tabId)
 
   // WEBSOCKET SECTION START
-  const { getWebSocket } = useWebSocket(
+  useWebSocket(
     `${webSocketServerUrl}/locks`,
     {
       onOpen: () => {
@@ -677,86 +699,17 @@ const ProducerPage = () => {
       showOfflineModal()
     }
   }, [isOnline])
-
-  useEffect(() => {
-    if (!loading && bookQueryData.getBook) {
-      if (
-        JSON.stringify(chapterList) !==
-        JSON.stringify(bookQueryData.getBook.divisions[1].bookComponents)
-      ) {
-        setChapterList(bookQueryData.getBook.divisions[1].bookComponents)
-      }
-
-      // the below is for the case where a user has the lock of a chapter and at the same time another user is in read only mode for that chapter.
-      // When the lock is release from the initial user then the read-only user will take it
-      if (selectedChapter?.id) {
-        const found = find(bookQueryData.getBook.divisions[1].bookComponents, {
-          id: selectedChapter?.id,
-        })
-
-        const { lock } = found
-
-        if (!lock && canModify) {
-          setEditorMode('full')
-        }
-      }
-    }
-  }, [bookQueryData?.getBook?.divisions[1].bookComponents])
-
-  useEffect(() => {
-    if (selectedChapter?.id) {
-      const found = find(bookQueryData.getBook.divisions[1].bookComponents, {
-        id: selectedChapter?.id,
-      })
-
-      const { lock } = found
-
-      if (
-        (lock && lock.userId !== currentUser.id) ||
-        (lock && lock.userId === currentUser.id && tabId !== lock.tabId) ||
-        !canModify
-      ) {
-        setEditorMode('preview')
-      }
-
-      if (!lock && canModify) {
-        setEditorMode('full')
-      }
-    }
-  }, [selectedChapter?.id, canModify])
-
-  useEffect(() => {
-    if (editorMode && editorMode === 'preview') {
-      if (selectedChapter?.id) {
-        const found = find(bookQueryData.getBook.divisions[1].bookComponents, {
-          id: selectedChapter?.id,
-        })
-
-        const { lock } = found
-
-        if (lock && lock.userId !== currentUser.id) {
-          if (getWebSocket()) {
-            getWebSocket().close()
-          }
-        }
-
-        if (lock && lock.userId === currentUser.id && tabId !== lock.tabId) {
-          if (getWebSocket()) {
-            getWebSocket().close()
-          }
-        }
-      }
-    }
-  }, [editorMode])
   // EFFECTS SECTION END
 
-  if (loading || bookComponentLoading) return <StyledSpin spinning />
+  if (loading || bookComponentLoading || changeOrderInProgress)
+    return <StyledSpin spinning />
 
   return (
     <Editor
+      bookComponentContent={bookComponentData?.getBookComponent?.content}
       bookMetadataValues={bookQueryData?.getBook.podMetadata}
       canEdit={canModify}
-      chapters={chapterList}
+      chapters={bookQueryData?.getBook?.divisions[1].bookComponents}
       chatGPTEnabled={chatGPTEnabled}
       isReadOnly={
         !selectedChapter?.id ||
@@ -764,6 +717,7 @@ const ProducerPage = () => {
         !canModify
       }
       onAddChapter={onAddChapter}
+      onAIToggle={onAIToggle}
       onBookComponentTitleChange={onBookComponentTitleChange}
       onChapterClick={onChapterClick}
       onClickBookMetadata={showMetadataModalPlaceholder}
@@ -776,9 +730,6 @@ const ProducerPage = () => {
       onUploadChapter={onUploadChapter}
       queryAI={queryAI}
       selectedChapter={selectedChapter}
-      // selectedBookComponentContent={selectedBookComponentContent}
-      // selectedChapterId={selectedChapterId}
-      setChatGPTEnabled={setChatGPTEnabled}
       subtitle={bookQueryData?.getBook.subtitle}
       title={bookQueryData?.getBook.title}
     />
