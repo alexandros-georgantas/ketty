@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Wax } from 'wax-prosemirror-core'
 import { LuluLayout } from './layout'
 import defaultConfig from './config/config'
-import configWithAi from './config/configWithAI'
+// import configWithAi from './config/configWithAI'
 import debounce from 'lodash/debounce'
 import { LuluWaxContext } from './luluWaxContext'
 
@@ -33,9 +33,8 @@ const EditorWrapper = ({
   onReorderChapter,
   onUploadChapter,
   onClickBookMetadata,
-  queryAI,
   bookMetadataValues,
-  selectedChapter,
+  selectedChapterId,
   canEdit,
 }) => {
   const [luluWax, setLuluWax] = useState({
@@ -44,7 +43,7 @@ const EditorWrapper = ({
     onDeleteChapter,
     onReorderChapter,
     chapters,
-    selectedChapter,
+    selectedChapterId,
     onUploadChapter,
     canEdit,
     title,
@@ -69,7 +68,7 @@ const EditorWrapper = ({
       title,
       subtitle,
       chapters,
-      selectedChapter,
+      selectedChapterId,
       onAddChapter,
       onChapterClick,
       onDeleteChapter,
@@ -79,41 +78,32 @@ const EditorWrapper = ({
       bookMetadataValues,
       canEdit,
     })
-  }, [title, subtitle, chapters, selectedChapter, bookMetadataValues, canEdit])
-  const selectedConfig = chatGPTEnabled ? configWithAi : defaultConfig
+  }, [
+    title,
+    subtitle,
+    chapters,
+    selectedChapterId,
+    bookMetadataValues,
+    canEdit,
+  ])
 
-  selectedConfig.TitleService = {
+  defaultConfig.TitleService = {
     updateTitle: periodicTitleChanges,
   }
-  selectedConfig.ImageService = { showAlt: true }
-  if (chatGPTEnabled) {
-    selectedConfig.AskAiContentService = {
-      AskAiContentTransformation: queryAI,
-    }
-  }
+  defaultConfig.ImageService = { showAlt: true }
 
   return (
-    <>
-      <Wrapper>
-        <Switch
-          checkedChildren="AI ON"
-          unCheckedChildren="AI OFF"
-          checked={chatGPTEnabled}
-          onChange={onAIToggle}
-        />
-      </Wrapper>
-      <LuluWaxContext.Provider value={{ luluWax, setLuluWax }}>
-        <Wax
-          config={selectedConfig}
-          fileUpload={onImageUpload}
-          key={`${selectedChapter?.id}-${isReadOnly}-${chatGPTEnabled}`}
-          layout={LuluLayout}
-          onChange={onPeriodicBookComponentContentChange}
-          readonly={isReadOnly}
-          value={bookComponentContent || ''}
-        />
-      </LuluWaxContext.Provider>
-    </>
+    <LuluWaxContext.Provider value={{ luluWax, setLuluWax }}>
+      <Wax
+        config={defaultConfig}
+        fileUpload={onImageUpload}
+        key={`${selectedChapterId}-${isReadOnly}`}
+        layout={LuluLayout}
+        onChange={onPeriodicBookComponentContentChange}
+        readonly={isReadOnly}
+        value={bookComponentContent || ''}
+      />
+    </LuluWaxContext.Provider>
   )
 }
 

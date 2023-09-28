@@ -103,7 +103,7 @@ const LuluLayout = ({ editor }) => {
     onChapterClick,
     onReorderChapter,
     onUploadChapter,
-    selectedChapter,
+    selectedChapterId,
     title,
     subtitle,
     onAddChapter,
@@ -129,7 +129,7 @@ const LuluLayout = ({ editor }) => {
             onDeleteChapter={onDeleteChapter}
             onReorderChapter={onReorderChapter}
             onUploadChapter={onUploadChapter}
-            selectedChapter={selectedChapter}
+            selectedChapterId={selectedChapterId}
             subtitle={subtitle}
             title={title}
           />
