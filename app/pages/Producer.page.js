@@ -332,6 +332,19 @@ const ProducerPage = () => {
       return
     }
 
+    const found = find(bookQueryData.getBook.divisions[1].bookComponents, {
+      id: bookComponentId,
+    })
+
+    if (found) {
+      const { lock } = found
+
+      if (lock && lock.userId !== currentUser.id) {
+        showUnauthorizedActionModal(false)
+        return
+      }
+    }
+
     deleteBookComponent({
       variables: {
         input: {
