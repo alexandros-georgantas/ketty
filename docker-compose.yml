@@ -13,7 +13,7 @@ services:
       - NODE_ENV=development
       - CLIENT_PORT=${CLIENT_PORT:-4000}
       - CLIENT_FAST_REFRESH=1
-      - CLIENT_PAGE_TITLE=${CLIENT_PAGE_TITLE:-Lulu}
+      - CLIENT_PAGE_TITLE=${CLIENT_PAGE_TITLE:-Ketida}
       - CLIENT_LANGUAGE=${CLIENT_LANGUAGE:-"en-US"}
       - CLIENT_FEATURE_UPLOAD_DOCX_FILES=true
       - CLIENT_FEATURE_BOOK_STRUCTURE=false
@@ -22,16 +22,12 @@ services:
       - CLIENT_WS_MIN_TIMEOUT=3000
       - CLIENT_WS_TIMEOUT=30000
       - CLIENT_FAVICON_PATH=${CLIENT_FAVICON_PATH:-../static/ketida.ico}
-      - CHOKIDAR_USEPOLLING=true
     volumes:
-      - ./app:/home/node/lulu/app
-      - ./public/locales:/home/node/lulu/public/locales
-      - ./services:/home/node/lulu/services
-      - ./config:/home/node/lulu/config
+      - ./app:/home/node/ketida/app
     tty: true
 
   server:
-    image: cokoapps/ketida-server:1.11.2
+    image: cokoapps/ketida-server:1.12.1
     restart: unless-stopped
     depends_on:
       - db
@@ -196,7 +192,7 @@ services:
   pagedjs:
     depends_on:
       - db-pagedjs
-    image: cokoapps/pagedjs:1.6.8
+    image: cokoapps/pagedjs:1.6.9
     ports:
       - ${SERVICE_PAGEDJS_PORT:-3003}:${SERVICE_PAGEDJS_PORT:-3003}
     environment:
@@ -227,7 +223,7 @@ services:
   xsweet:
     depends_on:
       - db-xsweet
-    image: cokoapps/xsweet:2.1.2
+    image: cokoapps/xsweet:2.2.0
     ports:
       - ${SERVICE_XSWEET_PORT:-3004}:${SERVICE_XSWEET_PORT:-3004}
     environment:

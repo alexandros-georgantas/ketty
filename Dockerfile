@@ -2,7 +2,7 @@ FROM node:16.19.0-alpine3.16 as build-stage
 
 RUN apk add --no-cache git make g++
 
-WORKDIR /home/node/pod
+WORKDIR /home/node/ketida
 
 COPY package.json .
 COPY yarn.lock .
@@ -18,7 +18,7 @@ COPY static static
 ARG node_env
 
 ENV NODE_ENV='production'
-ENV CLIENT_PAGE_TITLE='Print on Demand'
+ENV CLIENT_PAGE_TITLE='Ketida'
 ENV CLIENT_FAVICON_PATH='../static/ketida.ico'
 ENV CLIENT_LANGUAGE='en-US'
 
@@ -35,7 +35,7 @@ WORKDIR /usr/share/nginx/html
 RUN rm -rf ./*
 
 # copies static resources from build stage
-COPY --from=build-stage /home/node/pod/_build /usr/share/nginx/html
+COPY --from=build-stage /home/node/ketida/_build /usr/share/nginx/html
 
 COPY scripts/env.sh /usr/share/nginx/html/env.sh
 COPY static/env.js /usr/share/nginx/html/env.js
