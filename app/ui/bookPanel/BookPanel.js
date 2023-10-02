@@ -6,16 +6,15 @@ import { grid, th } from '@coko/client'
 import { Space } from 'antd'
 
 import ChapterList from './ChapterList'
+import MetadataModal from '../bookMetadata/BookMetadataForm'
 import { Button } from '../common'
 
 const LeftPanelWrapper = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  /* line-height: 1.25; */
   overflow: hidden;
-  padding: ${grid(1)} ${grid(5)};
-  /* width: 100%; */
+  padding: 0 ${grid(5)};
 `
 
 const TitleArea = styled.div`
@@ -31,20 +30,10 @@ const TitleArea = styled.div`
 const MetadataArea = styled.div`
   border-bottom: 1px solid ${th('colorBorder')};
   border-top: 1px solid ${th('colorBorder')};
-  cursor: pointer;
   flex-shrink: 0;
   margin-bottom: ${grid(4)};
   padding: ${grid(2)} 0;
   width: 100%;
-
-  > div {
-    padding: ${grid(2)} 0;
-    transition: background-color 0.2s ease-in;
-
-    &:hover {
-      background-color: ${th('colorBackgroundHue')};
-    }
-  }
 `
 
 const ChaptersArea = styled.div`
@@ -74,6 +63,11 @@ const IconWrapper = styled(Button)`
   cursor: pointer;
 `
 
+const StyledModalButton = styled(Button)`
+  text-align: left;
+  width: 100%;
+`
+
 const BookPanel = props => {
   const {
     className,
@@ -83,22 +77,38 @@ const BookPanel = props => {
     selectedChapterId,
     onReorderChapter,
     title,
-    subtitle,
     onAddChapter,
     onUploadChapter,
-    onClickBookMetadata,
-    canEdit,
+    onSubmitBookMetadata,
     bookMetadataValues,
+    chaptersActionInProgress,
+    canEdit,
+    metadataModalOpen,
+    setMetadataModalOpen,
   } = props
+
+  const closeModal = () => {
+    setMetadataModalOpen(false)
+  }
 
   return (
     <LeftPanelWrapper className={className}>
       <TitleArea>{title || 'Untitled Book'}</TitleArea>
-      <MetadataArea
-        onClick={() => onClickBookMetadata(title, subtitle, bookMetadataValues)}
-      >
-        <div>Book Metadata</div>
+      <MetadataArea>
+        <StyledModalButton
+          onClick={() => setMetadataModalOpen(true)}
+          type="text"
+        >
+          Book Metadata
+        </StyledModalButton>
       </MetadataArea>
+      <MetadataModal
+        canChangeMetadata={canEdit}
+        closeModal={closeModal}
+        initialValues={bookMetadataValues}
+        onSubmitBookMetadata={onSubmitBookMetadata}
+        open={metadataModalOpen}
+      />
 
       <ChaptersArea>
         <ChaptersHeader>
@@ -121,6 +131,7 @@ const BookPanel = props => {
         <ChapterList
           canEdit={canEdit}
           chapters={chapters}
+          chaptersActionInProgress={chaptersActionInProgress}
           onChapterClick={onChapterClick}
           onDeleteChapter={onDeleteChapter}
           onReorderChapter={onReorderChapter}
@@ -133,7 +144,6 @@ const BookPanel = props => {
 
 BookPanel.propTypes = {
   title: PropTypes.string,
-  subtitle: PropTypes.string,
   chapters: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
@@ -155,13 +165,10 @@ BookPanel.propTypes = {
     isbn: PropTypes.string.isRequired,
     topPage: PropTypes.string,
     bottomPage: PropTypes.string,
-    // copyrightLicense: PropTypes.oneOf(['SCL', 'PD', 'CC']),
     copyrightLicense: PropTypes.string,
     ncCopyrightHolder: PropTypes.string,
     ncCopyrightYear: PropTypes.string,
-    // ncCopyrightYear: PropTypes.instanceOf(dayjs),
     saCopyrightHolder: PropTypes.string,
-    // saCopyrightYear: PropTypes.instanceOf(dayjs),
     saCopyrightYear: PropTypes.string,
     licenseTypes: PropTypes.shape({
       NC: PropTypes.bool,
@@ -169,16 +176,15 @@ BookPanel.propTypes = {
       ND: PropTypes.bool,
     }),
     publicDomainType: PropTypes.string,
-    // publicDomainType: PropTypes.oneOf(['cc0', 'public']),
   }).isRequired,
-  onClickBookMetadata: PropTypes.func.isRequired,
-  // onSubmitBookMetadata: PropTypes.func.isRequired,
-  // onErrorBookMetadata: PropTypes.func.isRequired,
+  onSubmitBookMetadata: PropTypes.func.isRequired,
+  metadataModalOpen: PropTypes.bool.isRequired,
+  setMetadataModalOpen: PropTypes.func.isRequired,
+  chaptersActionInProgress: PropTypes.bool.isRequired,
 }
 BookPanel.defaultProps = {
   selectedChapterId: undefined,
   title: null,
-  subtitle: null,
 }
 
 export default BookPanel

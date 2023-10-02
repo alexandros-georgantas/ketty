@@ -17,6 +17,7 @@ const ChapterList = ({
   onReorderChapter,
   selectedChapterId,
   onDeleteChapter,
+  chaptersActionInProgress,
   className,
   canEdit,
 }) => {
@@ -48,6 +49,7 @@ const ChapterList = ({
             <div {...provided.droppableProps} ref={provided.innerRef}>
               <List
                 dataSource={chapters}
+                loading={chaptersActionInProgress}
                 locale={{
                   emptyText: (
                     <Empty
@@ -110,6 +112,7 @@ ChapterList.propTypes = {
   canEdit: PropTypes.bool.isRequired,
   // onDuplicateChapter: PropTypes.func.isRequired,
   onDeleteChapter: PropTypes.func.isRequired,
+  chaptersActionInProgress: PropTypes.bool.isRequired,
 }
 ChapterList.defaultProps = { chapters: [], selectedChapterId: undefined }
 

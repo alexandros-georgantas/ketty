@@ -1,21 +1,12 @@
-/* eslint-disable */
+/* eslint-disable react/prop-types, react/jsx-no-constructed-context-values */
 import React, { useEffect, useState } from 'react'
 import { Wax } from 'wax-prosemirror-core'
+import debounce from 'lodash/debounce'
 import { LuluLayout } from './layout'
 import defaultConfig from './config/config'
-// import configWithAi from './config/configWithAI'
-import debounce from 'lodash/debounce'
+import configWithAi from './config/configWithAI'
 import { LuluWaxContext } from './luluWaxContext'
 
-import { Switch } from 'antd'
-import styled from 'styled-components'
-
-const Wrapper = styled.div`
-  align-items: center;
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-`
 const EditorWrapper = ({
   title,
   subtitle,
@@ -27,15 +18,18 @@ const EditorWrapper = ({
   onAddChapter,
   onChapterClick,
   bookComponentContent,
-  chatGPTEnabled,
-  onAIToggle,
+  metadataModalOpen,
+  setMetadataModalOpen,
   onDeleteChapter,
+  queryAI,
+  chaptersActionInProgress,
   onReorderChapter,
   onUploadChapter,
-  onClickBookMetadata,
+  onSubmitBookMetadata,
   bookMetadataValues,
   selectedChapterId,
   canEdit,
+  aiEnabled,
 }) => {
   const [luluWax, setLuluWax] = useState({
     onAddChapter,
@@ -46,16 +40,23 @@ const EditorWrapper = ({
     selectedChapterId,
     onUploadChapter,
     canEdit,
+    chaptersActionInProgress,
     title,
     subtitle,
-    onClickBookMetadata,
+    onSubmitBookMetadata,
     bookMetadataValues,
+    metadataModalOpen,
+    setMetadataModalOpen,
   })
+
+  const selectedConfig = aiEnabled ? configWithAi : defaultConfig
+
   const periodicTitleChanges = debounce(changedTitle => {
     if (!isReadOnly) {
       onBookComponentTitleChange(changedTitle)
     }
   }, 50)
+
   useEffect(() => {
     return () => {
       onPeriodicBookComponentContentChange.cancel()
@@ -63,20 +64,35 @@ const EditorWrapper = ({
     }
   }, [])
 
+  if (aiEnabled) {
+    selectedConfig.AskAiContentService = {
+      AskAiContentTransformation: queryAI,
+    }
+  }
+
+  selectedConfig.TitleService = {
+    updateTitle: periodicTitleChanges,
+  }
+
+  selectedConfig.ImageService = { showAlt: true }
+
   useEffect(() => {
     setLuluWax({
       title,
       subtitle,
       chapters,
       selectedChapterId,
+      chaptersActionInProgress,
       onAddChapter,
       onChapterClick,
       onDeleteChapter,
       onReorderChapter,
       onUploadChapter,
-      onClickBookMetadata,
+      onSubmitBookMetadata,
       bookMetadataValues,
       canEdit,
+      metadataModalOpen,
+      setMetadataModalOpen,
     })
   }, [
     title,
@@ -84,18 +100,17 @@ const EditorWrapper = ({
     chapters,
     selectedChapterId,
     bookMetadataValues,
+    chaptersActionInProgress,
     canEdit,
+    metadataModalOpen,
   ])
 
-  defaultConfig.TitleService = {
-    updateTitle: periodicTitleChanges,
-  }
-  defaultConfig.ImageService = { showAlt: true }
+  if (!selectedConfig) return null
 
   return (
     <LuluWaxContext.Provider value={{ luluWax, setLuluWax }}>
       <Wax
-        config={defaultConfig}
+        config={selectedConfig}
         fileUpload={onImageUpload}
         key={`${selectedChapterId}-${isReadOnly}`}
         layout={LuluLayout}

@@ -23,6 +23,7 @@ const Chapter = styled.div`
 
   display: flex;
 
+  min-height: 40px;
   ${({ isDragging, theme }) =>
     isDragging &&
     `

@@ -30,6 +30,7 @@ import {
   USER_UPDATED_SUBSCRIPTION,
   GET_BOOK_COMPONENT,
   USE_CHATGPT,
+  APPLICATION_PARAMETERS,
 } from '../graphql'
 
 import { isOwner, hasEditAccess, isAdmin } from '../helpers/permissions'
@@ -40,9 +41,9 @@ import {
   onInfoModal,
 } from '../helpers/commonModals'
 
-import { Editor, Modal, Paragraph, Form, Spin } from '../ui'
+import { Editor, Modal, Paragraph, Spin } from '../ui'
 
-import { BookMetadataForm } from '../ui/bookMetadata'
+// import { BookMetadataForm } from '../ui/bookMetadata'
 
 const StyledSpin = styled(Spin)`
   display: grid;
@@ -68,6 +69,14 @@ const calculateEditorMode = (lock, canModify, currentUser, tabId) => {
     : 'preview'
 }
 
+const constructMetadataValues = (title, subtitle, podMetadata) => {
+  return {
+    title,
+    subtitle,
+    ...podMetadata,
+  }
+}
+
 const ProducerPage = () => {
   // INITIALIZATION SECTION START
   const history = useHistory()
@@ -75,10 +84,11 @@ const ProducerPage = () => {
   const [tabId] = useState(uuid())
   const [selectedChapterId, setSelectedChapterId] = useState(undefined)
   const [reconnecting, setReconnecting] = useState(false)
+  const [metadataModalOpen, setMetadataModalOpen] = useState(false)
 
   const { currentUser } = useCurrentUser()
   const token = localStorage.getItem('token')
-  const [form] = Form.useForm()
+  // const [form] = Form.useForm()
   const { bookId } = params
 
   const canModify =
@@ -88,6 +98,13 @@ const ProducerPage = () => {
   // INITIALIZATION SECTION END
 
   // QUERIES SECTION START
+  const {
+    loading: applicationParametersLoading,
+    data: applicationParametersData,
+  } = useQuery(APPLICATION_PARAMETERS, {
+    fetchPolicy: 'network-only',
+  })
+
   const {
     loading,
     error,
@@ -183,16 +200,17 @@ const ProducerPage = () => {
     },
   })
 
-  const [createBookComponent] = useMutation(CREATE_BOOK_COMPONENT, {
-    refetchQueries: [GET_ENTIRE_BOOK],
-    onError: err => {
-      if (err.toString().includes('Not Authorised')) {
-        showUnauthorizedActionModal(false)
-      } else {
-        showGenericErrorModal()
-      }
-    },
-  })
+  const [createBookComponent, { loading: addBookComponentInProgress }] =
+    useMutation(CREATE_BOOK_COMPONENT, {
+      refetchQueries: [GET_ENTIRE_BOOK],
+      onError: err => {
+        if (err.toString().includes('Not Authorised')) {
+          showUnauthorizedActionModal(false)
+        } else {
+          showGenericErrorModal()
+        }
+      },
+    })
 
   const [renameBookComponent] = useMutation(RENAME_BOOK_COMPONENT_TITLE, {
     refetchQueries: [GET_ENTIRE_BOOK],
@@ -205,24 +223,25 @@ const ProducerPage = () => {
     },
   })
 
-  const [deleteBookComponent] = useMutation(DELETE_BOOK_COMPONENT, {
-    refetchQueries: [GET_ENTIRE_BOOK],
-    onCompleted: (_, { variables }) => {
-      const { input } = variables
-      const { id: deletedId } = input
+  const [deleteBookComponent, { loading: deleteBookComponentInProgress }] =
+    useMutation(DELETE_BOOK_COMPONENT, {
+      refetchQueries: [GET_ENTIRE_BOOK],
+      onCompleted: (_, { variables }) => {
+        const { input } = variables
+        const { id: deletedId } = input
 
-      if (selectedChapterId && selectedChapterId === deletedId) {
-        setSelectedChapterId(undefined)
-      }
-    },
-    onError: err => {
-      if (err.toString().includes('Not Authorised')) {
-        showUnauthorizedActionModal(false)
-      } else {
-        showGenericErrorModal()
-      }
-    },
-  })
+        if (selectedChapterId && selectedChapterId === deletedId) {
+          setSelectedChapterId(undefined)
+        }
+      },
+      onError: err => {
+        if (err.toString().includes('Not Authorised')) {
+          showUnauthorizedActionModal(false)
+        } else {
+          showGenericErrorModal()
+        }
+      },
+    })
 
   const [updateBookComponentsOrder, { loading: changeOrderInProgress }] =
     useMutation(UPDATE_BOOK_COMPONENTS_ORDER, {
@@ -394,42 +413,6 @@ const ProducerPage = () => {
         marginRight: 38,
         textAlign: 'justify',
       },
-    })
-  }
-
-  const showMetadataModalPlaceholder = (
-    bookTitle,
-    subtitle,
-    bookMetadataValues,
-  ) => {
-    const metadataModal = Modal.confirm()
-    const dataToPass = { title: bookTitle, subtitle, ...bookMetadataValues }
-
-    return metadataModal.update({
-      title: 'Book metadata',
-      cancelText: 'Cancel',
-      okText: 'Save',
-      content: (
-        <BookMetadataForm
-          canChangeMetadata={canModify}
-          form={form}
-          initialValues={dataToPass}
-          onSubmitBookMetadata={onSubmitBookMetadata}
-        />
-      ),
-      onOk() {
-        form.submit()
-      },
-      okButtonProps: {
-        style: { backgroundColor: canModify ? 'black' : '' },
-        disabled: !canModify,
-      },
-      onCancel() {
-        metadataModal.destroy()
-      },
-      maskClosable: false,
-      centered: true,
-      width: 1200,
     })
   }
 
@@ -646,6 +629,12 @@ const ProducerPage = () => {
     selectedChapterId &&
     calculateEditorMode(bookComponent?.lock, canModify, currentUser, tabId)
 
+  const bookMetadataValues = constructMetadataValues(
+    bookQueryData?.getBook.title,
+    bookQueryData?.getBook.subtitle,
+    bookQueryData?.getBook?.podMetadata,
+  )
+
   // WEBSOCKET SECTION START
   useWebSocket(
     `${webSocketServerUrl}/locks`,
@@ -692,33 +681,47 @@ const ProducerPage = () => {
     return <StyledSpin spinning />
   }
 
-  if (loading || bookComponentLoading || changeOrderInProgress)
+  if (applicationParametersLoading || loading || bookComponentLoading)
     return <StyledSpin spinning />
+
+  const chaptersActionInProgress =
+    changeOrderInProgress ||
+    addBookComponentInProgress ||
+    deleteBookComponentInProgress
+
+  const isAIEnabled = find(
+    applicationParametersData?.getApplicationParameters,
+    { area: 'aiEnabled' },
+  )
 
   return (
     <Editor
+      aiEnabled={isAIEnabled?.config}
       bookComponentContent={bookComponentData?.getBookComponent?.content}
-      bookMetadataValues={bookQueryData?.getBook.podMetadata}
+      bookMetadataValues={bookMetadataValues}
       canEdit={canModify}
       chapters={bookQueryData?.getBook?.divisions[1].bookComponents}
+      chaptersActionInProgress={chaptersActionInProgress}
       isReadOnly={
         !selectedChapterId ||
         (editorMode && editorMode === 'preview') ||
         !canModify
       }
+      metadataModalOpen={metadataModalOpen}
       onAddChapter={onAddChapter}
       onBookComponentTitleChange={onBookComponentTitleChange}
       onChapterClick={onChapterClick}
-      onClickBookMetadata={showMetadataModalPlaceholder}
       onDeleteChapter={onDeleteChapter}
       onImageUpload={handleImageUpload}
       onPeriodicBookComponentContentChange={
         onPeriodicBookComponentContentChange
       }
       onReorderChapter={onReorderChapter}
+      onSubmitBookMetadata={onSubmitBookMetadata}
       onUploadChapter={onUploadChapter}
       queryAI={queryAI}
       selectedChapterId={selectedChapterId}
+      setMetadataModalOpen={setMetadataModalOpen}
       subtitle={bookQueryData?.getBook.subtitle}
       title={bookQueryData?.getBook.title}
     />

@@ -56,6 +56,7 @@ export default {
         },
         'SpecialCharacters',
         'FindAndReplaceTool',
+        'ToggleAi',
         'FullScreen',
       ],
     },

@@ -37,8 +37,10 @@ const TopMenu = styled.div`
 `
 
 const EditorArea = styled.div`
+  background: #f9f9f9;
   height: 100%;
-  width: ${({ isFullscreen }) => (isFullscreen ? '100%' : '80%')};
+  padding: 4px 0;
+  width: ${({ isFullscreen }) => (isFullscreen ? '100%' : '75%')};
 `
 
 const WaxSurfaceScroll = styled.div`
@@ -52,12 +54,19 @@ const WaxSurfaceScroll = styled.div`
 
 const EditorContainer = styled.div`
   height: 100%;
+  margin: 0 auto;
   position: relative;
-  width: 100%;
+
+  width: 816px;
+
+  & > div {
+    width: 100%;
+  }
 
   .ProseMirror {
     min-height: 100%;
-    padding: ${grid(10)};
+    padding: ${grid(5)} ${grid(20)};
+    width: 100%;
 
     table > caption {
       caption-side: top;
@@ -71,7 +80,7 @@ const EditorContainer = styled.div`
 
 const StyledBookPanel = styled(BookPanel)`
   border-right: ${th('borderWidth')} ${th('borderStyle')} ${th('colorBorder')};
-  width: 20%;
+  width: 25%;
 `
 
 const MainMenuToolBar = ComponentPlugin('mainMenuToolBar')
@@ -107,9 +116,12 @@ const LuluLayout = ({ editor }) => {
     title,
     subtitle,
     onAddChapter,
-    onClickBookMetadata,
+    onSubmitBookMetadata,
     bookMetadataValues,
+    chaptersActionInProgress,
     canEdit,
+    metadataModalOpen,
+    setMetadataModalOpen,
   } = luluWax
 
   return (
@@ -123,13 +135,16 @@ const LuluLayout = ({ editor }) => {
             bookMetadataValues={bookMetadataValues}
             canEdit={canEdit}
             chapters={chapters}
+            chaptersActionInProgress={chaptersActionInProgress}
+            metadataModalOpen={metadataModalOpen}
             onAddChapter={onAddChapter}
             onChapterClick={onChapterClick}
-            onClickBookMetadata={onClickBookMetadata}
             onDeleteChapter={onDeleteChapter}
             onReorderChapter={onReorderChapter}
+            onSubmitBookMetadata={onSubmitBookMetadata}
             onUploadChapter={onUploadChapter}
             selectedChapterId={selectedChapterId}
+            setMetadataModalOpen={setMetadataModalOpen}
             subtitle={subtitle}
             title={title}
           />
