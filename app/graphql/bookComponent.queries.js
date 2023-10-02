@@ -32,7 +32,7 @@ const CREATE_BOOK_COMPONENT = gql`
           id
           title
           divisionId
-          # content
+          content
           componentType
           trackChangesEnabled
           uploading
@@ -53,38 +53,13 @@ const CREATE_BOOK_COMPONENT = gql`
   }
 `
 
-const GET_BOOK_COMPONENT = gql`
-  query GetBookComponent($id: ID!) {
-    getBookComponent(id: $id) {
-      id
-      title
-      divisionId
-      content
-      componentType
-      trackChangesEnabled
-      uploading
-      status
-      lock {
-        userId
-        created
-        givenNames
-        tabId
-        foreignId
-        isAdmin
-        surname
-        id
-      }
-    }
-  }
-`
-
 const UPDATE_BOOK_COMPONENT_CONTENT = gql`
   mutation UpdateBookComponentContent($input: UpdateBookComponentInput!) {
     updateContent(input: $input) {
       id
       title
       divisionId
-      # content
+      content
       componentType
       trackChangesEnabled
       uploading
@@ -109,7 +84,7 @@ const RENAME_BOOK_COMPONENT_TITLE = gql`
       id
       title
       divisionId
-      # content
+      content
       componentType
       trackChangesEnabled
       uploading
@@ -161,7 +136,7 @@ const DELETE_BOOK_COMPONENT = gql`
           id
           title
           divisionId
-          # content
+          content
           componentType
           trackChangesEnabled
           uploading
@@ -301,7 +276,6 @@ const USE_CHATGPT = gql`
 // `
 
 export {
-  GET_BOOK_COMPONENT,
   CREATE_BOOK_COMPONENT,
   UPDATE_BOOK_COMPONENT_CONTENT,
   RENAME_BOOK_COMPONENT_TITLE,

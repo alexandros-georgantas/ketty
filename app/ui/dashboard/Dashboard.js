@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import { EditOutlined, CloudUploadOutlined } from '@ant-design/icons'
 import { grid } from '@coko/client'
 import { Space } from 'antd'
+import { useTranslation } from 'react-i18next'
 import { Button } from '../common'
 import { BookGrid } from '../bookGrid'
 
@@ -62,6 +63,7 @@ const Dashboard = props => {
       setLoadingImportBook(false)
     })
   }
+  const { t } = useTranslation()
 
   return (
     <Wrapper>
@@ -74,7 +76,7 @@ const Dashboard = props => {
           size="large"
           type="primary"
         >
-          Start writing your book
+          {t('Start writing your book'.toLowerCase().replace(/ /g, '_'))}
         </Button>
         <Button
           disabled={loadingCreateBook || loadingImportBook}
@@ -83,7 +85,7 @@ const Dashboard = props => {
           onClick={handleImportBook}
           size="large"
         >
-          Import your files
+          {t('Import your files'.toLowerCase().replace(/ /g, '_'))}
         </Button>
       </DashboardActions>
 
@@ -97,7 +99,7 @@ const Dashboard = props => {
         onClickDelete={onClickDelete}
         onPageChange={onPageChange}
         onUploadBookThumbnail={onUploadBookThumbnail}
-        title="Your books"
+        title={t('Your books'.toLowerCase().replace(/ /g, '_'))}
         totalCount={totalCount}
       />
     </Wrapper>

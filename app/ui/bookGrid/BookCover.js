@@ -3,6 +3,7 @@ import { Typography } from 'antd'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { th, grid } from '@coko/client'
+import {useTranslation} from "react-i18next";
 import { MissingImageIcon } from '../common'
 
 const { Text } = Typography
@@ -46,6 +47,7 @@ const IdealSizeText = styled(Text)`
 `
 
 const BookCover = ({ className, src, title }) => {
+  const {t} = useTranslation()
   return (
     <Wrapper className={className}>
       {src ? (
@@ -56,7 +58,7 @@ const BookCover = ({ className, src, title }) => {
           <MissingImageText>
             {/* <strong>Placeholder</strong> */}
             <br />
-            <IdealSizeText>Ideal size: 202 x 272 px</IdealSizeText>
+            <IdealSizeText>{t("Ideal size 202 x 272 px".toLowerCase().replace(/ /g,"_"))}</IdealSizeText>
           </MissingImageText>
         </BookNoCover>
       )}

@@ -84,26 +84,24 @@ const Upload = props => {
         <Text>
           Drag and drop files, or <Text underline>Browse</Text>
         </Text>
-        <FilesList>
-          {files.length > 0 &&
-            files.map(file => (
-              <Row
-                align="middle"
-                justify="space-between"
-                key={file.uid}
-                span={24}
-              >
-                <FileInfoText ellipsis={{ tooltip: file.name }} strong>
-                  {file.name}
-                </FileInfoText>
-                <Button
-                  icon={<CloseOutlined />}
-                  onClick={evt => onClickRemove(evt, file)}
-                  type="link"
-                />
-              </Row>
-            ))}
-        </FilesList>
+        {files.length > 0 &&
+          files.map(file => (
+            <Row
+              align="middle"
+              justify="space-between"
+              key={file.uid}
+              span={24}
+            >
+              <FileInfoText ellipsis={{ tooltip: file.name }} strong>
+                {file.name}
+              </FileInfoText>
+              <Button
+                icon={<CloseOutlined />}
+                onClick={evt => onClickRemove(evt, file)}
+                type="link"
+              />
+            </Row>
+          ))}
       </StyledSpace>
     </StyledDragger>
   )

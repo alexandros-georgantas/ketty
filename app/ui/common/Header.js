@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
@@ -7,7 +7,9 @@ import { Avatar, Dropdown, Menu } from 'antd'
 import find from 'lodash/find'
 import isEmpty from 'lodash/isEmpty'
 import { SettingOutlined } from '@ant-design/icons'
+import { useTranslation } from 'react-i18next'
 import Button from './Button'
+import { LanguageSwitcher } from '../languageSwitcher'
 
 // #region styles
 const StyledHeader = styled.header`
@@ -102,6 +104,7 @@ const Header = props => {
     ...rest
   } = props
 
+  const { t } = useTranslation()
   const curatedDropdownItems = [{ key: 'logout', label: 'Logout' }]
   // const [navLeftCurrentSelected, setNavLeftCurrentSelected] = useState([])
   // const [navRightCurrentSelected, setNavRightCurrentSelected] = useState([])
@@ -225,20 +228,21 @@ const Header = props => {
               mode="horizontal"
               // onClick={navLeftSelectHandler}
               selectable={false}
-              // selectedKeys={navLeftCurrentSelected}
+              selectedKeys={navLeftCurrentSelected}
               style={{ borderBottom: 'none' }}
             />
           )}
         </LeftNavContainer>
         <RightNavContainer>
+          <LanguageSwitcher />
           {!isEmpty(navItemsRight) && (
             <Menu
               disabledOverflow
               items={navItemsRight}
               mode="horizontal"
-              // onClick={navRightSelectHandler}
+              onClick={navRightSelectHandler}
               selectable={false}
-              // selectedKeys={navRightCurrentSelected}
+              selectedKeys={navRightCurrentSelected}
               style={{ borderBottom: 'none' }}
             />
           )}

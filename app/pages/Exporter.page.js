@@ -419,6 +419,8 @@ const PreviewerPage = () => {
     } else {
       setCreatingPreview(false)
     }
+
+    setTrimSize(selectedTrimSize)
   }
 
   const handleRefetchTemplates = options => {

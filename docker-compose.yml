@@ -13,7 +13,7 @@ services:
       - NODE_ENV=development
       - CLIENT_PORT=${CLIENT_PORT:-4000}
       - CLIENT_FAST_REFRESH=1
-      - CLIENT_PAGE_TITLE=${CLIENT_PAGE_TITLE:-Ketida}
+      - CLIENT_PAGE_TITLE=${CLIENT_PAGE_TITLE:-Lulu}
       - CLIENT_LANGUAGE=${CLIENT_LANGUAGE:-"en-US"}
       - CLIENT_FEATURE_UPLOAD_DOCX_FILES=true
       - CLIENT_FEATURE_BOOK_STRUCTURE=false
@@ -22,8 +22,12 @@ services:
       - CLIENT_WS_MIN_TIMEOUT=3000
       - CLIENT_WS_TIMEOUT=30000
       - CLIENT_FAVICON_PATH=${CLIENT_FAVICON_PATH:-../static/ketida.ico}
+      - CHOKIDAR_USEPOLLING=true
     volumes:
-      - ./app:/home/node/ketida/app
+      - ./app:/home/node/lulu/app
+      - ./public/locales:/home/node/lulu/public/locales
+      - ./services:/home/node/lulu/services
+      - ./config:/home/node/lulu/config
     tty: true
 
   server:

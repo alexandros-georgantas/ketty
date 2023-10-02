@@ -11,13 +11,12 @@ import {
   SpecialCharactersService,
   BlockDropDownToolGroupService,
   FindAndReplaceService,
+  // FindAndReplaceToolGroupService,
   FullScreenService,
   disallowPasteImagesPlugin,
 } from 'wax-prosemirror-services'
 
 import charactersList from './charactersList'
-
-import { onInfoModal } from '../../../helpers/commonModals'
 
 export default {
   MenuService: [
@@ -27,6 +26,17 @@ export default {
         { name: 'Base', exclude: ['Save'] },
         'BlockDropDown',
         { name: 'Lists', exclude: ['JoinUp'] },
+        // {
+        //   name: 'Text',
+        //   exclude: [
+        //     'ExtractPoetry',
+        //     'ExtractProse',
+        //     'ParagraphContinued',
+        //     'Subscript',
+        //     'SourceNote',
+        //     'Paragraph',
+        //   ],
+        // },
         'Images',
         {
           name: 'Annotations',
@@ -44,6 +54,7 @@ export default {
       ],
     },
   ],
+
   SchemaService: DefaultSchema,
   SpecialCharactersService: charactersList,
   PmPlugins: [
@@ -65,6 +76,7 @@ export default {
     new SpecialCharactersService(),
     new BlockDropDownToolGroupService(),
     new FindAndReplaceService(),
+    // new FindAndReplaceToolGroupService(),
     new FullScreenService(),
   ],
 }

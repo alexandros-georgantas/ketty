@@ -8,7 +8,6 @@ import { useLuluWaxContext } from '../luluWaxContext'
 
 import 'wax-prosemirror-core/dist/index.css'
 import 'wax-prosemirror-services/dist/index.css'
-import 'wax-table-service/dist/index.css'
 
 const Wrapper = styled.div`
   background: ${th('colorBackground')};

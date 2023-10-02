@@ -1,9 +1,11 @@
-import React from 'react'
+import React, {Suspense} from 'react'
 import PropTypes from 'prop-types'
 
+import {Trans, useTranslation} from "react-i18next";
 import AuthenticationForm from './AuthenticationForm'
 import AuthenticationHeader from './AuthenticationHeader'
 import AuthenticationWrapper from './AuthenticationWrapper'
+import {LanguageSwitcher, LanguageSwitcherWrapper} from "../languageSwitcher";
 
 import {
   Form,
@@ -15,6 +17,7 @@ import {
   Paragraph,
   Page,
 } from '../common'
+
 
 const ModalContext = React.createContext(null)
 
@@ -29,17 +32,22 @@ const Signup = props => {
     // userEmail,
   } = props
 
+  const {t, i18n} = useTranslation()
+
   const [modal, contextHolder] = Modal.useModal()
 
   const showTermsAndConditions = e => {
     e.preventDefault()
+
     const termsAndConditionsModal = modal.info()
     termsAndConditionsModal.update({
-      title: 'Agreeing to Terms and Conditions',
+      // title: 'Agreeing to Terms and Conditions',
+      title: (<>{t('Agreeing to Terms and Conditions'.toLowerCase().replace(/ /g,"_"))}</>),
       content: (
         <Paragraph>
-          By checking “I agree” and selecting “Sign up” below, I accept the
-          terms.
+           {/* By checking “I agree” and selecting “Sign up” below, I accept the
+          terms. */}
+          {t("by_checking_i_a_gree")}
         </Paragraph>
       ),
       onOk() {
@@ -56,8 +64,12 @@ const Signup = props => {
 
   return (
     <Page maxWidth={600}>
+      <Suspense fallback={<div>Loading...</div>}>
+      <LanguageSwitcherWrapper>
+        <LanguageSwitcher/>
+      </LanguageSwitcherWrapper>
       <AuthenticationWrapper className={className}>
-        <AuthenticationHeader>Sign up</AuthenticationHeader>
+        <AuthenticationHeader>{i18n.t("Sign up".toLowerCase().replace(/ /g,"_"))}</AuthenticationHeader>
 
         {hasSuccess && (
           <div role="alert">
@@ -66,11 +78,15 @@ const Signup = props => {
               status="success"
               subTitle={
                 <Paragraph>
-                  We&apos;ve sent you a verification email. Click on the link in
-                  the email to activate your account.
+                  <Trans i18nKey={"we've_sent_you_a_verification_email"}>
+                    {/* We & apos;ve sent you a verification email. Click on the link in
+                      the email to activate your account. */}
+                    We&apos;ve sent you a verification email. Click on the link in
+                    the email to activate your account.
+                  </Trans>
                 </Paragraph>
               }
-              title="Sign up successful!"
+              title={t("Sign up successful!".toLowerCase().replace(/ /g,"_"))}
             />
           </div>
         )}
@@ -88,43 +104,43 @@ const Signup = props => {
             title="Sign up"
           >
             <Form.Item
-              label="Given Name"
+              label={t("Given Name".toLowerCase().replace(/ /g,"_"))}
               name="givenNames"
-              rules={[{ required: true, message: 'Given name is required' }]}
+              rules={[{ required: true, message: ()=> t('Given name is required'.replace(/ /g,"_").toLowerCase()) }]}
             >
-              <Input placeholder="Fill in your first name" />
+              <Input placeholder={t("Fill in your first name".toLowerCase().replace(/ /g,"_"))} />
             </Form.Item>
 
             <Form.Item
-              label="Surname"
+              label={t("Surname".toLowerCase().replace(/ /g,"_"))}
               name="surname"
-              rules={[{ required: true, message: 'Surname is required' }]}
+              rules={[{ required: true, message: () => t( 'Surname is required'.toLowerCase().replace(/ /g, "_")) }]}
             >
-              <Input placeholder="Fill in your last name" />
+              <Input placeholder={t("Fill in your last name".toLowerCase().replace(/ /g,"_"))} />
             </Form.Item>
 
             <Form.Item
-              label="Email"
+              label={t("Email".toLowerCase().replace(/ /g,"_"))}
               name="email"
               rules={[
                 {
                   required: true,
-                  message: 'Email is required',
+                  message: () => t('Email is required'.toLowerCase().replace(/ /g,"_")),
                 },
                 {
                   type: 'email',
-                  message: 'This is not a valid email address',
+                  message: () => t('This is not a valid email address'.toLowerCase().replace(/ /g,"_")),
                 },
               ]}
             >
-              <Input placeholder="Fill in your email" type="email" />
+              <Input placeholder={t("Fill in your email".toLowerCase().replace(/ /g,"_"))} type="email" />
             </Form.Item>
 
             <Form.Item
-              label="Password"
+              label={t("Password".toLowerCase())}
               name="password"
               rules={[
-                { required: true, message: 'Password is required' },
+                { required: true, message: ()=> t('Password is required'.toLowerCase().replace(/ /g,"_"))} ,
                 ({ getFieldValue }) => ({
                   validator(_, value) {
                     if (value && value.length >= 8) {
@@ -133,24 +149,24 @@ const Signup = props => {
 
                     return Promise.reject(
                       new Error(
-                        'Password should not be shorter than 8 characters',
+                        t('Password should not be shorter than 8 characters'.toLowerCase().replace(/ /g,"_")),
                       ),
                     )
                   },
                 }),
               ]}
             >
-              <Input placeholder="Fill in your password" type="password" />
+              <Input placeholder={t("Fill in your password".toLowerCase().replace(/ /g,"_"))} type="password" />
             </Form.Item>
 
             <Form.Item
               dependencies={['password']}
-              label="Confirm Password"
+              label={t("Confirm Password".toLowerCase().replace(/ /g,"_"))}
               name="confirmPassword"
               rules={[
                 {
                   required: true,
-                  message: 'Please confirm your password!',
+                  message: ()=> t('Please confirm your password!'.replace(/ /g,"_").toLowerCase()),
                 },
                 ({ getFieldValue }) => ({
                   validator(_, value) {
@@ -160,7 +176,7 @@ const Signup = props => {
 
                     return Promise.reject(
                       new Error(
-                        'The two passwords that you entered do not match!',
+                        t('The two passwords that you entered do not match!'.replace(/ /g,"_").toLowerCase()),
                       ),
                     )
                   },
@@ -168,7 +184,7 @@ const Signup = props => {
               ]}
             >
               <Input
-                placeholder="Fill in your password again"
+                placeholder={t("Fill in your password again".toLowerCase().replace(/ /g,"_"))}
                 type="password"
               />
             </Form.Item>
@@ -182,22 +198,22 @@ const Signup = props => {
                         ? Promise.resolve()
                         : Promise.reject(
                             new Error(
-                              'You need to agree to the terms and conditions',
+                              t('You need to agree to the terms and conditions'.toLowerCase().replace(/ /g,"_")),
                             ),
                           ),
                   },
                 ]}
                 valuePropName="checked"
               >
-                <Checkbox aria-label="I agree to the terms and conditions">
-                  I agree to the{' '}
+                <Checkbox aria-label={t("I agree to the terms and conditions".toLowerCase().replace(/ /g,"_"))}>
+                    {t("I agree to the".toLowerCase().replace(/ /g,"_"))}{' '}
                   <Link
                     as="a"
                     href="#termsAndCondition"
                     id="termsAndConditions"
                     onClick={showTermsAndConditions}
                   >
-                    terms and conditions
+                      {t("terms and conditions".toLowerCase().replace(/ /g,"_"))}
                   </Link>
                 </Checkbox>
               </Form.Item>
@@ -206,7 +222,8 @@ const Signup = props => {
           </AuthenticationForm>
         )}
       </AuthenticationWrapper>
-    </Page>
+      </Suspense>
+      </Page>
   )
 }
 

@@ -4,6 +4,7 @@ import { List, Empty } from 'antd'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 import styled from 'styled-components'
 // import { List } from '../common'
+import {useTranslation} from "react-i18next";
 import ChapterItem from './ChapterItem'
 
 const ChapterListWrapper = styled.div`
@@ -21,6 +22,9 @@ const ChapterList = ({
   className,
   canEdit,
 }) => {
+
+  const {t} = useTranslation()
+  
   const handleDragEnd = result => {
     if (!canEdit || !result.destination) {
       return
@@ -53,7 +57,7 @@ const ChapterList = ({
                 locale={{
                   emptyText: (
                     <Empty
-                      description={<span>You don’t have any chapters yet</span>}
+                      description={<span>{t("You don’t have any chapters yet".replace(/ /g,"_").toLowerCase())}</span>}
                       image={Empty.PRESENTED_IMAGE_SIMPLE}
                     />
                   ),
