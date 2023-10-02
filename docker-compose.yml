@@ -24,6 +24,9 @@ services:
       - CLIENT_FAVICON_PATH=${CLIENT_FAVICON_PATH:-../static/ketida.ico}
     volumes:
       - ./app:/home/node/ketida/app
+      - ./config:/home/node/ketida/config
+      - ./public/locales:/home/node/ketida/public/locales
+      - ./services:/home/node/ketida/services
     tty: true
 
   server:
