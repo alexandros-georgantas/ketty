@@ -1,12 +1,14 @@
-﻿import React from 'react'
+﻿import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { Alert, Radio, Button, Space, Tag } from 'antd'
+import { Alert, Radio, Button, Space, Tag, Drawer } from 'antd'
 import {
   BorderOutlined,
   ReadOutlined,
   ZoomInOutlined,
   ZoomOutOutlined,
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
 } from '@ant-design/icons'
 import Page from '../common/Page'
 import PreviewSettings from './PreviewSettings'
@@ -26,7 +28,7 @@ const IframeWrapper = styled.div`
   flex-direction: column;
   height: 100%;
   justify-content: space-between;
-  width: 80%;
+  width: ${({ toggleWidth }) => (toggleWidth ? '73%' : '95%')};
 `
 
 const FloatingBtn = styled.div`
@@ -55,12 +57,34 @@ const AlertWrapper = styled.div`
 const Wrapper = styled.div`
   display: flex;
   height: 100%;
+  justify-content: space-between;
   width: 100%;
 `
 
 const PreviewSettingsWrapper = styled.div`
   height: 100%;
-  width: 20%;
+  width: 100%;
+`
+
+const ClosedDrawer = styled.div`
+  background-color: white;
+  border-left: 1px solid #dcdcdc;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1000;
+`
+
+const DrawerCloseIcon = styled(MenuUnfoldOutlined)`
+  margin: 24px;
+  position: absolute;
+  right: 0;
+  top: 0;
+`
+
+const DrawerOpenIcon = styled(MenuFoldOutlined)`
+  margin: 24px;
 `
 
 const Preview = ({
@@ -70,10 +94,8 @@ const Preview = ({
   createPreviewInProgress,
   doublePageSpread,
   onChangeAdditionalExportOptions,
-  additionalExportOptions,
   onSelectTemplate,
-  onClickDownloadPdf,
-  onClickDownloadEpub,
+  onClickDownloadExport,
   canExport,
   onChangePageSize,
   onChangePageSpread,
@@ -84,14 +106,42 @@ const Preview = ({
   onClickZoomOut,
   zoomPercentage,
   zoomMin,
+  saveExportInProgress,
+  downloadExportInProgress,
   processInProgress,
   sizeValue,
+  drawerTopPosition,
+  onChangeExportProfile,
+  exportProfiles,
+  selectedProfileId,
+  onClickExportNameEdit,
+  onCreatingNewExport,
+  onSaveExportProfile,
+  profilesMenuOptions,
+  onClickUploadToLulu,
+  onClickOpenLuluProject,
+  onClickSyncWithLulu,
+  selectedContentOptions,
+  onClickDelete,
 }) => {
+  const [drawerZIndex, setZIndex] = useState(1000)
+  const [drawerVisibility, setDrawerVisibility] = useState(true)
+
+  const showDrawer = () => {
+    setZIndex(1000)
+    setDrawerVisibility(true)
+  }
+
+  const closeDrawer = () => {
+    setZIndex(1)
+    setDrawerVisibility(false)
+  }
+
   return (
     <Page>
       <Wrapper>
         {exportFormatValue === 'pdf' && selectedTemplate ? (
-          <IframeWrapper>
+          <IframeWrapper toggleWidth={drawerVisibility}>
             {createPreviewInProgress ? (
               <Loader />
             ) : (
@@ -155,36 +205,71 @@ const Preview = ({
               )}
           </AlertWrapper>
         )}
-        <PreviewSettingsWrapper>
-          <PreviewSettings
-            additionalExportOptions={additionalExportOptions}
-            bookExportInProgress={bookExportInProgress}
-            canExport={canExport}
-            createPreviewInProgress={createPreviewInProgress}
-            exportFormatValue={exportFormatValue}
-            onChangeAdditionalExportOptions={onChangeAdditionalExportOptions}
-            onChangeExportFormat={onChangeExportFormat}
-            onChangePageSize={onChangePageSize}
-            onClickDownloadEpub={onClickDownloadEpub}
-            onClickDownloadPdf={onClickDownloadPdf}
-            onSelectTemplate={onSelectTemplate}
-            processInProgress={processInProgress}
-            selectedTemplate={selectedTemplate}
-            sizeValue={sizeValue}
-            templates={templates}
-          />
-        </PreviewSettingsWrapper>
+        {drawerVisibility ? null : (
+          <ClosedDrawer style={{ top: drawerTopPosition }}>
+            <DrawerOpenIcon onClick={showDrawer} />
+          </ClosedDrawer>
+        )}
+        <Drawer
+          bodyStyle={{ padding: 24, paddingTop: 8 }}
+          closeIcon={<MenuUnfoldOutlined />}
+          contentWrapperStyle={{
+            zIndex: drawerZIndex,
+            position: 'absolute',
+            top: drawerTopPosition,
+            boxShadow: 'none',
+            borderLeftWidth: 1,
+            borderLeftStyle: 'solid',
+            borderLeftColor: '#DCDCDC',
+          }}
+          getContainer={false}
+          headerStyle={{ display: 'none' }}
+          mask={false}
+          onClose={closeDrawer}
+          open={drawerVisibility}
+          placement="right"
+          width={385}
+          zIndex={drawerZIndex}
+        >
+          <DrawerCloseIcon onClick={closeDrawer} />
+          <PreviewSettingsWrapper>
+            <PreviewSettings
+              bookExportInProgress={bookExportInProgress}
+              canExport={canExport}
+              createPreviewInProgress={createPreviewInProgress}
+              downloadExportInProgress={downloadExportInProgress}
+              exportFormatValue={exportFormatValue}
+              exportProfiles={exportProfiles}
+              onChangeAdditionalExportOptions={onChangeAdditionalExportOptions}
+              onChangeExportFormat={onChangeExportFormat}
+              onChangeExportProfile={onChangeExportProfile}
+              onChangePageSize={onChangePageSize}
+              onClickDelete={onClickDelete}
+              onClickDownloadExport={onClickDownloadExport}
+              onClickExportNameEdit={onClickExportNameEdit}
+              onClickOpenLuluProject={onClickOpenLuluProject}
+              onClickSyncWithLulu={onClickSyncWithLulu}
+              onClickUploadToLulu={onClickUploadToLulu}
+              onCreatingNewExport={onCreatingNewExport}
+              onSaveExportProfile={onSaveExportProfile}
+              onSelectTemplate={onSelectTemplate}
+              processInProgress={processInProgress}
+              profilesMenuOptions={profilesMenuOptions}
+              saveExportInProgress={saveExportInProgress}
+              selectedContentOptions={selectedContentOptions}
+              selectedProfileId={selectedProfileId}
+              selectedTemplate={selectedTemplate}
+              sizeValue={sizeValue}
+              templates={templates}
+            />
+          </PreviewSettingsWrapper>
+        </Drawer>
       </Wrapper>
     </Page>
   )
 }
 
 Preview.propTypes = {
-  additionalExportOptions: PropTypes.shape({
-    includeTitlePage: PropTypes.bool.isRequired,
-    includeCopyrights: PropTypes.bool.isRequired,
-    includeTOC: PropTypes.bool.isRequired,
-  }).isRequired,
   processInProgress: PropTypes.bool.isRequired,
   bookExportInProgress: PropTypes.bool.isRequired,
   createPreviewInProgress: PropTypes.bool.isRequired,
@@ -197,17 +282,31 @@ Preview.propTypes = {
     }),
   ).isRequired,
   doublePageSpread: PropTypes.string.isRequired,
+  downloadExportInProgress: PropTypes.bool.isRequired,
+  drawerTopPosition: PropTypes.number,
+  exportProfiles: PropTypes.objectOf(Object).isRequired,
   zoomPercentage: PropTypes.string.isRequired,
   zoomMin: PropTypes.number.isRequired,
   selectedTemplate: PropTypes.string,
   onSelectTemplate: PropTypes.func.isRequired,
-  onClickDownloadPdf: PropTypes.func.isRequired,
-  onClickDownloadEpub: PropTypes.func.isRequired,
+  onClickDownloadExport: PropTypes.func.isRequired,
   onClickZoomIn: PropTypes.func.isRequired,
   onClickZoomOut: PropTypes.func.isRequired,
+  onChangeExportProfile: PropTypes.func.isRequired,
   onChangePageSize: PropTypes.func.isRequired,
   onChangePageSpread: PropTypes.func.isRequired,
   onChangeAdditionalExportOptions: PropTypes.func.isRequired,
+  onClickExportNameEdit: PropTypes.func.isRequired,
+  onClickUploadToLulu: PropTypes.func.isRequired,
+  onClickOpenLuluProject: PropTypes.func.isRequired,
+  onClickSyncWithLulu: PropTypes.func.isRequired,
+  onClickDelete: PropTypes.func.isRequired,
+  onCreatingNewExport: PropTypes.func.isRequired,
+  onSaveExportProfile: PropTypes.func.isRequired,
+  profilesMenuOptions: PropTypes.arrayOf(Object).isRequired,
+  saveExportInProgress: PropTypes.bool.isRequired,
+  selectedContentOptions: PropTypes.arrayOf(Object).isRequired,
+  selectedProfileId: PropTypes.string.isRequired,
   sizeValue: PropTypes.string.isRequired,
   onChangeExportFormat: PropTypes.func.isRequired,
   exportFormatValue: PropTypes.string.isRequired,
@@ -215,6 +314,7 @@ Preview.propTypes = {
 }
 
 Preview.defaultProps = {
+  drawerTopPosition: 0,
   selectedTemplate: null,
 }
 
