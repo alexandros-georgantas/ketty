@@ -2,17 +2,12 @@ import React, { useEffect, useState } from 'react'
 
 import useWebSocket from 'react-use-websocket'
 import { useHistory, useParams } from 'react-router-dom'
-import {
-  useQuery,
-  useLazyQuery,
-  useMutation,
-  useSubscription,
-} from '@apollo/client'
+import { useQuery, useMutation, useSubscription } from '@apollo/client'
 import find from 'lodash/find'
 import debounce from 'lodash/debounce'
 import { uuid, useCurrentUser } from '@coko/client'
 import { webSocketServerUrl } from '@coko/client/dist/helpers/getUrl'
-import styled from 'styled-components'
+
 import {
   GET_ENTIRE_BOOK,
   RENAME_BOOK_COMPONENT_TITLE,
@@ -28,8 +23,6 @@ import {
   UPDATE_SUBTITLE,
   BOOK_UPDATED_SUBSCRIPTION,
   USER_UPDATED_SUBSCRIPTION,
-  GET_BOOK_COMPONENT,
-  USE_CHATGPT,
 } from '../graphql'
 
 import { isOwner, hasEditAccess, isAdmin } from '../helpers/permissions'
@@ -37,39 +30,25 @@ import {
   showUnauthorizedActionModal,
   showGenericErrorModal,
   showChangeInPermissionsModal,
-  onInfoModal,
 } from '../helpers/commonModals'
 
-import { Editor, Modal, Paragraph, Form, Spin } from '../ui'
+import { Editor, Modal, Paragraph, Form } from '../ui'
 
 import { BookMetadataForm } from '../ui/bookMetadata'
 
-const StyledSpin = styled(Spin)`
-  display: grid;
-  height: 100vh;
-  place-content: center;
-`
-
 const ProducerPage = () => {
   // INITIALIZATION SECTION START
-
   const history = useHistory()
   const params = useParams()
   const [tabId] = useState(uuid())
   const [isOnline, setIsOnline] = useState(true)
   const [editorMode, setEditorMode] = useState(undefined)
-  const [chatGPTEnabled, setChatGPTEnabled] = useState(false)
-
-  const [selectedChapter, setSelectedChapter] = useState(undefined)
-  // const [selectedBookComponentContent, setSelectedBookComponentContent] =
-  //   useState(undefined)
-
   const { currentUser } = useCurrentUser()
   const token = localStorage.getItem('token')
   const [form] = Form.useForm()
 
   const [chapterList, setChapterList] = useState([]) // needed for snappier UI instead of waiting for servers response regarding new order
-  // const [selectedChapterId, setSelectedChapterId] = useState(undefined)
+  const [selectedChapterId, setSelectedChapterId] = useState(undefined)
 
   const { bookId } = params
 
@@ -93,43 +72,6 @@ const ProducerPage = () => {
       id: bookId,
     },
   })
-
-  const [getBookComponent, { loading: bookComponentLoading }] = useLazyQuery(
-    GET_BOOK_COMPONENT,
-    {
-      fetchPolicy: 'network-only',
-      onCompleted: ({ getBookComponent: bookComponentResponse }) => {
-        if (selectedChapter?.id) {
-          setSelectedChapter({
-            content: bookComponentResponse?.content,
-            id: selectedChapter.id,
-          })
-        }
-      },
-      onError: () => showGenericErrorModal(),
-    },
-  )
-
-  const [chatGPT] = useLazyQuery(USE_CHATGPT, {
-    fetchPolicy: 'network-only',
-    onError: err => {
-      if (err.toString().includes('Missing access key')) {
-        onInfoModal('Access key is missing or invalid')
-      } else {
-        showGenericErrorModal()
-      }
-    },
-  })
-
-  const queryAI = input =>
-    new Promise((resolve, reject) => {
-      chatGPT({ variables: { input } }).then(({ data }) => {
-        if (!data) return resolve(null)
-        const { chatGPT: res } = data
-        return resolve(res)
-      })
-    })
-
   // QUERIES SECTION END
 
   // SUBSCRIPTIONS SECTION START
@@ -209,10 +151,9 @@ const ProducerPage = () => {
     onCompleted: (_, { variables }) => {
       const { input } = variables
       const { id: deletedId } = input
-      // const { id } = selectedChapter
 
-      if (selectedChapter?.id && selectedChapter?.id === deletedId) {
-        setSelectedChapter(undefined)
+      if (selectedChapterId && selectedChapterId === deletedId) {
+        setSelectedChapterId(undefined)
       }
     },
     onError: err => {
@@ -280,11 +221,11 @@ const ProducerPage = () => {
   }
 
   const onBookComponentContentChange = content => {
-    if (selectedChapter?.id && canModify) {
+    if (selectedChapterId && canModify) {
       updateContent({
         variables: {
           input: {
-            id: selectedChapter.id,
+            id: selectedChapterId,
             content,
           },
         },
@@ -317,13 +258,11 @@ const ProducerPage = () => {
   }
 
   const onBookComponentTitleChange = title => {
-    // const { id } = selectedChapter
-
-    if (selectedChapter?.id && canModify) {
+    if (selectedChapterId && canModify) {
       renameBookComponent({
         variables: {
           input: {
-            id: selectedChapter.id,
+            id: selectedChapterId,
             title,
           },
         },
@@ -491,13 +430,11 @@ const ProducerPage = () => {
   }
 
   const onBookComponentLock = () => {
-    // const { id } = selectedChapter
-
-    if (selectedChapter?.id && canModify) {
+    if (selectedChapterId && canModify) {
       const userAgent = window.navigator.userAgent || null
       lockBookComponent({
         variables: {
-          id: selectedChapter.id,
+          id: selectedChapterId,
           tabId,
           userAgent,
         },
@@ -524,27 +461,20 @@ const ProducerPage = () => {
   }
 
   const onChapterClick = chapterId => {
-    // const { id } = selectedChapter
-
     const found = find(bookQueryData?.getBook?.divisions[1].bookComponents, {
       id: chapterId,
     })
 
-    const isAlreadySelected = chapterId === selectedChapter?.id
+    const isAlreadySelected = chapterId === selectedChapterId
 
     if (found.uploading) {
       showUploadingModal()
-      return
-    }
-
-    if (isAlreadySelected) {
-      setSelectedChapter(undefined)
+    } else if (isAlreadySelected) {
+      setSelectedChapterId(undefined)
       setEditorMode(undefined)
-      return
+    } else {
+      setSelectedChapterId(chapterId)
     }
-
-    setSelectedChapter({ id: chapterId })
-    getBookComponent({ variables: { id: chapterId } })
   }
 
   const onUploadChapter = () => {
@@ -640,14 +570,14 @@ const ProducerPage = () => {
       },
       queryParams: {
         token,
-        bookComponentId: selectedChapter?.id,
+        bookComponentId: selectedChapterId,
         tabId,
       },
       share: false,
       reconnectAttempts: 5000,
       reconnectInterval: 5000,
     },
-    selectedChapter?.id !== undefined && editorMode && editorMode !== 'preview',
+    selectedChapterId !== undefined && editorMode && editorMode !== 'preview',
   )
   // WEBSOCKET SECTION END
 
@@ -689,9 +619,9 @@ const ProducerPage = () => {
 
       // the below is for the case where a user has the lock of a chapter and at the same time another user is in read only mode for that chapter.
       // When the lock is release from the initial user then the read-only user will take it
-      if (selectedChapter?.id) {
+      if (selectedChapterId) {
         const found = find(bookQueryData.getBook.divisions[1].bookComponents, {
-          id: selectedChapter?.id,
+          id: selectedChapterId,
         })
 
         const { lock } = found
@@ -704,9 +634,9 @@ const ProducerPage = () => {
   }, [bookQueryData?.getBook?.divisions[1].bookComponents])
 
   useEffect(() => {
-    if (selectedChapter?.id) {
+    if (selectedChapterId) {
       const found = find(bookQueryData.getBook.divisions[1].bookComponents, {
-        id: selectedChapter?.id,
+        id: selectedChapterId,
       })
 
       const { lock } = found
@@ -723,13 +653,13 @@ const ProducerPage = () => {
         setEditorMode('full')
       }
     }
-  }, [selectedChapter?.id, canModify])
+  }, [selectedChapterId, canModify])
 
   useEffect(() => {
     if (editorMode && editorMode === 'preview') {
-      if (selectedChapter?.id) {
+      if (selectedChapterId) {
         const found = find(bookQueryData.getBook.divisions[1].bookComponents, {
-          id: selectedChapter?.id,
+          id: selectedChapterId,
         })
 
         const { lock } = found
@@ -750,16 +680,15 @@ const ProducerPage = () => {
   }, [editorMode])
   // EFFECTS SECTION END
 
-  if (loading || bookComponentLoading) return <StyledSpin spinning />
+  if (loading) return null
 
   return (
     <Editor
       bookMetadataValues={bookQueryData?.getBook.podMetadata}
       canEdit={canModify}
       chapters={chapterList}
-      chatGPTEnabled={chatGPTEnabled}
       isReadOnly={
-        !selectedChapter?.id ||
+        !selectedChapterId ||
         (editorMode && editorMode === 'preview') ||
         !canModify
       }
@@ -774,11 +703,7 @@ const ProducerPage = () => {
       }
       onReorderChapter={onReorderChapter}
       onUploadChapter={onUploadChapter}
-      queryAI={queryAI}
-      selectedChapter={selectedChapter}
-      // selectedBookComponentContent={selectedBookComponentContent}
-      // selectedChapterId={selectedChapterId}
-      setChatGPTEnabled={setChatGPTEnabled}
+      selectedChapterId={selectedChapterId}
       subtitle={bookQueryData?.getBook.subtitle}
       title={bookQueryData?.getBook.title}
     />

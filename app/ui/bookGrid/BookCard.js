@@ -8,6 +8,7 @@ import { Card, Dropdown } from 'antd'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { th } from '@coko/client'
+import {useTranslation} from "react-i18next";
 import { LinkWithoutStyles, SimpleUpload } from '../common'
 import BookCover from './BookCover'
 
@@ -48,6 +49,8 @@ const BookCard = ({
   canDeleteBook,
   canUploadBookThumbnail,
 }) => {
+  const {t} = useTranslation()
+
   const items = [
     {
       key: 'uploadBookImage',
@@ -57,7 +60,7 @@ const BookCard = ({
           acceptedTypes="image/*"
           disabled={!canUploadBookThumbnail(id)}
           handleFileChange={file => onUploadBookThumbnail(id, file)}
-          label="Upload book placeholder image"
+          label={t("Upload book placeholder image".toLowerCase().replace(/ /g,"_"))}
         />
       ),
       disabled: !canUploadBookThumbnail(id),
@@ -67,7 +70,7 @@ const BookCard = ({
       icon: <StyledDeleteOutlined disabled={!canDeleteBook(id)} />,
       label: (
         <DeleteBookLabel disabled={!canDeleteBook(id)}>
-          Delete book
+          {t("Delete book".toLowerCase().replace(/ /g,"_"))}
         </DeleteBookLabel>
       ),
       onClick: () => onClickDelete(id),
@@ -87,7 +90,7 @@ const BookCard = ({
     >
       <TitleAndActionsWrapper>
         <StyledLink to={`/books/${id}/producer`}>
-          <Meta title={title || 'Untitled'} />
+          <Meta title={title || t('Untitled'.toLowerCase())} />
         </StyledLink>
         {showActions && (
           <MoreActions>

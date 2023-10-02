@@ -38,7 +38,6 @@ const DashboardPage = () => {
     refetch,
   } = useQuery(GET_BOOKS, {
     fetchPolicy: 'network-only',
-
     variables: {
       options: {
         archived: false,
@@ -79,7 +78,6 @@ const DashboardPage = () => {
         })
       }
     },
-    onError: error => console.error(error),
   })
 
   const [createBook] = useMutation(CREATE_BOOK, {

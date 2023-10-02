@@ -7,7 +7,7 @@ import {
   Switch,
   useHistory,
   Redirect,
-  // useParams,
+  useParams,
 } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -19,9 +19,8 @@ import {
   useCurrentUser,
 } from '@coko/client'
 
-import Header from './ui/common/Header'
-import Spin from './ui/common/Spin'
-import UserInviteModal from './ui/invite/UserInviteModal'
+// import { Header, Spin, UserInviteModal, UserStatus } from './ui'
+import { Header, Spin, UserInviteModal } from './ui'
 
 import {
   BookTitlePage,
@@ -39,8 +38,8 @@ import {
 } from './pages'
 
 import { CURRENT_USER } from './graphql'
-// import { isOwner, isCollaborator, isAdmin } from './helpers/permissions'
-// import { showUnauthorizedAccessModal } from './helpers/commonModals'
+import { isOwner, isCollaborator, isAdmin } from './helpers/permissions'
+import { showUnauthorizedAccessModal } from './helpers/commonModals'
 
 const LayoutWrapper = styled.div`
   display: flex;
@@ -234,32 +233,30 @@ const RequireVerifiedUser = ({ children }) => {
   return children
 }
 
-// Find a better way for doing that
-// const RequireTeamMembership = ({ children }) => {
-//   const { currentUser } = useCurrentUser()
-//   const { bookId } = useParams()
+const RequireTeamMembership = ({ children }) => {
+  const { currentUser } = useCurrentUser()
+  const { bookId } = useParams()
 
-//   if (bookId) {
-//     const canAccess =
-//       isAdmin(currentUser) ||
-//       isOwner(bookId, currentUser) ||
-//       isCollaborator(bookId, currentUser)
+  if (bookId) {
+    const canAccess =
+      isAdmin(currentUser) ||
+      isOwner(bookId, currentUser) ||
+      isCollaborator(bookId, currentUser)
 
-//     if (!canAccess) {
-//       showUnauthorizedAccessModal()
-//       return <Redirect to="/dashboard" />
-//     }
-//   }
+    if (!canAccess) {
+      showUnauthorizedAccessModal()
+      return <Redirect to="/dashboard" />
+    }
+  }
 
-//   return children
-// }
+  return children
+}
 
 const Authenticated = ({ children }) => {
   return (
     <RequireAuth notAuthenticatedRedirectTo="/login">
       <RequireVerifiedUser>
-        {/* <RequireTeamMembership>{children}</RequireTeamMembership> */}
-        {children}
+        <RequireTeamMembership>{children}</RequireTeamMembership>
       </RequireVerifiedUser>
     </RequireAuth>
   )

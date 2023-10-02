@@ -198,14 +198,14 @@ const PreviewSettings = props => {
           itemLayout="horizontal"
           renderItem={({ id, thumbnail, name }) => (
             <StyledListItem
-              onClick={() => !processInProgress && handleChangeTemplate(id)}
+              onClick={() => handleChangeTemplate(id)}
               selected={id === selectedTemplate}
             >
               <Avatar shape="square" size="large" src={thumbnail?.url} />
               <Label>{name.charAt(0).toUpperCase() + name.slice(1)}</Label>
             </StyledListItem>
           )}
-          // showPagination={false}
+          showPagination={false}
         />
       </Section>
 

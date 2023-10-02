@@ -4,6 +4,7 @@ import styled from 'styled-components'
 
 import { grid } from '@coko/client'
 
+import {useTranslation} from "react-i18next";
 import { Form, Button, Link } from '../common'
 
 const Wrapper = styled.div``
@@ -48,6 +49,8 @@ const AuthenticationForm = props => {
     submitButtonLabel,
   } = props
 
+const {i18n} = useTranslation();
+  
   return (
     <Wrapper className={className}>
       <Form
@@ -59,7 +62,7 @@ const AuthenticationForm = props => {
         {children}
 
         <SubmitButton htmlType="submit" loading={loading} type="primary">
-          {submitButtonLabel}
+          {i18n.t(submitButtonLabel.toLowerCase().replace(/ /g,"_"))}
         </SubmitButton>
       </Form>
 
@@ -67,12 +70,12 @@ const AuthenticationForm = props => {
         <Footer showForgotPassword={showForgotPassword}>
           {showForgotPassword && (
             <ForgotPassword>
-              <Link to={forgotPasswordUrl}>Forgot your password?</Link>
+              <Link to={forgotPasswordUrl}>{i18n.t('Forgot your password?'.toLowerCase().replace(/ /g,"_"))}</Link>
             </ForgotPassword>
           )}
 
           <AlternativeAction>
-            <Link to={alternativeActionLink}>{alternativeActionLabel}</Link>
+            <Link to={alternativeActionLink}>{i18n.t(alternativeActionLabel.toLowerCase().replace(/ /g,"_"))}</Link>
           </AlternativeAction>
         </Footer>
       )}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams, useHistory } from 'react-router-dom'
 import { useQuery, useMutation, useLazyQuery } from '@apollo/client'
 import { useCurrentUser } from '@coko/client'
@@ -47,18 +47,6 @@ const chooseZoom = screenWidth => {
   return 1.0
 }
 
-const findAssociatedTemplate = (
-  exportFormat,
-  trimSize,
-  associatedTemplatesData,
-) => {
-  return exportFormat === 'pdf'
-    ? find(associatedTemplatesData?.getBook?.associatedTemplates.pagedjs, {
-        trimSize,
-      })
-    : associatedTemplatesData?.getBook?.associatedTemplates.epub
-}
-
 const PreviewerPage = () => {
   // INIT SECTION
   const params = useParams()
@@ -67,7 +55,13 @@ const PreviewerPage = () => {
   const { currentUser } = useCurrentUser()
   const [previewLink, setPreviewLink] = useState(undefined)
   const [exportFormat, setExportFormat] = useState('pdf')
-  const [trimSize, setTrimSize] = useState('8.5x11')
+  const [previewConfiguration, setPreviewConfiguration] = useState(undefined)
+
+  const [additionalExportOptions, setAdditionalExportOptions] =
+    useState(undefined)
+
+  const [currentSelectedTemplate, setCurrentSelectedTemplate] =
+    useState(undefined)
 
   if (!localStorage.getItem('zoomPercentage')) {
     localStorage.setItem('zoomPercentage', chooseZoom(window.innerWidth))
@@ -82,14 +76,20 @@ const PreviewerPage = () => {
   const zoomStep = 0.1
   const zoomMin = 0.3
 
-  const defaultAdditionalExportOptions = {
-    includeTOC: true,
-    includeCopyrights: true,
-    includeTitlePage: true,
-  }
+  const [trimSize, setTrimSize] = useState('8.5x11')
+
   // INIT SECTION END
 
   // QUERIES SECTION START
+  const { data: templatesData } = useQuery(GET_SPECIFIC_TEMPLATES, {
+    fetchPolicy: 'network-only',
+    variables: {
+      where: {
+        target: exportFormat === 'pdf' ? 'pagedjs' : exportFormat,
+        trimSize: exportFormat === 'pdf' ? trimSize : null,
+      },
+    },
+  })
 
   const {
     loading: associatedTemplatesInProgress,
@@ -100,39 +100,29 @@ const PreviewerPage = () => {
       id: bookId,
     },
     onCompleted: ({ getBook }) => {
+      // when query ends, check if there is any info about stored templates for that book
       const { associatedTemplates } = getBook
 
       if (associatedTemplates) {
         if (exportFormat === 'pdf') {
-          const found = findAssociatedTemplate(
-            exportFormat,
+          const found = find(associatedTemplates.pagedjs, {
             trimSize,
-            associatedTemplatesData,
-          )
+          })
 
           if (found) {
-            triggerPreviewCreation(
-              found.templateId,
-              found.additionalExportOptions,
-            )
+            setPreviewConfiguration(found)
+
+            setAdditionalExportOptions(found.additionalExportOptions)
           }
+        } else if (associatedTemplates.epub) {
+          setPreviewConfiguration(associatedTemplates.epub)
+          setAdditionalExportOptions(
+            associatedTemplates.epub.additionalExportOptions,
+          )
         }
       }
     },
   })
-
-  const { data: templatesData, loading: templatesLoading } = useQuery(
-    GET_SPECIFIC_TEMPLATES,
-    {
-      fetchPolicy: 'network-only',
-      variables: {
-        where: {
-          target: exportFormat === 'pdf' ? 'pagedjs' : exportFormat,
-          trimSize: exportFormat === 'pdf' ? trimSize : null,
-        },
-      },
-    },
-  )
 
   const [getPagedLink, { loading: PagedPreviewLinkInProgress }] = useLazyQuery(
     GET_PAGED_PREVIEWER_LINK,
@@ -223,19 +213,15 @@ const PreviewerPage = () => {
                   associatedTemplatesToPush.pagedjs.push({
                     templateId: storedTemplate.templateId,
                     trimSize: storedTemplate.trimSize,
-                    additionalExportOptions: defaultAdditionalExportOptions,
+                    additionalExportOptions,
                   })
                 }
               })
 
-              if (storedAssociatedTemplates.epub) {
-                associatedTemplatesToPush.epub = {
-                  templateId: storedAssociatedTemplates?.epub?.templateId,
-                  additionalExportOptions:
-                    storedAssociatedTemplates?.epub?.additionalExportOptions,
-                }
-              } else {
-                associatedTemplatesToPush.epub = null
+              associatedTemplatesToPush.epub = {
+                templateId: storedAssociatedTemplates.epub.templateId,
+                additionalExportOptions:
+                  storedAssociatedTemplates.epub.additionalExportOptions,
               }
             }
           } else {
@@ -266,6 +252,9 @@ const PreviewerPage = () => {
         } else {
           showErrorModal(true)
         }
+
+        setPreviewConfiguration(undefined)
+        setCurrentSelectedTemplate(undefined)
       },
     },
   )
@@ -283,6 +272,34 @@ const PreviewerPage = () => {
       },
     ],
     awaitRefetchQueries: true,
+    onCompleted: ({
+      updateAssociatedTemplates: updateAssociatedTemplatesRes,
+    }) => {
+      // // when query ends, check if there is any info about stored templates for that book
+      const { associatedTemplates } = updateAssociatedTemplatesRes
+
+      if (associatedTemplates) {
+        if (exportFormat === 'pdf') {
+          const found = find(associatedTemplates.pagedjs, {
+            trimSize,
+          })
+
+          if (found) {
+            setPreviewConfiguration(found)
+            setAdditionalExportOptions(found.additionalExportOptions)
+            triggerPreviewCreation(
+              found.templateId,
+              found.additionalExportOptions,
+            )
+          }
+        } else if (associatedTemplates.epub) {
+          setPreviewConfiguration(associatedTemplates.epub)
+          setAdditionalExportOptions(
+            associatedTemplates.epub.additionalExportOptions,
+          )
+        }
+      }
+    },
     onError: err => {
       if (err.toString().includes('Not Authorised')) {
         showUnauthorizedActionModal(false)
@@ -315,25 +332,6 @@ const PreviewerPage = () => {
 
         errorModal.destroy()
       },
-      okButtonProps: { style: { backgroundColor: 'black' } },
-      maskClosable: false,
-      width: 570,
-      bodyStyle: {
-        marginRight: 38,
-        textAlign: 'justify',
-      },
-    })
-  }
-
-  const showErrorModalWithText = errorMessage => {
-    const warningModal = Modal.warning()
-    return warningModal.update({
-      title: 'Error',
-      content: <Paragraph>{errorMessage}</Paragraph>,
-      onOk() {
-        warningModal.destroy()
-      },
-      okButtonProps: { style: { backgroundColor: 'black' } },
       maskClosable: false,
       width: 570,
       bodyStyle: {
@@ -344,19 +342,26 @@ const PreviewerPage = () => {
   }
 
   const triggerPreviewCreation = (templateIdParam, contentOptions) => {
-    /* eslint-disable no-underscore-dangle, no-param-reassign */
-    delete contentOptions.__typename
-    /* eslint-enable no-underscore-dangle, no-param-reassign */
-    createPreview({
-      variables: {
-        input: {
-          bookId,
-          templateId: templateIdParam,
-          previewer: 'pagedjs',
-          additionalExportOptions: contentOptions,
+    if (
+      currentSelectedTemplate &&
+      additionalExportOptions &&
+      exportFormat === 'pdf'
+    ) {
+      /* eslint-disable no-underscore-dangle, no-param-reassign */
+      delete contentOptions.__typename
+      /* eslint-enable no-underscore-dangle, no-param-reassign */
+
+      createPreview({
+        variables: {
+          input: {
+            bookId,
+            templateId: templateIdParam,
+            previewer: exportFormat === 'pdf' ? 'pagedjs' : '',
+            additionalExportOptions: contentOptions,
+          },
         },
-      },
-    })
+      })
+    }
   }
 
   const downloadPDFHandler = () => {
@@ -364,21 +369,14 @@ const PreviewerPage = () => {
       return showUnauthorizedActionModal(false)
     }
 
-    const currentSelectedTemplate = findAssociatedTemplate(
-      exportFormat,
-      trimSize,
-      associatedTemplatesData,
-    )
-
-    if (currentSelectedTemplate.templateId && exportFormat === 'pdf') {
+    if (currentSelectedTemplate && exportFormat === 'pdf') {
       return bookExport({
         variables: {
           input: {
             bookId,
-            templateId: currentSelectedTemplate.templateId,
+            templateId: currentSelectedTemplate,
             fileExtension: exportFormat,
-            additionalExportOptions:
-              currentSelectedTemplate.additionalExportOptions,
+            additionalExportOptions,
           },
         },
       })
@@ -392,36 +390,14 @@ const PreviewerPage = () => {
       return showUnauthorizedActionModal(false)
     }
 
-    const currentSelectedTemplate = findAssociatedTemplate(
-      exportFormat,
-      undefined,
-      associatedTemplatesData,
-    )
-
-    let bookComponents
-
-    if (associatedTemplatesData) {
-      bookComponents = associatedTemplatesData.getBook.divisions.find(
-        item => item.label === 'Body',
-      ).bookComponents
-    }
-
-    if (bookComponents && bookComponents.length === 0) {
-      const errorMessage =
-        'You must add content to your book before a valid EPUB can be produced.'
-
-      return showErrorModalWithText(errorMessage)
-    }
-
-    if (currentSelectedTemplate.templateId && exportFormat === 'epub') {
+    if (currentSelectedTemplate && exportFormat === 'epub') {
       return bookExport({
         variables: {
           input: {
             bookId,
-            templateId: currentSelectedTemplate.templateId,
+            templateId: currentSelectedTemplate,
             fileExtension: exportFormat,
-            additionalExportOptions:
-              currentSelectedTemplate.additionalExportOptions,
+            additionalExportOptions,
           },
         },
       })
@@ -431,80 +407,90 @@ const PreviewerPage = () => {
   }
 
   const changeExportFormatHandler = selectedFormat => {
-    setExportFormat(selectedFormat)
+    // First check if there is any stored template selection
+    if (associatedTemplatesData) {
+      const { getBook } = associatedTemplatesData
+      const { associatedTemplates } = getBook
 
-    if (previewLink) setPreviewLink(undefined)
+      if (associatedTemplates) {
+        if (selectedFormat === 'pdf') {
+          // check if there is any stored template for pdf with the specific trim size
+          const found = find(associatedTemplates.pagedjs, {
+            trimSize,
+          })
 
-    if (selectedFormat === 'pdf') {
-      const currentSelectedTemplate = findAssociatedTemplate(
-        selectedFormat,
-        trimSize,
-        associatedTemplatesData,
-      )
+          if (found) {
+            setPreviewConfiguration(found)
+            setAdditionalExportOptions(found.additionalExportOptions)
+            setCurrentSelectedTemplate(found.templateId)
+          } else {
+            setPreviewLink(undefined)
+            setAdditionalExportOptions(undefined)
+            setCurrentSelectedTemplate(undefined)
+          }
+        } else {
+          // check if there is any stored template for epub
+          if (associatedTemplates.epub) {
+            setPreviewConfiguration(associatedTemplates.epub)
+            setAdditionalExportOptions(
+              associatedTemplates.epub.additionalExportOptions,
+            )
+          }
 
-      if (currentSelectedTemplate) {
-        triggerPreviewCreation(
-          currentSelectedTemplate.templateId,
-          currentSelectedTemplate.additionalExportOptions,
-        )
+          setAdditionalExportOptions(undefined)
+          setPreviewLink(undefined)
+          setCurrentSelectedTemplate(undefined)
+        }
       }
+
+      setExportFormat(selectedFormat)
+    } else {
+      // default case when no stored templates
+      setPreviewLink(undefined)
+      setCurrentSelectedTemplate(undefined)
+      setExportFormat(selectedFormat)
     }
   }
 
   // This applies only for the case of pdf
   const changePageSizeHandler = selectedTrimSize => {
-    setTrimSize(selectedTrimSize)
+    // First check if there is any stored template selection
+    if (associatedTemplatesData && exportFormat === 'pdf') {
+      const { getBook } = associatedTemplatesData
+      const { associatedTemplates } = getBook
 
-    const currentSelectedTemplate = findAssociatedTemplate(
-      exportFormat,
-      selectedTrimSize,
-      associatedTemplatesData,
-    )
+      if (associatedTemplates) {
+        // check if there is any stored template for pdf with the specific trim size
+        const found = find(associatedTemplates.pagedjs, {
+          trimSize: selectedTrimSize,
+        })
 
-    if (!currentSelectedTemplate && exportFormat === 'pdf') {
-      setPreviewLink(undefined)
-    } else {
-      triggerPreviewCreation(
-        currentSelectedTemplate.templateId,
-        currentSelectedTemplate.additionalExportOptions,
-      )
+        if (found) {
+          setPreviewLink(undefined)
+          setPreviewConfiguration(found)
+          setAdditionalExportOptions(found.additionalExportOptions)
+        } else {
+          setPreviewConfiguration(undefined)
+          setPreviewLink(undefined)
+        }
+      }
     }
+
+    setTrimSize(selectedTrimSize)
   }
 
   const changeAdditionalExportOptionsHandler = (key, value) => {
+    if (!currentSelectedTemplate) return
+
     if (!canExport) {
       showUnauthorizedActionModal(false)
       return
     }
 
-    let currentAdditionalExportOptions
-    let currentSelectedTemplate
-
-    if (exportFormat === 'pdf') {
-      currentSelectedTemplate = findAssociatedTemplate(
-        exportFormat,
-        trimSize,
-        associatedTemplatesData,
-      )
-
-      if (!currentSelectedTemplate.templateId) return
-
-      currentAdditionalExportOptions =
-        currentSelectedTemplate.additionalExportOptions
-    } else {
-      currentSelectedTemplate = findAssociatedTemplate(
-        exportFormat,
-        undefined,
-        associatedTemplatesData,
-      )
-      currentAdditionalExportOptions =
-        associatedTemplatesData?.getBook?.associatedTemplates?.epub
-          ?.additionalExportOptions
-    }
-
-    const clonedExportOptions = { ...currentAdditionalExportOptions }
+    const clonedExportOptions = { ...additionalExportOptions }
 
     clonedExportOptions[key] = value
+    setAdditionalExportOptions(clonedExportOptions)
 
     const associatedTemplatesToPush = { pagedjs: [] }
     let storedAssociatedTemplates
@@ -516,7 +502,7 @@ const PreviewerPage = () => {
 
     if (exportFormat === 'pdf') {
       associatedTemplatesToPush.pagedjs.push({
-        templateId: currentSelectedTemplate.templateId,
+        templateId: currentSelectedTemplate,
         trimSize,
         additionalExportOptions: clonedExportOptions,
       })
@@ -572,16 +558,10 @@ const PreviewerPage = () => {
   }
 
   const selectTemplateHandler = toBeSelectedTemplateId => {
-    const currentSelectedTemplate = findAssociatedTemplate(
-      exportFormat,
-      trimSize,
-      associatedTemplatesData,
-    )
-
     // If you click on the same template that you already have selected then do nothing
     if (
       currentSelectedTemplate &&
-      currentSelectedTemplate.templateId === toBeSelectedTemplateId
+      currentSelectedTemplate === toBeSelectedTemplateId
     ) {
       console.warn('this template is already selected')
     } else {
@@ -591,72 +571,43 @@ const PreviewerPage = () => {
       }
 
       if (createPreviewInProgress || bookExportInProgress) return
+      setCurrentSelectedTemplate(toBeSelectedTemplateId)
 
       const associatedTemplatesToPush = { pagedjs: [] }
+      let storedAssociatedTemplates
 
-      const storedAssociatedTemplates =
-        associatedTemplatesData?.getBook?.associatedTemplates
+      if (associatedTemplatesData) {
+        const { getBook } = associatedTemplatesData
+        storedAssociatedTemplates = getBook.associatedTemplates
+      }
 
       if (exportFormat === 'pdf') {
-        if (!currentSelectedTemplate) {
-          associatedTemplatesToPush.pagedjs.push({
-            templateId: toBeSelectedTemplateId,
-            trimSize,
-            additionalExportOptions: defaultAdditionalExportOptions,
+        associatedTemplatesToPush.pagedjs.push({
+          templateId: toBeSelectedTemplateId,
+          trimSize,
+          additionalExportOptions,
+        })
+
+        if (storedAssociatedTemplates) {
+          storedAssociatedTemplates.pagedjs.forEach(storedTemplate => {
+            if (storedTemplate.trimSize !== trimSize) {
+              associatedTemplatesToPush.pagedjs.push({
+                templateId: storedTemplate.templateId,
+                trimSize: storedTemplate.trimSize,
+                additionalExportOptions,
+              })
+            }
           })
 
-          if (storedAssociatedTemplates) {
-            storedAssociatedTemplates.pagedjs.forEach(storedTemplate => {
-              if (storedTemplate.trimSize !== trimSize) {
-                associatedTemplatesToPush.pagedjs.push({
-                  templateId: storedTemplate.templateId,
-                  trimSize: storedTemplate.trimSize,
-                  additionalExportOptions: defaultAdditionalExportOptions,
-                })
-              }
-            })
-
-            if (storedAssociatedTemplates.epub) {
-              associatedTemplatesToPush.epub = {
-                templateId: storedAssociatedTemplates.epub.templateId,
-                additionalExportOptions:
-                  storedAssociatedTemplates.epub.additionalExportOptions,
-              }
-            } else {
-              // case of null epub
-              associatedTemplatesToPush.epub = storedAssociatedTemplates.epub
+          if (storedAssociatedTemplates.epub) {
+            associatedTemplatesToPush.epub = {
+              templateId: storedAssociatedTemplates.epub.templateId,
+              additionalExportOptions:
+                storedAssociatedTemplates.epub.additionalExportOptions,
             }
-          }
-        } else {
-          const { additionalExportOptions } = currentSelectedTemplate
-
-          associatedTemplatesToPush.pagedjs.push({
-            templateId: toBeSelectedTemplateId,
-            trimSize,
-            additionalExportOptions,
-          })
-
-          if (storedAssociatedTemplates) {
-            storedAssociatedTemplates.pagedjs.forEach(storedTemplate => {
-              if (storedTemplate.trimSize !== trimSize) {
-                associatedTemplatesToPush.pagedjs.push({
-                  templateId: storedTemplate.templateId,
-                  trimSize: storedTemplate.trimSize,
-                  additionalExportOptions,
-                })
-              }
-            })
-
-            if (storedAssociatedTemplates.epub) {
-              associatedTemplatesToPush.epub = {
-                templateId: storedAssociatedTemplates.epub.templateId,
-                additionalExportOptions:
-                  storedAssociatedTemplates.epub.additionalExportOptions,
-              }
-            } else {
-              // case of null epub
-              associatedTemplatesToPush.epub = storedAssociatedTemplates.epub
-            }
+          } else {
+            // case of null epub
+            associatedTemplatesToPush.epub = storedAssociatedTemplates.epub
           }
         }
       } else {
@@ -672,14 +623,11 @@ const PreviewerPage = () => {
 
         associatedTemplatesToPush.epub = {
           templateId: toBeSelectedTemplateId,
-          additionalExportOptions: !currentSelectedTemplate
-            ? defaultAdditionalExportOptions
-            : storedAssociatedTemplates.epub.additionalExportOptions,
+          additionalExportOptions,
         }
       }
 
       setPreviewLink(undefined)
-
       updateAssociatedTemplates({
         variables: { bookId, associatedTemplates: associatedTemplatesToPush },
       })
@@ -693,18 +641,8 @@ const PreviewerPage = () => {
       localStorage.setItem('zoomPercentage', 1.0)
     }
 
-    const currentSelectedTemplate = findAssociatedTemplate(
-      exportFormat,
-      trimSize,
-      associatedTemplatesData,
-    )
-
-    if (currentSelectedTemplate) {
-      setPreviewLink(undefined)
-      triggerPreviewCreation(
-        currentSelectedTemplate.templateId,
-        currentSelectedTemplate.additionalExportOptions,
-      )
+    if (currentSelectedTemplate && exportFormat === 'pdf') {
+      triggerPreviewCreation(currentSelectedTemplate, additionalExportOptions)
     }
   }
 
@@ -717,18 +655,8 @@ const PreviewerPage = () => {
         Math.round((currentValue + zoomStep) * 100) / 100,
       )
 
-      const currentSelectedTemplate = findAssociatedTemplate(
-        exportFormat,
-        trimSize,
-        associatedTemplatesData,
-      )
-
-      if (currentSelectedTemplate) {
-        setPreviewLink(undefined)
-        triggerPreviewCreation(
-          currentSelectedTemplate.templateId,
-          currentSelectedTemplate.additionalExportOptions,
-        )
+      if (currentSelectedTemplate && exportFormat === 'pdf') {
+        triggerPreviewCreation(currentSelectedTemplate, additionalExportOptions)
       }
     }
   }
@@ -742,46 +670,46 @@ const PreviewerPage = () => {
         Math.round((currentValue - zoomStep) * 100) / 100,
       )
 
-      const currentSelectedTemplate = findAssociatedTemplate(
-        exportFormat,
-        trimSize,
-        associatedTemplatesData,
-      )
-
-      if (currentSelectedTemplate) {
-        setPreviewLink(undefined)
-        triggerPreviewCreation(
-          currentSelectedTemplate.templateId,
-          currentSelectedTemplate.additionalExportOptions,
-        )
+      if (currentSelectedTemplate && exportFormat === 'pdf') {
+        triggerPreviewCreation(currentSelectedTemplate, additionalExportOptions)
       }
     }
   }
   // HANDLERS SECTION END
 
-  if (associatedTemplatesInProgress || templatesLoading) return <Loader />
+  // EFFECTS SECTION START
+  useEffect(() => {
+    if (previewConfiguration && previewConfiguration.templateId) {
+      setCurrentSelectedTemplate(previewConfiguration.templateId)
+      setAdditionalExportOptions(previewConfiguration.additionalExportOptions)
 
-  let foundTemplate
-
-  if (templatesData) {
-    const tempFoundTemplate = findAssociatedTemplate(
-      exportFormat,
-      trimSize,
-      associatedTemplatesData,
-    )
-
-    const templateExists = find(templatesData.getSpecificTemplates, {
-      id: tempFoundTemplate?.templateId,
-    })
-
-    if (templateExists) {
-      foundTemplate = tempFoundTemplate
+      // for the case of pdf trigger a new preview
+      if (previewConfiguration.templateId && exportFormat === 'pdf') {
+        triggerPreviewCreation(
+          previewConfiguration.templateId,
+          additionalExportOptions,
+        )
+      }
+    } else {
+      setCurrentSelectedTemplate(undefined)
     }
-  }
+  }, [previewConfiguration, exportFormat])
+
+  useEffect(() => {
+    if (currentSelectedTemplate && exportFormat === 'pdf') {
+      triggerPreviewCreation(
+        previewConfiguration.templateId,
+        previewConfiguration.additionalExportOptions,
+      )
+    }
+  }, [additionalExportOptions])
+  // EFFECTS SECTION END
+
+  if (associatedTemplatesInProgress) return <Loader />
 
   return (
     <Preview
-      additionalExportOptions={foundTemplate?.additionalExportOptions}
+      additionalExportOptions={additionalExportOptions}
       bookExportInProgress={bookExportInProgress}
       canExport={canExport}
       createPreviewInProgress={createPreviewInProgress}
@@ -803,10 +731,9 @@ const PreviewerPage = () => {
         PagedPreviewLinkInProgress ||
         updateAssociatedTemplatesInProgress
       }
-      selectedTemplate={foundTemplate?.templateId}
+      selectedTemplate={currentSelectedTemplate}
       sizeValue={trimSize}
       templates={templatesData?.getSpecificTemplates || []}
-      trimSizeValue={trimSize}
       zoomMin={zoomMin}
       zoomPercentage={parseFloat(
         localStorage.getItem('zoomPercentage'),
