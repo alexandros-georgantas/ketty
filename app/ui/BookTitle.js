@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { grid } from '@coko/client'
 import { Button } from 'antd'
 import PropTypes from 'prop-types'
+import {useTranslation} from "react-i18next";
 import { Form, Page } from '.'
 
 const StyledInput = styled.input`
@@ -23,6 +24,7 @@ const Wrapper = styled.div`
 `
 
 const BookTitle = ({ onClickContinue, title, canRename }) => {
+  const {t} = useTranslation()
   const [form] = Form.useForm()
   const bookTitle = Form.useWatch('bookTitle', form)
 
@@ -43,15 +45,15 @@ const BookTitle = ({ onClickContinue, title, canRename }) => {
           onFinish={handleContinue}
         >
           <Form.Item name="bookTitle">
-            <StyledInput autoFocus placeholder="Book title" type="text" />
+            <StyledInput autoFocus placeholder={t("Book title".replace(/ /g,"_").toLowerCase())} type="text" />
           </Form.Item>
-          <p>Don&apos;t overthink it, you can change your title at any time</p>
+          <p>{t("Don't overthink it, you can change your title at any time".toLowerCase().replace(/ /g,"_"))}</p>
           <Button
             disabled={!bookTitle || !canRename}
             onClick={handleContinue}
             type="primary"
           >
-            Continue
+            {t("Continue".toLowerCase())}
           </Button>
         </Form>
       </Wrapper>

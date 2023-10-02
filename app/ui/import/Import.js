@@ -61,10 +61,7 @@ const Import = ({ onClickContinue, canImport }) => {
 
 Import.propTypes = {
   onClickContinue: PropTypes.func.isRequired,
-  canImport: PropTypes.bool,
-}
-Import.defaultProps = {
-  canImport: false,
+  canImport: PropTypes.bool.isRequired,
 }
 
 export default Import

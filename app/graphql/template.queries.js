@@ -67,13 +67,6 @@ const GET_BOOK_ASSOCIATED_TEMPLATES = gql`
           }
         }
       }
-      divisions {
-        id
-        label
-        bookComponents {
-          id
-        }
-      }
     }
   }
 `

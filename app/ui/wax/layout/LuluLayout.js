@@ -8,7 +8,6 @@ import { useLuluWaxContext } from '../luluWaxContext'
 
 import 'wax-prosemirror-core/dist/index.css'
 import 'wax-prosemirror-services/dist/index.css'
-import 'wax-table-service/dist/index.css'
 
 const Wrapper = styled.div`
   background: ${th('colorBackground')};
@@ -59,10 +58,6 @@ const EditorContainer = styled.div`
     min-height: 100%;
     padding: ${grid(10)};
 
-    table > caption {
-      caption-side: top;
-    }
-
     &:focus-visible {
       outline: none;
     }
@@ -103,7 +98,7 @@ const LuluLayout = ({ editor }) => {
     onChapterClick,
     onReorderChapter,
     onUploadChapter,
-    selectedChapter,
+    selectedChapterId,
     title,
     subtitle,
     onAddChapter,
@@ -129,7 +124,7 @@ const LuluLayout = ({ editor }) => {
             onDeleteChapter={onDeleteChapter}
             onReorderChapter={onReorderChapter}
             onUploadChapter={onUploadChapter}
-            selectedChapter={selectedChapter}
+            selectedChapterId={selectedChapterId}
             subtitle={subtitle}
             title={title}
           />

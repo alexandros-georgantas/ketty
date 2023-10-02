@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { grid } from '@coko/client'
 import { Empty } from 'antd'
+import {useTranslation} from "react-i18next";
 import BookCard from './BookCard'
 import { List } from '../common'
 
@@ -54,6 +55,8 @@ const BookGrid = ({
     onChange: onPageChange,
   }
 
+  const {t} = useTranslation();
+
   return (
     <Wrapper>
       <SectionHeader>{title && <h2>{title}</h2>}</SectionHeader>
@@ -74,7 +77,7 @@ const BookGrid = ({
         locale={{
           emptyText: (
             <Empty
-              description={<span>You don’t have any books yet</span>}
+              description={<span>{t("You don’t have any books yet".toLowerCase().replace(/ /g,"_"))}</span>}
               image={Empty.PRESENTED_IMAGE_SIMPLE}
             />
           ),

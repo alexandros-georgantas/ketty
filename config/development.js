@@ -28,11 +28,5 @@ module.exports = {
       assetsRoot: 'dist',
       supportedNoteTypes: ['footnotes'],
     },
-    {
-      label: 'vanilla',
-      url: 'https://gitlab.coko.foundation/ketida-templates/vanilla',
-      assetsRoot: 'dist',
-      supportedNoteTypes: ['footnotes'],
-    },
   ],
 }
