@@ -14,7 +14,7 @@ const LeftPanelWrapper = styled.div`
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  padding: 0 ${grid(5)};
+  padding: ${grid(3)};
 `
 
 const TitleArea = styled.div`

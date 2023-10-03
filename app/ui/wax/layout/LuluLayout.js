@@ -30,6 +30,7 @@ const Main = styled.div`
 const TopMenu = styled.div`
   align-items: center;
   background: ${th('colorBackgroundToolBar')};
+  border-bottom: 1px solid lightgrey;
   display: flex;
   height: 48px;
   justify-content: center;
@@ -37,7 +38,7 @@ const TopMenu = styled.div`
 `
 
 const EditorArea = styled.div`
-  background: #f9f9f9;
+  background: lightgrey;
   height: 100%;
   padding: 4px 0;
   width: ${({ isFullscreen }) => (isFullscreen ? '100%' : '75%')};
@@ -64,8 +65,10 @@ const EditorContainer = styled.div`
   }
 
   .ProseMirror {
+    background: ${({ selectedChapterId }) =>
+      selectedChapterId ? '#fff' : 'lightgrey'};
     min-height: 100%;
-    padding: ${grid(5)} ${grid(20)};
+    padding: ${grid(10)} ${grid(20)};
     width: 100%;
 
     table > caption {
@@ -152,7 +155,9 @@ const LuluLayout = ({ editor }) => {
 
         <EditorArea isFullscreen={options.fullScreen}>
           <WaxSurfaceScroll>
-            <EditorContainer>{editor}</EditorContainer>
+            <EditorContainer selectedChapterId={selectedChapterId}>
+              {editor}
+            </EditorContainer>
           </WaxSurfaceScroll>
         </EditorArea>
       </Main>

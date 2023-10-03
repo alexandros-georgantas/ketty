@@ -1,6 +1,4 @@
 import { DefaultSchema } from 'wax-prosemirror-core'
-// import axios from 'axios'
-// import { useLazyQuery } from '@apollo/client'
 
 import {
   InlineAnnotationsService,
@@ -27,7 +25,7 @@ import {
   // AskAiContentService,
 } from 'wax-prosemirror-services'
 
-import { TablesService, tableEditing, columnResizing } from 'wax-table-service'
+import { TablesService, columnResizing } from 'wax-table-service'
 
 import charactersList from './charactersList'
 
@@ -63,7 +61,6 @@ export default {
   SchemaService: DefaultSchema,
   SpecialCharactersService: charactersList,
   PmPlugins: [
-    tableEditing(),
     columnResizing(),
     disallowPasteImagesPlugin(() =>
       onInfoModal(
