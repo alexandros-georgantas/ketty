@@ -267,6 +267,24 @@ const BOOK_UPDATED_SUBSCRIPTION = gql`
   }
 `
 
+const BOOK_CREATED_SUBSCRIPTION = gql`
+  subscription BookCreated {
+    bookCreated
+  }
+`
+
+const BOOK_DELETED_SUBSCRIPTION = gql`
+  subscription BookDeleted {
+    bookDeleted
+  }
+`
+
+const BOOK_RENAMED_SUBSCRIPTION = gql`
+  subscription BookRenamed {
+    bookRenamed
+  }
+`
+
 export {
   GET_BOOK,
   GET_ENTIRE_BOOK,
@@ -280,6 +298,9 @@ export {
   UPDATE_BOOK_POD_METADATA,
   UPLOAD_BOOK_THUMBNAIL,
   EXPORT_BOOK,
-  BOOK_UPDATED_SUBSCRIPTION,
   LOCK_BOOK_COMPONENT_POD,
+  BOOK_UPDATED_SUBSCRIPTION,
+  BOOK_CREATED_SUBSCRIPTION,
+  BOOK_DELETED_SUBSCRIPTION,
+  BOOK_RENAMED_SUBSCRIPTION,
 }

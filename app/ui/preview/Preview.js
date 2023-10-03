@@ -188,7 +188,7 @@ Preview.propTypes = {
   processInProgress: PropTypes.bool.isRequired,
   bookExportInProgress: PropTypes.bool.isRequired,
   createPreviewInProgress: PropTypes.bool.isRequired,
-  previewLink: PropTypes.string.isRequired,
+  previewLink: PropTypes.string,
   templates: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
@@ -216,6 +216,7 @@ Preview.propTypes = {
 
 Preview.defaultProps = {
   selectedTemplate: null,
+  previewLink: undefined,
 }
 
 export default Preview

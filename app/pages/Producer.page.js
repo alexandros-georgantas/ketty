@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import useWebSocket from 'react-use-websocket'
 import { useHistory, useParams } from 'react-router-dom'
@@ -30,6 +30,7 @@ import {
   USER_UPDATED_SUBSCRIPTION,
   GET_BOOK_COMPONENT,
   USE_CHATGPT,
+  APPLICATION_PARAMETERS,
 } from '../graphql'
 
 import { isOwner, hasEditAccess, isAdmin } from '../helpers/permissions'
@@ -40,9 +41,9 @@ import {
   onInfoModal,
 } from '../helpers/commonModals'
 
-import { Editor, Modal, Paragraph, Form, Spin } from '../ui'
+import { Editor, Modal, Paragraph, Spin } from '../ui'
 
-import { BookMetadataForm } from '../ui/bookMetadata'
+// import { BookMetadataForm } from '../ui/bookMetadata'
 
 const StyledSpin = styled(Spin)`
   display: grid;
@@ -50,27 +51,44 @@ const StyledSpin = styled(Spin)`
   place-content: center;
 `
 
+const calculateEditorMode = (lock, canModify, currentUser, tabId) => {
+  if (
+    (lock && lock.userId !== currentUser.id) ||
+    (lock && lock.userId === currentUser.id && tabId !== lock.tabId) ||
+    !canModify
+  ) {
+    return 'preview'
+  }
+
+  if (!lock && canModify) {
+    return 'full'
+  }
+
+  return lock && lock.userId === currentUser.id && tabId === lock.tabId
+    ? 'full'
+    : 'preview'
+}
+
+const constructMetadataValues = (title, subtitle, podMetadata) => {
+  return {
+    title,
+    subtitle,
+    ...podMetadata,
+  }
+}
+
 const ProducerPage = () => {
   // INITIALIZATION SECTION START
-
   const history = useHistory()
   const params = useParams()
   const [tabId] = useState(uuid())
-  const [isOnline, setIsOnline] = useState(true)
-  const [editorMode, setEditorMode] = useState(undefined)
-  const [chatGPTEnabled, setChatGPTEnabled] = useState(false)
-
-  const [selectedChapter, setSelectedChapter] = useState(undefined)
-  // const [selectedBookComponentContent, setSelectedBookComponentContent] =
-  //   useState(undefined)
+  const [selectedChapterId, setSelectedChapterId] = useState(undefined)
+  const [reconnecting, setReconnecting] = useState(false)
+  const [metadataModalOpen, setMetadataModalOpen] = useState(false)
 
   const { currentUser } = useCurrentUser()
   const token = localStorage.getItem('token')
-  const [form] = Form.useForm()
-
-  const [chapterList, setChapterList] = useState([]) // needed for snappier UI instead of waiting for servers response regarding new order
-  // const [selectedChapterId, setSelectedChapterId] = useState(undefined)
-
+  // const [form] = Form.useForm()
   const { bookId } = params
 
   const canModify =
@@ -81,10 +99,16 @@ const ProducerPage = () => {
 
   // QUERIES SECTION START
   const {
+    loading: applicationParametersLoading,
+    data: applicationParametersData,
+  } = useQuery(APPLICATION_PARAMETERS, {
+    fetchPolicy: 'network-only',
+  })
+
+  const {
     loading,
     error,
     data: bookQueryData,
-    networkStatus,
     refetch: refetchBook,
   } = useQuery(GET_ENTIRE_BOOK, {
     fetchPolicy: 'network-only',
@@ -94,18 +118,12 @@ const ProducerPage = () => {
     },
   })
 
-  const [getBookComponent, { loading: bookComponentLoading }] = useLazyQuery(
+  const { loading: bookComponentLoading, data: bookComponentData } = useQuery(
     GET_BOOK_COMPONENT,
     {
       fetchPolicy: 'network-only',
-      onCompleted: ({ getBookComponent: bookComponentResponse }) => {
-        if (selectedChapter?.id) {
-          setSelectedChapter({
-            content: bookComponentResponse?.content,
-            id: selectedChapter.id,
-          })
-        }
-      },
+      skip: !selectedChapterId,
+      variables: { id: selectedChapterId },
       onError: () => showGenericErrorModal(),
     },
   )
@@ -182,16 +200,17 @@ const ProducerPage = () => {
     },
   })
 
-  const [createBookComponent] = useMutation(CREATE_BOOK_COMPONENT, {
-    refetchQueries: [GET_ENTIRE_BOOK],
-    onError: err => {
-      if (err.toString().includes('Not Authorised')) {
-        showUnauthorizedActionModal(false)
-      } else {
-        showGenericErrorModal()
-      }
-    },
-  })
+  const [createBookComponent, { loading: addBookComponentInProgress }] =
+    useMutation(CREATE_BOOK_COMPONENT, {
+      refetchQueries: [GET_ENTIRE_BOOK],
+      onError: err => {
+        if (err.toString().includes('Not Authorised')) {
+          showUnauthorizedActionModal(false)
+        } else {
+          showGenericErrorModal()
+        }
+      },
+    })
 
   const [renameBookComponent] = useMutation(RENAME_BOOK_COMPONENT_TITLE, {
     refetchQueries: [GET_ENTIRE_BOOK],
@@ -204,29 +223,28 @@ const ProducerPage = () => {
     },
   })
 
-  const [deleteBookComponent] = useMutation(DELETE_BOOK_COMPONENT, {
-    refetchQueries: [GET_ENTIRE_BOOK],
-    onCompleted: (_, { variables }) => {
-      const { input } = variables
-      const { id: deletedId } = input
-      // const { id } = selectedChapter
+  const [deleteBookComponent, { loading: deleteBookComponentInProgress }] =
+    useMutation(DELETE_BOOK_COMPONENT, {
+      refetchQueries: [GET_ENTIRE_BOOK],
+      onCompleted: (_, { variables }) => {
+        const { input } = variables
+        const { id: deletedId } = input
 
-      if (selectedChapter?.id && selectedChapter?.id === deletedId) {
-        setSelectedChapter(undefined)
-      }
-    },
-    onError: err => {
-      if (err.toString().includes('Not Authorised')) {
-        showUnauthorizedActionModal(false)
-      } else {
-        showGenericErrorModal()
-      }
-    },
-  })
+        if (selectedChapterId && selectedChapterId === deletedId) {
+          setSelectedChapterId(undefined)
+        }
+      },
+      onError: err => {
+        if (err.toString().includes('Not Authorised')) {
+          showUnauthorizedActionModal(false)
+        } else {
+          showGenericErrorModal()
+        }
+      },
+    })
 
-  const [updateBookComponentsOrder] = useMutation(
-    UPDATE_BOOK_COMPONENTS_ORDER,
-    {
+  const [updateBookComponentsOrder, { loading: changeOrderInProgress }] =
+    useMutation(UPDATE_BOOK_COMPONENTS_ORDER, {
       refetchQueries: [GET_ENTIRE_BOOK],
       onError: err => {
         if (err.toString().includes('Not Authorised')) {
@@ -235,8 +253,7 @@ const ProducerPage = () => {
           showGenericErrorModal()
         }
       },
-    },
-  )
+    })
 
   const [ingestWordFile] = useMutation(INGEST_WORD_FILES, {
     refetchQueries: [GET_ENTIRE_BOOK],
@@ -264,7 +281,6 @@ const ProducerPage = () => {
   })
 
   const [upload] = useMutation(UPLOAD_FILES)
-
   // MUTATIONS SECTION END
 
   // HANDLERS SECTION START
@@ -280,11 +296,11 @@ const ProducerPage = () => {
   }
 
   const onBookComponentContentChange = content => {
-    if (selectedChapter?.id && canModify) {
+    if (selectedChapterId && canModify) {
       updateContent({
         variables: {
           input: {
-            id: selectedChapter.id,
+            id: selectedChapterId,
             content,
           },
         },
@@ -317,13 +333,11 @@ const ProducerPage = () => {
   }
 
   const onBookComponentTitleChange = title => {
-    // const { id } = selectedChapter
-
-    if (selectedChapter?.id && canModify) {
+    if (selectedChapterId && canModify) {
       renameBookComponent({
         variables: {
           input: {
-            id: selectedChapter.id,
+            id: selectedChapterId,
             title,
           },
         },
@@ -337,7 +351,9 @@ const ProducerPage = () => {
       return
     }
 
-    const found = find(chapterList, { id: bookComponentId })
+    const found = find(bookQueryData.getBook.divisions[1].bookComponents, {
+      id: bookComponentId,
+    })
 
     if (found) {
       const { lock } = found
@@ -400,61 +416,43 @@ const ProducerPage = () => {
     })
   }
 
-  const showMetadataModalPlaceholder = (
-    bookTitle,
-    subtitle,
-    bookMetadataValues,
-  ) => {
-    const metadataModal = Modal.confirm()
-    const dataToPass = { title: bookTitle, subtitle, ...bookMetadataValues }
-
-    return metadataModal.update({
-      title: 'Book metadata',
-      cancelText: 'Cancel',
-      okText: 'Save',
-      content: (
-        <BookMetadataForm
-          canChangeMetadata={canModify}
-          form={form}
-          initialValues={dataToPass}
-          onSubmitBookMetadata={onSubmitBookMetadata}
-        />
-      ),
-      onOk() {
-        form.submit()
-        // .validateFields()
-        // .then(values => {
-        //   onSubmitBookMetadata(values, form)
-        //   metadataModal.destroy()
-        // })
-        // .catch(err => console.error(err))
-      },
-      okButtonProps: {
-        style: { backgroundColor: canModify ? 'black' : '' },
-        disabled: !canModify,
-      },
-      onCancel() {
-        metadataModal.destroy()
-      },
-      maskClosable: false,
-      centered: true,
-      width: 1200,
-    })
-  }
-
   const showOfflineModal = () => {
     const warningModal = Modal.error()
     return warningModal.update({
-      title: 'Error',
+      title: 'Server is unreachable',
       content: (
         <Paragraph>
-          Your network is down! Currently we don&apos;t support offline mode.
-          Please return to this page when your network issue is resolved.
+          {`Unfortunately, we couldn't re-establish communication with our server! Currently we don't
+          support offline mode. Please return to this page when your network
+          issue is resolved.`}
         </Paragraph>
       ),
       maskClosable: false,
       onOk() {
         history.push('/dashboard')
+        warningModal.destroy()
+      },
+      okButtonProps: { style: { backgroundColor: 'black' } },
+      width: 570,
+      bodyStyle: {
+        marginRight: 38,
+        textAlign: 'justify',
+      },
+    })
+  }
+
+  const communicationDownModal = () => {
+    const warningModal = Modal.warn()
+    return warningModal.update({
+      title: 'Server is unreachable',
+      content: (
+        <Paragraph>
+          The communication with our server is down! Please wait a bit while we
+          are trying to reconnect.
+        </Paragraph>
+      ),
+      maskClosable: false,
+      onOk() {
         warningModal.destroy()
       },
       okButtonProps: { style: { backgroundColor: 'black' } },
@@ -491,13 +489,11 @@ const ProducerPage = () => {
   }
 
   const onBookComponentLock = () => {
-    // const { id } = selectedChapter
-
-    if (selectedChapter?.id && canModify) {
+    if (selectedChapterId && canModify) {
       const userAgent = window.navigator.userAgent || null
       lockBookComponent({
         variables: {
-          id: selectedChapter.id,
+          id: selectedChapterId,
           tabId,
           userAgent,
         },
@@ -511,9 +507,10 @@ const ProducerPage = () => {
       return
     }
 
-    if (JSON.stringify(newChapterList) !== JSON.stringify(chapterList)) {
-      setChapterList(newChapterList)
-
+    if (
+      JSON.stringify(newChapterList) !==
+      JSON.stringify(bookQueryData.getBook.divisions[1].bookComponents)
+    ) {
       updateBookComponentsOrder({
         variables: {
           targetDivisionId: bookQueryData.getBook.divisions[1].id,
@@ -524,13 +521,12 @@ const ProducerPage = () => {
   }
 
   const onChapterClick = chapterId => {
-    // const { id } = selectedChapter
-
     const found = find(bookQueryData?.getBook?.divisions[1].bookComponents, {
       id: chapterId,
     })
 
-    const isAlreadySelected = chapterId === selectedChapter?.id
+    const isAlreadySelected =
+      selectedChapterId && chapterId === selectedChapterId
 
     if (found.uploading) {
       showUploadingModal()
@@ -538,13 +534,11 @@ const ProducerPage = () => {
     }
 
     if (isAlreadySelected) {
-      setSelectedChapter(undefined)
-      setEditorMode(undefined)
+      setSelectedChapterId(undefined)
       return
     }
 
-    setSelectedChapter({ id: chapterId })
-    getBookComponent({ variables: { id: chapterId } })
+    setSelectedChapterId(chapterId)
   }
 
   const onUploadChapter = () => {
@@ -621,164 +615,113 @@ const ProducerPage = () => {
       }
     })
   }
+
   // HANDLERS SECTION END
+  const bookComponent =
+    !loading &&
+    selectedChapterId &&
+    find(bookQueryData.getBook.divisions[1].bookComponents, {
+      id: selectedChapterId,
+    })
+
+  const editorMode =
+    !loading &&
+    selectedChapterId &&
+    calculateEditorMode(bookComponent?.lock, canModify, currentUser, tabId)
+
+  const bookMetadataValues = constructMetadataValues(
+    bookQueryData?.getBook.title,
+    bookQueryData?.getBook.subtitle,
+    bookQueryData?.getBook?.podMetadata,
+  )
 
   // WEBSOCKET SECTION START
-  const { getWebSocket } = useWebSocket(
+  useWebSocket(
     `${webSocketServerUrl}/locks`,
     {
       onOpen: () => {
         if (editorMode && editorMode !== 'preview') {
           onBookComponentLock()
+
+          if (reconnecting) {
+            setReconnecting(false)
+          }
         }
       },
-      onError: err => {
-        console.error(err)
+      onError: () => {
+        if (!reconnecting) {
+          communicationDownModal()
+          setReconnecting(true)
+        }
       },
       shouldReconnect: () => {
-        return editorMode && editorMode !== 'preview'
+        return selectedChapterId && editorMode && editorMode !== 'preview'
+      },
+      onReconnectStop: () => {
+        showOfflineModal()
       },
       queryParams: {
         token,
-        bookComponentId: selectedChapter?.id,
+        bookComponentId: selectedChapterId,
         tabId,
       },
-      share: false,
-      reconnectAttempts: 5000,
+      share: true,
+      reconnectAttempts: 5,
       reconnectInterval: 5000,
     },
-    selectedChapter?.id !== undefined && editorMode && editorMode !== 'preview',
+    selectedChapterId !== undefined && editorMode && editorMode !== 'preview',
   )
   // WEBSOCKET SECTION END
 
-  // EFFECTS SECTION START
-  useEffect(() => {
-    if (
-      networkStatus === 8 &&
-      isOnline &&
-      !error?.message?.includes('does not exist')
-    ) {
-      setIsOnline(false)
-    }
+  if (!loading && error?.message?.includes('does not exist')) {
+    showErrorModal()
+  }
 
-    if (networkStatus === 7 && !isOnline) {
-      setIsOnline(true)
-    }
-  }, [networkStatus])
+  if (reconnecting) {
+    return <StyledSpin spinning />
+  }
 
-  useEffect(() => {
-    if (!loading && error?.message?.includes('does not exist')) {
-      showErrorModal()
-    }
-  }, [error])
+  if (applicationParametersLoading || loading || bookComponentLoading)
+    return <StyledSpin spinning />
 
-  useEffect(() => {
-    if (!isOnline) {
-      showOfflineModal()
-    }
-  }, [isOnline])
+  const chaptersActionInProgress =
+    changeOrderInProgress ||
+    addBookComponentInProgress ||
+    deleteBookComponentInProgress
 
-  useEffect(() => {
-    if (!loading && bookQueryData.getBook) {
-      if (
-        JSON.stringify(chapterList) !==
-        JSON.stringify(bookQueryData.getBook.divisions[1].bookComponents)
-      ) {
-        setChapterList(bookQueryData.getBook.divisions[1].bookComponents)
-      }
-
-      // the below is for the case where a user has the lock of a chapter and at the same time another user is in read only mode for that chapter.
-      // When the lock is release from the initial user then the read-only user will take it
-      if (selectedChapter?.id) {
-        const found = find(bookQueryData.getBook.divisions[1].bookComponents, {
-          id: selectedChapter?.id,
-        })
-
-        const { lock } = found
-
-        if (!lock && canModify) {
-          setEditorMode('full')
-        }
-      }
-    }
-  }, [bookQueryData?.getBook?.divisions[1].bookComponents])
-
-  useEffect(() => {
-    if (selectedChapter?.id) {
-      const found = find(bookQueryData.getBook.divisions[1].bookComponents, {
-        id: selectedChapter?.id,
-      })
-
-      const { lock } = found
-
-      if (
-        (lock && lock.userId !== currentUser.id) ||
-        (lock && lock.userId === currentUser.id && tabId !== lock.tabId) ||
-        !canModify
-      ) {
-        setEditorMode('preview')
-      }
-
-      if (!lock && canModify) {
-        setEditorMode('full')
-      }
-    }
-  }, [selectedChapter?.id, canModify])
-
-  useEffect(() => {
-    if (editorMode && editorMode === 'preview') {
-      if (selectedChapter?.id) {
-        const found = find(bookQueryData.getBook.divisions[1].bookComponents, {
-          id: selectedChapter?.id,
-        })
-
-        const { lock } = found
-
-        if (lock && lock.userId !== currentUser.id) {
-          if (getWebSocket()) {
-            getWebSocket().close()
-          }
-        }
-
-        if (lock && lock.userId === currentUser.id && tabId !== lock.tabId) {
-          if (getWebSocket()) {
-            getWebSocket().close()
-          }
-        }
-      }
-    }
-  }, [editorMode])
-  // EFFECTS SECTION END
-
-  if (loading || bookComponentLoading) return <StyledSpin spinning />
+  const isAIEnabled = find(
+    applicationParametersData?.getApplicationParameters,
+    { area: 'aiEnabled' },
+  )
 
   return (
     <Editor
-      bookMetadataValues={bookQueryData?.getBook.podMetadata}
+      aiEnabled={isAIEnabled?.config}
+      bookComponentContent={bookComponentData?.getBookComponent?.content}
+      bookMetadataValues={bookMetadataValues}
       canEdit={canModify}
-      chapters={chapterList}
-      chatGPTEnabled={chatGPTEnabled}
+      chapters={bookQueryData?.getBook?.divisions[1].bookComponents}
+      chaptersActionInProgress={chaptersActionInProgress}
       isReadOnly={
-        !selectedChapter?.id ||
+        !selectedChapterId ||
         (editorMode && editorMode === 'preview') ||
         !canModify
       }
+      metadataModalOpen={metadataModalOpen}
       onAddChapter={onAddChapter}
       onBookComponentTitleChange={onBookComponentTitleChange}
       onChapterClick={onChapterClick}
-      onClickBookMetadata={showMetadataModalPlaceholder}
       onDeleteChapter={onDeleteChapter}
       onImageUpload={handleImageUpload}
       onPeriodicBookComponentContentChange={
         onPeriodicBookComponentContentChange
       }
       onReorderChapter={onReorderChapter}
+      onSubmitBookMetadata={onSubmitBookMetadata}
       onUploadChapter={onUploadChapter}
       queryAI={queryAI}
-      selectedChapter={selectedChapter}
-      // selectedBookComponentContent={selectedBookComponentContent}
-      // selectedChapterId={selectedChapterId}
-      setChatGPTEnabled={setChatGPTEnabled}
+      selectedChapterId={selectedChapterId}
+      setMetadataModalOpen={setMetadataModalOpen}
       subtitle={bookQueryData?.getBook.subtitle}
       title={bookQueryData?.getBook.title}
     />
