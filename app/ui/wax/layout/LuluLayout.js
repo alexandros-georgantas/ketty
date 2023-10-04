@@ -30,6 +30,7 @@ const Main = styled.div`
 const TopMenu = styled.div`
   align-items: center;
   background: ${th('colorBackgroundToolBar')};
+  border-bottom: 1px solid lightgrey;
   display: flex;
   height: 48px;
   justify-content: center;
@@ -37,8 +38,11 @@ const TopMenu = styled.div`
 `
 
 const EditorArea = styled.div`
+  background: #e8e8e8;
+  border-bottom: 1px solid lightgrey;
   height: 100%;
-  width: ${({ isFullscreen }) => (isFullscreen ? '100%' : '80%')};
+  padding: 4px 0 0;
+  width: ${({ isFullscreen }) => (isFullscreen ? '100%' : '75%')};
 `
 
 const WaxSurfaceScroll = styled.div`
@@ -52,12 +56,20 @@ const WaxSurfaceScroll = styled.div`
 
 const EditorContainer = styled.div`
   height: 100%;
+  margin: 0 auto;
   position: relative;
-  width: 100%;
+  width: calc(80ch + 80px);
+
+  & > div {
+    width: 100%;
+  }
 
   .ProseMirror {
+    background: ${({ selectedChapterId }) =>
+      selectedChapterId ? '#fff' : '#e8e8e8'};
     min-height: 100%;
-    padding: ${grid(10)};
+    padding: ${grid(10)} ${grid(20)};
+    width: 100%;
 
     table > caption {
       caption-side: top;
@@ -71,7 +83,7 @@ const EditorContainer = styled.div`
 
 const StyledBookPanel = styled(BookPanel)`
   border-right: ${th('borderWidth')} ${th('borderStyle')} ${th('colorBorder')};
-  width: 20%;
+  width: 25%;
 `
 
 const MainMenuToolBar = ComponentPlugin('mainMenuToolBar')
@@ -103,13 +115,16 @@ const LuluLayout = ({ editor }) => {
     onChapterClick,
     onReorderChapter,
     onUploadChapter,
-    selectedChapter,
+    selectedChapterId,
     title,
     subtitle,
     onAddChapter,
-    onClickBookMetadata,
+    onSubmitBookMetadata,
     bookMetadataValues,
+    chaptersActionInProgress,
     canEdit,
+    metadataModalOpen,
+    setMetadataModalOpen,
   } = luluWax
 
   return (
@@ -123,13 +138,16 @@ const LuluLayout = ({ editor }) => {
             bookMetadataValues={bookMetadataValues}
             canEdit={canEdit}
             chapters={chapters}
+            chaptersActionInProgress={chaptersActionInProgress}
+            metadataModalOpen={metadataModalOpen}
             onAddChapter={onAddChapter}
             onChapterClick={onChapterClick}
-            onClickBookMetadata={onClickBookMetadata}
             onDeleteChapter={onDeleteChapter}
             onReorderChapter={onReorderChapter}
+            onSubmitBookMetadata={onSubmitBookMetadata}
             onUploadChapter={onUploadChapter}
-            selectedChapter={selectedChapter}
+            selectedChapterId={selectedChapterId}
+            setMetadataModalOpen={setMetadataModalOpen}
             subtitle={subtitle}
             title={title}
           />
@@ -137,7 +155,9 @@ const LuluLayout = ({ editor }) => {
 
         <EditorArea isFullscreen={options.fullScreen}>
           <WaxSurfaceScroll>
-            <EditorContainer>{editor}</EditorContainer>
+            <EditorContainer selectedChapterId={selectedChapterId}>
+              {editor}
+            </EditorContainer>
           </WaxSurfaceScroll>
         </EditorArea>
       </Main>

@@ -211,7 +211,7 @@ const UPDATE_BOOK_COMPONENTS_ORDER = gql`
           id
           title
           divisionId
-          # content
+          content
           componentType
           trackChangesEnabled
           uploading

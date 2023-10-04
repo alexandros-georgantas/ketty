@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { CaretRightFilled } from '@ant-design/icons'
@@ -21,10 +21,8 @@ ExpandIcon.propTypes = {
 
 const CopyrightLicenseInput = props => {
   const { onChange, value, canChangeMetadata } = props
-  const [selectedOption, setSelectedOption] = useState(value)
 
   const handleChange = v => {
-    setSelectedOption(v)
     onChange(v)
   }
 
@@ -41,10 +39,10 @@ const CopyrightLicenseInput = props => {
         key="NC"
         name="SCL"
         onChange={handleChange}
-        selected={selectedOption === 'SCL'}
+        selected={value === 'SCL'}
         title="All Rights Reserved - Standard Copyright License"
       >
-        {selectedOption === 'SCL' && (
+        {value === 'SCL' && (
           <CopyrightInputs
             canChangeMetadata={canChangeMetadata}
             namePrefix="nc"
@@ -60,10 +58,10 @@ const CopyrightLicenseInput = props => {
         linkText="What is Creative Commons?"
         name="CC"
         onChange={handleChange}
-        selected={selectedOption === 'CC'}
+        selected={value === 'CC'}
         title="Some Rights Reserved - Creative Commons (CC BY)"
       >
-        {selectedOption === 'CC' && (
+        {value === 'CC' && (
           <>
             <CopyrightInputs
               canChangeMetadata={canChangeMetadata}
@@ -82,10 +80,10 @@ const CopyrightLicenseInput = props => {
         key="ND"
         name="PD"
         onChange={handleChange}
-        selected={selectedOption === 'PD'}
+        selected={value === 'PD'}
         title="No Rights Reserved - Public Domain"
       >
-        {selectedOption === 'PD' && (
+        {value === 'PD' && (
           <Form.Item name="publicDomainType">
             <Radio.Group
               disabled={!canChangeMetadata}

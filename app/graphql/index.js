@@ -1,3 +1,4 @@
+export * from './applicationParameters'
 export * from './authentication.queries'
 export * from './bookComponent.queries'
 export * from './team.queries'
