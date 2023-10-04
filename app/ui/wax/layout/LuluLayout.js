@@ -38,9 +38,10 @@ const TopMenu = styled.div`
 `
 
 const EditorArea = styled.div`
-  background: lightgrey;
+  background: #e8e8e8;
+  border-bottom: 1px solid lightgrey;
   height: 100%;
-  padding: 4px 0;
+  padding: 4px 0 0;
   width: ${({ isFullscreen }) => (isFullscreen ? '100%' : '75%')};
 `
 
@@ -57,8 +58,7 @@ const EditorContainer = styled.div`
   height: 100%;
   margin: 0 auto;
   position: relative;
-
-  width: 816px;
+  width: calc(80ch + 80px);
 
   & > div {
     width: 100%;
@@ -66,7 +66,7 @@ const EditorContainer = styled.div`
 
   .ProseMirror {
     background: ${({ selectedChapterId }) =>
-      selectedChapterId ? '#fff' : 'lightgrey'};
+      selectedChapterId ? '#fff' : '#e8e8e8'};
     min-height: 100%;
     padding: ${grid(10)} ${grid(20)};
     width: 100%;

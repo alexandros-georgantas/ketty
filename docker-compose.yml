@@ -27,7 +27,7 @@ services:
     tty: true
 
   server:
-    image: cokoapps/ketida-server:1.12.1
+    image: cokoapps/ketida-server:1.12.2
     restart: unless-stopped
     depends_on:
       - db
@@ -132,6 +132,8 @@ services:
       - FEATURE_UPLOAD_DOCX_FILES=true
       - FEATURE_BOOK_STRUCTURE=false
       - FEATURE_POD=true
+      - AI_ENABLED=false
+      # - AI_ENABLED=true for the case of ai needs
       - TEMP_DIRECTORY_CRON_JOB_SCHEDULE=${TEMP_DIRECTORY_CRON_JOB_TIMING:-0 * * * *}
       - TEMP_DIRECTORY_CRON_JOB_OFFSET=${TEMP_DIRECTORY_CRON_JOB_OFFSET:-1800000}
       - TEMP_DIRECTORY_CLEAN_UP=${TEMP_DIRECTORY_CLEAN_UP:-true}
