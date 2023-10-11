@@ -31,6 +31,7 @@ import {
   GET_BOOK_COMPONENT,
   USE_CHATGPT,
   APPLICATION_PARAMETERS,
+  SET_BOOK_COMPONENT_STATUS,
 } from '../graphql'
 
 import { isOwner, hasEditAccess, isAdmin } from '../helpers/permissions'
@@ -180,6 +181,19 @@ const ProducerPage = () => {
     },
   })
 
+  const [
+    setBookComponentStatus,
+    { loading: setBookComponentStatusInProgress },
+  ] = useMutation(SET_BOOK_COMPONENT_STATUS, {
+    onError: err => {
+      if (err.toString().includes('Not Authorised')) {
+        showUnauthorizedActionModal(false)
+      } else {
+        showGenericErrorModal()
+      }
+    },
+  })
+
   const [renameBook] = useMutation(RENAME_BOOK, {
     onError: err => {
       if (err.toString().includes('Not Authorised')) {
@@ -255,16 +269,19 @@ const ProducerPage = () => {
       },
     })
 
-  const [ingestWordFile] = useMutation(INGEST_WORD_FILES, {
-    refetchQueries: [GET_ENTIRE_BOOK],
-    onError: err => {
-      if (err.toString().includes('Not Authorised')) {
-        showUnauthorizedActionModal(false)
-      } else {
-        showGenericErrorModal()
-      }
+  const [ingestWordFile, { loading: ingestWordFileInProgress }] = useMutation(
+    INGEST_WORD_FILES,
+    {
+      refetchQueries: [GET_ENTIRE_BOOK],
+      onError: err => {
+        if (err.toString().includes('Not Authorised')) {
+          showUnauthorizedActionModal(false)
+        } else {
+          showGenericErrorModal()
+        }
+      },
     },
-  })
+  )
 
   const [updatePODMetadata] = useMutation(UPDATE_BOOK_POD_METADATA, {
     onError: err => {
@@ -488,6 +505,35 @@ const ProducerPage = () => {
     })
   }
 
+  const showConversionErrorModal = chapterId => {
+    const errorModal = Modal.error()
+    return errorModal.update({
+      title: 'Error',
+      content: (
+        <Paragraph>
+          Unfortunately, something went wrong while trying to convert your docx
+          file. Please inform your admin about this issue. In the meantime, you
+          could manually insert your content via using our editor, or delete
+          this chapter and re-upload it if your admin informs you that this
+          issue is resolved.
+        </Paragraph>
+      ),
+      maskClosable: false,
+      onOk() {
+        setBookComponentStatus({
+          variables: { id: chapterId, status: 200 },
+        })
+        errorModal.destroy()
+      },
+      okButtonProps: { style: { backgroundColor: 'black' } },
+      width: 570,
+      bodyStyle: {
+        marginRight: 38,
+        textAlign: 'justify',
+      },
+    })
+  }
+
   const onBookComponentLock = () => {
     if (selectedChapterId && canModify) {
       const userAgent = window.navigator.userAgent || null
@@ -527,6 +573,11 @@ const ProducerPage = () => {
 
     const isAlreadySelected =
       selectedChapterId && chapterId === selectedChapterId
+
+    if (found.status === 300) {
+      showConversionErrorModal(chapterId)
+      return
+    }
 
     if (found.uploading) {
       showUploadingModal()
@@ -687,7 +738,9 @@ const ProducerPage = () => {
   const chaptersActionInProgress =
     changeOrderInProgress ||
     addBookComponentInProgress ||
-    deleteBookComponentInProgress
+    deleteBookComponentInProgress ||
+    ingestWordFileInProgress ||
+    setBookComponentStatusInProgress
 
   const isAIEnabled = find(
     applicationParametersData?.getApplicationParameters,
