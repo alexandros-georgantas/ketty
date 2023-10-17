@@ -136,7 +136,7 @@ const DashboardPage = () => {
     onError: error => console.error(error),
   })
 
-  const [createBook] = useMutation(CREATE_BOOK, {
+  const [createBook, createBookResult] = useMutation(CREATE_BOOK, {
     refetchQueries: [
       {
         query: GET_BOOKS,
@@ -214,6 +214,11 @@ const DashboardPage = () => {
   }
 
   const createBookHandler = whereNext => {
+    // Play it safe and refuse to call "createBook" while it is loading
+    if (createBookResult.loading) {
+      return false
+    }
+
     const variables = { input: { addUserToBookTeams: ['owner'] } }
 
     return createBook({ variables }).then(res => {
@@ -259,6 +264,7 @@ const DashboardPage = () => {
 
   return (
     <Dashboard
+      awaitingResult={createBookResult.loading}
       books={queryData?.getBooks.result || []}
       booksPerPage={booksPerPage}
       canDeleteBook={canTakeActionOnBook}

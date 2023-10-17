@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { EditOutlined, CloudUploadOutlined } from '@ant-design/icons'
@@ -43,22 +43,36 @@ const Dashboard = props => {
     canUploadBookThumbnail,
     loading,
     onUploadBookThumbnail,
+    awaitingResult,
   } = props
 
+  // Keep track of the most recently clicked button so that buttons can show
+  // "loading wheels" while awaiting the result their "onClick" action
+  const [lastClicked, setLastClicked] = useState('')
   return (
     <Wrapper>
       <DashboardActions>
         <Button
+          disabled={awaitingResult}
           icon={<EditOutlined />}
-          onClick={onCreateBook}
+          loading={awaitingResult && lastClicked === 'write-book'}
+          onClick={() => {
+            setLastClicked('write-book')
+            onCreateBook()
+          }}
           size="large"
           type="primary"
         >
           Start writing your book
         </Button>
         <Button
+          disabled={awaitingResult}
           icon={<CloudUploadOutlined />}
-          onClick={onImportBook}
+          loading={awaitingResult && lastClicked === 'import-book'}
+          onClick={() => {
+            setLastClicked('import-book')
+            onImportBook()
+          }}
           size="large"
         >
           Import your files
