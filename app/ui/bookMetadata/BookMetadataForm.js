@@ -117,18 +117,7 @@ const BookMetadataForm = ({
 
         <FormSection>
           <h2>COPYRIGHT PAGE</h2>
-          <Form.Item
-            label="ISBN"
-            labelCol={{ span: 24 }}
-            name="isbn"
-            // rules={[{ required: true, message: 'ISBN is required' }]}
-            wrapperCol={{ span: 24 }}
-          >
-            <Input
-              disabled={!canChangeMetadata}
-              placeholder="Update this ISBN before exporting versions requiring unique identifier"
-            />
-          </Form.Item>
+          <ISBNItem canChangeMetadata={canChangeMetadata} id="new-0" />
           <Form.Item
             label="Top of the page"
             labelCol={{ span: 24 }}
@@ -193,6 +182,49 @@ BookMetadataForm.propTypes = {
   closeModal: PropTypes.func.isRequired,
   canChangeMetadata: PropTypes.bool.isRequired,
   onSubmitBookMetadata: PropTypes.func.isRequired,
+}
+
+const ISBNItem = ({ canChangeMetadata, id }) => {
+  return (
+    <Form.Item
+      label="ISBN"
+      labelCol={{ span: 24 }}
+      style={{ marginBottom: 0 }}
+      wrapperCol={{ span: 24 }}
+    >
+      <Form.Item
+        name={`isbnLabel-${id}`}
+        // rules={[{ required: true, message: 'ISBN is required' }]}
+        style={{ display: 'inline-block', width: 'calc(30% - 10px)' }}
+      >
+        <Input disabled={!canChangeMetadata} placeholder="Label" />
+      </Form.Item>
+      <span
+        style={{
+          display: 'inline-block',
+          width: '20px',
+          lineHeight: '32px',
+          textAlign: 'center',
+        }}
+      />
+      <Form.Item
+        name={`isbnValue-${id}`}
+        // rules={[{ required: true, message: 'ISBN is required' }]}
+        style={{ display: 'inline-block', width: 'calc(70% - 10px)' }}
+      >
+        <Input
+          disabled={!canChangeMetadata}
+          placeholder="ISBN: update this value before exporting versions requiring unique identifier"
+        />
+      </Form.Item>
+    </Form.Item>
+  )
+}
+
+ISBNItem.propTypes = {
+  /* eslint-disable-next-line react/forbid-prop-types */
+  id: PropTypes.string.isRequired,
+  canChangeMetadata: PropTypes.bool.isRequired,
 }
 
 export default BookMetadataForm
