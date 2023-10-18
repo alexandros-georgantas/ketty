@@ -31,6 +31,7 @@ import {
   GET_BOOK_COMPONENT,
   USE_CHATGPT,
   APPLICATION_PARAMETERS,
+  SET_BOOK_COMPONENT_STATUS,
 } from '../graphql'
 
 import { isOwner, hasEditAccess, isAdmin } from '../helpers/permissions'
@@ -76,6 +77,8 @@ const constructMetadataValues = (title, subtitle, podMetadata) => {
     ...podMetadata,
   }
 }
+
+let issueInCommunicationModal
 
 const ProducerPage = () => {
   // INITIALIZATION SECTION START
@@ -180,6 +183,19 @@ const ProducerPage = () => {
     },
   })
 
+  const [
+    setBookComponentStatus,
+    { loading: setBookComponentStatusInProgress },
+  ] = useMutation(SET_BOOK_COMPONENT_STATUS, {
+    onError: err => {
+      if (err.toString().includes('Not Authorised')) {
+        showUnauthorizedActionModal(false)
+      } else {
+        showGenericErrorModal()
+      }
+    },
+  })
+
   const [renameBook] = useMutation(RENAME_BOOK, {
     onError: err => {
       if (err.toString().includes('Not Authorised')) {
@@ -255,16 +271,19 @@ const ProducerPage = () => {
       },
     })
 
-  const [ingestWordFile] = useMutation(INGEST_WORD_FILES, {
-    refetchQueries: [GET_ENTIRE_BOOK],
-    onError: err => {
-      if (err.toString().includes('Not Authorised')) {
-        showUnauthorizedActionModal(false)
-      } else {
-        showGenericErrorModal()
-      }
+  const [ingestWordFile, { loading: ingestWordFileInProgress }] = useMutation(
+    INGEST_WORD_FILES,
+    {
+      refetchQueries: [GET_ENTIRE_BOOK],
+      onError: err => {
+        if (err.toString().includes('Not Authorised')) {
+          showUnauthorizedActionModal(false)
+        } else {
+          showGenericErrorModal()
+        }
+      },
     },
-  })
+  )
 
   const [updatePODMetadata] = useMutation(UPDATE_BOOK_POD_METADATA, {
     onError: err => {
@@ -278,6 +297,7 @@ const ProducerPage = () => {
 
   const [lockBookComponent] = useMutation(LOCK_BOOK_COMPONENT_POD, {
     refetchQueries: [GET_ENTIRE_BOOK],
+    onError: () => {},
   })
 
   const [upload] = useMutation(UPLOAD_FILES)
@@ -443,25 +463,23 @@ const ProducerPage = () => {
 
   const communicationDownModal = () => {
     const warningModal = Modal.warn()
-    return warningModal.update({
-      title: 'Server is unreachable',
+    warningModal.update({
+      title: 'Something went wrong!',
       content: (
         <Paragraph>
-          The communication with our server is down! Please wait a bit while we
-          are trying to reconnect.
+          Please wait while we are trying resolve the issue. Make sure your
+          internet connection is working.
         </Paragraph>
       ),
       maskClosable: false,
-      onOk() {
-        warningModal.destroy()
-      },
-      okButtonProps: { style: { backgroundColor: 'black' } },
+      footer: null,
       width: 570,
       bodyStyle: {
         marginRight: 38,
         textAlign: 'justify',
       },
     })
+    return warningModal
   }
 
   const showUploadingModal = () => {
@@ -478,6 +496,35 @@ const ProducerPage = () => {
       maskClosable: false,
       onOk() {
         warningModal.destroy()
+      },
+      okButtonProps: { style: { backgroundColor: 'black' } },
+      width: 570,
+      bodyStyle: {
+        marginRight: 38,
+        textAlign: 'justify',
+      },
+    })
+  }
+
+  const showConversionErrorModal = chapterId => {
+    const errorModal = Modal.error()
+    return errorModal.update({
+      title: 'Error',
+      content: (
+        <Paragraph>
+          Unfortunately, something went wrong while trying to convert your docx
+          file. Please inform your admin about this issue. In the meantime, you
+          could manually insert your content via using our editor, or delete
+          this chapter and re-upload it if your admin informs you that this
+          issue is resolved.
+        </Paragraph>
+      ),
+      maskClosable: false,
+      onOk() {
+        setBookComponentStatus({
+          variables: { id: chapterId, status: 200 },
+        })
+        errorModal.destroy()
       },
       okButtonProps: { style: { backgroundColor: 'black' } },
       width: 570,
@@ -527,6 +574,11 @@ const ProducerPage = () => {
 
     const isAlreadySelected =
       selectedChapterId && chapterId === selectedChapterId
+
+    if (found.status === 300) {
+      showConversionErrorModal(chapterId)
+      return
+    }
 
     if (found.uploading) {
       showUploadingModal()
@@ -636,21 +688,55 @@ const ProducerPage = () => {
   )
 
   // WEBSOCKET SECTION START
-  useWebSocket(
+  const { getWebSocket } = useWebSocket(
     `${webSocketServerUrl}/locks`,
     {
       onOpen: () => {
         if (editorMode && editorMode !== 'preview') {
-          onBookComponentLock()
+          if (!reconnecting) {
+            onBookComponentLock()
+          }
 
           if (reconnecting) {
             setReconnecting(false)
+            refetchBook().then(({ data }) => {
+              const { getBook } = data
+
+              if (selectedChapterId) {
+                const found = find(getBook.divisions[1].bookComponents, {
+                  id: selectedChapterId,
+                })
+
+                const currentEditorMode =
+                  calculateEditorMode(
+                    found.lock,
+                    canModify,
+                    currentUser,
+                    tabId,
+                  ) !== 'preview'
+
+                if (currentEditorMode && currentEditorMode !== 'preview') {
+                  onBookComponentLock()
+                } else {
+                  const currentWS = getWebSocket()
+
+                  if (currentWS) {
+                    currentWS.close()
+                  }
+                }
+              }
+
+              if (issueInCommunicationModal) {
+                issueInCommunicationModal.destroy()
+                issueInCommunicationModal = undefined
+              }
+            })
           }
         }
       },
       onError: () => {
         if (!reconnecting) {
-          communicationDownModal()
+          issueInCommunicationModal = communicationDownModal()
           setReconnecting(true)
         }
       },
@@ -665,12 +751,13 @@ const ProducerPage = () => {
         bookComponentId: selectedChapterId,
         tabId,
       },
-      share: true,
-      reconnectAttempts: 5,
+      share: false,
+      reconnectAttempts: 5000,
       reconnectInterval: 5000,
     },
     selectedChapterId !== undefined && editorMode && editorMode !== 'preview',
   )
+
   // WEBSOCKET SECTION END
 
   if (!loading && error?.message?.includes('does not exist')) {
@@ -687,7 +774,9 @@ const ProducerPage = () => {
   const chaptersActionInProgress =
     changeOrderInProgress ||
     addBookComponentInProgress ||
-    deleteBookComponentInProgress
+    deleteBookComponentInProgress ||
+    ingestWordFileInProgress ||
+    setBookComponentStatusInProgress
 
   const isAIEnabled = find(
     applicationParametersData?.getApplicationParameters,

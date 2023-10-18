@@ -270,6 +270,15 @@ const UNLOCK_BOOK_COMPONENT = gql`
   }
 `
 
+const SET_BOOK_COMPONENT_STATUS = gql`
+  mutation SetBookComponentStatus($id: ID!, $status: Int!) {
+    setBookComponentStatus(id: $id, status: $status) {
+      id
+      status
+    }
+  }
+`
+
 const USE_CHATGPT = gql`
   query ChatGPT($input: String!) {
     chatGPT(input: $input)
@@ -291,6 +300,7 @@ export {
   UPDATE_BOOK_COMPONENTS_ORDER,
   LOCK_BOOK_COMPONENT,
   UNLOCK_BOOK_COMPONENT,
+  SET_BOOK_COMPONENT_STATUS,
   USE_CHATGPT,
   // BOOK_COMPONENT_UPDATED_SUBSCRIPTION,
 }

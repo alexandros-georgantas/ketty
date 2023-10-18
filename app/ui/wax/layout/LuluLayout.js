@@ -42,7 +42,7 @@ const EditorArea = styled.div`
   border-bottom: 1px solid lightgrey;
   height: 100%;
   padding: 4px 0 0;
-  width: ${({ isFullscreen }) => (isFullscreen ? '100%' : '75%')};
+  width: ${({ isFullscreen }) => (isFullscreen ? '100%' : '80%')};
 `
 
 const WaxSurfaceScroll = styled.div`
@@ -52,13 +52,19 @@ const WaxSurfaceScroll = styled.div`
   overflow-y: auto;
   position: relative;
   width: 100%;
+
+  .ProseMirror {
+    /* figcaption {
+      width: 640px;
+    } */
+  }
 `
 
 const EditorContainer = styled.div`
   height: 100%;
   margin: 0 auto;
   position: relative;
-  width: calc(80ch + 80px);
+  width: 816px;
 
   & > div {
     width: 100%;
@@ -68,11 +74,15 @@ const EditorContainer = styled.div`
     background: ${({ selectedChapterId }) =>
       selectedChapterId ? '#fff' : '#e8e8e8'};
     min-height: 100%;
-    padding: ${grid(10)} ${grid(20)};
+    padding: ${grid(20)} ${grid(24)};
     width: 100%;
 
     table > caption {
       caption-side: top;
+    }
+
+    figcaption {
+      width: 624px;
     }
 
     &:focus-visible {
@@ -83,7 +93,7 @@ const EditorContainer = styled.div`
 
 const StyledBookPanel = styled(BookPanel)`
   border-right: ${th('borderWidth')} ${th('borderStyle')} ${th('colorBorder')};
-  width: 25%;
+  width: 20%;
 `
 
 const MainMenuToolBar = ComponentPlugin('mainMenuToolBar')

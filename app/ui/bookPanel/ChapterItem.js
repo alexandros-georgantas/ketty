@@ -87,6 +87,22 @@ const UserAvatar = styled.div`
 
 const ChapterTitle = styled.div`
   flex: 1;
+  ${({ status }) => {
+    if (status === 300) {
+      return css`
+        color: red;
+        font-weight: bold;
+        &::before {
+          content: '!! ';
+        }
+        &::after {
+          content: ' !!';
+        }
+      `
+    }
+
+    return false
+  }}
   overflow: hidden;
   text-overflow: ellipsis;
 `
@@ -111,6 +127,7 @@ const ChapterItem = props => {
     onClickDelete,
     selectedChapterId,
     uploading,
+    status,
     canEdit,
     ...rest
   } = props
@@ -130,7 +147,7 @@ const ChapterItem = props => {
           // }
         }}
       >
-        <ChapterTitle>
+        <ChapterTitle status={status}>
           {!uploading ? title || 'Untitled Chapter' : 'Processing'}
         </ChapterTitle>
         {lockedBy ? <UserAvatar>{getInitials(lockedBy)}</UserAvatar> : null}
@@ -166,6 +183,7 @@ ChapterItem.propTypes = {
   lockedBy: PropTypes.string,
   selectedChapterId: PropTypes.string,
   isDragging: PropTypes.bool.isRequired,
+  status: PropTypes.number,
   // onClickDuplicate: PropTypes.func.isRequired,
   onClickDelete: PropTypes.func.isRequired,
   onChapterClick: PropTypes.func.isRequired,
@@ -176,6 +194,7 @@ ChapterItem.defaultProps = {
   lockedBy: null,
   uploading: false,
   title: null,
+  status: null,
   selectedChapterId: undefined,
 }
 

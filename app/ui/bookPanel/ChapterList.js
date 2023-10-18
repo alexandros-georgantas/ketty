@@ -81,6 +81,7 @@ const ChapterList = ({
                           onChapterClick={onChapterClick}
                           onClickDelete={handleChapterDelete}
                           selectedChapterId={selectedChapterId}
+                          status={chapter.status}
                           title={chapter.title}
                           uploading={chapter.uploading}
                         />
@@ -104,6 +105,7 @@ ChapterList.propTypes = {
       id: PropTypes.string.isRequired,
       title: PropTypes.string,
       lockedBy: PropTypes.string,
+      status: PropTypes.number,
     }),
   ),
   selectedChapterId: PropTypes.string,
