@@ -52,6 +52,12 @@ const WaxSurfaceScroll = styled.div`
   overflow-y: auto;
   position: relative;
   width: 100%;
+
+  .ProseMirror {
+    /* figcaption {
+      width: 640px;
+    } */
+  }
 `
 
 const EditorContainer = styled.div`
@@ -73,6 +79,10 @@ const EditorContainer = styled.div`
 
     table > caption {
       caption-side: top;
+    }
+
+    figcaption {
+      width: 624px;
     }
 
     &:focus-visible {

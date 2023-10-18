@@ -78,6 +78,8 @@ const constructMetadataValues = (title, subtitle, podMetadata) => {
   }
 }
 
+let issueInCommunicationModal
+
 const ProducerPage = () => {
   // INITIALIZATION SECTION START
   const history = useHistory()
@@ -295,6 +297,7 @@ const ProducerPage = () => {
 
   const [lockBookComponent] = useMutation(LOCK_BOOK_COMPONENT_POD, {
     refetchQueries: [GET_ENTIRE_BOOK],
+    onError: () => {},
   })
 
   const [upload] = useMutation(UPLOAD_FILES)
@@ -460,25 +463,23 @@ const ProducerPage = () => {
 
   const communicationDownModal = () => {
     const warningModal = Modal.warn()
-    return warningModal.update({
-      title: 'Server is unreachable',
+    warningModal.update({
+      title: 'Something went wrong!',
       content: (
         <Paragraph>
-          The communication with our server is down! Please wait a bit while we
-          are trying to reconnect.
+          Please wait while we are trying resolve the issue. Make sure your
+          internet connection is working.
         </Paragraph>
       ),
       maskClosable: false,
-      onOk() {
-        warningModal.destroy()
-      },
-      okButtonProps: { style: { backgroundColor: 'black' } },
+      footer: null,
       width: 570,
       bodyStyle: {
         marginRight: 38,
         textAlign: 'justify',
       },
     })
+    return warningModal
   }
 
   const showUploadingModal = () => {
@@ -687,21 +688,55 @@ const ProducerPage = () => {
   )
 
   // WEBSOCKET SECTION START
-  useWebSocket(
+  const { getWebSocket } = useWebSocket(
     `${webSocketServerUrl}/locks`,
     {
       onOpen: () => {
         if (editorMode && editorMode !== 'preview') {
-          onBookComponentLock()
+          if (!reconnecting) {
+            onBookComponentLock()
+          }
 
           if (reconnecting) {
             setReconnecting(false)
+            refetchBook().then(({ data }) => {
+              const { getBook } = data
+
+              if (selectedChapterId) {
+                const found = find(getBook.divisions[1].bookComponents, {
+                  id: selectedChapterId,
+                })
+
+                const currentEditorMode =
+                  calculateEditorMode(
+                    found.lock,
+                    canModify,
+                    currentUser,
+                    tabId,
+                  ) !== 'preview'
+
+                if (currentEditorMode && currentEditorMode !== 'preview') {
+                  onBookComponentLock()
+                } else {
+                  const currentWS = getWebSocket()
+
+                  if (currentWS) {
+                    currentWS.close()
+                  }
+                }
+              }
+
+              if (issueInCommunicationModal) {
+                issueInCommunicationModal.destroy()
+                issueInCommunicationModal = undefined
+              }
+            })
           }
         }
       },
       onError: () => {
         if (!reconnecting) {
-          communicationDownModal()
+          issueInCommunicationModal = communicationDownModal()
           setReconnecting(true)
         }
       },
@@ -716,12 +751,13 @@ const ProducerPage = () => {
         bookComponentId: selectedChapterId,
         tabId,
       },
-      share: true,
-      reconnectAttempts: 5,
+      share: false,
+      reconnectAttempts: 5000,
       reconnectInterval: 5000,
     },
     selectedChapterId !== undefined && editorMode && editorMode !== 'preview',
   )
+
   // WEBSOCKET SECTION END
 
   if (!loading && error?.message?.includes('does not exist')) {
