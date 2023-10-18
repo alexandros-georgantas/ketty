@@ -191,7 +191,7 @@ const SiteHeader = () => {
       },
       closable: true,
       icon: null,
-      // footer: <StyledUserStatus />,
+      footer: null,
     })
   }
 
