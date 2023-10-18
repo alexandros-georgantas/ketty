@@ -43,36 +43,43 @@ const Dashboard = props => {
     canUploadBookThumbnail,
     loading,
     onUploadBookThumbnail,
-    awaitingResult,
   } = props
 
-  // Keep track of the most recently clicked button so that buttons can show
-  // "loading wheels" while awaiting the result their "onClick" action
-  const [lastClicked, setLastClicked] = useState('')
+  const [loadingCreateBook, setLoadingCreateBook] = useState(false)
+  const [loadingImportBook, setLoadingImportBook] = useState(false)
+
+  const handleCreateBook = () => {
+    setLoadingCreateBook(true)
+    onCreateBook().finally(() => {
+      setLoadingCreateBook(false)
+    })
+  }
+
+  const handleImportBook = () => {
+    setLoadingImportBook(true)
+    onImportBook().finally(() => {
+      setLoadingImportBook(false)
+    })
+  }
+
   return (
     <Wrapper>
       <DashboardActions>
         <Button
-          disabled={awaitingResult}
+          disabled={loadingCreateBook || loadingImportBook}
           icon={<EditOutlined />}
-          loading={awaitingResult && lastClicked === 'write-book'}
-          onClick={() => {
-            setLastClicked('write-book')
-            onCreateBook()
-          }}
+          loading={loadingCreateBook}
+          onClick={handleCreateBook}
           size="large"
           type="primary"
         >
           Start writing your book
         </Button>
         <Button
-          disabled={awaitingResult}
+          disabled={loadingCreateBook || loadingImportBook}
           icon={<CloudUploadOutlined />}
-          loading={awaitingResult && lastClicked === 'import-book'}
-          onClick={() => {
-            setLastClicked('import-book')
-            onImportBook()
-          }}
+          loading={loadingImportBook}
+          onClick={handleImportBook}
           size="large"
         >
           Import your files

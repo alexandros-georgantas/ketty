@@ -264,7 +264,6 @@ const DashboardPage = () => {
 
   return (
     <Dashboard
-      awaitingResult={createBookResult.loading}
       books={queryData?.getBooks.result || []}
       booksPerPage={booksPerPage}
       canDeleteBook={canTakeActionOnBook}
