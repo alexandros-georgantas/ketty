@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { isEmpty } from 'lodash'
 import { th } from '@coko/client'
 import dayjs from 'dayjs'
 import mapValues from 'lodash/mapValues'
 import { Form, Modal } from 'antd'
 import { Input, TextArea } from '../common'
 import CopyrightLicenseInput from './CopyrightLicenseInput'
+import ISBNList from './ISBNList'
 
 const StyledForm = styled(Form)`
   height: calc(100vh - 156.5px);
@@ -40,6 +42,10 @@ const BookMetadataForm = ({
       ? dayjs(value)
       : value
   })
+
+  if (isEmpty(transformedInitialValues.isbnList)) {
+    transformedInitialValues.isbnList = [{}]
+  }
 
   useEffect(() => {
     form.setFieldsValue(transformedInitialValues)
@@ -117,7 +123,14 @@ const BookMetadataForm = ({
 
         <FormSection>
           <h2>COPYRIGHT PAGE</h2>
-          <ISBNItem canChangeMetadata={canChangeMetadata} id="new-0" />
+          <Form.Item
+            label="ISBN List"
+            labelCol={{ span: 24 }}
+            style={{ marginBottom: '0px' }}
+            wrapperCol={{ span: 24 }}
+          >
+            <ISBNList canChangeMetadata={canChangeMetadata} name="isbnList" />
+          </Form.Item>
           <Form.Item
             label="Top of the page"
             labelCol={{ span: 24 }}
@@ -160,7 +173,12 @@ BookMetadataForm.propTypes = {
     title: PropTypes.string,
     subtitle: PropTypes.string,
     authors: PropTypes.string.isRequired,
-    isbn: PropTypes.string.isRequired,
+    isbnList: PropTypes.arrayOf(
+      PropTypes.shape({
+        label: PropTypes.string,
+        value: PropTypes.string.isRequired,
+      }),
+    ).isRequired,
     topPage: PropTypes.string,
     bottomPage: PropTypes.string,
     copyrightLicense: PropTypes.oneOf(['SCL', 'PD', 'CC']),
@@ -182,49 +200,6 @@ BookMetadataForm.propTypes = {
   closeModal: PropTypes.func.isRequired,
   canChangeMetadata: PropTypes.bool.isRequired,
   onSubmitBookMetadata: PropTypes.func.isRequired,
-}
-
-const ISBNItem = ({ canChangeMetadata, id }) => {
-  return (
-    <Form.Item
-      label="ISBN"
-      labelCol={{ span: 24 }}
-      style={{ marginBottom: 0 }}
-      wrapperCol={{ span: 24 }}
-    >
-      <Form.Item
-        name={`isbnLabel-${id}`}
-        // rules={[{ required: true, message: 'ISBN is required' }]}
-        style={{ display: 'inline-block', width: 'calc(30% - 10px)' }}
-      >
-        <Input disabled={!canChangeMetadata} placeholder="Label" />
-      </Form.Item>
-      <span
-        style={{
-          display: 'inline-block',
-          width: '20px',
-          lineHeight: '32px',
-          textAlign: 'center',
-        }}
-      />
-      <Form.Item
-        name={`isbnValue-${id}`}
-        // rules={[{ required: true, message: 'ISBN is required' }]}
-        style={{ display: 'inline-block', width: 'calc(70% - 10px)' }}
-      >
-        <Input
-          disabled={!canChangeMetadata}
-          placeholder="ISBN: update this value before exporting versions requiring unique identifier"
-        />
-      </Form.Item>
-    </Form.Item>
-  )
-}
-
-ISBNItem.propTypes = {
-  /* eslint-disable-next-line react/forbid-prop-types */
-  id: PropTypes.string.isRequired,
-  canChangeMetadata: PropTypes.bool.isRequired,
 }
 
 export default BookMetadataForm
