@@ -30,7 +30,7 @@ const ISBNList = ({ canChangeMetadata, name }) => {
             const duplicates = []
             rows.forEach(row => {
               if (row) {
-                const trimmedValue = row.value.trim()
+                const trimmedValue = (row.value || '').trim()
                 values[trimmedValue] = (values[trimmedValue] || 0) + 1
 
                 if (values[trimmedValue] === 2) {
