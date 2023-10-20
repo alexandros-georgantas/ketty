@@ -138,7 +138,7 @@ Base.args = {
     title: faker.lorem.words(4),
     subtitle: faker.lorem.words(8),
     authors: [faker.name.fullName(), faker.name.fullName()].join(', '),
-    isbnList: faker.random.numeric(10),
+    isbn: faker.random.numeric(10),
     topPage: 'top page',
     bottomPage: 'bottom page',
     copyrightLicense: 'SCL',
