@@ -121,7 +121,12 @@ export const Base = args => {
           title: faker.lorem.words(2),
           subtitle: faker.lorem.words(2),
           authors: [faker.name.fullName(), faker.name.fullName()].join(', '),
-          isbnList: faker.random.numeric(10),
+          isbnList: [
+            {
+              label: faker.lorem.words(),
+              value: faker.random.alphaNumeric(10),
+            },
+          ],
           topPage: faker.lorem.words(2),
           bottomPage: faker.lorem.words(2),
           copyrightLicense: 'SCL',
