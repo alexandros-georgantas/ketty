@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { isEmpty } from 'lodash'
 import { MinusCircleTwoTone, PlusOutlined } from '@ant-design/icons'
 import { Button, Form, Input } from 'antd'
 
@@ -14,32 +15,63 @@ const IconWrapper = styled(Button)`
 
 const ISBNList = ({ canChangeMetadata, name }) => {
   return (
-    <Form.List name={name}>
-      {(fields, { add, remove }) => {
+    <Form.List
+      name={name}
+      rules={[
+        {
+          validator: async (_, rows) => {
+            // Require at least one ISBN form entry (even if it is blank)
+            if (!rows || rows.length < 1) {
+              return Promise.reject(new Error('At least 1 ISBN required'))
+            }
+
+            // Identify duplicate
+            const values = {}
+            const duplicates = []
+            rows.forEach(row => {
+              if (row) {
+                const trimmedValue = row.value.trim()
+                values[trimmedValue] = (values[trimmedValue] || 0) + 1
+
+                if (values[trimmedValue] === 2) {
+                  duplicates.push(trimmedValue)
+                }
+              }
+            })
+
+            if (!isEmpty(duplicates)) {
+              return Promise.reject(
+                new Error(`Duplicate ISBN values: ${duplicates.join(', ')}`),
+              )
+            }
+
+            // The ISBN list is valid
+            return Promise.resolve()
+          },
+        },
+      ]}
+    >
+      {(fields, { add, remove }, { errors }) => {
         return (
           <div>
-            {fields.map(({ name: fieldName, key, ...restField }) => (
-              <div key={key}>
-                <Form.Item
-                  {...restField}
-                  name={[fieldName, 'label']}
-                  style={{ display: 'inline-block', width: 'calc(30% - 18px)' }}
-                  // rules={[{ required: true, message: 'ISBN is required' }]}
-                >
-                  <Input disabled={!canChangeMetadata} placeholder="Label" />
-                </Form.Item>
+            {fields.map(field => (
+              <div key={field.key}>
+                <ISBNInput
+                  canChangeMetadata={canChangeMetadata}
+                  field={field}
+                  name="label"
+                  placeholder="Label"
+                  style={{ width: 'calc(30% - 18px)' }}
+                />
                 <span style={{ display: 'inline-block', width: '10px' }} />
-                <Form.Item
-                  {...restField}
-                  name={[fieldName, 'value']}
-                  style={{ display: 'inline-block', width: 'calc(70% - 18px)' }}
+                <ISBNInput
+                  canChangeMetadata={canChangeMetadata}
+                  field={field}
+                  name="value"
+                  placeholder="ISBN: update this value before exporting versions requiring unique identifier"
+                  style={{ width: 'calc(70% - 18px)' }}
                   // rules={[{ required: true, message: 'ISBN is required' }]}
-                >
-                  <Input
-                    disabled={!canChangeMetadata}
-                    placeholder="ISBN: update this value before exporting versions requiring unique identifier"
-                  />
-                </Form.Item>
+                />
                 <Form.Item style={{ display: 'inline-block', width: '26px' }}>
                   <IconWrapper
                     disabled={!canChangeMetadata || fields.length < 2}
@@ -49,15 +81,17 @@ const ISBNList = ({ canChangeMetadata, name }) => {
                       />
                     }
                     onClick={() => {
-                      if (fields.length > 1) remove(fieldName)
+                      if (fields.length > 1) remove(field.name)
                     }}
                     type="danger"
                   />
                 </Form.Item>
               </div>
             ))}
-
-            <Form.Item style={{ textAlign: 'right' }} wrapperCol={{ span: 24 }}>
+            <Form.Item
+              style={{ marginBottom: '0px', textAlign: 'right' }}
+              wrapperCol={{ span: 24 }}
+            >
               <Button
                 disabled={!canChangeMetadata}
                 onClick={() => add()}
@@ -65,6 +99,9 @@ const ISBNList = ({ canChangeMetadata, name }) => {
               >
                 <PlusOutlined /> Add Another ISBN
               </Button>
+            </Form.Item>
+            <Form.Item style={{ paddingLeft: '1em' }} wrapperCol={{ span: 24 }}>
+              <Form.ErrorList errors={errors} />
             </Form.Item>
           </div>
         )
@@ -76,6 +113,43 @@ const ISBNList = ({ canChangeMetadata, name }) => {
 ISBNList.propTypes = {
   canChangeMetadata: PropTypes.bool.isRequired,
   name: PropTypes.string.isRequired,
+}
+
+const ISBNInput = ({
+  canChangeMetadata,
+  field,
+  name,
+  placeholder,
+  style,
+  ...props
+}) => {
+  return (
+    <Form.Item
+      {...props}
+      fieldKey={field.fieldKey}
+      isListField
+      name={[field.name, name]}
+      style={{ ...style, display: 'inline-block' }}
+    >
+      <Input disabled={!canChangeMetadata} placeholder={placeholder} />
+    </Form.Item>
+  )
+}
+
+ISBNInput.defaultProps = {
+  style: {},
+}
+
+ISBNInput.propTypes = {
+  canChangeMetadata: PropTypes.bool.isRequired,
+  field: PropTypes.shape({
+    fieldKey: PropTypes.string.isRequired,
+    key: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+  }).isRequired,
+  name: PropTypes.string.isRequired,
+  placeholder: PropTypes.string.isRequired,
+  style: PropTypes.shape({}),
 }
 
 export default ISBNList
