@@ -143,9 +143,9 @@ ISBNInput.defaultProps = {
 ISBNInput.propTypes = {
   canChangeMetadata: PropTypes.bool.isRequired,
   field: PropTypes.shape({
-    fieldKey: PropTypes.string.isRequired,
-    key: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
+    fieldKey: PropTypes.number.isRequired,
+    key: PropTypes.number.isRequired,
+    name: PropTypes.number.isRequired,
   }).isRequired,
   name: PropTypes.string.isRequired,
   placeholder: PropTypes.string.isRequired,
