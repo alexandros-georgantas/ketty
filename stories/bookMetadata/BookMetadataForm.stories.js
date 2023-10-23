@@ -1,13 +1,15 @@
 /* eslint-disable no-console */
-import React from 'react'
+import React, { useState } from 'react'
 import { faker } from '@faker-js/faker'
 import { BookMetadataForm } from '../../app/ui'
 import { Form } from '../../app/ui/common'
 
 export const Base = props => {
+  const [modalOpen, setModalOpen] = useState(true)
   const handleSubmit = values => console.log(values)
 
   const handleClose = () => {
+    setModalOpen(false)
     console.log('closeModal called')
   }
 
@@ -15,10 +17,10 @@ export const Base = props => {
 
   return (
     <BookMetadataForm
-      closeModal={handleClose}
+      closeModal={closeModal}
       form={form}
       onSubmit={handleSubmit}
-      open
+      open={modalOpen}
       {...props}
     />
   )
@@ -39,6 +41,8 @@ Base.args = {
     bottomPage: faker.lorem.sentence(),
     copyrightLicense: 'SCL',
   },
+  canChangeMetadata: true,
+  onSubmitBookMetadata: values => console.log(values),
 }
 
 export default {

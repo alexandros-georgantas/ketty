@@ -3,7 +3,8 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { isEmpty } from 'lodash'
 import { MinusCircleTwoTone, PlusOutlined } from '@ant-design/icons'
-import { Button, Form, Input } from 'antd'
+import { Button, Form } from 'antd'
+import ISBNInput from './ISBNInput'
 
 const IconWrapper = styled(Button)`
   cursor: pointer;
@@ -20,29 +21,26 @@ const ISBNList = ({ canChangeMetadata, name }) => {
       rules={[
         {
           validator: async (_, rows) => {
-            // Require at least one ISBN form entry (even if it is blank)
-            if (!rows || rows.length < 1) {
-              return Promise.reject(new Error('At least 1 ISBN required'))
-            }
+            if (!isEmpty(rows)) {
+              // Identify duplicate
+              const values = {}
+              const duplicates = []
+              rows.forEach(row => {
+                if (row) {
+                  const trimmedValue = (row.value || '').trim()
+                  values[trimmedValue] = (values[trimmedValue] || 0) + 1
 
-            // Identify duplicate
-            const values = {}
-            const duplicates = []
-            rows.forEach(row => {
-              if (row) {
-                const trimmedValue = (row.value || '').trim()
-                values[trimmedValue] = (values[trimmedValue] || 0) + 1
-
-                if (values[trimmedValue] === 2) {
-                  duplicates.push(trimmedValue)
+                  if (values[trimmedValue] === 2) {
+                    duplicates.push(trimmedValue)
+                  }
                 }
-              }
-            })
+              })
 
-            if (!isEmpty(duplicates)) {
-              return Promise.reject(
-                new Error(`Duplicate ISBN values: ${duplicates.join(', ')}`),
-              )
+              if (!isEmpty(duplicates)) {
+                return Promise.reject(
+                  new Error(`Duplicate ISBN values: ${duplicates.join(', ')}`),
+                )
+              }
             }
 
             // The ISBN list is valid
@@ -74,14 +72,16 @@ const ISBNList = ({ canChangeMetadata, name }) => {
                 />
                 <Form.Item style={{ display: 'inline-block', width: '26px' }}>
                   <IconWrapper
-                    disabled={!canChangeMetadata || fields.length < 2}
+                    disabled={!canChangeMetadata}
                     icon={
-                      <MinusCircleTwoTone
-                        twoToneColor={fields.length < 2 ? 'lightgrey' : 'red'}
-                      />
+                      canChangeMetadata ? (
+                        <MinusCircleTwoTone twoToneColor="red" />
+                      ) : (
+                        <MinusCircleTwoTone twoToneColor="lightgrey" />
+                      )
                     }
                     onClick={() => {
-                      if (fields.length > 1) remove(field.name)
+                      remove(field.name)
                     }}
                     type="danger"
                   />
@@ -97,7 +97,7 @@ const ISBNList = ({ canChangeMetadata, name }) => {
                 onClick={() => add()}
                 type="dashed"
               >
-                <PlusOutlined /> Add Another ISBN
+                <PlusOutlined /> Add{fields.length < 1 ? '' : ' Another'} ISBN
               </Button>
             </Form.Item>
             <Form.Item style={{ paddingLeft: '1em' }} wrapperCol={{ span: 24 }}>
@@ -113,43 +113,6 @@ const ISBNList = ({ canChangeMetadata, name }) => {
 ISBNList.propTypes = {
   canChangeMetadata: PropTypes.bool.isRequired,
   name: PropTypes.string.isRequired,
-}
-
-const ISBNInput = ({
-  canChangeMetadata,
-  field,
-  name,
-  placeholder,
-  style,
-  ...props
-}) => {
-  return (
-    <Form.Item
-      {...props}
-      fieldKey={field.fieldKey}
-      isListField
-      name={[field.name, name]}
-      style={{ ...style, display: 'inline-block' }}
-    >
-      <Input disabled={!canChangeMetadata} placeholder={placeholder} />
-    </Form.Item>
-  )
-}
-
-ISBNInput.defaultProps = {
-  style: {},
-}
-
-ISBNInput.propTypes = {
-  canChangeMetadata: PropTypes.bool.isRequired,
-  field: PropTypes.shape({
-    fieldKey: PropTypes.number.isRequired,
-    key: PropTypes.number.isRequired,
-    name: PropTypes.number.isRequired,
-  }).isRequired,
-  name: PropTypes.string.isRequired,
-  placeholder: PropTypes.string.isRequired,
-  style: PropTypes.shape({}),
 }
 
 export default ISBNList
