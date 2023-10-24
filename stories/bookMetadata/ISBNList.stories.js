@@ -22,7 +22,7 @@ export const Base = ({ canChangeMetadata, ...props }) => {
         style={{ marginBottom: '0px' }}
         wrapperCol={{ span: 24 }}
       >
-        <ISBNList canChangeMetadata={canChangeMetadata} name="isbnList" />
+        <ISBNList canChangeMetadata={canChangeMetadata} name="isbns" />
       </Form.Item>
       <button type="submit">Submit</button>
     </Form>
@@ -31,7 +31,7 @@ export const Base = ({ canChangeMetadata, ...props }) => {
 
 Base.args = {
   canChangeMetadata: true,
-  isbnList: [],
+  isbns: [],
 }
 
 export const ReloadExistingISBNs = () => {
@@ -46,7 +46,7 @@ export const ReloadExistingISBNs = () => {
     <Form
       initialValues={{
         canChangeMetadata: { canChangeMetadata },
-        isbnList: [{}, { label: 'test label', value: '111333' }],
+        isbns: [{}, { label: 'test label', isbn: '111333' }],
       }}
       onFinish={handleSubmit}
       onValuesChange={handleValuesChange}
@@ -57,7 +57,7 @@ export const ReloadExistingISBNs = () => {
         style={{ marginBottom: '0px' }}
         wrapperCol={{ span: 24 }}
       >
-        <ISBNList canChangeMetadata={canChangeMetadata} name="isbnList" />
+        <ISBNList canChangeMetadata={canChangeMetadata} name="isbns" />
       </Form.Item>
       <button type="submit">Submit</button>
     </Form>

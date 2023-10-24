@@ -23,7 +23,7 @@ export const Base = ({ canChangeMetadata, ...props }) => {
                   <ISBNInput
                     canChangeMetadata={canChangeMetadata}
                     field={field}
-                    name="value"
+                    name="isbn"
                     placeholder="ISBN value"
                     style={{ width: '20em' }}
                   />
@@ -39,7 +39,7 @@ export const Base = ({ canChangeMetadata, ...props }) => {
 
 Base.args = {
   canChangeMetadata: true,
-  inputList: [{}, { label: 'test label', value: '111333' }],
+  inputList: [{}, { label: 'test label', isbn: '111333' }],
 }
 
 export default {
