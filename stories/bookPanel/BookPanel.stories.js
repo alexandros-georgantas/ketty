@@ -125,10 +125,10 @@ export const Base = args => {
           title: faker.lorem.words(2),
           subtitle: faker.lorem.words(2),
           authors: [faker.name.fullName(), faker.name.fullName()].join(', '),
-          isbnList: [
+          isbns: [
             {
               label: faker.lorem.words(),
-              value: faker.random.alphaNumeric(10),
+              isbn: faker.random.alphaNumeric(10),
             },
           ],
           topPage: faker.lorem.words(2),

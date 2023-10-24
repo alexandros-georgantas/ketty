@@ -43,8 +43,8 @@ const BookMetadataForm = ({
       : value
   })
 
-  if (isEmpty(transformedInitialValues.isbnList)) {
-    transformedInitialValues.isbnList = [{}]
+  if (isEmpty(transformedInitialValues.isbns)) {
+    transformedInitialValues.isbns = []
   }
 
   useEffect(() => {
@@ -129,7 +129,7 @@ const BookMetadataForm = ({
             style={{ marginBottom: '0px' }}
             wrapperCol={{ span: 24 }}
           >
-            <ISBNList canChangeMetadata={canChangeMetadata} name="isbnList" />
+            <ISBNList canChangeMetadata={canChangeMetadata} name="isbns" />
           </Form.Item>
           <Form.Item
             label="Top of the page"
@@ -173,10 +173,10 @@ BookMetadataForm.propTypes = {
     title: PropTypes.string,
     subtitle: PropTypes.string,
     authors: PropTypes.string.isRequired,
-    isbnList: PropTypes.arrayOf(
+    isbns: PropTypes.arrayOf(
       PropTypes.shape({
         label: PropTypes.string,
-        value: PropTypes.string.isRequired,
+        isbn: PropTypes.string.isRequired,
       }),
     ).isRequired,
     topPage: PropTypes.string,

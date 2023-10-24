@@ -23,15 +23,15 @@ const ISBNList = ({ canChangeMetadata, name }) => {
           validator: async (_, rows) => {
             if (!isEmpty(rows)) {
               // Identify duplicate
-              const values = {}
+              const isbns = {}
               const duplicates = []
               rows.forEach(row => {
                 if (row) {
-                  const trimmedValue = (row.value || '').trim()
-                  values[trimmedValue] = (values[trimmedValue] || 0) + 1
+                  const trimmedIsbn = (row.isbn || '').trim()
+                  isbns[trimmedIsbn] = (isbns[trimmedIsbn] || 0) + 1
 
-                  if (values[trimmedValue] === 2) {
-                    duplicates.push(trimmedValue)
+                  if (isbns[trimmedIsbn] === 2) {
+                    duplicates.push(trimmedIsbn)
                   }
                 }
               })
@@ -65,7 +65,7 @@ const ISBNList = ({ canChangeMetadata, name }) => {
                 <ISBNInput
                   canChangeMetadata={canChangeMetadata}
                   field={field}
-                  name="value"
+                  name="isbn"
                   placeholder="ISBN: update this value before exporting versions requiring unique identifier"
                   style={{ width: 'calc(70% - 18px)' }}
                   // rules={[{ required: true, message: 'ISBN is required' }]}

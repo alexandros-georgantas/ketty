@@ -31,10 +31,10 @@ Base.args = {
     title: faker.lorem.words(),
     subtitle: faker.lorem.words(10),
     authors: faker.name.fullName(),
-    isbnList: [
+    isbns: [
       {
         label: faker.lorem.words(),
-        value: faker.random.alphaNumeric(10),
+        isbn: faker.random.alphaNumeric(10),
       },
     ],
     topPage: faker.lorem.sentence(),
