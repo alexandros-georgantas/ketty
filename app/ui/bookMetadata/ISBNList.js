@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { isEmpty } from 'lodash'
+import { get, isEmpty } from 'lodash'
 import { MinusCircleTwoTone, PlusOutlined } from '@ant-design/icons'
 import { Button, Form } from 'antd'
 import ISBNInput from './ISBNInput'
@@ -15,36 +15,47 @@ const IconWrapper = styled(Button)`
 `
 
 const ISBNList = ({ canChangeMetadata, name }) => {
+  const checkForDuplicates = (items, itemPath, itemDescription) => {
+    if (!isEmpty(items)) {
+      // Identify duplicate
+      const valueCount = {}
+      const duplicates = []
+      items.forEach(item => {
+        const trimmedValue = get(item, itemPath, '').trim()
+
+        if (!isEmpty(trimmedValue)) {
+          valueCount[trimmedValue] = (valueCount[trimmedValue] || 0) + 1
+
+          if (valueCount[trimmedValue] === 2) {
+            duplicates.push(trimmedValue)
+          }
+        }
+      })
+
+      if (!isEmpty(duplicates)) {
+        return Promise.reject(
+          new Error(
+            `Duplicate ${itemDescription} values: "${duplicates.join('", "')}"`,
+          ),
+        )
+      }
+    }
+
+    return Promise.resolve()
+  }
+
   return (
     <Form.List
       name={name}
       rules={[
         {
-          validator: async (_, rows) => {
-            if (!isEmpty(rows)) {
-              // Identify duplicate
-              const isbns = {}
-              const duplicates = []
-              rows.forEach(row => {
-                if (row) {
-                  const trimmedIsbn = (row.isbn || '').trim()
-                  isbns[trimmedIsbn] = (isbns[trimmedIsbn] || 0) + 1
-
-                  if (isbns[trimmedIsbn] === 2) {
-                    duplicates.push(trimmedIsbn)
-                  }
-                }
-              })
-
-              if (!isEmpty(duplicates)) {
-                return Promise.reject(
-                  new Error(`Duplicate ISBN values: ${duplicates.join(', ')}`),
-                )
-              }
-            }
-
-            // The ISBN list is valid
-            return Promise.resolve()
+          validator: async (_, items) => {
+            return checkForDuplicates(items, 'label', 'Label')
+          },
+        },
+        {
+          validator: async (_, items) => {
+            return checkForDuplicates(items, 'isbn', 'ISBN')
           },
         },
       ]}
@@ -59,6 +70,12 @@ const ISBNList = ({ canChangeMetadata, name }) => {
                   field={field}
                   name="label"
                   placeholder="Label"
+                  rules={[
+                    {
+                      required: fields.length > 1,
+                      message: 'Label is required (for multiple ISBNs)',
+                    },
+                  ]}
                   style={{ width: 'calc(30% - 18px)' }}
                 />
                 <span style={{ display: 'inline-block', width: '10px' }} />
@@ -67,8 +84,8 @@ const ISBNList = ({ canChangeMetadata, name }) => {
                   field={field}
                   name="isbn"
                   placeholder="ISBN: update this value before exporting versions requiring unique identifier"
+                  rules={[{ required: true, message: 'ISBN is required' }]}
                   style={{ width: 'calc(70% - 18px)' }}
-                  // rules={[{ required: true, message: 'ISBN is required' }]}
                 />
                 <Form.Item style={{ display: 'inline-block', width: '26px' }}>
                   <IconWrapper
