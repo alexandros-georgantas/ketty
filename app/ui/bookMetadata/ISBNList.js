@@ -68,6 +68,7 @@ const ISBNList = ({ canChangeMetadata, name }) => {
                 <ISBNInput
                   canChangeMetadata={canChangeMetadata}
                   field={field}
+                  initialValue=""
                   name="label"
                   placeholder="Label"
                   rules={[
