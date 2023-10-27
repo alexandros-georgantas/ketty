@@ -1200,6 +1200,13 @@
   dependencies:
     regenerator-runtime "^0.13.11"
 
+"@babel/runtime@^7.22.5":
+  version "7.23.2"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.23.2.tgz#062b0ac103261d68a966c4c7baf2ae3e62ec3885"
+  integrity sha512-mM8eg4yl5D6i3lu2QKPuPH4FArvJ8KhTofbE7jwMUv9KX5mBvwPAqnV3MlyBNqdp9RyRKP6Yck8TrfYrPvX3bg==
+  dependencies:
+    regenerator-runtime "^0.14.0"
+
 "@babel/template@^7.12.7", "@babel/template@^7.18.10", "@babel/template@^7.20.7", "@babel/template@^7.3.3":
   version "7.20.7"
   resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.20.7.tgz#a15090c2839a83b02aa996c0b4994005841fd5a8"
@@ -9377,6 +9384,13 @@ html-minifier-terser@^6.0.2:
     relateurl "^0.2.7"
     terser "^5.10.0"
 
+html-parse-stringify@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/html-parse-stringify/-/html-parse-stringify-3.0.1.tgz#dfc1017347ce9f77c8141a507f233040c59c55d2"
+  integrity sha512-KknJ50kTInJ7qIScF3jeaFRpMpE8/lfiTdzf/twXyPBLAGrLRTmkz3AdTnKeh40X8k9L2fdYwEp/42WGXIRGcg==
+  dependencies:
+    void-elements "3.1.0"
+
 html-tags@^3.1.0, html-tags@^3.2.0:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/html-tags/-/html-tags-3.3.1.tgz#a04026a18c882e4bba8a01a3d39cfe465d40b5ce"
@@ -13916,6 +13930,14 @@ react-helmet-async@^1.0.7:
     react-fast-compare "^3.2.0"
     shallowequal "^1.1.0"
 
+react-i18next@^13.3.1:
+  version "13.3.1"
+  resolved "https://registry.yarnpkg.com/react-i18next/-/react-i18next-13.3.1.tgz#9b072bf4dd4cafb028e92315a8a1415f8034bdca"
+  integrity sha512-JAtYREK879JXaN9GdzfBI4yJeo/XyLeXWUsRABvYXiFUakhZJ40l+kaTo+i+A/3cKIED41kS/HAbZ5BzFtq/Og==
+  dependencies:
+    "@babel/runtime" "^7.22.5"
+    html-parse-stringify "^3.0.1"
+
 react-input-autosize@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/react-input-autosize/-/react-input-autosize-3.0.0.tgz#6b5898c790d4478d69420b55441fcc31d5c50a85"
@@ -14254,6 +14276,11 @@ regenerator-runtime@^0.13.11, regenerator-runtime@^0.13.7:
   version "0.13.11"
   resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.11.tgz#f6dca3e7ceec20590d07ada785636a90cdca17f9"
   integrity sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==
+
+regenerator-runtime@^0.14.0:
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.14.0.tgz#5e19d68eb12d486f797e15a3c6a918f7cec5eb45"
+  integrity sha512-srw17NI0TUWHuGa5CFGGmhfNIeja30WMBfbslPNhf6JrqQlLN5gcrvig1oqPxiVaXb0oW0XRKtH6Nngs5lKCIA==
 
 regenerator-transform@^0.15.1:
   version "0.15.1"
@@ -16645,6 +16672,11 @@ vm-browserify@^1.0.1:
   resolved "https://registry.yarnpkg.com/vm-browserify/-/vm-browserify-1.1.2.tgz#78641c488b8e6ca91a75f511e7a3b32a86e5dda0"
   integrity sha512-2ham8XPWTONajOR0ohOKOHXkm3+gaBmGut3SRuu75xLd/RRaY6vqgh8NBYYk7+RW3u5AtzPQZG8F10LHkl0lAQ==
 
+void-elements@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/void-elements/-/void-elements-3.1.0.tgz#614f7fbf8d801f0bb5f0661f5b2f5785750e4f09"
+  integrity sha512-Dhxzh5HZuiHQhbvTW9AMetFfBHDMYpo23Uo9btPXgdYP+3T5S+p+jgNy7spra+veYhBP2dCSgxR/i2Y02h5/6w==
+
 w3c-keyname@^2.2.0:
   version "2.2.6"
   resolved "https://registry.yarnpkg.com/w3c-keyname/-/w3c-keyname-2.2.6.tgz#8412046116bc16c5d73d4e612053ea10a189c85f"
@@ -16690,10 +16722,10 @@ watchpack@^2.2.0, watchpack@^2.4.0:
     glob-to-regexp "^0.4.1"
     graceful-fs "^4.1.2"
 
-wax-prosemirror-core@0.8.20, wax-prosemirror-core@^0.8.20:
-  version "0.8.20"
-  resolved "https://registry.yarnpkg.com/wax-prosemirror-core/-/wax-prosemirror-core-0.8.20.tgz#9616b7a2675a8f9efdcb7e081ea97364b5f6e5ec"
-  integrity sha512-bbKOTs/JjnsB91zHM1okLmAAFWnSIe0cXtQURYNYVac+pZ1a58gt0UWMwLC0fLVZ8mnwAv3hjHfFKmTfSAjkxQ==
+wax-prosemirror-core@0.8.25, wax-prosemirror-core@^0.8.25:
+  version "0.8.25"
+  resolved "https://registry.yarnpkg.com/wax-prosemirror-core/-/wax-prosemirror-core-0.8.25.tgz#08338ef8483538f5332953ecb7e7674ca80efcbe"
+  integrity sha512-Z6E8fI1t+fV+NRzV5+XMTKyZOKuEglyXBcj2ecJjXzGxaq01eYAr/qPfUR/3iX+YWjjppM+17qrFmr83XiqF0Q==
   dependencies:
     "@pubsweet/ui-toolkit" "^2.3.1"
     deepmerge "^4.2.2"
@@ -16713,13 +16745,14 @@ wax-prosemirror-core@0.8.20, wax-prosemirror-core@^0.8.20:
     prosemirror-state "1.4.2"
     prosemirror-transform "1.7.1"
     prosemirror-view "1.30.2"
+    react-i18next "^13.3.1"
     reflect-metadata "^0.1.13"
     uuid "^7.0.3"
 
-wax-prosemirror-services@0.8.20, wax-prosemirror-services@^0.8.20:
-  version "0.8.20"
-  resolved "https://registry.yarnpkg.com/wax-prosemirror-services/-/wax-prosemirror-services-0.8.20.tgz#c216027fcc086f9da9806191c1a20f83cc45174c"
-  integrity sha512-4mYysJCFIY6BDvjET77xWbgcisFWYsS2U45SOsCMWfEAnR4NUKsKTS69yLTFzElSUZyi0/1+uMGFDrCWdL/4wA==
+wax-prosemirror-services@0.8.25:
+  version "0.8.25"
+  resolved "https://registry.yarnpkg.com/wax-prosemirror-services/-/wax-prosemirror-services-0.8.25.tgz#8293b66e6de0e505c1b747ae43c38cad9c791fff"
+  integrity sha512-uEZspBVzMlwEVHKtp1SMg1COHtiq4rap6Ln32D/CZI9+Mf55UNoLD56o8tiOWobdf9A73XkfAAWLuaCGy4KTCA==
   dependencies:
     "@pubsweet/ui-toolkit" "^2.3.1"
     highlight.js "^10.1.1"
@@ -16740,19 +16773,20 @@ wax-prosemirror-services@0.8.20, wax-prosemirror-services@^0.8.20:
     prosemirror-view "1.30.2"
     rc-switch "^3.2.2"
     react-dropdown "^1.6.2"
+    react-i18next "^13.3.1"
     use-deep-compare-effect "^1.3.1"
     uuid "^7.0.3"
-    wax-prosemirror-core "^0.8.20"
+    wax-prosemirror-core "^0.8.25"
     y-prosemirror "1.2.0"
     y-protocols "1.0.5"
     y-webrtc "10.2.0"
     y-websocket "1.4.5"
     yjs "13.5.38"
 
-wax-table-service@0.8.20:
-  version "0.8.20"
-  resolved "https://registry.yarnpkg.com/wax-table-service/-/wax-table-service-0.8.20.tgz#aa148d8830b262430d3269fd75328daa903dfbf1"
-  integrity sha512-0wZ6V+ODRv49daAHpbEmuYhJ/c3ybAtVUXFT/8aNDoCRjAchPUGYX8lHCrUFov+5T27UjcRwao/0O1DzEpF7GQ==
+wax-table-service@0.8.25:
+  version "0.8.25"
+  resolved "https://registry.yarnpkg.com/wax-table-service/-/wax-table-service-0.8.25.tgz#b9a9f75a1270944990ea947cad275977c3b0f447"
+  integrity sha512-MYJ/w5+D48uLEk+OyzInDEMfzW91HsQWEba3u1P7cvwidkqTDCOl8qjX3bDitGdOQAk7hNqXXx4Wh5h00q63Eg==
   dependencies:
     "@pubsweet/ui-toolkit" "^2.3.1"
     inversify "^5.0.1"
@@ -16761,9 +16795,9 @@ wax-table-service@0.8.20:
     prosemirror-state "1.4.2"
     prosemirror-transform "1.7.1"
     prosemirror-view "1.30.2"
+    react-i18next "^13.3.1"
     uuid "^7.0.3"
-    wax-prosemirror-core "^0.8.20"
-    wax-prosemirror-services "^0.8.20"
+    wax-prosemirror-core "^0.8.25"
 
 wbuf@^1.1.0, wbuf@^1.7.3:
   version "1.7.3"

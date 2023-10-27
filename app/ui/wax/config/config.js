@@ -25,7 +25,7 @@ import {
   // AskAiContentService,
 } from 'wax-prosemirror-services'
 
-import { TablesService, columnResizing } from 'wax-table-service'
+// import { TablesService, columnResizing } from 'wax-table-service'
 
 import charactersList from './charactersList'
 
@@ -39,7 +39,7 @@ export default {
         { name: 'Base', exclude: ['Save'] },
         'BlockDropDown',
         'TitleTool',
-        'Tables',
+        // 'Tables',
         { name: 'Lists', exclude: ['JoinUp'] },
         'Images',
         {
@@ -61,7 +61,7 @@ export default {
   SchemaService: DefaultSchema,
   SpecialCharactersService: charactersList,
   PmPlugins: [
-    columnResizing(),
+    // columnResizing(),
     disallowPasteImagesPlugin(() =>
       onInfoModal(
         `Pasting external images is not supported. Please use platform's Asset Manager infrastructure`,
@@ -79,7 +79,7 @@ export default {
     new LinkService(),
     new ListsService(),
     new ListToolGroupService(),
-    new TablesService(),
+    // new TablesService(),
     new BaseService(),
     new BaseToolGroupService(),
     new DisplayBlockLevelService(),
