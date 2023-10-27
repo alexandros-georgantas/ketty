@@ -18,7 +18,7 @@ async function fetchUserList(username) {
   })
 }
 
-export const Base = () => {
+export const Base = props => {
   const [value, setValue] = useState([])
 
   const handleChange = newValue => {
@@ -27,14 +27,20 @@ export const Base = () => {
 
   return (
     <SelectUsers
+      {...props}
       fetchOptions={fetchUserList}
       mode="multiple"
+      noResultsSetter={() => {}}
       onChange={handleChange}
       placeholder="Email, comma separated"
       style={{ width: '100%' }}
       value={value}
     />
   )
+}
+
+Base.args = {
+  canChangeAccess: true,
 }
 
 export default {
