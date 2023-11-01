@@ -34,7 +34,10 @@ async function fetchUserList(username) {
 export const Base = props => {
   const [form] = Form.useForm()
 
-  const handleInvite = values => console.log('Invite: ', values)
+  const handleInvite = values => {
+    console.log('Invite: ', values)
+    form.resetFields()
+  }
 
   return (
     <FormWrapper>
@@ -70,7 +73,10 @@ async function fetchMatchingUser(username) {
 export const requireExactUserName = props => {
   const [form] = Form.useForm()
 
-  const handleInvite = values => console.log('Invite: ', values)
+  const handleInvite = values => {
+    console.log('Invite: ', values)
+    form.resetFields()
+  }
 
   return (
     <span>
