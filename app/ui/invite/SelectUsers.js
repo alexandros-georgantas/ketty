@@ -28,7 +28,7 @@ const SelectUsers = ({
       const fetchId = fetchRef.current
       setOptions([])
       setFetching(true)
-      fetchOptions(v).then(newOptions => {
+      fetchOptions(v.trim()).then(newOptions => {
         if (fetchId !== fetchRef.current) {
           // for fetch callback order
           return
