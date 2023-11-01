@@ -13,6 +13,12 @@ RUN chown -R node:node .
 USER node
 
 RUN yarn install --frozen-lockfile
+RUN yarn cache clean
+RUN yarn cypress cache clear
 
 COPY --chown=node:node app app
 COPY --chown=node:node static static
+
+COPY --chown=node:node .eslintrc.js .eslintrc.js
+COPY --chown=node:node .stylelintrc.js .stylelintrc.js
+COPY --chown=node:node .prettierrc.js .prettierrc.js

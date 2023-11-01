@@ -1,39 +1,150 @@
+include:
+  - project: 'cokoapps/ci'
+    ref: main
+    file: 'ci-templates.yml'
+
 variables:
-  IMAGE_ORG: cokoapps
-  STORYBOOK_IMAGE_NAME: lulu-storybook
+  IMAGE_NAME_DEVELOPMENT: ketida-client-ci-development
+  IMAGE_NAME_PREPRODUCTION_DEVELOP: ketida-client-ci-production-develop
+  IMAGE_NAME_PREPRODUCTION_DEMO: ketida-client-ci-production-demo
+  IMAGE_NAME_PRODUCTION_DEVELOP: ketida-client-deploy-develop
+  IMAGE_NAME_PRODUCTION_DEMO: ketida-client
+  IMAGE_NAME_STORYBOOK: ketida-client-storybook
+  PATH_TO_BUILD: .
+  PATH_INSIDE_CONTAINER: /home/node/ketida
+  COMPOSE_FILE_STORYBOOK: docker-compose.storybook-deploy.yml
 
 stages:
-  - build_production
-  - deploy
+  - Build development
+  - Lint & Unit test
+  - Build production
+  - Publish
+  - Deploy
 
-build_storybook:
-  stage: build_production
-  image: docker:23
-  services:
-    - docker:23-dind
-  before_script:
-    - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
-  script:
-    - if [ -z "$DOCKERHUB_USERNAME" ] || [ -z "$DOCKERHUB_PASSWORD" ]; then echo "Not pushing" && exit 0; fi
-    - docker pull $IMAGE_ORG/$STORYBOOK_IMAGE_NAME:latest || true
-    - docker build --cache-from $IMAGE_ORG/$STORYBOOK_IMAGE_NAME:latest --tag $IMAGE_ORG/$STORYBOOK_IMAGE_NAME:$CI_COMMIT_SHA --tag $IMAGE_ORG/$STORYBOOK_IMAGE_NAME:latest . -f Dockerfile-storybook-deploy
-    - docker push $IMAGE_ORG/$STORYBOOK_IMAGE_NAME:$CI_COMMIT_SHA
-    - docker push $IMAGE_ORG/$STORYBOOK_IMAGE_NAME:latest
+## LINT & UNIT TEST
+
+build development:
+  extends: .build development
+  stage: Build development
+  variables:
+    IMAGE_NAME: $IMAGE_NAME_DEVELOPMENT
+    BUILD_PATH: $PATH_TO_BUILD
+
+lint:
+  extends: .lint
+  stage: Lint & Unit test
+  variables:
+    IMAGE_NAME: $IMAGE_NAME_DEVELOPMENT
+    WORKDIR: $PATH_INSIDE_CONTAINER
+    STYLELINT: 1
+
+unit test:
+  extends: .client unit test
+  stage: Lint & Unit test
+  variables:
+    IMAGE_NAME: $IMAGE_NAME_DEVELOPMENT
+    WORKDIR: $PATH_INSIDE_CONTAINER
+
+## BUILD PRODUCTION IMAGE
+
+.build preproduction develop:
+  extends: .build production
+  stage: Build production
+  variables:
+    IMAGE_NAME: $IMAGE_NAME_PREPRODUCTION_DEVELOP
+    BUILD_PATH: $PATH_TO_BUILD
+  only:
+    - develop
+
+.build preproduction demo:
+  extends: .build production
+  stage: Build production
+  variables:
+    IMAGE_NAME: $IMAGE_NAME_PREPRODUCTION_DEMO
+    BUILD_PATH: $PATH_TO_BUILD
   only:
     - main
 
+## E2E TESTS -- TO DO --
+# NOTE: update 'needs' for publish stage after adding e2e tests.
+
+## PUBLISH PRODUCTION IMAGE
+
+.publish production develop:
+  extends: .publish
+  stage: Publish
+  needs:
+    - build preproduction develop
+  variables:
+    PREPRODUCTION_IMAGE_NAME: $IMAGE_NAME_PREPRODUCTION_DEVELOP
+    PRODUCTION_IMAGE_NAME: $IMAGE_NAME_PRODUCTION_DEVELOP
+  only:
+    - develop
+
+.publish production demo:
+  extends: .publish
+  stage: Publish
+  needs:
+    - build preproduction demo
+  variables:
+    PREPRODUCTION_IMAGE_NAME: $IMAGE_NAME_PREPRODUCTION_DEMO
+    PRODUCTION_IMAGE_NAME: $IMAGE_NAME_PRODUCTION_DEMO
+  only:
+    - main
+
+build & publish storybook:
+  extends: .build & publish storybook
+  stage: Publish
+  variables:
+    IMAGE_NAME: $IMAGE_NAME_STORYBOOK
+    BUILD_PATH: $PATH_TO_BUILD
+  only:
+    - develop
+
+# DEPLOY
+
 deploy storybook:
-  image: debian:bullseye-slim
-  stage: deploy
-  before_script:
-    - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
-    - eval $(ssh-agent -s)
-    - echo "$STORYBOOK_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - mkdir -p ~/.ssh && touch ~/.ssh/known_hosts
-    - chmod 700 ~/.ssh
-    - ssh-keyscan -p $STORYBOOK_SSH_PORT $STORYBOOK_SSH_URL >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-  script:
-    - ssh ${STORYBOOK_SSH_USER}@${STORYBOOK_SSH_URL} -p ${STORYBOOK_SSH_PORT} "docker pull cokoapps/$STORYBOOK_IMAGE_NAME:latest && sudo systemctl restart lulustorybook.service"
+  extends: .deploy base
+  stage: Deploy
+  needs:
+    - build & publish storybook
+  variables:
+    URL: $STORYBOOK_SSH_URL
+    PORT: $STORYBOOK_SSH_PORT
+    USER: $STORYBOOK_SSH_USER
+    PRIVATE_KEY: $STORYBOOK_SSH_PRIVATE_KEY
+    APP_PATH_ON_SERVER: $STORYBOOK_APP_PATH_ON_SERVER
+    COMPOSE_FILE: $COMPOSE_FILE_STORYBOOK
+    SERVICE_NAME: $SERVICE_NAME_STORYBOOK
+  only:
+    - develop
+
+.deploy develop:
+  extends: .deploy base
+  stage: Deploy
+  needs:
+    - publish production develop
+  variables:
+    URL: $DEVELOP_SSH_URL
+    PORT: $DEVELOP_SSH_PORT
+    USER: $DEVELOP_SSH_USER
+    PRIVATE_KEY: $DEVELOP_SSH_PRIVATE_KEY
+    COMPOSE_FILE: $COMPOSE_FILE_DEPLOY_DEVELOP
+    SERVICE_NAME: $SERVICE_NAME_DEPLOY_DEVELOP
+  only:
+    - develop
+
+.deploy demo:
+  extends: .deploy base
+  stage: Deploy
+  needs:
+    - publish production demo
+  variables:
+    URL: $DEMO_SSH_URL
+    PORT: $DEMO_SSH_PORT
+    USER: $DEMO_SSH_USER
+    PRIVATE_KEY: $DEMO_SSH_PRIVATE_KEY
+    COMPOSE_FILE: $COMPOSE_FILE_DEPLOY_DEMO
+    SERVICE_NAME: $SERVICE_NAME_DEPLOY_DEMO
   only:
     - main
