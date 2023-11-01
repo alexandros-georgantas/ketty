@@ -548,6 +548,11 @@ const ProducerPage = () => {
     }
   }
 
+  const heartbeatInterval = find(
+    applicationParametersData?.getApplicationParameters,
+    { area: 'heartbeatInterval' },
+  )
+
   const onReorderChapter = newChapterList => {
     if (!canModify) {
       showUnauthorizedActionModal(false)
@@ -753,7 +758,7 @@ const ProducerPage = () => {
       },
       share: false,
       reconnectAttempts: 5000,
-      reconnectInterval: 5000,
+      reconnectInterval: (heartbeatInterval?.config || 5000) + 500,
     },
     selectedChapterId !== undefined && editorMode && editorMode !== 'preview',
   )
