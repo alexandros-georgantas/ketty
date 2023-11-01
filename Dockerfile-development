@@ -13,6 +13,8 @@ RUN chown -R node:node .
 USER node
 
 RUN yarn install --frozen-lockfile
+RUN yarn cache clean
+RUN yarn cypress cache clear
 
 COPY --chown=node:node app app
 COPY --chown=node:node static static
