@@ -55,7 +55,7 @@ unit test:
 
 ## BUILD PRODUCTION IMAGE
 
-.build preproduction develop:
+build preproduction develop:
   extends: .build production
   stage: Build production
   variables:
@@ -78,7 +78,7 @@ unit test:
 
 ## PUBLISH PRODUCTION IMAGE
 
-.publish production develop:
+publish production develop:
   extends: .publish
   stage: Publish
   needs:
@@ -127,7 +127,7 @@ deploy storybook:
   only:
     - develop
 
-.deploy develop:
+deploy develop:
   extends: .deploy base
   stage: Deploy
   needs:
