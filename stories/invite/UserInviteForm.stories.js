@@ -76,6 +76,7 @@ export const requireExactUserName = props => {
   const handleInvite = values => {
     console.log('Invite: ', values)
     form.resetFields()
+    return true
   }
 
   return (
