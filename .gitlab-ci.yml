@@ -14,6 +14,7 @@ variables:
   PATH_INSIDE_CONTAINER: /home/node/ketida
   COMPOSE_FILE_STORYBOOK: docker-compose.storybook-deploy.yml
   COMPOSE_FILE_DEPLOY_DEVELOP: docker-compose.develop-deploy.yml
+  COMPOSE_FILE_DEPLOY_DEMO: docker-compose.demo-deploy.yml
 
 stages:
   - Branch checks
@@ -90,7 +91,7 @@ publish production develop:
   only:
     - develop
 
-.publish production demo:
+publish production demo:
   extends: .publish
   stage: Publish
   needs:
@@ -144,7 +145,7 @@ deploy develop:
   only:
     - develop
 
-.deploy demo:
+deploy demo:
   extends: .deploy base
   stage: Deploy
   needs:
@@ -154,6 +155,7 @@ deploy develop:
     PORT: $DEMO_SSH_PORT
     USER: $DEMO_SSH_USER
     PRIVATE_KEY: $DEMO_SSH_PRIVATE_KEY
+    APP_PATH_ON_SERVER: $DEMO_APP_PATH_ON_SERVER
     COMPOSE_FILE: $COMPOSE_FILE_DEPLOY_DEMO
     SERVICE_NAME: $SERVICE_NAME_DEPLOY_DEMO
   only:
