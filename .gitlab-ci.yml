@@ -66,7 +66,7 @@ build preproduction develop:
   only:
     - develop
 
-.build preproduction demo:
+build preproduction demo:
   extends: .build production
   stage: Build production
   variables:
