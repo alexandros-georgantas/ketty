@@ -73,8 +73,23 @@ const ISBNList = ({ canChangeMetadata, name }) => {
                   placeholder="Label"
                   rules={[
                     {
-                      required: fields.length > 1,
-                      message: 'Label is required (for multiple ISBNs)',
+                      validator: (_, value) => {
+                        const trimmedValue = value.trim()
+
+                        if (fields.length > 1 && trimmedValue === '') {
+                          return Promise.reject(
+                            new Error('Label is required (for multiple ISBNs)'),
+                          )
+                        }
+
+                        if (value && !trimmedValue) {
+                          return Promise.reject(
+                            new Error('Label contains only spaces'),
+                          )
+                        }
+
+                        return Promise.resolve()
+                      },
                     },
                   ]}
                   style={{ width: 'calc(30% - 18px)' }}
@@ -85,7 +100,23 @@ const ISBNList = ({ canChangeMetadata, name }) => {
                   field={field}
                   name="isbn"
                   placeholder="ISBN: update this value before exporting versions requiring unique identifier"
-                  rules={[{ required: true, message: 'ISBN is required' }]}
+                  rules={[
+                    {
+                      validator: (_, value) => {
+                        const trimmedValue = value.trim()
+
+                        if (!trimmedValue) {
+                          return Promise.reject(new Error('ISBN is required'))
+                        }
+
+                        if (trimmedValue.search(/[^\s\-0-9]/) !== -1) {
+                          return Promise.reject(new Error('ISBN is invalid'))
+                        }
+
+                        return Promise.resolve()
+                      },
+                    },
+                  ]}
                   style={{ width: 'calc(70% - 18px)' }}
                 />
                 <Form.Item style={{ display: 'inline-block', width: '26px' }}>
