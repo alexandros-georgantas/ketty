@@ -125,8 +125,14 @@ const ProducerPage = () => {
       const { divisions } = getBook
       const body = divisions[1]
       const { bookComponents } = body
+      if (bookComponents?.length) {
+        // Once the page and chapter 1 are loaded, allow auto select of chapter 1
+        const chapter1 = bookComponents[0]
 
-      if (bookComponents.length === 0 && !addBookComponentInProgress) {
+        if (selectedChapterId === undefined && !chapter1.uploading) {
+          setSelectedChapterId(chapter1.id)
+        }
+      } else if ( !addBookComponentInProgress) {
         createBookComponent({
           variables: {
             input: {
@@ -266,7 +272,7 @@ const ProducerPage = () => {
         const { id: deletedId } = input
 
         if (selectedChapterId && selectedChapterId === deletedId) {
-          setSelectedChapterId(undefined)
+          setSelectedChapterId('')
         }
       },
       onError: err => {
@@ -612,7 +618,7 @@ const ProducerPage = () => {
     }
 
     if (isAlreadySelected) {
-      setSelectedChapterId(undefined)
+      setSelectedChapterId('')
       return
     }
 
