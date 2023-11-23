@@ -272,7 +272,7 @@ const ProducerPage = () => {
         const { id: deletedId } = input
 
         if (selectedChapterId && selectedChapterId === deletedId) {
-          setSelectedChapterId('')
+          setSelectedChapterId(undefined)
         }
       },
       onError: err => {
