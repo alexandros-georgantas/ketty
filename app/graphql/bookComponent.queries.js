@@ -1,8 +1,11 @@
 import { gql } from '@apollo/client'
 
 const CREATE_BOOK_COMPONENT = gql`
-  mutation CreateBookComponent($input: BookComponentInput!) {
-    podAddBookComponent(input: $input) {
+  mutation CreateBookComponent(
+    $input: BookComponentInput!
+    $condition: AddComponentCondition
+  ) {
+    podAddBookComponent(input: $input, condition: $condition) {
       id
       title
       podMetadata {

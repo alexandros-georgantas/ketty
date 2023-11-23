@@ -304,6 +304,8 @@ const ProducerPage = () => {
   // MUTATIONS SECTION END
 
   // HANDLERS SECTION START
+  const chaptersDivision = bookQueryData?.getBook?.divisions[1]
+
   const getBodyDivisionId = () => {
     if (bookQueryData) {
       const { getBook } = bookQueryData
@@ -371,7 +373,7 @@ const ProducerPage = () => {
       return
     }
 
-    const found = find(bookQueryData.getBook.divisions[1].bookComponents, {
+    const found = find(chaptersDivision.bookComponents, {
       id: bookComponentId,
     })
 
@@ -561,11 +563,11 @@ const ProducerPage = () => {
 
     if (
       JSON.stringify(newChapterList) !==
-      JSON.stringify(bookQueryData.getBook.divisions[1].bookComponents)
+      JSON.stringify(chaptersDivision.bookComponents)
     ) {
       updateBookComponentsOrder({
         variables: {
-          targetDivisionId: bookQueryData.getBook.divisions[1].id,
+          targetDivisionId: chaptersDivision?.id,
           bookComponents: newChapterList.map(chapter => chapter.id),
         },
       })
@@ -573,7 +575,7 @@ const ProducerPage = () => {
   }
 
   const onChapterClick = chapterId => {
-    const found = find(bookQueryData?.getBook?.divisions[1].bookComponents, {
+    const found = find(chaptersDivision?.bookComponents, {
       id: chapterId,
     })
 
@@ -674,10 +676,30 @@ const ProducerPage = () => {
   }
 
   // HANDLERS SECTION END
+
+  // Create an empty chapter if the book has no chapters
+  if (
+    !loading &&
+    chaptersDivision &&
+    !chaptersDivision.bookComponents?.length &&
+    !addBookComponentInProgress
+  ) {
+    createBookComponent({
+      variables: {
+        input: {
+          bookId,
+          divisionId: chaptersDivision.id,
+          componentType: 'chapter',
+        },
+        condition: 'bookEmpty',
+      },
+    })
+  }
+
   const bookComponent =
     !loading &&
     selectedChapterId &&
-    find(bookQueryData.getBook.divisions[1].bookComponents, {
+    find(chaptersDivision.bookComponents, {
       id: selectedChapterId,
     })
 
@@ -794,7 +816,7 @@ const ProducerPage = () => {
       bookComponentContent={bookComponentData?.getBookComponent?.content}
       bookMetadataValues={bookMetadataValues}
       canEdit={canModify}
-      chapters={bookQueryData?.getBook?.divisions[1].bookComponents}
+      chapters={chaptersDivision?.bookComponents}
       chaptersActionInProgress={chaptersActionInProgress}
       isReadOnly={
         !selectedChapterId ||
