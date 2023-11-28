@@ -25,6 +25,10 @@ const CURRENT_USER = gql`
         id
         isVerified
       }
+      identities {
+        id
+        provider
+      }
     }
   }
 `

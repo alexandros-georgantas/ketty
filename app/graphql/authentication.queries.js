@@ -25,6 +25,10 @@ export const LOGIN = gql`
           id
           isVerified
         }
+        identities {
+          id
+          provider
+        }
       }
       token
       code
