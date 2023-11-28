@@ -96,7 +96,6 @@ const Spin = props => {
       isNested={!!children}
       renderBackground={renderBackground}
       spinning={spinning}
-      // eslint-disable-next-line react/jsx-props-no-spreading
       {...rest}
     >
       {showChildren && children}

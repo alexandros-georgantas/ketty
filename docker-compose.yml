@@ -137,9 +137,8 @@ services:
       - TEMP_DIRECTORY_CLEAN_UP=${TEMP_DIRECTORY_CLEAN_UP:-true}
       - AI_ENABLED=${AI_ENABLED:-false}
       - CHAT_GPT_KEY=${CHAT_GPT_KEY}
-    # UN-COMMENT BELOW ONLY IF TEMPLATES SEEDING IS REQUIRED
-    # volumes:
-    #   - ./config/development.js:/home/node/server/config/development.js
+    volumes:
+      - ./config/local.js:/home/node/server/config/local.js
 
   epubchecker:
     depends_on:
@@ -309,9 +308,9 @@ services:
     command: server --console-address ":9001" /data
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
-      interval: 30s
+      interval: 0.5s
       timeout: 20s
-      retries: 10
+      retries: 30
 
   createbucket:
     image: minio/mc:RELEASE.2022-05-09T04-08-26Z
