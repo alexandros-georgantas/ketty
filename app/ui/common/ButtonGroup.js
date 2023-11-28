@@ -27,7 +27,7 @@ const Wrapper = styled.div`
   }}
 
   > button {
-    margin-right: ${grid(1)};
+    margin-right: ${grid(2)};
   }
 
   > button:first-child {
@@ -53,7 +53,10 @@ ButtonGroup.propTypes = {
   /** Must be multiple Button components */
   children: PropTypes.arrayOf(
     (propValue, key, componentName, location, propFullName) => {
-      const notButton = propValue.find(el => el.type.name !== 'Button')
+      // allow eg. {isAThing && <Button>something</Button>} if isAThing is false
+      if (typeof el === 'undefined') return true
+
+      const notButton = propValue.find(el => el.type.displayName !== 'Button')
 
       if (notButton)
         return new Error('ButtonGroup children should be instances of Button!')

@@ -5,13 +5,13 @@ module.exports = {
   colorSecondary: 'gainsboro',
   colorBorder: 'gainsboro',
   colorShadow: 'rgba(0, 0, 0, 0.1)',
-  colorTextQuaternary: 'rgba(0, 0, 0, 0.50)',
 
   colorSuccess: 'green',
   colorError: 'red',
   colorWarning: '#ffc300',
 
   colorText: '#696969',
+  colorTextLight: '#9c9c9c',
   colorTextReverse: 'white',
 
   fontInterface:
