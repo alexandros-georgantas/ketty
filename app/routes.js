@@ -61,6 +61,11 @@ const GlobalStyle = createGlobalStyle`
       }
     }
   }
+
+  .ant-modal-confirm-content {
+    /* stylelint-disable-next-line declaration-no-important */
+    max-width: 100% !important;
+  }
 `
 
 const Wrapper = props => {
@@ -142,6 +147,7 @@ const StyledMembersHeader = styled.div`
 const StyledMembersHeaderTitle = styled.span`
   margin-right: ${grid(1)};
 `
+
 // const StyledUserStatus = styled(UserStatus)`
 //   padding-top: 8px;
 // `
@@ -200,7 +206,6 @@ const SiteHeader = () => {
       maskClosable: true,
       width: 680,
       bodyStyle: {
-        marginRight: 38,
         textAlign: 'justify',
       },
       closable: true,

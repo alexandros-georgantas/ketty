@@ -13,6 +13,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   height: 100%;
   overflow: hidden;
+  padding: ${grid(4)};
 
   .ant-spin-container,
   .ant-spin-nested-loading {
