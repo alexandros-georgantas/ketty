@@ -1,7 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import styled from 'styled-components'
 import { useQuery, useMutation } from '@apollo/client'
-import { useCurrentUser } from '@coko/client'
+import { useCurrentUser, th, grid } from '@coko/client'
 import UserInviteForm from './UserInviteForm'
 import UserList from './UserList'
 // import UserStatus from './UserStatus'
@@ -15,6 +16,16 @@ import {
 } from '../../graphql'
 
 import { isAdmin, isOwner } from '../../helpers/permissions'
+
+const Wrapper = styled.div``
+
+const ScrollWrapper = styled.div`
+  border: 1px solid ${th('colorBorder')};
+  border-radius: ${th('colorBorder')};
+  max-height: 400px;
+  overflow: auto;
+  padding: ${grid(1)} ${grid(2)};
+`
 
 const UserInviteModal = ({ bookId }) => {
   const { data: bookTeamsData, loading: loadingBookTeamsData } = useQuery(
@@ -99,21 +110,24 @@ const UserInviteModal = ({ bookId }) => {
   const canChangeAccess = isAdmin(currentUser) || isOwner(bookId, currentUser)
 
   return (
-    <>
+    <Wrapper>
       <UserInviteForm
         canChangeAccess={canChangeAccess}
         fetchOptions={fetchUserList}
         form={form}
         onInvite={inviteUsers}
       />
-      <UserList
-        bookTeams={bookTeams}
-        canChangeAccess={canChangeAccess}
-        loading={loadingBookTeamsData}
-        onChangeAccess={handleUpdateTeamMemberStatus}
-        onRemoveAccess={handleRemoveTeamMember}
-      />
-    </>
+
+      <ScrollWrapper>
+        <UserList
+          bookTeams={bookTeams}
+          canChangeAccess={canChangeAccess}
+          loading={loadingBookTeamsData}
+          onChangeAccess={handleUpdateTeamMemberStatus}
+          onRemoveAccess={handleRemoveTeamMember}
+        />
+      </ScrollWrapper>
+    </Wrapper>
   )
 }
 
