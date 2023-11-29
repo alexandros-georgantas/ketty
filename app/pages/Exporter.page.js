@@ -54,6 +54,7 @@ export const defaultProfile = {
 const sanitizeProfileData = input => {
   const res = { ...input }
   if (res.format === 'epub') res.trimSize = null
+
   return res
 }
 
@@ -135,11 +136,14 @@ const PreviewerPage = () => {
     APPLICATION_PARAMETERS,
   )
 
-  const [getPagedLink] = useLazyQuery(GET_PAGED_PREVIEWER_LINK, {
-    onCompleted: ({ getPagedPreviewerLink: { link } }) => {
-      setPreviewLink(link)
+  const [getPagedLink, { loading: previewIsLoading }] = useLazyQuery(
+    GET_PAGED_PREVIEWER_LINK,
+    {
+      onCompleted: ({ getPagedPreviewerLink: { link } }) => {
+        setPreviewLink(link)
+      },
     },
-  })
+  )
 
   const [createPreview, { called: createPreviewCalled }] = useMutation(
     EXPORT_BOOK,
@@ -405,7 +409,7 @@ const PreviewerPage = () => {
       spread: options.spread,
     })
 
-    if (target === 'pagedjs') {
+    if (target === 'pagedjs' && !previewIsLoading) {
       createPreview({
         variables: {
           input: previewData,
