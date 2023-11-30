@@ -56,7 +56,7 @@ const makeContentOptions = isEpub => [
 // #region styled
 const Wrapper = styled.div`
   > div:last-child {
-    margin-top: ${grid(2)};
+    margin-top: ${grid(6)};
   }
 `
 
