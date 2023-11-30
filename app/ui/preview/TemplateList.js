@@ -7,7 +7,7 @@ import { grid, th } from '@coko/client'
 import Template from './Template'
 
 const Wrapper = styled.div`
-  align-items: center;
+  align-items: start;
   border: 1px solid ${th('colorBorder')};
   border-radius: ${th('borderRadius')};
   display: flex;

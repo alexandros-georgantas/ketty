@@ -14,15 +14,34 @@ const Wrapper = styled.div`
   object-fit: cover;
 `
 
+const Marker = styled.div`
+  background-color: ${th('colorText')};
+  border-radius: 5px;
+  height: ${grid(1)};
+  margin: 0 auto ${grid(1)};
+  transition: visibility 0.1s ease-in, width 0.1s ease-in;
+  visibility: ${props => (props.selected ? 'visible' : 'hidden')};
+  width: ${props => (props.selected ? grid(8) : 0)};
+
+  /* stylelint-disable-next-line order/properties-alphabetical-order */
+  ${props =>
+    props.isDot &&
+    css`
+      border-radius: 50%;
+      height: ${grid(2)};
+      width: ${props.selected ? grid(2) : 0};
+    `}
+`
+
 const Name = styled.div`
   align-items: center;
   text-align: center;
   text-transform: capitalize;
   word-wrap: break-word;
 
-  > span {
-    padding-bottom: ${grid(0.5)};
-  }
+  /* > span {
+    padding-bottom: ${grid(0.2)};
+  } */
 
   /* stylelint-disable-next-line order/properties-alphabetical-order */
   ${props =>
@@ -31,10 +50,10 @@ const Name = styled.div`
       font-weight: bold;
       transition: font-weight 0.1s ease-in;
 
-      > span {
+      /* > span {
         border-bottom: 2px solid ${th('colorPrimary')};
         transition: border 0.1s ease-in;
-      }
+      } */
     `}
 `
 
@@ -58,7 +77,7 @@ const TemplateImg = styled.img`
   ${props =>
     props.selected &&
     css`
-      border-color: ${th('colorPrimary')};
+      border-color: ${th('colorText')};
 
       &:hover {
         border-color: ${th('colorPrimary')};
@@ -73,6 +92,11 @@ const Template = props => {
 
   return (
     <Wrapper className={className} key={id} onClick={handleClick}>
+      <Marker
+        // isDot
+        selected={isSelected}
+      />
+
       <TemplateImg
         alt={name}
         selected={isSelected}

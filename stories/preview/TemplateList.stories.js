@@ -13,7 +13,7 @@ const templateData = Array.from(Array(10)).map((_, j) => {
     //   'https://fastly.picsum.photos/id/11/82/100.jpg?hmac=solY9YT1h0M-KJfh8WKXqPfbFygW52ideb5Hf1VCKgc',
     imageUrl: thumbnailsAsArray[j],
     isSelected: false,
-    name: faker.lorem.word(),
+    name: faker.lorem.words(2),
   }
 })
 
