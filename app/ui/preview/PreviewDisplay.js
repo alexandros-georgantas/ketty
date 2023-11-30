@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { Alert } from 'antd'
@@ -34,6 +34,21 @@ const PreviewWrapper = styled.div`
 const IframeWrapper = styled.div`
   flex-grow: 1;
   height: 100%;
+  position: relative;
+`
+
+const Veil = styled.div`
+  background-color: #b1b1b1;
+  height: 100%;
+  opacity: ${props => (props.hide ? 0 : 1)};
+  position: absolute;
+  transition: opacity 0.3s ease-in;
+  width: 100%;
+`
+
+const StyledSpin = styled(Spin)`
+  /* stylelint-disable-next-line declaration-no-important */
+  max-height: 80% !important;
 `
 
 const Iframe = styled.iframe`
@@ -64,11 +79,26 @@ const PreviewDisplay = props => {
     zoom,
   } = props
 
+  const [iFrameLoading, setIFrameLoading] = useState(false)
+
+  // This and the Veil are to hide the flashing effect of the pagedjs previewer
+  useEffect(() => {
+    if (loading) {
+      setIFrameLoading(true)
+    }
+
+    if (iFrameLoading && !loading) {
+      setTimeout(() => {
+        setIFrameLoading(false)
+      }, 800)
+    }
+  }, [loading])
+
   // !previewLink case?
   const showEpub = isEpub
   // const showNoPreview = !isEpub && noPreview
   // const showLoading = !isEpub && !noPreview && loading
-  const showLoading = !isEpub && loading
+  const showLoading = !isEpub && (loading || iFrameLoading)
   // const showPreview = !isEpub && !noPreview
   const showPreview = !isEpub
 
@@ -95,11 +125,12 @@ const PreviewDisplay = props => {
 
       {showPreview && (
         <PreviewWrapper>
-          <Spin spinning={showLoading}>
+          <StyledSpin spinning={showLoading}>
             <IframeWrapper>
+              <Veil hide={!iFrameLoading} />
               <Iframe id="previewer" src={previewLink} />
             </IframeWrapper>
-          </Spin>
+          </StyledSpin>
 
           <Floating>
             <PreviewDisplayOptions
