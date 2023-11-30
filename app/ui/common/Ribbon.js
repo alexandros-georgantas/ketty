@@ -19,7 +19,7 @@ const Wrapper = styled.div`
     return props.theme.colorText
   }};
   opacity: 1;
-  padding: ${grid(0.5)} ${grid(2)};
+  padding: ${grid(1)} ${grid(2)};
   text-align: center;
   transition: opacity 0.2s ease-in-out;
 
