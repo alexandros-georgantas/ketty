@@ -39,11 +39,11 @@ const IframeWrapper = styled.div`
 
 const Veil = styled.div`
   background-color: #b1b1b1;
-  height: 100%;
+  height: ${props => (props.hide ? 0 : '100%')};
   opacity: ${props => (props.hide ? 0 : 1)};
   position: absolute;
   transition: opacity 0.3s ease-in;
-  width: 100%;
+  width: ${props => (props.hide ? 0 : '100%')};
 `
 
 const StyledSpin = styled(Spin)`
