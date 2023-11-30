@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import styled, { css } from 'styled-components'
 
-import { th } from '@coko/client'
+import { th, grid } from '@coko/client'
 
 import fallback from '../../../static/imageFallback.png'
 
@@ -19,6 +19,23 @@ const Name = styled.div`
   text-align: center;
   text-transform: capitalize;
   word-wrap: break-word;
+
+  > span {
+    padding-bottom: ${grid(0.5)};
+  }
+
+  /* stylelint-disable-next-line order/properties-alphabetical-order */
+  ${props =>
+    props.selected &&
+    css`
+      font-weight: bold;
+      transition: font-weight 0.1s ease-in;
+
+      > span {
+        border-bottom: 2px solid ${th('colorPrimary')};
+        transition: border 0.1s ease-in;
+      }
+    `}
 `
 
 const TemplateImg = styled.img`
@@ -28,11 +45,13 @@ const TemplateImg = styled.img`
   border-width: 3px;
   cursor: pointer;
   height: 100px;
-  transition: border 0.2s ease-in;
+  opacity: ${props => (props.selected ? 1 : 0.5)};
+  transition: border 0.1s ease-in, opacity 0.1s ease-in;
   width: 82px;
 
   &:hover {
     border-color: ${th('colorBorder')};
+    opacity: 1;
   }
 
   /* stylelint-disable-next-line order/properties-alphabetical-order */
@@ -59,7 +78,10 @@ const Template = props => {
         selected={isSelected}
         src={imageUrl || fallback}
       />
-      <Name>{name}</Name>
+
+      <Name selected={isSelected}>
+        <span>{name}</span>
+      </Name>
     </Wrapper>
   )
 }

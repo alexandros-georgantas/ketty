@@ -5,6 +5,9 @@ import camelCase from 'lodash/camelCase'
 
 import { PreviewSettings } from '../../app/ui/preview'
 import { defaultProfile } from '../../app/pages/Exporter.page'
+import thumbnails from './static'
+
+const thumbnailsAsArray = Object.keys(thumbnails).map(key => thumbnails[key])
 
 const profileData = [
   {
@@ -36,8 +39,9 @@ const profileData = [
 const templateData = Array.from(Array(10)).map((_, j) => {
   return {
     id: String(j + 1),
-    imageUrl:
-      'https://fastly.picsum.photos/id/11/82/100.jpg?hmac=solY9YT1h0M-KJfh8WKXqPfbFygW52ideb5Hf1VCKgc',
+    // imageUrl:
+    //   'https://fastly.picsum.photos/id/11/82/100.jpg?hmac=solY9YT1h0M-KJfh8WKXqPfbFygW52ideb5Hf1VCKgc',
+    imageUrl: thumbnailsAsArray[j],
     isSelected: false,
     name: faker.lorem.word(),
   }
