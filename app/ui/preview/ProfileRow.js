@@ -16,6 +16,7 @@ const Wrapper = styled.div`
 
 const StyledSelect = styled(Select)`
   flex-grow: 1;
+  max-width: calc(100% - 78px - ${grid(2)});
 
   .ant-select-selection-item {
     font-size: 18px;
