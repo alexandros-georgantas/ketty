@@ -80,6 +80,7 @@ const PreviewSettings = props => {
     selectedProfile,
     sendToLulu,
     templates,
+    isbns,
     updateProfileOptions,
   } = props
 
@@ -142,9 +143,11 @@ const PreviewSettings = props => {
 
           <ExportOptionsSection
             disabled={optionsDisabled}
+            isbns={isbns}
             onChange={handleOptionsChange}
             selectedContent={currentOptions.content}
             selectedFormat={currentOptions.format}
+            selectedIsbn={currentOptions.isbn}
             selectedSize={currentOptions.size}
             selectedTemplate={currentOptions.template}
             templates={templates}
@@ -194,6 +197,7 @@ PreviewSettings.propTypes = {
       PropTypes.oneOf(['includeTitlePage', 'includeCopyrights', 'includeTOC']),
     ),
     template: PropTypes.string,
+    isbn: PropTypes.string,
     spread: PropTypes.oneOf(['single', 'double']),
     zoom: PropTypes.number,
   }).isRequired,
@@ -207,6 +211,7 @@ PreviewSettings.propTypes = {
       PropTypes.oneOf(['includeTitlePage', 'includeCopyrights', 'includeTOC']),
     ),
     template: PropTypes.string,
+    isbn: PropTypes.string,
   }).isRequired,
   download: PropTypes.func.isRequired,
   isCollapsed: PropTypes.bool.isRequired,
@@ -240,6 +245,12 @@ PreviewSettings.propTypes = {
       id: PropTypes.string.isRequired,
       imageUrl: PropTypes.string,
       name: PropTypes.string.isRequired,
+    }),
+  ).isRequired,
+  isbns: PropTypes.arrayOf(
+    PropTypes.shape({
+      isbn: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
     }),
   ).isRequired,
   updateProfileOptions: PropTypes.func.isRequired,
