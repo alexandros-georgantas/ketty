@@ -39,6 +39,7 @@ const GET_EXPORT_PROFILES = gql`
         }
         templateId
         trimSize
+        isbn
       }
     }
   }
@@ -64,6 +65,7 @@ const CREATE_EXPORT_PROFILE = gql`
       }
       templateId
       trimSize
+      isbn
     }
   }
 `
@@ -104,6 +106,7 @@ const UPDATE_EXPORT_PROFILE_OPTIONS = gql`
       }
       templateId
       trimSize
+      isbn
     }
   }
 `
@@ -117,6 +120,12 @@ const GET_BOOK_COMPONENT_IDS = gql`
         label
         bookComponents {
           id
+        }
+      }
+      podMetadata {
+        isbns {
+          isbn
+          label
         }
       }
     }
