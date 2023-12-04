@@ -17,6 +17,7 @@ const profileData = [
     size: '6x9',
     content: ['includeTitlePage', 'includeCopyrights', 'includeTOC'],
     template: '4',
+    isbn: '978-1-23-456789-3',
     synced: false,
     lastSynced: null,
     projectId: null,
@@ -29,6 +30,7 @@ const profileData = [
     size: '5.5x8.5',
     content: ['includeTitlePage', 'includeCopyrights'],
     template: '2',
+    isbn: null,
     synced: true,
     lastSynced: new Date().toString(),
     projectId: 'abcd1234',
@@ -46,6 +48,25 @@ const templateData = Array.from(Array(10)).map((_, j) => {
     name: faker.lorem.word(),
   }
 })
+
+const isbnData = [
+  {
+    isbn: '978-1-23-456789-0',
+    label: 'Hard cover',
+  },
+  {
+    isbn: '978-1-23-456789-1',
+    label: '',
+  },
+  {
+    isbn: '978-1-23-456789-2',
+    label: 'Soft cover',
+  },
+  {
+    isbn: '978-1-23-456789-3',
+    label: 'EPub',
+  },
+]
 
 const Wrapper = styled.div`
   border: 1px solid gainsboro;
@@ -71,6 +92,7 @@ export const Base = () => {
     size: '8.5x11',
     content: [],
     template: templateData[0].id,
+    isbn: null,
     zoom: 1,
     spread: 'double',
   })
@@ -96,7 +118,7 @@ export const Base = () => {
   }
 
   const handleClickDownload = options => {
-    return fakeCall().then(() => {
+    return fakeCall(() => {}).then(() => {
       /* eslint-disable-next-line no-console */
       console.log(`Downloading with the following options`, options)
     })
@@ -168,6 +190,7 @@ export const Base = () => {
         defaultProfile={defaultProfile}
         deleteProfile={handleClickDeleteProfile}
         download={handleClickDownload}
+        isbns={isbnData}
         isCollapsed={isCollapsed}
         isDownloadButtonDisabled={false}
         isUserConnectedToLulu
