@@ -12,6 +12,7 @@ RUN yarn install  --frozen-lockfile
 
 # COPY ./.storybook ./.storybook
 COPY ./app ./app
+COPY ./static ./static
 COPY ./stories ./stories
 
 RUN yarn build-storybook \
