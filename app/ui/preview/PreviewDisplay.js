@@ -90,7 +90,7 @@ const PreviewDisplay = props => {
     if (iFrameLoading && !loading) {
       setTimeout(() => {
         setIFrameLoading(false)
-      }, 800)
+      }, 1500)
     }
   }, [loading])
 
