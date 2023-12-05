@@ -1,12 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { Select } from 'antd'
 
 import { grid } from '@coko/client'
 
 import ExportOption from './ExportOption'
 import TemplateList from './TemplateList'
+import { Select } from '../common'
 
 // #region menu options
 const exportFormatOptions = [
