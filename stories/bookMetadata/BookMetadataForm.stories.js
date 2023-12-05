@@ -7,9 +7,21 @@ import { Form } from '../../app/ui/common'
 export const Base = props => {
   const handleSubmit = values => console.log(values)
 
+  const handleClose = () => {
+    console.log('closeModal called')
+  }
+
   const [form] = Form.useForm()
 
-  return <BookMetadataForm form={form} onSubmit={handleSubmit} {...props} />
+  return (
+    <BookMetadataForm
+      closeModal={handleClose}
+      form={form}
+      onSubmit={handleSubmit}
+      open
+      {...props}
+    />
+  )
 }
 
 Base.args = {
