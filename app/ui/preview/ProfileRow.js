@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import styled, { css } from 'styled-components'
-import { Select } from 'antd'
 import { EditOutlined, VerticalAlignTopOutlined } from '@ant-design/icons'
 
 import { grid, th } from '@coko/client'
 
-import { Button, Input, Modal } from '../common'
+import { Button, Input, Modal, Select } from '../common'
 
 // #region styled
 const Wrapper = styled.div`
