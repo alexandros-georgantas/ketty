@@ -128,6 +128,9 @@ deploy storybook:
     SERVICE_NAME: $SERVICE_NAME_STORYBOOK
   only:
     - develop
+  environment:
+    name: storybook
+    url: https://$STORYBOOK_SSH_URL
 
 deploy develop:
   extends: .deploy base
