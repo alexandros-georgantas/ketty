@@ -14,7 +14,7 @@ const Label = styled.div`
   ${props =>
     props.inline
       ? css`
-          display: inline;
+          display: inline-block;
           margin-right: ${grid(1)};
         `
       : css`
@@ -23,7 +23,7 @@ const Label = styled.div`
 `
 
 const ChildWrapper = styled.div`
-  display: ${props => (props.inline ? 'inline' : 'block')};
+  display: ${props => (props.inline ? 'inline-block' : 'block')};
 `
 
 const ExportOption = props => {
