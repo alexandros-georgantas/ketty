@@ -15,7 +15,7 @@ export const Base = props => {
 
   return (
     <BookMetadataForm
-      closeModal={closeModal}
+      closeModal={handleClose}
       form={form}
       onSubmit={handleSubmit}
       open
