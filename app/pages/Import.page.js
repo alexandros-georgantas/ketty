@@ -16,12 +16,24 @@ import {
 } from '../helpers/commonModals'
 
 const StyledSpin = styled(Spin)`
+  display: flex;
+  margin-bottom: 20px;
+  place-content: center;
+`
+
+const Wrapper = styled.div`
   display: grid;
+  flex-direction: column;
   height: calc(100% - 48px);
   place-content: center;
 `
 
-const Loader = () => <StyledSpin spinning />
+const Loader = () => (
+  <Wrapper>
+    <StyledSpin spinning />
+    Your files are being uploaded...
+  </Wrapper>
+)
 
 const ImportPage = () => {
   const history = useHistory()
