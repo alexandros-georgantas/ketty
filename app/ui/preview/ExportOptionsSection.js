@@ -79,14 +79,20 @@ const ExportOptionsSection = props => {
     isbns,
   } = props
 
-  const isbnOptions = isbns.map((isbnItem, index) => {
-    return {
-      value: isbnItem.isbn,
-      label: isbnItem.label
-        ? `${isbnItem.label}: ${isbnItem.isbn}`
-        : isbnItem.isbn,
-    }
-  })
+  const isbnOptions = [
+    {
+      value: '',
+      label: 'Please select',
+    },
+    ...isbns.map((isbnItem, index) => {
+      return {
+        value: isbnItem.isbn,
+        label: isbnItem.label
+          ? `${isbnItem.label}: ${isbnItem.isbn}`
+          : isbnItem.isbn,
+      }
+    }),
+  ]
 
   const isEpub = selectedFormat === 'epub'
   const contentOptions = makeContentOptions(isEpub)
