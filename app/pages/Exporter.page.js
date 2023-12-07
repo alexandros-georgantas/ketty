@@ -524,6 +524,10 @@ const PreviewerPage = () => {
     }
   }, [templatesData, selectedTemplate])
 
+  const isbns = (book?.getBook?.podMetadata?.isbns || []).map(item => {
+    return { isbn: item.isbn, label: item.label }
+  })
+
   const profiles =
     applicationParameters &&
     profilesData?.getBookExportProfiles.result.map(p => {
@@ -551,7 +555,8 @@ const PreviewerPage = () => {
         synced: luluProfile ? luluProfile.inSync : null,
         template: p.templateId,
         value: p.id,
-        isbn: p.isbn,
+        // Require that p.isbn is a valid option from podMetadata.isbns
+        isbn: p.isbn && isbns.find(i => i.isbn === p.isbn) ? p.isbn : null,
       }
     })
 
@@ -560,10 +565,6 @@ const PreviewerPage = () => {
   const hasContent =
     book?.getBook.divisions.find(d => d.label === 'Body').bookComponents
       .length > 0
-
-  const isbns = (book?.getBook?.podMetadata?.isbns || []).map(item => {
-    return { isbn: item.isbn, label: item.label }
-  })
 
   const isOwnerOrAdmin = isAdmin(currentUser) || isOwner(bookId, currentUser)
   const canModify = hasEditAccess(bookId, currentUser)
