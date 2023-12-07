@@ -348,8 +348,8 @@ const PreviewerPage = () => {
             includeTOC: content.includes('includeTOC'),
             includeCopyrights: content.includes('includeCopyrights'),
             includeTitlePage: content.includes('includeTitlePage'),
+            isbn,
           },
-          withISBN: isbn,
         },
       },
     })
