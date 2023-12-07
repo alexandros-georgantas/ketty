@@ -53,7 +53,9 @@ const UserInviteForm = ({ form, fetchOptions, onInvite, canChangeAccess }) => {
           users: [],
           access: 'read',
         }}
-        onFinish={onInvite}
+        onFinish={values => {
+          setNoAvailableUsers(onInvite(values))
+        }}
       >
         <StyledSpace align="start">
           <Space.Compact>

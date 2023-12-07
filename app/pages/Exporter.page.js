@@ -1,193 +1,155 @@
+// #region import
 import React, { useState } from 'react'
-import { useParams, useHistory } from 'react-router-dom'
-import { useQuery, useMutation, useLazyQuery } from '@apollo/client'
-import { useCurrentUser } from '@coko/client'
+import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
+import {
+  useQuery,
+  useMutation,
+  useLazyQuery,
+  useSubscription,
+} from '@apollo/client'
+import isEqual from 'lodash/isEqual'
+import pick from 'lodash/pick'
+import sortBy from 'lodash/sortBy'
 
-import find from 'lodash/find'
+import { useCurrentUser } from '@coko/client'
 
 import {
-  UPDATE_ASSOCIATED_TEMPLATES,
-  GET_BOOK_ASSOCIATED_TEMPLATES,
+  APPLICATION_PARAMETERS,
+  BOOK_UPDATED_SUBSCRIPTION,
+  CREATE_EXPORT_PROFILE,
+  DELETE_EXPORT_PROFILE,
+  GET_BOOK_COMPONENT_IDS,
   GET_SPECIFIC_TEMPLATES,
+  GET_EXPORT_PROFILES,
   GET_PAGED_PREVIEWER_LINK,
   EXPORT_BOOK,
+  RENAME_EXPORT_PROFILE,
+  UPLOAD_TO_LULU,
+  UPDATE_EXPORT_PROFILE_OPTIONS,
 } from '../graphql'
 
-import { isOwner } from '../helpers/permissions'
-
-import {
-  showUnauthorizedActionModal,
-  showGenericErrorModal,
-} from '../helpers/commonModals'
-
-import { Preview, Modal, Paragraph, Spin } from '../ui'
+import { isOwner, hasEditAccess, isAdmin } from '../helpers/permissions'
+import { Preview, Spin } from '../ui'
+// #endregion import
 
 const StyledSpin = styled(Spin)`
   display: grid;
-  height: calc(100% - 48px);
+  height: 100vh;
   place-content: center;
 `
 
-const Loader = () => <StyledSpin spinning />
+// #region helpers
+// exported for stories
+export const defaultProfile = {
+  label: 'New export',
+  value: 'new-export',
+  format: 'pdf',
+  size: '8.5x11',
+  content: ['includeTitlePage', 'includeCopyrights', 'includeTOC'],
+  template: null,
+}
+
+const sanitizeProfileData = input => {
+  const res = { ...input }
+  if (res.format === 'epub') res.trimSize = null
+  return res
+}
+
+const getFormatTarget = format => (format === 'pdf' ? 'pagedjs' : 'epub')
+
+const sanitizeOptionData = data => {
+  const d = { ...data }
+  d.content = d.content.sort()
+  return d
+}
+
+const optionKeys = ['format', 'size', 'content', 'template']
+
+const getProfileExportOptions = profile => {
+  const p = pick(profile, optionKeys)
+  return sanitizeOptionData(p)
+}
 
 const chooseZoom = screenWidth => {
-  if (screenWidth <= 1600 && screenWidth >= 1470) {
-    return 0.8
-  }
-
-  if (screenWidth <= 1469 && screenWidth >= 1281) {
-    return 0.6
-  }
-
-  if (screenWidth <= 1280) {
-    return 0.5
-  }
-
+  if (screenWidth <= 1600 && screenWidth >= 1470) return 0.8
+  if (screenWidth <= 1469 && screenWidth >= 1281) return 0.6
+  if (screenWidth <= 1280) return 0.5
   return 1.0
 }
-
-const findAssociatedTemplate = (
-  exportFormat,
-  trimSize,
-  associatedTemplatesData,
-) => {
-  return exportFormat === 'pdf'
-    ? find(associatedTemplatesData?.getBook?.associatedTemplates.pagedjs, {
-        trimSize,
-      })
-    : associatedTemplatesData?.getBook?.associatedTemplates.epub
-}
+// #endregion helpers
 
 const PreviewerPage = () => {
-  // INIT SECTION
+  // #region init
   const params = useParams()
-  const history = useHistory()
   const { bookId } = params
   const { currentUser } = useCurrentUser()
-  const [previewLink, setPreviewLink] = useState(undefined)
-  const [exportFormat, setExportFormat] = useState('pdf')
-  const [trimSize, setTrimSize] = useState('8.5x11')
+  const [previewLink, setPreviewLink] = useState(null)
+  const [creatingPreview, setCreatingPreview] = useState(true)
+  const [selectedTemplate, setSelectedTemplate] = useState(null)
 
-  if (!localStorage.getItem('zoomPercentage')) {
-    localStorage.setItem('zoomPercentage', chooseZoom(window.innerWidth))
-  }
+  React.useEffect(() => {
+    if (!localStorage.getItem('zoomPercentage')) {
+      localStorage.setItem('zoomPercentage', chooseZoom(window.innerWidth))
+    }
 
-  if (!localStorage.getItem('doublePageSpread')) {
-    localStorage.setItem('doublePageSpread', 'double')
-  }
+    if (!localStorage.getItem('pageSpread')) {
+      localStorage.setItem('pageSpread', 'double')
+    }
+  }, [])
+  // #endregion init
 
-  const canExport = isOwner(bookId, currentUser)
-
-  const zoomStep = 0.1
-  const zoomMin = 0.3
-
-  const defaultAdditionalExportOptions = {
-    includeTOC: true,
-    includeCopyrights: true,
-    includeTitlePage: true,
-  }
-  // INIT SECTION END
-
-  // QUERIES SECTION START
-
+  // #region queries
   const {
-    loading: associatedTemplatesInProgress,
-    data: associatedTemplatesData,
-  } = useQuery(GET_BOOK_ASSOCIATED_TEMPLATES, {
-    fetchPolicy: 'network-only',
+    data: templatesData,
+    loading: templatesLoading,
+    refetch: refetchTemplates,
+  } = useQuery(GET_SPECIFIC_TEMPLATES, {
     variables: {
-      id: bookId,
-    },
-    onCompleted: ({ getBook }) => {
-      const { associatedTemplates } = getBook
-
-      if (associatedTemplates) {
-        if (exportFormat === 'pdf') {
-          const found = findAssociatedTemplate(
-            exportFormat,
-            trimSize,
-            associatedTemplatesData,
-          )
-
-          if (found) {
-            triggerPreviewCreation(
-              found.templateId,
-              found.additionalExportOptions,
-            )
-          }
-        }
-      }
+      where: {
+        target: getFormatTarget(defaultProfile.format),
+        trimSize: defaultProfile.size,
+      },
     },
   })
 
-  const { data: templatesData, loading: templatesLoading } = useQuery(
-    GET_SPECIFIC_TEMPLATES,
-    {
-      fetchPolicy: 'network-only',
-      variables: {
-        where: {
-          target: exportFormat === 'pdf' ? 'pagedjs' : exportFormat,
-          trimSize: exportFormat === 'pdf' ? trimSize : null,
-        },
-      },
+  const {
+    data: profilesData,
+    loading: profilesLoading,
+    refetch: refetchProfiles,
+  } = useQuery(GET_EXPORT_PROFILES, {
+    fetchPolicy: 'network-only',
+    variables: {
+      bookId,
     },
+  })
+
+  const { data: book } = useQuery(GET_BOOK_COMPONENT_IDS, {
+    variables: {
+      bookId,
+    },
+  })
+
+  const { data: applicationParameters, loading: paramsLoading } = useQuery(
+    APPLICATION_PARAMETERS,
   )
 
-  const [getPagedLink, { loading: PagedPreviewLinkInProgress }] = useLazyQuery(
-    GET_PAGED_PREVIEWER_LINK,
-    {
-      onCompleted: ({ getPagedPreviewerLink: { link } }) => {
-        setPreviewLink(link)
-      },
-      onError: err => console.error(err),
+  const [getPagedLink] = useLazyQuery(GET_PAGED_PREVIEWER_LINK, {
+    onCompleted: ({ getPagedPreviewerLink: { link } }) => {
+      setPreviewLink(link)
     },
-  )
-  // QUERIES SECTION END
+  })
 
-  // MUTATIONS SECTION START
-  const [bookExport, { loading: bookExportInProgress }] = useMutation(
-    EXPORT_BOOK,
-    {
-      onCompleted: ({ exportBook }, { variables: { input } }) => {
-        const { previewer, fileExtension } = input
-        const { path } = exportBook
-
-        if (!previewer) {
-          if (fileExtension === 'epub') {
-            return window.location.replace(path)
-          }
-
-          return window.open(path, '_blank')
-        }
-
-        return false
-      },
-      onError: err => {
-        if (err.toString().includes('Not Authorised')) {
-          showUnauthorizedActionModal(false)
-        }
-
-        if (err.toString().includes('NotFoundError')) {
-          showErrorModal()
-        } else {
-          showErrorModal(true)
-        }
-      },
-    },
-  )
-
-  const [createPreview, { loading: createPreviewInProgress }] = useMutation(
+  const [createPreview, { called: createPreviewCalled }] = useMutation(
     EXPORT_BOOK,
     {
       onCompleted: ({ exportBook }, { variables: { input } }) => {
         const { path } = exportBook
-
         const hash = path.split('/')
 
         const previewerOptions = {
-          ...(localStorage.getItem('doublePageSpread') &&
-            localStorage.getItem('doublePageSpread') === 'double' && {
+          ...(localStorage.getItem('pageSpread') &&
+            localStorage.getItem('pageSpread') === 'double' && {
               doublePageSpread: true,
             }),
           ...(localStorage.getItem('zoomPercentage') &&
@@ -205,612 +167,427 @@ const PreviewerPage = () => {
           },
         })
       },
-      onError: err => {
-        if (err.toString().includes('Not Authorised')) {
-          showUnauthorizedActionModal(false)
-        }
-
-        // if missing template remove it from associated templates if exists
-        if (associatedTemplatesData) {
-          const { getBook } = associatedTemplatesData
-          const associatedTemplatesToPush = { pagedjs: [] }
-          const storedAssociatedTemplates = getBook.associatedTemplates
-
-          if (exportFormat === 'pdf') {
-            if (storedAssociatedTemplates) {
-              storedAssociatedTemplates.pagedjs.forEach(storedTemplate => {
-                if (storedTemplate.trimSize !== trimSize) {
-                  associatedTemplatesToPush.pagedjs.push({
-                    templateId: storedTemplate.templateId,
-                    trimSize: storedTemplate.trimSize,
-                    additionalExportOptions: defaultAdditionalExportOptions,
-                  })
-                }
-              })
-
-              if (storedAssociatedTemplates.epub) {
-                associatedTemplatesToPush.epub = {
-                  templateId: storedAssociatedTemplates?.epub?.templateId,
-                  additionalExportOptions:
-                    storedAssociatedTemplates?.epub?.additionalExportOptions,
-                }
-              } else {
-                associatedTemplatesToPush.epub = null
-              }
-            }
-          } else {
-            if (storedAssociatedTemplates) {
-              storedAssociatedTemplates.pagedjs.forEach(storedTemplate => {
-                associatedTemplatesToPush.pagedjs.push({
-                  templateId: storedTemplate.templateId,
-                  trimSize: storedTemplate.trimSize,
-                  additionalExportOptions:
-                    storedTemplate.additionalExportOptions,
-                })
-              })
-            }
-
-            associatedTemplatesToPush.epub = null
-          }
-
-          updateAssociatedTemplates({
-            variables: {
-              bookId,
-              associatedTemplates: associatedTemplatesToPush,
-            },
-          })
-        }
-
-        if (err.toString().includes('NotFoundError')) {
-          showErrorModal()
-        } else {
-          showErrorModal(true)
-        }
-      },
     },
   )
 
-  const [
-    updateAssociatedTemplates,
-    { loading: updateAssociatedTemplatesInProgress },
-  ] = useMutation(UPDATE_ASSOCIATED_TEMPLATES, {
+  const [createProfile] = useMutation(CREATE_EXPORT_PROFILE, {
     refetchQueries: [
       {
-        query: GET_BOOK_ASSOCIATED_TEMPLATES,
-        variables: {
-          id: bookId,
-        },
+        query: GET_EXPORT_PROFILES,
+        variables: { bookId },
       },
     ],
     awaitRefetchQueries: true,
-    onError: err => {
-      if (err.toString().includes('Not Authorised')) {
-        showUnauthorizedActionModal(false)
-      } else {
-        showGenericErrorModal()
-      }
+    onCompleted: res => {
+      const created = res.createExportProfile
+      setSelectedProfile(created.id)
     },
   })
-  // MUTATIONS SECTION END
 
-  // HANDLERS SECTION START
+  const [renameProfile] = useMutation(RENAME_EXPORT_PROFILE)
 
-  const showErrorModal = (backToBook = false) => {
-    const errorModal = Modal.error()
-    return errorModal.update({
-      title: 'Error',
-      content: (
-        <Paragraph>
-          {backToBook
-            ? 'There is something wrong with the export process. You will be redirected back to the editor. Please contact your admin'
-            : `The template ${
-                exportFormat === 'pdf' ? 'of this trim size ' : ''
-              }stored for this book does not exist anymore. Please, choose a different one from the templates list.`}
-        </Paragraph>
-      ),
-      onOk() {
-        if (backToBook) {
-          history.push(`/books/${bookId}/producer`)
-        }
+  const [updateProfileOptions] = useMutation(UPDATE_EXPORT_PROFILE_OPTIONS)
 
-        errorModal.destroy()
+  const [deleteProfile] = useMutation(DELETE_EXPORT_PROFILE, {
+    refetchQueries: [
+      {
+        query: GET_EXPORT_PROFILES,
+        variables: { bookId },
       },
-      okButtonProps: { style: { backgroundColor: 'black' } },
-      maskClosable: false,
-      width: 570,
-      bodyStyle: {
-        marginRight: 38,
-        textAlign: 'justify',
+    ],
+  })
+
+  const [download] = useMutation(EXPORT_BOOK, {
+    onCompleted: ({ exportBook }, { variables: { input } }) => {
+      const { fileExtension } = input
+      const { path } = exportBook
+
+      if (fileExtension === 'epub') return window.location.replace(path)
+      return window.open(path, '_blank')
+    },
+  })
+
+  const [uploadToLulu] = useMutation(UPLOAD_TO_LULU)
+
+  useSubscription(BOOK_UPDATED_SUBSCRIPTION, {
+    variables: { id: bookId },
+    fetchPolicy: 'network-only',
+    onData: () => {
+      refetchProfiles({ id: bookId })
+    },
+  })
+  // #endregion queries
+
+  // #region handlers
+  const getLuluConfigValue = value => {
+    const luluConfig = applicationParameters.getApplicationParameters.find(
+      p => p.area === 'integrations',
+    ).config.lulu
+
+    return luluConfig[value]
+  }
+
+  const handleConnectToLulu = () => {
+    const { location } = window
+    const appURL = `${location.protocol}//${location.host}`
+    const redirectURL = `${appURL}/provider-redirect/lulu`
+    const encodedRedirectURL = encodeURIComponent(redirectURL)
+    const baseLuluURL = getLuluConfigValue('loginUrl')
+    const luluURLParams = `response_type=code&client_id=ketida-editor&redirect_uri=${encodedRedirectURL}`
+    const luluURL = `${baseLuluURL}?${luluURLParams}`
+
+    window.open(luluURL, null, 'width=600, height=600')
+  }
+
+  const handleSendToLulu = e => {
+    return uploadToLulu({
+      variables: { id: selectedProfile },
+    })
+  }
+
+  const handleCreateProfile = displayName => {
+    const {
+      size: trimSize,
+      format,
+      content,
+      template: templateId,
+    } = currentOptions
+
+    const data = {
+      bookId,
+      displayName,
+      format,
+      includedComponents: {
+        toc: content.includes('includeTOC'),
+        copyright: content.includes('includeCopyrights'),
+        titlePage: content.includes('includeTitlePage'),
+      },
+      templateId,
+      trimSize,
+    }
+
+    return createProfile({
+      variables: {
+        input: sanitizeProfileData(data),
       },
     })
   }
 
-  const showErrorModalWithText = errorMessage => {
-    const warningModal = Modal.warning()
-    return warningModal.update({
-      title: 'Error',
-      content: <Paragraph>{errorMessage}</Paragraph>,
-      onOk() {
-        warningModal.destroy()
-      },
-      okButtonProps: { style: { backgroundColor: 'black' } },
-      maskClosable: false,
-      width: 570,
-      bodyStyle: {
-        marginRight: 38,
-        textAlign: 'justify',
+  const handleDeleteProfile = () => {
+    setSelectedProfile(defaultProfile.value)
+
+    const defaultTemplate = templatesData?.getSpecificTemplates.find(
+      t => t.default,
+    )
+
+    setCurrentOptions({
+      ...currentOptions,
+      ...getProfileExportOptions({
+        ...defaultProfile,
+        template: defaultTemplate.id,
+      }),
+    })
+
+    return deleteProfile({
+      variables: {
+        id: selectedProfile,
       },
     })
   }
 
-  const triggerPreviewCreation = (templateIdParam, contentOptions) => {
-    /* eslint-disable no-underscore-dangle, no-param-reassign */
-    delete contentOptions.__typename
-    /* eslint-enable no-underscore-dangle, no-param-reassign */
-    createPreview({
+  const handleRenameProfile = (id, newName) => {
+    return renameProfile({
+      variables: {
+        id,
+        displayName: newName,
+      },
+    })
+  }
+
+  const handleUpdateProfileOptions = () => {
+    const {
+      size: trimSize,
+      format,
+      content,
+      template: templateId,
+    } = currentOptions
+
+    const data = {
+      format,
+      includedComponents: {
+        toc: content.includes('includeTOC'),
+        copyright: content.includes('includeCopyrights'),
+        titlePage: content.includes('includeTitlePage'),
+      },
+      templateId,
+      trimSize,
+    }
+
+    return updateProfileOptions({
+      variables: {
+        id: selectedProfile,
+        input: sanitizeProfileData(data),
+      },
+    })
+  }
+
+  const handleDownload = () => {
+    const { format, template, content } = currentOptions
+
+    return download({
       variables: {
         input: {
           bookId,
-          templateId: templateIdParam,
-          previewer: 'pagedjs',
-          additionalExportOptions: contentOptions,
+          templateId: template,
+          fileExtension: format,
+          additionalExportOptions: {
+            includeTOC: content.includes('includeTOC'),
+            includeCopyrights: content.includes('includeCopyrights'),
+            includeTitlePage: content.includes('includeTitlePage'),
+          },
         },
       },
     })
   }
 
-  const downloadPDFHandler = () => {
-    if (!canExport) {
-      return showUnauthorizedActionModal(false)
-    }
+  const handleCreatePreview = (templates, options, target) => {
+    const newTemplates = templates
 
-    const currentSelectedTemplate = findAssociatedTemplate(
-      exportFormat,
-      trimSize,
-      associatedTemplatesData,
+    const optionsToApply = { ...options }
+
+    const existingTemplateStillThere = newTemplates.find(
+      t => t.id === options.template,
     )
 
-    if (currentSelectedTemplate.templateId && exportFormat === 'pdf') {
-      return bookExport({
+    if (!existingTemplateStillThere) {
+      const newTemplateWithSameName = newTemplates.find(
+        t => t.name.toLowerCase() === selectedTemplate.name.toLowerCase(),
+      )
+
+      const newDefaultTemplate = newTemplates.find(t => t.default)
+
+      const templateToApply =
+        newTemplateWithSameName || newDefaultTemplate || null
+
+      optionsToApply.template = templateToApply?.id || null
+      setSelectedTemplate(templateToApply)
+    } else if (selectedTemplate.id !== optionsToApply.template) {
+      const newTemplate = newTemplates.find(
+        t => t.id === optionsToApply.template,
+      )
+
+      setSelectedTemplate(newTemplate)
+    }
+
+    if (options.zoom) localStorage.setItem('zoomPercentage', options.zoom)
+    if (options.spread) localStorage.setItem('pageSpread', options.spread)
+
+    const previewData = {
+      bookId,
+      previewer: 'pagedjs',
+      templateId: optionsToApply.template,
+      additionalExportOptions: {
+        includeTOC: options.content.includes('includeTOC'),
+        includeCopyrights: options.content.includes('includeCopyrights'),
+        includeTitlePage: options.content.includes('includeTitlePage'),
+      },
+    }
+
+    setCurrentOptions({
+      ...currentOptions,
+      ...getProfileExportOptions(optionsToApply),
+      zoom: options.zoom,
+      spread: options.spread,
+    })
+
+    if (target === 'pagedjs') {
+      createPreview({
         variables: {
-          input: {
-            bookId,
-            templateId: currentSelectedTemplate.templateId,
-            fileExtension: exportFormat,
-            additionalExportOptions:
-              currentSelectedTemplate.additionalExportOptions,
-          },
+          input: previewData,
         },
+      }).finally(() => {
+        setCreatingPreview(false)
       })
-    }
-
-    return false
-  }
-
-  const downloadEPUBHandler = () => {
-    if (!canExport) {
-      return showUnauthorizedActionModal(false)
-    }
-
-    const currentSelectedTemplate = findAssociatedTemplate(
-      exportFormat,
-      undefined,
-      associatedTemplatesData,
-    )
-
-    let bookComponents
-
-    if (associatedTemplatesData) {
-      bookComponents = associatedTemplatesData.getBook.divisions.find(
-        item => item.label === 'Body',
-      ).bookComponents
-    }
-
-    if (bookComponents && bookComponents.length === 0) {
-      const errorMessage =
-        'You must add content to your book before a valid EPUB can be produced.'
-
-      return showErrorModalWithText(errorMessage)
-    }
-
-    if (currentSelectedTemplate.templateId && exportFormat === 'epub') {
-      return bookExport({
-        variables: {
-          input: {
-            bookId,
-            templateId: currentSelectedTemplate.templateId,
-            fileExtension: exportFormat,
-            additionalExportOptions:
-              currentSelectedTemplate.additionalExportOptions,
-          },
-        },
-      })
-    }
-
-    return false
-  }
-
-  const changeExportFormatHandler = selectedFormat => {
-    setExportFormat(selectedFormat)
-
-    if (previewLink) setPreviewLink(undefined)
-
-    if (selectedFormat === 'pdf') {
-      const currentSelectedTemplate = findAssociatedTemplate(
-        selectedFormat,
-        trimSize,
-        associatedTemplatesData,
-      )
-
-      if (currentSelectedTemplate) {
-        triggerPreviewCreation(
-          currentSelectedTemplate.templateId,
-          currentSelectedTemplate.additionalExportOptions,
-        )
-      }
-    }
-  }
-
-  // This applies only for the case of pdf
-  const changePageSizeHandler = selectedTrimSize => {
-    setTrimSize(selectedTrimSize)
-
-    const currentSelectedTemplate = findAssociatedTemplate(
-      exportFormat,
-      selectedTrimSize,
-      associatedTemplatesData,
-    )
-
-    if (!currentSelectedTemplate && exportFormat === 'pdf') {
-      setPreviewLink(undefined)
     } else {
-      triggerPreviewCreation(
-        currentSelectedTemplate.templateId,
-        currentSelectedTemplate.additionalExportOptions,
-      )
+      setCreatingPreview(false)
     }
   }
 
-  const changeAdditionalExportOptionsHandler = (key, value) => {
-    if (!canExport) {
-      showUnauthorizedActionModal(false)
-      return
-    }
+  const handleRefetchTemplates = options => {
+    const templateTarget = getFormatTarget(options.format)
+    const templateTrimSize = templateTarget === 'epub' ? null : options.size
 
-    let currentAdditionalExportOptions
-    let currentSelectedTemplate
+    setCreatingPreview(true)
 
-    if (exportFormat === 'pdf') {
-      currentSelectedTemplate = findAssociatedTemplate(
-        exportFormat,
-        trimSize,
-        associatedTemplatesData,
+    refetchTemplates({
+      where: {
+        target: templateTarget,
+        trimSize: templateTrimSize,
+      },
+    }).then(res => {
+      handleCreatePreview(
+        res.data.getSpecificTemplates,
+        options,
+        templateTarget,
       )
-
-      if (!currentSelectedTemplate.templateId) return
-
-      currentAdditionalExportOptions =
-        currentSelectedTemplate.additionalExportOptions
-    } else {
-      currentSelectedTemplate = findAssociatedTemplate(
-        exportFormat,
-        undefined,
-        associatedTemplatesData,
-      )
-      currentAdditionalExportOptions =
-        associatedTemplatesData?.getBook?.associatedTemplates?.epub
-          ?.additionalExportOptions
-    }
-
-    const clonedExportOptions = { ...currentAdditionalExportOptions }
-
-    clonedExportOptions[key] = value
-
-    const associatedTemplatesToPush = { pagedjs: [] }
-    let storedAssociatedTemplates
-
-    if (associatedTemplatesData) {
-      const { getBook } = associatedTemplatesData
-      storedAssociatedTemplates = getBook.associatedTemplates
-    }
-
-    if (exportFormat === 'pdf') {
-      associatedTemplatesToPush.pagedjs.push({
-        templateId: currentSelectedTemplate.templateId,
-        trimSize,
-        additionalExportOptions: clonedExportOptions,
-      })
-
-      // change also content options for all the stored templates of each trimSize
-      if (storedAssociatedTemplates) {
-        storedAssociatedTemplates.pagedjs.forEach(storedTemplate => {
-          if (storedTemplate.trimSize !== trimSize) {
-            associatedTemplatesToPush.pagedjs.push({
-              templateId: storedTemplate.templateId,
-              trimSize: storedTemplate.trimSize,
-              additionalExportOptions: clonedExportOptions,
-            })
-          }
-        })
-
-        if (storedAssociatedTemplates.epub) {
-          associatedTemplatesToPush.epub = {
-            templateId: storedAssociatedTemplates.epub.templateId,
-            additionalExportOptions:
-              storedAssociatedTemplates.epub.additionalExportOptions,
-          }
-        } else {
-          associatedTemplatesToPush.epub = null
-        }
-      }
-    } else {
-      if (storedAssociatedTemplates) {
-        storedAssociatedTemplates.pagedjs.forEach(storedTemplate => {
-          associatedTemplatesToPush.pagedjs.push({
-            templateId: storedTemplate.templateId,
-            trimSize: storedTemplate.trimSize,
-            additionalExportOptions: storedTemplate.additionalExportOptions,
-          })
-        })
-      }
-
-      const clonedAssociatedEPUB = { ...storedAssociatedTemplates.epub }
-      clonedAssociatedEPUB.additionalExportOptions = clonedExportOptions
-
-      clonedExportOptions.includeTOC = true // make sure TOC is always on because otherwise epub is invalid
-
-      associatedTemplatesToPush.epub = {
-        templateId: clonedAssociatedEPUB.templateId,
-        additionalExportOptions: clonedExportOptions,
-      }
-    }
-
-    setPreviewLink(undefined)
-    updateAssociatedTemplates({
-      variables: { bookId, associatedTemplates: associatedTemplatesToPush },
     })
   }
 
-  const selectTemplateHandler = toBeSelectedTemplateId => {
-    const currentSelectedTemplate = findAssociatedTemplate(
-      exportFormat,
-      trimSize,
-      associatedTemplatesData,
+  const handleOptionsChange = newOptions => {
+    const options = { ...currentOptions, ...newOptions }
+
+    if (options.format === 'pdf' && !options.size) {
+      options.size = defaultProfile.size
+    }
+
+    if (options.format === 'epub') {
+      options.size = null
+    }
+
+    if (isEqual(currentOptions, options)) return
+
+    handleRefetchTemplates(options)
+  }
+
+  const handleProfileChange = profileId => {
+    setSelectedProfile(profileId)
+
+    const newProfile = [defaultProfileWithTemplate, ...profiles].find(
+      p => p.value === profileId,
     )
 
-    // If you click on the same template that you already have selected then do nothing
-    if (
-      currentSelectedTemplate &&
-      currentSelectedTemplate.templateId === toBeSelectedTemplateId
-    ) {
-      console.warn('this template is already selected')
-    } else {
-      if (!canExport) {
-        showUnauthorizedActionModal(false)
-        return
-      }
+    handleOptionsChange(getProfileExportOptions(newProfile))
+  }
+  // #endregion handlers
 
-      if (createPreviewInProgress || bookExportInProgress) return
+  // #region data wrangling
+  const isUserConnectedToLulu = !!currentUser?.identities?.find(
+    id => id.provider === 'lulu',
+  )
 
-      const associatedTemplatesToPush = { pagedjs: [] }
+  const storedZoom = localStorage.getItem('zoomPercentage')
+  const initialZoom = storedZoom ? parseFloat(storedZoom) : 1
 
-      const storedAssociatedTemplates =
-        associatedTemplatesData?.getBook?.associatedTemplates
+  const storedSpread = localStorage.getItem('pageSpread')
+  const initialSpread = storedSpread || undefined
 
-      if (exportFormat === 'pdf') {
-        if (!currentSelectedTemplate) {
-          associatedTemplatesToPush.pagedjs.push({
-            templateId: toBeSelectedTemplateId,
-            trimSize,
-            additionalExportOptions: defaultAdditionalExportOptions,
-          })
+  const sortedTemplates = sortBy(
+    templatesData?.getSpecificTemplates,
+    i => !i.default,
+  )
 
-          if (storedAssociatedTemplates) {
-            storedAssociatedTemplates.pagedjs.forEach(storedTemplate => {
-              if (storedTemplate.trimSize !== trimSize) {
-                associatedTemplatesToPush.pagedjs.push({
-                  templateId: storedTemplate.templateId,
-                  trimSize: storedTemplate.trimSize,
-                  additionalExportOptions: defaultAdditionalExportOptions,
-                })
-              }
-            })
-
-            if (storedAssociatedTemplates.epub) {
-              associatedTemplatesToPush.epub = {
-                templateId: storedAssociatedTemplates.epub.templateId,
-                additionalExportOptions:
-                  storedAssociatedTemplates.epub.additionalExportOptions,
-              }
-            } else {
-              // case of null epub
-              associatedTemplatesToPush.epub = storedAssociatedTemplates.epub
-            }
+  const templates =
+    sortedTemplates.length > 0
+      ? sortedTemplates.map(t => {
+          return {
+            id: t.id,
+            imageUrl: t.thumbnail?.url,
+            name: t.name,
           }
-        } else {
-          const { additionalExportOptions } = currentSelectedTemplate
+        })
+      : undefined
 
-          associatedTemplatesToPush.pagedjs.push({
-            templateId: toBeSelectedTemplateId,
-            trimSize,
-            additionalExportOptions,
-          })
+  const defaultTemplate = templatesData?.getSpecificTemplates.find(
+    t => t.default,
+  )
 
-          if (storedAssociatedTemplates) {
-            storedAssociatedTemplates.pagedjs.forEach(storedTemplate => {
-              if (storedTemplate.trimSize !== trimSize) {
-                associatedTemplatesToPush.pagedjs.push({
-                  templateId: storedTemplate.templateId,
-                  trimSize: storedTemplate.trimSize,
-                  additionalExportOptions,
-                })
-              }
-            })
+  const defaultProfileWithTemplate = {
+    ...defaultProfile,
+    template: defaultTemplate?.id,
+  }
 
-            if (storedAssociatedTemplates.epub) {
-              associatedTemplatesToPush.epub = {
-                templateId: storedAssociatedTemplates.epub.templateId,
-                additionalExportOptions:
-                  storedAssociatedTemplates.epub.additionalExportOptions,
-              }
-            } else {
-              // case of null epub
-              associatedTemplatesToPush.epub = storedAssociatedTemplates.epub
-            }
-          }
-        }
-      } else {
-        if (storedAssociatedTemplates) {
-          storedAssociatedTemplates.pagedjs.forEach(storedTemplate => {
-            associatedTemplatesToPush.pagedjs.push({
-              templateId: storedTemplate.templateId,
-              trimSize: storedTemplate.trimSize,
-              additionalExportOptions: storedTemplate.additionalExportOptions,
-            })
-          })
-        }
+  const [selectedProfile, setSelectedProfile] = useState(defaultProfile.value)
 
-        associatedTemplatesToPush.epub = {
-          templateId: toBeSelectedTemplateId,
-          additionalExportOptions: !currentSelectedTemplate
-            ? defaultAdditionalExportOptions
-            : storedAssociatedTemplates.epub.additionalExportOptions,
-        }
+  const [currentOptions, setCurrentOptions] = useState({
+    ...getProfileExportOptions(defaultProfileWithTemplate),
+    zoom: initialZoom,
+    spread: initialSpread,
+  })
+
+  // initial preview
+  React.useEffect(() => {
+    if (!selectedTemplate && !createPreviewCalled) {
+      setSelectedTemplate(defaultTemplate)
+    }
+
+    if (templatesData && selectedTemplate && !createPreviewCalled) {
+      handleCreatePreview(
+        templatesData.getSpecificTemplates,
+        currentOptions,
+        getFormatTarget(currentOptions.format),
+      )
+    }
+  }, [templatesData, selectedTemplate])
+
+  const profiles =
+    applicationParameters &&
+    profilesData?.getBookExportProfiles.result.map(p => {
+      const luluProfile = p.providerInfo.find(x => x.providerLabel === 'lulu')
+      const projectId = luluProfile ? luluProfile.externalProjectId : null
+
+      const luluProjectUrl = projectId
+        ? `${getLuluConfigValue('projectBaseUrl')}/${projectId}`
+        : null
+
+      const content = []
+
+      if (p.includedComponents.copyright) content.push('includeTOC')
+      if (p.includedComponents.titlePage) content.push('includeTitlePage')
+      if (p.includedComponents.toc) content.push('includeCopyrights')
+
+      return {
+        format: p.format,
+        content,
+        label: p.displayName,
+        lastSynced: luluProfile ? luluProfile.lastSync : null,
+        projectId,
+        projectUrl: luluProjectUrl,
+        size: p.trimSize,
+        synced: luluProfile ? luluProfile.inSync : null,
+        template: p.templateId,
+        value: p.id,
       }
-
-      setPreviewLink(undefined)
-
-      updateAssociatedTemplates({
-        variables: { bookId, associatedTemplates: associatedTemplatesToPush },
-      })
-    }
-  }
-
-  const changePageSpread = ({ target: { value } }) => {
-    localStorage.setItem('doublePageSpread', value)
-
-    if (value === 'single') {
-      localStorage.setItem('zoomPercentage', 1.0)
-    }
-
-    const currentSelectedTemplate = findAssociatedTemplate(
-      exportFormat,
-      trimSize,
-      associatedTemplatesData,
-    )
-
-    if (currentSelectedTemplate) {
-      setPreviewLink(undefined)
-      triggerPreviewCreation(
-        currentSelectedTemplate.templateId,
-        currentSelectedTemplate.additionalExportOptions,
-      )
-    }
-  }
-
-  const handleZoomIn = () => {
-    const currentValue = parseFloat(localStorage.getItem('zoomPercentage'))
-
-    if (currentValue <= 1 - zoomStep) {
-      localStorage.setItem(
-        'zoomPercentage',
-        Math.round((currentValue + zoomStep) * 100) / 100,
-      )
-
-      const currentSelectedTemplate = findAssociatedTemplate(
-        exportFormat,
-        trimSize,
-        associatedTemplatesData,
-      )
-
-      if (currentSelectedTemplate) {
-        setPreviewLink(undefined)
-        triggerPreviewCreation(
-          currentSelectedTemplate.templateId,
-          currentSelectedTemplate.additionalExportOptions,
-        )
-      }
-    }
-  }
-
-  const handleZoomOut = () => {
-    const currentValue = parseFloat(localStorage.getItem('zoomPercentage'))
-
-    if (currentValue >= zoomMin + zoomStep) {
-      localStorage.setItem(
-        'zoomPercentage',
-        Math.round((currentValue - zoomStep) * 100) / 100,
-      )
-
-      const currentSelectedTemplate = findAssociatedTemplate(
-        exportFormat,
-        trimSize,
-        associatedTemplatesData,
-      )
-
-      if (currentSelectedTemplate) {
-        setPreviewLink(undefined)
-        triggerPreviewCreation(
-          currentSelectedTemplate.templateId,
-          currentSelectedTemplate.additionalExportOptions,
-        )
-      }
-    }
-  }
-  // HANDLERS SECTION END
-
-  if (associatedTemplatesInProgress || templatesLoading) return <Loader />
-
-  let foundTemplate
-
-  if (templatesData) {
-    const tempFoundTemplate = findAssociatedTemplate(
-      exportFormat,
-      trimSize,
-      associatedTemplatesData,
-    )
-
-    const templateExists = find(templatesData.getSpecificTemplates, {
-      id: tempFoundTemplate?.templateId,
     })
 
-    if (templateExists) {
-      foundTemplate = tempFoundTemplate
-    }
+  const allProfiles = profiles && [defaultProfileWithTemplate, ...profiles]
+
+  const hasContent =
+    book?.getBook.divisions.find(d => d.label === 'Body').bookComponents
+      .length > 0
+
+  const isOwnerOrAdmin = isAdmin(currentUser) || isOwner(bookId, currentUser)
+  const canModify = hasEditAccess(bookId, currentUser)
+
+  const isDownloadButtonDisabled =
+    !canModify || (!hasContent && currentOptions.format === 'epub')
+  // #endregion data wrangling
+
+  if (templatesLoading || profilesLoading || !currentUser || paramsLoading) {
+    return <StyledSpin spinning />
   }
 
   return (
     <Preview
-      additionalExportOptions={foundTemplate?.additionalExportOptions}
-      bookExportInProgress={bookExportInProgress}
-      canExport={canExport}
-      createPreviewInProgress={createPreviewInProgress}
-      doublePageSpread={localStorage.getItem('doublePageSpread')}
-      exportFormatValue={exportFormat}
-      onChangeAdditionalExportOptions={changeAdditionalExportOptionsHandler}
-      onChangeExportFormat={changeExportFormatHandler}
-      onChangePageSize={changePageSizeHandler}
-      onChangePageSpread={changePageSpread}
-      onClickDownloadEpub={downloadEPUBHandler}
-      onClickDownloadPdf={downloadPDFHandler}
-      onClickZoomIn={handleZoomIn}
-      onClickZoomOut={handleZoomOut}
-      onSelectTemplate={selectTemplateHandler}
+      connectToLulu={handleConnectToLulu}
+      createProfile={handleCreateProfile}
+      currentOptions={currentOptions}
+      defaultProfile={defaultProfileWithTemplate}
+      deleteProfile={handleDeleteProfile}
+      download={handleDownload}
+      isDownloadButtonDisabled={isDownloadButtonDisabled}
+      isUserConnectedToLulu={isUserConnectedToLulu}
+      loadingExport={false}
+      loadingPreview={creatingPreview}
+      onOptionsChange={handleOptionsChange}
+      onProfileChange={handleProfileChange}
       previewLink={previewLink}
-      processInProgress={
-        createPreviewInProgress ||
-        bookExportInProgress ||
-        PagedPreviewLinkInProgress ||
-        updateAssociatedTemplatesInProgress
-      }
-      selectedTemplate={foundTemplate?.templateId}
-      sizeValue={trimSize}
-      templates={templatesData?.getSpecificTemplates || []}
-      trimSizeValue={trimSize}
-      zoomMin={zoomMin}
-      zoomPercentage={parseFloat(
-        localStorage.getItem('zoomPercentage'),
-      ).toFixed(1)}
+      profiles={allProfiles}
+      renameProfile={handleRenameProfile}
+      selectedProfile={selectedProfile}
+      sendToLulu={handleSendToLulu}
+      showFooter={isOwnerOrAdmin}
+      templates={templates}
+      updateProfileOptions={handleUpdateProfileOptions}
     />
   )
 }

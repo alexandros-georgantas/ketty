@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { EditOutlined, CloudUploadOutlined } from '@ant-design/icons'
@@ -13,6 +13,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   height: 100%;
   overflow: hidden;
+  padding: ${grid(4)};
 
   .ant-spin-container,
   .ant-spin-nested-loading {
@@ -45,20 +46,41 @@ const Dashboard = props => {
     onUploadBookThumbnail,
   } = props
 
+  const [loadingCreateBook, setLoadingCreateBook] = useState(false)
+  const [loadingImportBook, setLoadingImportBook] = useState(false)
+
+  const handleCreateBook = () => {
+    setLoadingCreateBook(true)
+    onCreateBook().finally(() => {
+      setLoadingCreateBook(false)
+    })
+  }
+
+  const handleImportBook = () => {
+    setLoadingImportBook(true)
+    onImportBook().finally(() => {
+      setLoadingImportBook(false)
+    })
+  }
+
   return (
     <Wrapper>
       <DashboardActions>
         <Button
+          disabled={loadingCreateBook || loadingImportBook}
           icon={<EditOutlined />}
-          onClick={onCreateBook}
+          loading={loadingCreateBook}
+          onClick={handleCreateBook}
           size="large"
           type="primary"
         >
           Start writing your book
         </Button>
         <Button
+          disabled={loadingCreateBook || loadingImportBook}
           icon={<CloudUploadOutlined />}
-          onClick={onImportBook}
+          loading={loadingImportBook}
+          onClick={handleImportBook}
           size="large"
         >
           Import your files

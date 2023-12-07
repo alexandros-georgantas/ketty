@@ -13,13 +13,23 @@ variables:
   PATH_TO_BUILD: .
   PATH_INSIDE_CONTAINER: /home/node/ketida
   COMPOSE_FILE_STORYBOOK: docker-compose.storybook-deploy.yml
+  COMPOSE_FILE_DEPLOY_DEVELOP: docker-compose.develop-deploy.yml
+  COMPOSE_FILE_DEPLOY_DEMO: docker-compose.demo-deploy.yml
 
 stages:
+  - Branch checks
   - Build development
   - Lint & Unit test
   - Build production
   - Publish
   - Deploy
+
+branch source and target rules:
+  stage: Branch checks
+  script:
+    - if [[ "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" == "main" ]]; then exit 1; fi # do not allow MRs from main into anything
+    - if [[ "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" != "develop" && "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" == "main" ]]; then exit 1; fi # only develop can be merged into main
+    - if [[ "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" == "develop" && "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" != "main" ]]; then exit 1; fi # develop can only be merged into main
 
 ## LINT & UNIT TEST
 
@@ -47,7 +57,7 @@ unit test:
 
 ## BUILD PRODUCTION IMAGE
 
-.build preproduction develop:
+build preproduction develop:
   extends: .build production
   stage: Build production
   variables:
@@ -56,7 +66,7 @@ unit test:
   only:
     - develop
 
-.build preproduction demo:
+build preproduction demo:
   extends: .build production
   stage: Build production
   variables:
@@ -70,7 +80,7 @@ unit test:
 
 ## PUBLISH PRODUCTION IMAGE
 
-.publish production develop:
+publish production develop:
   extends: .publish
   stage: Publish
   needs:
@@ -81,7 +91,7 @@ unit test:
   only:
     - develop
 
-.publish production demo:
+publish production demo:
   extends: .publish
   stage: Publish
   needs:
@@ -118,8 +128,11 @@ deploy storybook:
     SERVICE_NAME: $SERVICE_NAME_STORYBOOK
   only:
     - develop
+  environment:
+    name: storybook
+    url: https://$STORYBOOK_SSH_URL
 
-.deploy develop:
+deploy develop:
   extends: .deploy base
   stage: Deploy
   needs:
@@ -129,12 +142,13 @@ deploy storybook:
     PORT: $DEVELOP_SSH_PORT
     USER: $DEVELOP_SSH_USER
     PRIVATE_KEY: $DEVELOP_SSH_PRIVATE_KEY
+    APP_PATH_ON_SERVER: $DEVELOP_APP_PATH_ON_SERVER
     COMPOSE_FILE: $COMPOSE_FILE_DEPLOY_DEVELOP
     SERVICE_NAME: $SERVICE_NAME_DEPLOY_DEVELOP
   only:
     - develop
 
-.deploy demo:
+deploy demo:
   extends: .deploy base
   stage: Deploy
   needs:
@@ -144,6 +158,7 @@ deploy storybook:
     PORT: $DEMO_SSH_PORT
     USER: $DEMO_SSH_USER
     PRIVATE_KEY: $DEMO_SSH_PRIVATE_KEY
+    APP_PATH_ON_SERVER: $DEMO_APP_PATH_ON_SERVER
     COMPOSE_FILE: $COMPOSE_FILE_DEPLOY_DEMO
     SERVICE_NAME: $SERVICE_NAME_DEPLOY_DEMO
   only:

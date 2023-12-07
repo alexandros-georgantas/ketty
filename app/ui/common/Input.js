@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { Input as AntInput } from 'antd'
@@ -20,7 +20,7 @@ const NoStyleButton = styled.button`
 
 const StyledPassword = styled(AntInput.Password)``
 
-const Input = props => {
+const Input = forwardRef((props, ref) => {
   const { className, onChange, type, passwordIconRender, ...rest } = props
 
   const handleChange = e => onChange && onChange(e.target.value)
@@ -40,18 +40,21 @@ const Input = props => {
 
   return (
     <Wrapper className={className}>
-      {type !== 'password' && <StyledInput onChange={handleChange} {...rest} />}
+      {type !== 'password' && (
+        <StyledInput onChange={handleChange} ref={ref} {...rest} />
+      )}
 
       {type === 'password' && (
         <StyledPassword
           iconRender={passwordIconRender || defaultPasswordIconRender}
           onChange={handleChange}
+          ref={ref}
           {...rest}
         />
       )}
     </Wrapper>
   )
-}
+})
 
 Input.propTypes = {
   /** optional icon for reveal/hide password */
