@@ -14,6 +14,7 @@ const Footer = props => {
   const {
     className,
     createProfile,
+    canModify,
     isDownloadButtonDisabled,
     isNewProfileSelected,
     isSaveDisabled,
@@ -161,7 +162,7 @@ const Footer = props => {
       <ButtonGroup>
         <Button
           // disabled={isSaveDisabled || updateLoading || loadingPreview}
-          disabled={isSaveDisabled || updateLoading}
+          disabled={isSaveDisabled || updateLoading || !canModify}
           loading={updateLoading}
           onClick={handleClickSave}
           type="primary"
@@ -182,7 +183,7 @@ const Footer = props => {
         {!isNewProfileSelected && (
           <Button
             // disabled={updateLoading || loadingPreview}
-            disabled={updateLoading}
+            disabled={updateLoading || !canModify}
             icon={<DeleteOutlined />}
             loading={deleteLoading}
             onClick={handleClickDelete}
@@ -213,6 +214,7 @@ const Footer = props => {
 
 Footer.propTypes = {
   createProfile: PropTypes.func.isRequired,
+  canModify: PropTypes.bool.isRequired,
   isDownloadButtonDisabled: PropTypes.bool.isRequired,
   isNewProfileSelected: PropTypes.bool.isRequired,
   isSaveDisabled: PropTypes.bool.isRequired,

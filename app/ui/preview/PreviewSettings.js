@@ -67,6 +67,7 @@ const PreviewSettings = props => {
     defaultProfile,
     download,
     isCollapsed,
+    canModify,
     isDownloadButtonDisabled,
     isUserConnectedToLulu,
     loadingPreview,
@@ -171,6 +172,7 @@ const PreviewSettings = props => {
           </div>
 
           <Footer
+            canModify={canModify}
             createProfile={createProfile}
             isDownloadButtonDisabled={isDownloadButtonDisabled}
             isNewProfileSelected={isNewProfileSelected}
@@ -215,6 +217,7 @@ PreviewSettings.propTypes = {
   }).isRequired,
   download: PropTypes.func.isRequired,
   isCollapsed: PropTypes.bool.isRequired,
+  canModify: PropTypes.bool.isRequired,
   isDownloadButtonDisabled: PropTypes.bool.isRequired,
   isUserConnectedToLulu: PropTypes.bool.isRequired,
   loadingPreview: PropTypes.bool.isRequired,
