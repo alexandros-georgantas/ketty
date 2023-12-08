@@ -18,10 +18,10 @@ const UserStatus = ({ className }) => {
         <InfoCircleOutlined />
         Only the book owner can add team members who are already signed up on
         the system, and can determine their permissions. Collaborators with Edit
-        access can change book content or metadata and view export previews, but
-        cannot download PDF or Epub files. Collaborators with View access cannot
-        change book content or metadata or download PDF or Epub files, but can
-        view export previews.
+        access can change book content or metadata, view export previews, and
+        download PDF and Epub files, but cannot delete the book. Collaborators
+        with View access cannot delete the book, change book content or
+        metadata, or download PDF or Epub files, but can view export previews.
       </Space>
     </Wrapper>
   )

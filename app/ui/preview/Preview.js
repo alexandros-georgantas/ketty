@@ -36,6 +36,7 @@ const Preview = props => {
     deleteProfile,
     defaultProfile,
     download,
+    canModify,
     isDownloadButtonDisabled,
     isUserConnectedToLulu,
     loadingExport,
@@ -78,6 +79,7 @@ const Preview = props => {
         />
 
         <PreviewSettings
+          canModify={canModify}
           createProfile={createProfile}
           currentOptions={exportOptions}
           defaultProfile={defaultProfile}
@@ -130,6 +132,7 @@ Preview.propTypes = {
   }).isRequired,
   deleteProfile: PropTypes.func.isRequired,
   download: PropTypes.func.isRequired,
+  canModify: PropTypes.bool.isRequired,
   isDownloadButtonDisabled: PropTypes.bool.isRequired,
   isUserConnectedToLulu: PropTypes.bool.isRequired,
   loadingExport: PropTypes.bool.isRequired,
