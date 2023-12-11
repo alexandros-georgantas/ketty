@@ -40,7 +40,7 @@ const Wrapper = styled.div`
 
 // #region helpoers
 const selectKeys = ['label', 'value']
-const optionKeys = ['format', 'size', 'content', 'template']
+const optionKeys = ['format', 'size', 'content', 'template', 'isbn']
 
 const getProfileSelectOptions = profile => pick(profile, selectKeys)
 
