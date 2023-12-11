@@ -252,6 +252,12 @@ const ProducerPage = () => {
           showGenericErrorModal()
         }
       },
+      onCompleted: res => {
+        const { podAddBookComponent } = res
+        const { divisions } = podAddBookComponent
+        const { bookComponents } = divisions[1]
+        setSelectedChapterId(bookComponents[bookComponents.length - 1].id)
+      },
     })
 
   const [renameBookComponent] = useMutation(RENAME_BOOK_COMPONENT_TITLE, {
