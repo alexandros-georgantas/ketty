@@ -119,6 +119,25 @@ const ProducerPage = () => {
     variables: {
       id: bookId,
     },
+    awaitRefetchQueries: true,
+    onCompleted: res => {
+      const { getBook } = res
+      const { divisions } = getBook
+      const body = divisions[1]
+      const { bookComponents } = body
+
+      if (bookComponents.length === 0 && !addBookComponentInProgress) {
+        createBookComponent({
+          variables: {
+            input: {
+              bookId,
+              divisionId: body.id,
+              componentType: 'chapter',
+            },
+          },
+        })
+      }
+    },
   })
 
   const { loading: bookComponentLoading, data: bookComponentData } = useQuery(
@@ -676,26 +695,6 @@ const ProducerPage = () => {
   }
 
   // HANDLERS SECTION END
-
-  // Create an empty chapter if the book has no chapters
-  if (
-    !loading &&
-    chaptersDivision &&
-    !chaptersDivision.bookComponents?.length &&
-    !addBookComponentInProgress
-  ) {
-    createBookComponent({
-      variables: {
-        input: {
-          bookId,
-          divisionId: chaptersDivision.id,
-          componentType: 'chapter',
-        },
-        condition: 'bookEmpty',
-      },
-    })
-  }
-
   const bookComponent =
     !loading &&
     selectedChapterId &&
