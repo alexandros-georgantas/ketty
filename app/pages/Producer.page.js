@@ -123,15 +123,18 @@ const ProducerPage = () => {
     onCompleted: res => {
       const { getBook } = res
       const { divisions } = getBook
-      const body = divisions[1]
+      const body = find(divisions, { label: 'Body' })
       const { bookComponents } = body
 
       if (bookComponents?.length) {
         // Once the page and chapter 1 are loaded, allow auto select of chapter 1
-        const chapter1 = bookComponents[0]
+        const firstChapter = bookComponents[0]
 
-        if (selectedChapterId === undefined && !chapter1.uploading) {
-          setSelectedChapterId(chapter1.id)
+        // When 'selectedChapterId' is falsey, it could be that ALL chapters
+        // should be deselected. Use "undefined" to indicate that chapters
+        // should be auto-selected
+        if (selectedChapterId === undefined && !firstChapter.uploading) {
+          setSelectedChapterId(firstChapter.id)
         }
       } else if (!addBookComponentInProgress) {
         createBookComponent({
@@ -255,7 +258,7 @@ const ProducerPage = () => {
       onCompleted: res => {
         const { podAddBookComponent } = res
         const { divisions } = podAddBookComponent
-        const { bookComponents } = divisions[1]
+        const { bookComponents } = find(divisions, { label: 'Body' })
         setSelectedChapterId(bookComponents[bookComponents.length - 1].id)
       },
     })
@@ -336,14 +339,16 @@ const ProducerPage = () => {
   // MUTATIONS SECTION END
 
   // HANDLERS SECTION START
-  const chaptersDivision = bookQueryData?.getBook?.divisions[1]
+  const bodyDivision = find(bookQueryData?.getBook?.divisions, {
+    label: 'Body',
+  })
 
   const getBodyDivisionId = () => {
     if (bookQueryData) {
       const { getBook } = bookQueryData
       const { divisions } = getBook
-      const bodyDivision = find(divisions, { label: 'Body' })
-      return bodyDivision.id
+      const body = find(divisions, { label: 'Body' })
+      return body.id
     }
 
     return undefined
@@ -405,7 +410,7 @@ const ProducerPage = () => {
       return
     }
 
-    const found = find(chaptersDivision.bookComponents, {
+    const found = find(bodyDivision.bookComponents, {
       id: bookComponentId,
     })
 
@@ -595,11 +600,11 @@ const ProducerPage = () => {
 
     if (
       JSON.stringify(newChapterList) !==
-      JSON.stringify(chaptersDivision.bookComponents)
+      JSON.stringify(bodyDivision.bookComponents)
     ) {
       updateBookComponentsOrder({
         variables: {
-          targetDivisionId: chaptersDivision?.id,
+          targetDivisionId: bodyDivision?.id,
           bookComponents: newChapterList.map(chapter => chapter.id),
         },
       })
@@ -607,7 +612,7 @@ const ProducerPage = () => {
   }
 
   const onChapterClick = chapterId => {
-    const found = find(chaptersDivision?.bookComponents, {
+    const found = find(bodyDivision?.bookComponents, {
       id: chapterId,
     })
 
@@ -711,7 +716,7 @@ const ProducerPage = () => {
   const bookComponent =
     !loading &&
     selectedChapterId &&
-    find(chaptersDivision.bookComponents, {
+    find(bodyDivision.bookComponents, {
       id: selectedChapterId,
     })
 
@@ -828,7 +833,7 @@ const ProducerPage = () => {
       bookComponentContent={bookComponentData?.getBookComponent?.content}
       bookMetadataValues={bookMetadataValues}
       canEdit={canModify}
-      chapters={chaptersDivision?.bookComponents}
+      chapters={bodyDivision?.bookComponents}
       chaptersActionInProgress={chaptersActionInProgress}
       isReadOnly={
         !selectedChapterId ||
