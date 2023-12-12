@@ -581,7 +581,8 @@ const PreviewerPage = () => {
   return (
     <Preview
       canModify={userIsOwner || userIsAdmin}
-      connectToLulu={userIsOwner ? handleConnectToLulu : null}
+      canUploadToProvider={userIsOwner}
+      connectToLulu={handleConnectToLulu}
       createProfile={handleCreateProfile}
       currentOptions={currentOptions}
       defaultProfile={defaultProfileWithTemplate}

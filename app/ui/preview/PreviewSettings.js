@@ -68,6 +68,7 @@ const PreviewSettings = props => {
     download,
     isCollapsed,
     canModify,
+    canUploadToProvider,
     isDownloadButtonDisabled,
     isUserConnectedToLulu,
     loadingPreview,
@@ -157,19 +158,19 @@ const PreviewSettings = props => {
           <Divider />
 
           <div>
-            {!isNewProfileSelected &&
-              onClickConnectToLulu(
-                <LuluIntegration
-                  isConnected={isUserConnectedToLulu}
-                  isInLulu={isProfileInLulu}
-                  isSynced={isProfileSyncedWithLulu}
-                  lastSynced={lastSynced}
-                  onClickConnect={onClickConnectToLulu}
-                  onClickSendToLulu={sendToLulu}
-                  projectId={projectId}
-                  projectUrl={projectUrl}
-                />,
-              )}
+            {!isNewProfileSelected && (
+              <LuluIntegration
+                canUploadToProvider={canUploadToProvider}
+                isConnected={isUserConnectedToLulu}
+                isInLulu={isProfileInLulu}
+                isSynced={isProfileSyncedWithLulu}
+                lastSynced={lastSynced}
+                onClickConnect={onClickConnectToLulu}
+                onClickSendToLulu={sendToLulu}
+                projectId={projectId}
+                projectUrl={projectUrl}
+              />
+            )}
           </div>
 
           <Footer
@@ -219,11 +220,12 @@ PreviewSettings.propTypes = {
   download: PropTypes.func.isRequired,
   isCollapsed: PropTypes.bool.isRequired,
   canModify: PropTypes.bool.isRequired,
+  canUploadToProvider: PropTypes.bool.isRequired,
   isDownloadButtonDisabled: PropTypes.bool.isRequired,
   isUserConnectedToLulu: PropTypes.bool.isRequired,
   loadingPreview: PropTypes.bool.isRequired,
   onClickCollapse: PropTypes.func.isRequired,
-  onClickConnectToLulu: PropTypes.func,
+  onClickConnectToLulu: PropTypes.func.isRequired,
   onOptionsChange: PropTypes.func.isRequired,
   onProfileChange: PropTypes.func.isRequired,
   optionsDisabled: PropTypes.bool.isRequired,
@@ -260,8 +262,6 @@ PreviewSettings.propTypes = {
   updateProfileOptions: PropTypes.func.isRequired,
 }
 
-PreviewSettings.defaultProps = {
-  onClickConnectToLulu: null,
-}
+PreviewSettings.defaultProps = {}
 
 export default PreviewSettings
