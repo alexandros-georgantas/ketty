@@ -157,18 +157,19 @@ const PreviewSettings = props => {
           <Divider />
 
           <div>
-            {!isNewProfileSelected && (
-              <LuluIntegration
-                isConnected={isUserConnectedToLulu}
-                isInLulu={isProfileInLulu}
-                isSynced={isProfileSyncedWithLulu}
-                lastSynced={lastSynced}
-                onClickConnect={onClickConnectToLulu}
-                onClickSendToLulu={sendToLulu}
-                projectId={projectId}
-                projectUrl={projectUrl}
-              />
-            )}
+            {!isNewProfileSelected &&
+              onClickConnectToLulu(
+                <LuluIntegration
+                  isConnected={isUserConnectedToLulu}
+                  isInLulu={isProfileInLulu}
+                  isSynced={isProfileSyncedWithLulu}
+                  lastSynced={lastSynced}
+                  onClickConnect={onClickConnectToLulu}
+                  onClickSendToLulu={sendToLulu}
+                  projectId={projectId}
+                  projectUrl={projectUrl}
+                />,
+              )}
           </div>
 
           <Footer
@@ -222,7 +223,7 @@ PreviewSettings.propTypes = {
   isUserConnectedToLulu: PropTypes.bool.isRequired,
   loadingPreview: PropTypes.bool.isRequired,
   onClickCollapse: PropTypes.func.isRequired,
-  onClickConnectToLulu: PropTypes.func.isRequired,
+  onClickConnectToLulu: PropTypes.func,
   onOptionsChange: PropTypes.func.isRequired,
   onProfileChange: PropTypes.func.isRequired,
   optionsDisabled: PropTypes.bool.isRequired,
@@ -259,6 +260,8 @@ PreviewSettings.propTypes = {
   updateProfileOptions: PropTypes.func.isRequired,
 }
 
-PreviewSettings.defaultProps = {}
+PreviewSettings.defaultProps = {
+  onClickConnectToLulu: null,
+}
 
 export default PreviewSettings

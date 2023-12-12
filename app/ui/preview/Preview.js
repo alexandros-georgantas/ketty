@@ -108,7 +108,7 @@ const Preview = props => {
 }
 
 Preview.propTypes = {
-  connectToLulu: PropTypes.func.isRequired,
+  connectToLulu: PropTypes.func,
   createProfile: PropTypes.func.isRequired,
   currentOptions: PropTypes.shape({
     format: PropTypes.oneOf(['pdf', 'epub']),
@@ -174,6 +174,7 @@ Preview.propTypes = {
 }
 
 Preview.defaultProps = {
+  connectToLulu: null,
   previewLink: null,
 }
 
