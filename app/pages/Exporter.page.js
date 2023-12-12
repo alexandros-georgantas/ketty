@@ -566,7 +566,8 @@ const PreviewerPage = () => {
     book?.getBook.divisions.find(d => d.label === 'Body').bookComponents
       .length > 0
 
-  const isOwnerOrAdmin = isAdmin(currentUser) || isOwner(bookId, currentUser)
+  const userIsOwner = isOwner(bookId, currentUser)
+  const userIsAdmin = isAdmin(currentUser)
 
   const isDownloadButtonDisabled =
     !hasEditAccess(bookId, currentUser) ||
@@ -579,8 +580,8 @@ const PreviewerPage = () => {
 
   return (
     <Preview
-      canModify={isOwnerOrAdmin}
-      connectToLulu={handleConnectToLulu}
+      canModify={userIsOwner || userIsAdmin}
+      connectToLulu={userIsOwner ? handleConnectToLulu : null}
       createProfile={handleCreateProfile}
       currentOptions={currentOptions}
       defaultProfile={defaultProfileWithTemplate}
