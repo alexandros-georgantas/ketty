@@ -37,6 +37,7 @@ const Preview = props => {
     defaultProfile,
     download,
     canModify,
+    canUploadToProvider,
     isDownloadButtonDisabled,
     isUserConnectedToLulu,
     loadingExport,
@@ -80,6 +81,7 @@ const Preview = props => {
 
         <PreviewSettings
           canModify={canModify}
+          canUploadToProvider={canUploadToProvider}
           createProfile={createProfile}
           currentOptions={exportOptions}
           defaultProfile={defaultProfile}
@@ -108,7 +110,7 @@ const Preview = props => {
 }
 
 Preview.propTypes = {
-  connectToLulu: PropTypes.func,
+  connectToLulu: PropTypes.func.isRequired,
   createProfile: PropTypes.func.isRequired,
   currentOptions: PropTypes.shape({
     format: PropTypes.oneOf(['pdf', 'epub']),
@@ -133,6 +135,7 @@ Preview.propTypes = {
   deleteProfile: PropTypes.func.isRequired,
   download: PropTypes.func.isRequired,
   canModify: PropTypes.bool.isRequired,
+  canUploadToProvider: PropTypes.bool.isRequired,
   isDownloadButtonDisabled: PropTypes.bool.isRequired,
   isUserConnectedToLulu: PropTypes.bool.isRequired,
   loadingExport: PropTypes.bool.isRequired,
@@ -174,7 +177,6 @@ Preview.propTypes = {
 }
 
 Preview.defaultProps = {
-  connectToLulu: null,
   previewLink: null,
 }
 

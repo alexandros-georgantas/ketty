@@ -29,6 +29,7 @@ const StyledButtonGroup = styled(ButtonGroup)`
 
 const LuluIntegration = props => {
   const {
+    canUploadToProvider,
     className,
     isConnected,
     isInLulu,
@@ -60,7 +61,7 @@ const LuluIntegration = props => {
         </div>
       )}
 
-      {isConnected && !isInLulu && (
+      {isConnected && !isInLulu && canUploadToProvider && (
         <div>
           <Button
             disabled={isUploading}
@@ -106,6 +107,7 @@ const LuluIntegration = props => {
 }
 
 LuluIntegration.propTypes = {
+  canUploadToProvider: PropTypes.bool.isRequired,
   /** Is the export profile uploaded to a lulu project */
   isConnected: PropTypes.bool.isRequired,
   /** Has the project been pushed to lulu at all */
