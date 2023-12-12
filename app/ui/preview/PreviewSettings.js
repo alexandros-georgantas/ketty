@@ -1,285 +1,261 @@
-﻿import React from 'react'
+﻿/* stylelint-disable no-descending-specificity */
+
+import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { Divider } from 'antd'
+import pick from 'lodash/pick'
+import isEqual from 'lodash/isEqual'
 
-import { Space, List, Avatar } from 'antd'
-import { th, grid } from '@coko/client'
-import { Checkbox, Select, Radio, Button } from '../common'
+import { grid } from '@coko/client'
 
+import {
+  Ribbon,
+  //  Spin
+} from '../common'
+import ProfileRow from './ProfileRow'
+import ExportOptionsSection from './ExportOptionsSection'
+import LuluIntegration from './LuluIntegration'
+import Footer from './Footer'
+
+// #region styled
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow: hidden;
   padding: ${grid(4)};
-  width: 100%;
-`
 
-const Label = styled.span`
-  padding-left: 8px;
-`
-
-const Section = styled.div`
-  border-bottom: 1px solid ${th('colorBorder')};
-  margin-bottom: ${grid(6)};
-
-  ${({ grow }) => (grow ? 'flex-grow: 1;' : 'flex-shrink: 0;')};
-  overflow-y: auto;
-
-  padding-bottom: ${grid(5)};
-
-  h3 {
-    margin: 0 0 ${grid(3)} 0;
+  > div:first-child {
+    margin-bottom: ${grid(2)};
   }
-  width: 100%;
+
+  > div:nth-child(2) {
+    margin-bottom: ${grid(1)} 0;
+  }
+
+  > div:nth-child(5) {
+    flex-grow: 1;
+  }
 `
 
-const CenteredSection = styled.div`
-  align-items: center;
-  display: flex;
-  flex-shrink: 0;
-  justify-content: center;
-  margin-bottom: ${grid(6)};
-`
+// #region helpoers
+const selectKeys = ['label', 'value']
+const optionKeys = ['format', 'size', 'content', 'template', 'isbn']
 
-const StyledList = styled(List)``
+const getProfileSelectOptions = profile => pick(profile, selectKeys)
 
-const StyledListItem = styled(List.Item)`
-  align-items: center;
-  background-color: ${({ selected, theme }) =>
-    selected ? theme.colorShadow : 'transparent'};
-  cursor: pointer;
-  display: flex;
-  /* stylelint-disable declaration-no-important */
-  justify-content: flex-start !important;
-  padding-left: 8px !important;
-  /* stylelint-enable declaration-no-important */
-  width: 100%;
-`
+const getAllProfileSelectOptions = profiles =>
+  profiles?.map(p => getProfileSelectOptions(p))
 
-const StyledSpace = styled(Space)`
-  margin-top: 0;
-  width: 100%;
-`
+const sanitizeOptionData = data => {
+  const d = { ...data }
+  d.content = d.content.sort()
+  return d
+}
+
+const getProfileExportOptions = profile => {
+  const p = pick(profile, optionKeys)
+  return sanitizeOptionData(p)
+}
+// #endregion helpers
 
 const PreviewSettings = props => {
   const {
-    additionalExportOptions,
+    createProfile,
+    currentOptions,
+    deleteProfile,
+    defaultProfile,
+    download,
+    isCollapsed,
+    isDownloadButtonDisabled,
+    isUserConnectedToLulu,
+    loadingPreview,
+    onClickCollapse,
+    onClickConnectToLulu,
+    onOptionsChange,
+    onProfileChange,
+    optionsDisabled,
+    profiles,
+    renameProfile,
+    selectedProfile,
+    sendToLulu,
     templates,
-    selectedTemplate,
-    onSelectTemplate,
-    onClickDownloadPdf,
-    onClickDownloadEpub,
-    onChangePageSize,
-    onChangeAdditionalExportOptions,
-    processInProgress,
-    onChangeExportFormat,
-    canExport,
-    exportFormatValue,
-    sizeValue,
-    bookExportInProgress,
-    createPreviewInProgress,
+    isbns,
+    updateProfileOptions,
   } = props
 
-  const showSizeDropdown = exportFormatValue === 'pdf'
-  const showDownloadPdfButton = exportFormatValue === 'pdf'
-  const showDownloadEpubButton = exportFormatValue === 'epub'
-
-  const handleChangeTemplate = templateId => {
-    onSelectTemplate(templateId)
+  // #region functions
+  const findProfile = profileValue => {
+    return profiles.find(p => p.value === profileValue)
   }
 
-  const handleChangeExportFormat = value => {
-    onChangeExportFormat(value)
+  const handleProfileChange = val => {
+    onProfileChange(val)
   }
+
+  const handleOptionsChange = vals => {
+    const sanitized = sanitizeOptionData({
+      ...currentOptions,
+      ...vals,
+    })
+
+    onOptionsChange(sanitized)
+  }
+
+  const handleClickCollapse = () => {
+    onClickCollapse(!isCollapsed)
+  }
+  // #endregion functions
+
+  // #region data wrangling
+  const profileSelectOptions = getAllProfileSelectOptions(profiles)
+
+  const fullSelectedProfile = findProfile(selectedProfile)
+
+  const selectedProfileSelectOption =
+    getProfileSelectOptions(fullSelectedProfile)
+
+  const selectedProfileExportOptions =
+    getProfileExportOptions(fullSelectedProfile)
+
+  const isNewProfileSelected = selectedProfile === defaultProfile.value
+  const { lastSynced, projectId, projectUrl, synced } = fullSelectedProfile
+  const isProfileInLulu = !!projectId
+  const isProfileSyncedWithLulu = synced
+  const hasChanges = !isEqual(selectedProfileExportOptions, currentOptions)
+  // #endregion data wrangling
 
   return (
     <Wrapper>
-      <CenteredSection>
-        <Radio.Group
-          buttonStyle="solid"
-          disabled={bookExportInProgress || createPreviewInProgress}
-          onChange={handleChangeExportFormat}
-          options={[
-            { value: 'pdf', label: 'PDF' },
-            { value: 'epub', label: 'EPUB' },
-          ]}
-          optionType="button"
-          value={exportFormatValue}
-        />
-      </CenteredSection>
+      <ProfileRow
+        isCollapsed={isCollapsed}
+        isNewProfileSelected={isNewProfileSelected}
+        onClickCollapse={handleClickCollapse}
+        onProfileChange={handleProfileChange}
+        onProfileRename={renameProfile}
+        profiles={profileSelectOptions}
+        selectedProfile={selectedProfileSelectOption}
+      />
 
-      {showSizeDropdown && (
-        <Section>
-          <h3>Size</h3>
-          <Select
-            bordered={false}
-            defaultValue={sizeValue}
-            disabled={bookExportInProgress || createPreviewInProgress}
-            onChange={onChangePageSize}
-            options={[
-              {
-                value: '8.5x11',
-                label: '8.5 x 11 inches, 216 x 279 mm (A4)',
-              },
-              {
-                value: '6x9',
-                label: '6 x 9 inches, 152 x 229 mm',
-              },
-              {
-                value: '5.5x8.5',
-                label: '5.5 x 8.5, 140 x 216 (A5)',
-              },
-            ]}
+      {!isCollapsed && (
+        <>
+          <Ribbon hide={!hasChanges}>You have unsaved changes</Ribbon>
+
+          <ExportOptionsSection
+            disabled={optionsDisabled}
+            isbns={isbns}
+            onChange={handleOptionsChange}
+            selectedContent={currentOptions.content}
+            selectedFormat={currentOptions.format}
+            selectedIsbn={currentOptions.isbn}
+            selectedSize={currentOptions.size}
+            selectedTemplate={currentOptions.template}
+            templates={templates}
           />
-        </Section>
+
+          <Divider />
+
+          <div>
+            {!isNewProfileSelected && (
+              <LuluIntegration
+                isConnected={isUserConnectedToLulu}
+                isInLulu={isProfileInLulu}
+                isSynced={isProfileSyncedWithLulu}
+                lastSynced={lastSynced}
+                onClickConnect={onClickConnectToLulu}
+                onClickSendToLulu={sendToLulu}
+                projectId={projectId}
+                projectUrl={projectUrl}
+              />
+            )}
+          </div>
+
+          <Footer
+            createProfile={createProfile}
+            isDownloadButtonDisabled={isDownloadButtonDisabled}
+            isNewProfileSelected={isNewProfileSelected}
+            isSaveDisabled={
+              loadingPreview || (!isNewProfileSelected && !hasChanges)
+            }
+            loadingPreview={loadingPreview}
+            onClickDelete={deleteProfile}
+            onClickDownload={download}
+            updateProfile={updateProfileOptions}
+          />
+        </>
       )}
-
-      <Section>
-        <h3>Content</h3>
-        <StyledSpace direction="vertical">
-          <Checkbox
-            checked={additionalExportOptions?.includeTitlePage}
-            disabled={
-              !selectedTemplate ||
-              !canExport ||
-              bookExportInProgress ||
-              createPreviewInProgress
-            }
-            onChange={e =>
-              onChangeAdditionalExportOptions(
-                'includeTitlePage',
-                e.target.checked,
-              )
-            }
-          >
-            Title page
-          </Checkbox>
-          <Checkbox
-            checked={additionalExportOptions?.includeCopyrights}
-            disabled={
-              !selectedTemplate ||
-              !canExport ||
-              bookExportInProgress ||
-              createPreviewInProgress
-            }
-            onChange={e =>
-              onChangeAdditionalExportOptions(
-                'includeCopyrights',
-                e.target.checked,
-              )
-            }
-          >
-            Copyright page
-          </Checkbox>
-          {exportFormatValue !== 'epub' && (
-            <Checkbox
-              checked={additionalExportOptions?.includeTOC}
-              disabled={
-                !selectedTemplate ||
-                !canExport ||
-                bookExportInProgress ||
-                createPreviewInProgress
-              }
-              onChange={e =>
-                onChangeAdditionalExportOptions('includeTOC', e.target.checked)
-              }
-            >
-              Table of contents
-            </Checkbox>
-          )}
-        </StyledSpace>
-      </Section>
-
-      <Section grow>
-        <StyledList
-          dataSource={templates}
-          header={<h3>Template Selection</h3>}
-          itemLayout="horizontal"
-          renderItem={({ id, thumbnail, name }) => (
-            <StyledListItem
-              onClick={() => !processInProgress && handleChangeTemplate(id)}
-              selected={id === selectedTemplate}
-            >
-              <Avatar shape="square" size="large" src={thumbnail?.url} />
-              <Label>{name.charAt(0).toUpperCase() + name.slice(1)}</Label>
-            </StyledListItem>
-          )}
-          // showPagination={false}
-        />
-      </Section>
-
-      <StyledSpace direction="vertical">
-        {showDownloadPdfButton && (
-          <Section>
-            <StyledSpace direction="vertical">
-              <Button
-                block
-                disabled={!selectedTemplate || processInProgress || !canExport}
-                loading={selectedTemplate && bookExportInProgress}
-                onClick={onClickDownloadPdf}
-                size="large"
-                type="primary"
-              >
-                Download PDF
-              </Button>
-            </StyledSpace>
-          </Section>
-        )}
-
-        {showDownloadEpubButton && (
-          <Section>
-            <StyledSpace direction="vertical">
-              <Button
-                block
-                disabled={!selectedTemplate || processInProgress || !canExport}
-                loading={selectedTemplate && processInProgress}
-                onClick={onClickDownloadEpub}
-                size="large"
-                type="primary"
-              >
-                Download EPUB
-              </Button>
-            </StyledSpace>
-          </Section>
-        )}
-      </StyledSpace>
     </Wrapper>
   )
 }
 
 PreviewSettings.propTypes = {
-  additionalExportOptions: PropTypes.shape({
-    includeTitlePage: PropTypes.bool.isRequired,
-    includeCopyrights: PropTypes.bool.isRequired,
-    includeTOC: PropTypes.bool.isRequired,
+  createProfile: PropTypes.func.isRequired,
+  currentOptions: PropTypes.shape({
+    format: PropTypes.oneOf(['pdf', 'epub']),
+    size: PropTypes.oneOf(['8.5x11', '6x9', '5.5x8.5']),
+    content: PropTypes.arrayOf(
+      PropTypes.oneOf(['includeTitlePage', 'includeCopyrights', 'includeTOC']),
+    ),
+    template: PropTypes.string,
+    isbn: PropTypes.string,
+    spread: PropTypes.oneOf(['single', 'double']),
+    zoom: PropTypes.number,
   }).isRequired,
+  deleteProfile: PropTypes.func.isRequired,
+  defaultProfile: PropTypes.shape({
+    label: PropTypes.string.isRequired,
+    value: PropTypes.string.isRequired,
+    format: PropTypes.oneOf(['pdf', 'epub']),
+    size: PropTypes.oneOf(['8.5x11', '6x9', '5.5x8.5']),
+    content: PropTypes.arrayOf(
+      PropTypes.oneOf(['includeTitlePage', 'includeCopyrights', 'includeTOC']),
+    ),
+    template: PropTypes.string,
+    isbn: PropTypes.string,
+  }).isRequired,
+  download: PropTypes.func.isRequired,
+  isCollapsed: PropTypes.bool.isRequired,
+  isDownloadButtonDisabled: PropTypes.bool.isRequired,
+  isUserConnectedToLulu: PropTypes.bool.isRequired,
+  loadingPreview: PropTypes.bool.isRequired,
+  onClickCollapse: PropTypes.func.isRequired,
+  onClickConnectToLulu: PropTypes.func.isRequired,
+  onOptionsChange: PropTypes.func.isRequired,
+  onProfileChange: PropTypes.func.isRequired,
+  optionsDisabled: PropTypes.bool.isRequired,
+  profiles: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      value: PropTypes.string.isRequired,
+      format: PropTypes.string.isRequired,
+      size: PropTypes.string,
+      content: PropTypes.arrayOf(PropTypes.string).isRequired,
+      template: PropTypes.string,
+      synced: PropTypes.bool,
+      lastSynced: PropTypes.string,
+      projectId: PropTypes.string,
+      projectUrl: PropTypes.string,
+    }),
+  ).isRequired,
+  renameProfile: PropTypes.func.isRequired,
+  selectedProfile: PropTypes.string.isRequired,
+  sendToLulu: PropTypes.func.isRequired,
   templates: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
-      thumbnail: PropTypes.string,
+      imageUrl: PropTypes.string,
       name: PropTypes.string.isRequired,
     }),
   ).isRequired,
-  selectedTemplate: PropTypes.string,
-  processInProgress: PropTypes.bool.isRequired,
-  bookExportInProgress: PropTypes.bool.isRequired,
-  createPreviewInProgress: PropTypes.bool.isRequired,
-  onSelectTemplate: PropTypes.func.isRequired,
-  onClickDownloadPdf: PropTypes.func.isRequired,
-  onClickDownloadEpub: PropTypes.func.isRequired,
-  onChangePageSize: PropTypes.func.isRequired,
-  onChangeAdditionalExportOptions: PropTypes.func.isRequired,
-  sizeValue: PropTypes.string,
-  onChangeExportFormat: PropTypes.func.isRequired,
-  exportFormatValue: PropTypes.string,
-  canExport: PropTypes.bool.isRequired,
+  isbns: PropTypes.arrayOf(
+    PropTypes.shape({
+      isbn: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+    }),
+  ).isRequired,
+  updateProfileOptions: PropTypes.func.isRequired,
 }
 
-PreviewSettings.defaultProps = {
-  exportFormatValue: 'pdf',
-  sizeValue: 'a4',
-  selectedTemplate: null,
-}
+PreviewSettings.defaultProps = {}
 
 export default PreviewSettings

@@ -28,7 +28,7 @@ const SelectUsers = ({
       const fetchId = fetchRef.current
       setOptions([])
       setFetching(true)
-      fetchOptions(v).then(newOptions => {
+      fetchOptions(v.trim()).then(newOptions => {
         if (fetchId !== fetchRef.current) {
           // for fetch callback order
           return
@@ -39,7 +39,7 @@ const SelectUsers = ({
           value: user.id,
         }))
 
-        if (userOptions.length === 0) {
+        if (userOptions.length === 0 && value.length === 0) {
           noResultsSetter(true)
         }
 
@@ -49,7 +49,7 @@ const SelectUsers = ({
     }
 
     return debounce(loadOptions, debounceTimeout)
-  }, [fetchOptions, debounceTimeout])
+  }, [fetchOptions, debounceTimeout, value])
 
   return (
     <StyledSelect

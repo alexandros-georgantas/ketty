@@ -9,13 +9,19 @@ const { Dragger } = AntUpload
 
 const StyledDragger = styled(Dragger)`
   .ant-upload-drag {
+    margin: 0;
     min-height: 300px;
-    padding: 0 50px;
+    padding: 0;
+    position: relative;
   }
 
   .ant-upload-drag-container {
     display: block;
-    height: 100%;
+    margin: 0;
+    max-height: 100%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
     width: 100%;
   }
 
@@ -28,7 +34,7 @@ const StyledDragger = styled(Dragger)`
 
 const FileInfoText = styled(Text)`
   text-align: left;
-  width: 80%;
+  width: 85%;
 `
 
 const StyledSpace = styled(Space)`
@@ -38,6 +44,7 @@ const StyledSpace = styled(Space)`
 const FilesList = styled.div`
   max-height: 200px;
   overflow-y: auto;
+  padding: 0 15px 0 35px;
 `
 
 const Upload = props => {

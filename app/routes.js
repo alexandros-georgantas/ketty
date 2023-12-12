@@ -1,3 +1,5 @@
+/* stylelint-disable no-descending-specificity */
+
 import React, { useState, useEffect } from 'react'
 import { Modal, Tooltip } from 'antd'
 import { QuestionCircleOutlined } from '@ant-design/icons'
@@ -9,7 +11,7 @@ import {
   Redirect,
   // useParams,
 } from 'react-router-dom'
-import styled from 'styled-components'
+import styled, { createGlobalStyle } from 'styled-components'
 
 import {
   Authenticate,
@@ -17,10 +19,11 @@ import {
   RequireAuth,
   grid,
   useCurrentUser,
+  ProviderConnectionPage,
 } from '@coko/client'
 
 import Header from './ui/common/Header'
-import Spin from './ui/common/Spin'
+// import Spin from './ui/common/Spin'
 import UserInviteModal from './ui/invite/UserInviteModal'
 
 import {
@@ -46,6 +49,23 @@ const LayoutWrapper = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
+`
+
+const GlobalStyle = createGlobalStyle`
+  #root {
+    > div.ant-spin-nested-loading {
+      height: 100%;
+
+      > div.ant-spin-container {
+        height: 100%;
+      }
+    }
+  }
+
+  .ant-modal-confirm-content {
+    /* stylelint-disable-next-line declaration-no-important */
+    max-width: 100% !important;
+  }
 `
 
 const Wrapper = props => {
@@ -107,15 +127,16 @@ const StyledPage = styled(Page)`
   height: calc(100% - 48px);
 
   > div {
-    padding: ${grid(2)} ${grid(2)} ${grid(6)};
+    /* padding: ${grid(2)} ${grid(2)} ${grid(6)}; */
+    padding: 0;
   }
 `
 
-const StyledSpin = styled(Spin)`
-  display: grid;
-  height: 100vh;
-  place-content: center;
-`
+// const StyledSpin = styled(Spin)`
+//   display: grid;
+//   height: 100vh;
+//   place-content: center;
+// `
 
 const StyledMembersHeader = styled.div`
   align-items: center;
@@ -126,11 +147,10 @@ const StyledMembersHeader = styled.div`
 const StyledMembersHeaderTitle = styled.span`
   margin-right: ${grid(1)};
 `
+
 // const StyledUserStatus = styled(UserStatus)`
 //   padding-top: 8px;
 // `
-
-const Loader = () => <StyledSpin spinning />
 
 const SiteHeader = () => {
   const { currentUser, setCurrentUser } = useCurrentUser()
@@ -186,7 +206,6 @@ const SiteHeader = () => {
       maskClosable: true,
       width: 680,
       bodyStyle: {
-        marginRight: 38,
         textAlign: 'justify',
       },
       closable: true,
@@ -266,16 +285,22 @@ const Authenticated = ({ children }) => {
 }
 
 const routes = (
-  <Authenticate currentUserQuery={CURRENT_USER} loadingComponent={<Loader />}>
+  <Authenticate
+    currentUserQuery={CURRENT_USER}
+    // loadingComponent={StyledSpin}
+  >
+    <GlobalStyle />
     <LayoutWrapper>
       <Wrapper>
         <SiteHeader />
-        <StyledPage fadeInPages padPages>
+        <StyledPage fadeInPages>
           <StyledMain id="main-content" tabIndex="-1">
             <Switch>
               <Redirect exact path="/" to="/dashboard" />
+
               <Route component={SignupPage} exact path="/signup" />
               <Route component={LoginPage} exact path="/login" />
+
               <Route
                 component={RequestPasswordResetPage}
                 exact
@@ -337,15 +362,16 @@ const routes = (
                   </Authenticated>
                 )}
               />
-              <Route
-                exact
-                path="/books/:bookId/exporter"
-                render={() => (
-                  <Authenticated>
-                    <ExporterPage />
-                  </Authenticated>
-                )}
-              />
+
+              <Route exact path="/books/:bookId/exporter">
+                <Authenticated>
+                  <ExporterPage />
+                </Authenticated>
+              </Route>
+
+              <Route exact path="/provider-redirect/:provider">
+                <ProviderConnectionPage closeOnSuccess />
+              </Route>
             </Switch>
           </StyledMain>
         </StyledPage>

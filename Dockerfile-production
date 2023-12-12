@@ -1,0 +1,42 @@
+FROM node:16.19.0-alpine3.16
+
+RUN apk add --no-cache git make g++
+
+WORKDIR /home/node/ketida
+
+COPY package.json .
+COPY yarn.lock .
+
+RUN yarn install --frozen-lockfile --production
+
+COPY app app
+COPY static static
+
+ARG server_url
+ARG websocket_server_url
+ENV SERVER_URL=$server_url
+ENV WEBSOCKET_SERVER_URL=$websocket_server_url
+
+ENV NODE_ENV='production'
+ENV CLIENT_PAGE_TITLE='Ketida'
+ENV CLIENT_FAVICON_PATH='../static/ketida.ico'
+ENV CLIENT_LANGUAGE='en-US'
+
+RUN yarn coko-client-build
+
+############################################################################
+
+FROM node:16.19.0-alpine3.16
+
+RUN npm install --global serve
+
+WORKDIR /home/node/ketida
+
+COPY --from=0 /home/node/ketida/_build ./_build
+COPY --from=0 /home/node/ketida/node_modules/@coko/client/scripts/env.sh ./env.sh
+
+RUN chown -R node:node .
+USER node
+
+ENTRYPOINT ["sh", "./env.sh"]
+CMD ["npx", "serve", "-p", "8080", "--single", "./_build"]

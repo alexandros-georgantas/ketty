@@ -4,9 +4,11 @@ import { CloudUploadOutlined, PlusOutlined } from '@ant-design/icons'
 import styled from 'styled-components'
 import { grid, th } from '@coko/client'
 import { Space } from 'antd'
+import find from 'lodash/find'
 
 import ChapterList from './ChapterList'
 import MetadataModal from '../bookMetadata/BookMetadataForm'
+import MetadataLockedModal from '../bookMetadata/BookMetadataLocked'
 import { Button } from '../common'
 
 const LeftPanelWrapper = styled.div`
@@ -91,6 +93,15 @@ const BookPanel = props => {
     setMetadataModalOpen(false)
   }
 
+  let showFormModal = false
+  let showLockedModal = false
+
+  if (metadataModalOpen) {
+    // Do no show meta data form if chapters are being processed
+    showLockedModal = find(chapters, { uploading: true })
+    showFormModal = !showLockedModal
+  }
+
   return (
     <LeftPanelWrapper className={className}>
       <TitleArea>{title || 'Untitled Book'}</TitleArea>
@@ -107,8 +118,9 @@ const BookPanel = props => {
         closeModal={closeModal}
         initialValues={bookMetadataValues}
         onSubmitBookMetadata={onSubmitBookMetadata}
-        open={metadataModalOpen}
+        open={showFormModal}
       />
+      <MetadataLockedModal closeModal={closeModal} open={showLockedModal} />
 
       <ChaptersArea>
         <ChaptersHeader>
@@ -162,7 +174,12 @@ BookPanel.propTypes = {
     title: PropTypes.string,
     subtitle: PropTypes.string,
     authors: PropTypes.string.isRequired,
-    isbn: PropTypes.string.isRequired,
+    isbns: PropTypes.arrayOf(
+      PropTypes.shape({
+        label: PropTypes.string,
+        isbn: PropTypes.string.isRequired,
+      }),
+    ).isRequired,
     topPage: PropTypes.string,
     bottomPage: PropTypes.string,
     copyrightLicense: PropTypes.string,

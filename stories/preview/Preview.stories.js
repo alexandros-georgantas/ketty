@@ -1,117 +1,214 @@
-/* eslint-disable no-console */
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { faker } from '@faker-js/faker'
 import styled from 'styled-components'
+import camelCase from 'lodash/camelCase'
+
 import { Preview } from '../../app/ui'
-import { createData, randomPick } from '../_helpers'
+import { defaultProfile } from '../../app/pages/Exporter.page'
+import thumbnails from './static'
+
+const thumbnailsAsArray = Object.keys(thumbnails).map(key => thumbnails[key])
 
 const Wrapper = styled.div`
-  height: 1000px;
+  border: 1px solid gainsboro;
+  height: 700px;
 `
 
-const numberOfTemplates = 10
-
-const templateTitles = [
-  'Traditional',
-  'Poetry',
-  'Modern',
-  'Memoir',
-  'Classic',
-  'Beatrix',
+const profileData = [
+  {
+    label: 'Custom profile',
+    value: 'custom',
+    format: 'epub',
+    size: '6x9',
+    content: ['includeTitlePage', 'includeCopyrights', 'includeTOC'],
+    template: '4',
+    isbn: '978-1-23-456789-3',
+    synced: false,
+    lastSynced: null,
+    projectId: null,
+    projectUrl: null,
+  },
+  {
+    label: 'Special profile',
+    value: 'special',
+    format: 'pdf',
+    size: '5.5x8.5',
+    content: ['includeTitlePage', 'includeCopyrights'],
+    template: '2',
+    isbn: null,
+    synced: true,
+    lastSynced: new Date().toString(),
+    projectId: 'abcd1234',
+    projectUrl: 'https://lulu.com',
+  },
 ]
 
-const templates = createData(numberOfTemplates, i => ({
-  id: faker.datatype.uuid(),
-  thumbnail:
-    Math.random() < 0.5
-      ? faker.image.imageUrl(200, 200, 'abstract', true)
-      : null,
-  name: randomPick(templateTitles),
-}))
+const templateData = Array.from(Array(10)).map((_, j) => {
+  return {
+    id: String(j + 1),
+    // imageUrl:
+    //   'https://fastly.picsum.photos/id/11/82/100.jpg?hmac=solY9YT1h0M-KJfh8WKXqPfbFygW52ideb5Hf1VCKgc',
+    imageUrl: thumbnailsAsArray[j],
+    isSelected: false,
+    name: faker.lorem.word(),
+  }
+})
+
+const isbnData = [
+  {
+    isbn: '978-1-23-456789-0',
+    label: 'Hard cover',
+  },
+  {
+    isbn: '978-1-23-456789-1',
+    label: '',
+  },
+  {
+    isbn: '978-1-23-456789-2',
+    label: 'Soft cover',
+  },
+  {
+    isbn: '978-1-23-456789-3',
+    label: 'EPub',
+  },
+]
+
+const fakeCall = fn => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const res = fn()
+      resolve(res)
+    }, 700)
+  })
+}
 
 export const Base = () => {
-  const [previewLink, setPreviewLink] = useState('')
+  const [profiles, setProfiles] = useState(profileData)
+  const [loadingPreview, setLoadingPreview] = useState(false)
+  const [loadingExport] = useState(false)
 
-  const [previewParams, setPreviewParams] = useState({
-    exportFormat: 'pdf',
-    size: 'a4',
-    content: {
-      title: true,
-      copyright: true,
-      toc: true,
-    },
-    template: null,
+  const [currentOptions, setCurrentOptions] = useState({
+    format: 'pdf',
+    size: '8.5x11',
+    content: [],
+    template: templateData[0].id,
+    isbn: null,
+    zoom: 1,
+    spread: 'double',
   })
 
-  useEffect(() => {
-    if (
-      previewParams.exportFormat &&
-      previewParams.size &&
-      previewParams.template
-    ) {
-      setPreviewLink(
-        previewParams.exportFormat === 'pdf'
-          ? 'https://ketida.community/features/'
-          : '',
-      )
-    }
-  }, [previewParams])
+  const handleCreateProfile = (name, options) => {
+    return fakeCall(() => {
+      const newProfile = {
+        label: name,
+        value: camelCase(name),
+        ...options,
+      }
 
-  const handleDownloadPdf = () => {
-    console.log('Download PDF clicked')
-  }
+      setProfiles([...profiles, newProfile])
 
-  const handleDownloadEpub = () => {
-    console.log('Download EPUB clicked')
-  }
-
-  const handleSelectTemplate = template => {
-    setPreviewParams({
-      ...previewParams,
-      template,
+      return newProfile
     })
   }
 
-  const handleChangePageSize = size => {
-    setPreviewParams({
-      ...previewParams,
-      size,
+  const handleUpdateProfileOptions = (profileValue, options) => {
+    return fakeCall(() => {
+      const newProfiles = profiles.map(p => {
+        if (p.value === profileValue) {
+          return {
+            ...p,
+            ...options,
+          }
+        }
+
+        return p
+      })
+
+      setProfiles(newProfiles)
     })
   }
 
-  const handleChangeExportFormat = exportFormat => {
-    setPreviewParams({
-      ...previewParams,
-      exportFormat,
+  const handleRenameProfile = (profileValue, name) => {
+    return fakeCall(() => {
+      const newProfiles = profiles.map(p => {
+        if (p.value === profileValue) {
+          return {
+            ...p,
+            label: name,
+          }
+        }
+
+        return p
+      })
+
+      setProfiles(newProfiles)
     })
   }
 
-  const handleContentChange = content => {
-    setPreviewParams({
-      ...previewParams,
-      content,
+  const handleDeleteProfile = profileValue => {
+    return fakeCall(() => {}).then(() => {
+      const newProfiles = profiles.filter(p => p.value !== profileValue)
+      setProfiles(newProfiles)
     })
   }
+
+  const handleDownload = options => {
+    return fakeCall(() => {}).then(() => {
+      /* eslint-disable-next-line no-console */
+      console.log(`Downloading with the following options`, options)
+    })
+  }
+
+  const handleConnectToLulu = () => {
+    /* eslint-disable-next-line no-console */
+    console.log('Connecting user to Lulu')
+  }
+
+  const handleSendToLulu = (profileValue, options) => {
+    /* eslint-disable-next-line no-console */
+    console.log(
+      `Sending ${profileValue} with the following options to Lulu`,
+      options,
+    )
+  }
+
+  const handleOptionsChange = vals => {
+    setLoadingPreview(true)
+
+    fakeCall(() => {
+      setLoadingPreview(false)
+      setCurrentOptions({
+        ...currentOptions,
+        ...vals,
+      })
+    })
+  }
+
+  const handleProfileChange = () => {}
 
   return (
     <Wrapper>
       <Preview
-        additionalExportOptions={{
-          includeTitlePage: true,
-          includeCopyrights: true,
-          includeTOC: true,
-        }}
-        exportFormatValue={previewParams.exportFormat}
-        onChangeContent={handleContentChange}
-        onChangeExportFormat={handleChangeExportFormat}
-        onChangePageSize={handleChangePageSize}
-        onClickDownloadEpub={handleDownloadEpub}
-        onClickDownloadPdf={handleDownloadPdf}
-        onSelectTemplate={handleSelectTemplate}
-        previewLink={previewLink}
-        selectedTemplate={previewParams.template}
-        sizeValue={previewParams.size}
-        templates={templates}
+        connectToLulu={handleConnectToLulu}
+        createProfile={handleCreateProfile}
+        currentOptions={currentOptions}
+        defaultProfile={defaultProfile}
+        deleteProfile={handleDeleteProfile}
+        download={handleDownload}
+        isbns={isbnData}
+        isDownloadButtonDisabled={false}
+        isUserConnectedToLulu
+        loadingExport={loadingExport}
+        loadingPreview={loadingPreview}
+        onOptionsChange={handleOptionsChange}
+        onProfileChange={handleProfileChange}
+        previewLink="https://coko.foundation"
+        profiles={profiles}
+        renameProfile={handleRenameProfile}
+        selectedProfile={profiles[0].value}
+        sendToLulu={handleSendToLulu}
+        templates={templateData}
+        updateProfileOptions={handleUpdateProfileOptions}
       />
     </Wrapper>
   )

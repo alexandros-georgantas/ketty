@@ -2,30 +2,18 @@ import { DefaultSchema } from 'wax-prosemirror-core'
 
 import {
   InlineAnnotationsService,
-  AnnotationToolGroupService,
   ImageService,
-  ImageToolGroupService,
   LinkService,
   ListsService,
-  ListToolGroupService,
   BaseService,
-  BaseToolGroupService,
   DisplayBlockLevelService,
-  DisplayToolGroupService,
   TextBlockLevelService,
-  TextToolGroupService,
   SpecialCharactersService,
-  SpecialCharactersToolGroupService,
   BlockDropDownToolGroupService,
   FindAndReplaceService,
   FullScreenService,
-  FullScreenToolGroupService,
-  TitleToolGroupService,
   disallowPasteImagesPlugin,
-  // AskAiContentService,
 } from 'wax-prosemirror-services'
-
-import { TablesService, columnResizing } from 'wax-table-service'
 
 import charactersList from './charactersList'
 
@@ -38,8 +26,6 @@ export default {
       toolGroups: [
         { name: 'Base', exclude: ['Save'] },
         'BlockDropDown',
-        'TitleTool',
-        'Tables',
         { name: 'Lists', exclude: ['JoinUp'] },
         'Images',
         {
@@ -61,7 +47,6 @@ export default {
   SchemaService: DefaultSchema,
   SpecialCharactersService: charactersList,
   PmPlugins: [
-    columnResizing(),
     disallowPasteImagesPlugin(() =>
       onInfoModal(
         `Pasting external images is not supported. Please use platform's Asset Manager infrastructure`,
@@ -71,26 +56,15 @@ export default {
 
   services: [
     new InlineAnnotationsService(),
-    new TitleToolGroupService(),
-    new AnnotationToolGroupService(),
-    // new AskAiContentService(),
     new ImageService(),
-    new ImageToolGroupService(),
     new LinkService(),
     new ListsService(),
-    new ListToolGroupService(),
-    new TablesService(),
     new BaseService(),
-    new BaseToolGroupService(),
     new DisplayBlockLevelService(),
-    new DisplayToolGroupService(),
     new TextBlockLevelService(),
-    new TextToolGroupService(),
     new SpecialCharactersService(),
-    new SpecialCharactersToolGroupService(),
     new BlockDropDownToolGroupService(),
     new FindAndReplaceService(),
     new FullScreenService(),
-    new FullScreenToolGroupService(),
   ],
 }

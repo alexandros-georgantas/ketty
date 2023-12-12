@@ -9,7 +9,10 @@ const CREATE_BOOK_COMPONENT = gql`
         authors
         bottomPage
         copyrightLicense
-        isbn
+        isbns {
+          label
+          isbn
+        }
         licenseTypes {
           NC
           SA
@@ -135,7 +138,10 @@ const DELETE_BOOK_COMPONENT = gql`
         authors
         bottomPage
         copyrightLicense
-        isbn
+        isbns {
+          label
+          isbn
+        }
         licenseTypes {
           NC
           SA
@@ -191,7 +197,10 @@ const UPDATE_BOOK_COMPONENTS_ORDER = gql`
         authors
         bottomPage
         copyrightLicense
-        isbn
+        isbns {
+          label
+          isbn
+        }
         licenseTypes {
           NC
           SA

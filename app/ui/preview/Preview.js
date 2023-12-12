@@ -1,222 +1,177 @@
-﻿import React from 'react'
+﻿import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { Alert, Radio, Button, Space, Tag } from 'antd'
-import {
-  BorderOutlined,
-  ReadOutlined,
-  ZoomInOutlined,
-  ZoomOutOutlined,
-} from '@ant-design/icons'
-import Page from '../common/Page'
+
+import { Page } from '../common'
+
+import PreviewDisplay from './PreviewDisplay'
 import PreviewSettings from './PreviewSettings'
 
-import { Spin } from '../common'
-
-const StyledSpin = styled(Spin)`
-  display: grid;
-  height: calc(100% - 48px);
-  place-content: center;
-`
-
-const Loader = () => <StyledSpin spinning />
-
-const IframeWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  justify-content: space-between;
-  width: 80%;
-`
-
-const FloatingBtn = styled.div`
-  align-items: center;
-  display: flex;
-  height: 48px;
-  justify-content: center;
-  position: sticky;
-  width: 100%;
-`
-
-const Iframe = styled.iframe`
-  border: solid 1px gainsboro;
-  height: calc(100% - 48px);
-  width: 100%;
-`
-
-const AlertWrapper = styled.div`
-  align-items: center;
-  display: flex;
-  height: 100%;
-  justify-content: center;
-  width: 80%;
-`
-
+// #region styled
 const Wrapper = styled.div`
   display: flex;
   height: 100%;
-  width: 100%;
-`
 
-const PreviewSettingsWrapper = styled.div`
-  height: 100%;
-  width: 20%;
-`
+  > div {
+    transition: width 0.3s;
+  }
 
-const Preview = ({
-  previewLink,
-  templates,
-  bookExportInProgress,
-  createPreviewInProgress,
-  doublePageSpread,
-  onChangeAdditionalExportOptions,
-  additionalExportOptions,
-  onSelectTemplate,
-  onClickDownloadPdf,
-  onClickDownloadEpub,
-  canExport,
-  onChangePageSize,
-  onChangePageSpread,
-  selectedTemplate,
-  onChangeExportFormat,
-  exportFormatValue,
-  onClickZoomIn,
-  onClickZoomOut,
-  zoomPercentage,
-  zoomMin,
-  processInProgress,
-  sizeValue,
-}) => {
+  > div:first-child {
+    border-right: 2px solid gainsboro;
+    flex-grow: 1;
+  }
+
+  > div:last-child {
+    min-width: 50px;
+    width: ${props => (props.$showSettings ? '500px' : '2%')};
+  }
+`
+// #endregion styled
+
+const Preview = props => {
+  const {
+    connectToLulu,
+    createProfile,
+    currentOptions,
+    deleteProfile,
+    defaultProfile,
+    download,
+    isDownloadButtonDisabled,
+    isUserConnectedToLulu,
+    loadingExport,
+    loadingPreview,
+    onOptionsChange,
+    onProfileChange,
+    previewLink,
+    profiles,
+    renameProfile,
+    selectedProfile,
+    sendToLulu,
+    templates,
+    isbns,
+    updateProfileOptions,
+  } = props
+
+  const [showSettings, setShowSettings] = useState(true)
+
+  const handleClickCollapse = () => {
+    setShowSettings(!showSettings)
+  }
+
+  const handleOptionsChange = newOptions => {
+    onOptionsChange(newOptions)
+  }
+
+  const { spread, zoom, ...exportOptions } = currentOptions
+
   return (
     <Page>
-      <Wrapper>
-        {exportFormatValue === 'pdf' && selectedTemplate ? (
-          <IframeWrapper>
-            {createPreviewInProgress ? (
-              <Loader />
-            ) : (
-              <Iframe id="previewer" src={previewLink} />
-            )}
-            <FloatingBtn>
-              <Space>
-                <Radio.Group
-                  buttonStyle="solid"
-                  onChange={onChangePageSpread}
-                  value={doublePageSpread}
-                >
-                  <Radio.Button value="double">
-                    <ReadOutlined />
-                  </Radio.Button>
-                  <Radio.Button value="single">
-                    <BorderOutlined />
-                  </Radio.Button>
-                </Radio.Group>
+      <Wrapper $showSettings={showSettings}>
+        <PreviewDisplay
+          isEpub={currentOptions.format === 'epub'}
+          loading={loadingPreview}
+          noPreview={!loadingPreview && !previewLink}
+          onOptionsChange={handleOptionsChange}
+          previewLink={previewLink}
+          spread={spread}
+          zoom={zoom}
+        />
 
-                <Button
-                  disabled={
-                    createPreviewInProgress ||
-                    parseFloat(zoomPercentage) <= zoomMin
-                  }
-                  icon={<ZoomOutOutlined />}
-                  onClick={onClickZoomOut}
-                  shape="circle"
-                  type="primary"
-                />
-                <Tag color="black">{`${zoomPercentage} x`}</Tag>
-                <Button
-                  disabled={
-                    createPreviewInProgress ||
-                    parseFloat(zoomPercentage) === 1.0
-                  }
-                  icon={<ZoomInOutlined />}
-                  onClick={onClickZoomIn}
-                  shape="circle"
-                  type="primary"
-                />
-              </Space>
-            </FloatingBtn>
-          </IframeWrapper>
-        ) : (
-          <AlertWrapper>
-            {exportFormatValue === 'epub' && (
-              <Alert
-                message="Preview is not available for EPUB format, please download your EPUB and preview it in your reader of choice."
-                type="warning"
-              />
-            )}
-            {exportFormatValue === 'pdf' &&
-              !selectedTemplate &&
-              !createPreviewInProgress &&
-              !previewLink && (
-                <Alert
-                  message="Your book preview will be displayed here when you select a template."
-                  type="warning"
-                />
-              )}
-          </AlertWrapper>
-        )}
-        <PreviewSettingsWrapper>
-          <PreviewSettings
-            additionalExportOptions={additionalExportOptions}
-            bookExportInProgress={bookExportInProgress}
-            canExport={canExport}
-            createPreviewInProgress={createPreviewInProgress}
-            exportFormatValue={exportFormatValue}
-            onChangeAdditionalExportOptions={onChangeAdditionalExportOptions}
-            onChangeExportFormat={onChangeExportFormat}
-            onChangePageSize={onChangePageSize}
-            onClickDownloadEpub={onClickDownloadEpub}
-            onClickDownloadPdf={onClickDownloadPdf}
-            onSelectTemplate={onSelectTemplate}
-            processInProgress={processInProgress}
-            selectedTemplate={selectedTemplate}
-            sizeValue={sizeValue}
-            templates={templates}
-          />
-        </PreviewSettingsWrapper>
+        <PreviewSettings
+          createProfile={createProfile}
+          currentOptions={exportOptions}
+          defaultProfile={defaultProfile}
+          deleteProfile={deleteProfile}
+          download={download}
+          isbns={isbns}
+          isCollapsed={!showSettings}
+          isDownloadButtonDisabled={isDownloadButtonDisabled}
+          isUserConnectedToLulu={isUserConnectedToLulu}
+          loadingPreview={loadingPreview}
+          onClickCollapse={handleClickCollapse}
+          onClickConnectToLulu={connectToLulu}
+          onOptionsChange={handleOptionsChange}
+          onProfileChange={onProfileChange}
+          optionsDisabled={loadingExport || loadingPreview}
+          profiles={profiles}
+          renameProfile={renameProfile}
+          selectedProfile={selectedProfile}
+          sendToLulu={sendToLulu}
+          templates={templates}
+          updateProfileOptions={updateProfileOptions}
+        />
       </Wrapper>
     </Page>
   )
 }
 
 Preview.propTypes = {
-  additionalExportOptions: PropTypes.shape({
-    includeTitlePage: PropTypes.bool.isRequired,
-    includeCopyrights: PropTypes.bool.isRequired,
-    includeTOC: PropTypes.bool.isRequired,
+  connectToLulu: PropTypes.func.isRequired,
+  createProfile: PropTypes.func.isRequired,
+  currentOptions: PropTypes.shape({
+    format: PropTypes.oneOf(['pdf', 'epub']),
+    size: PropTypes.oneOf(['8.5x11', '6x9', '5.5x8.5']),
+    content: PropTypes.arrayOf(
+      PropTypes.oneOf(['includeTitlePage', 'includeCopyrights', 'includeTOC']),
+    ),
+    template: PropTypes.string,
+    spread: PropTypes.oneOf(['single', 'double']),
+    zoom: PropTypes.number,
   }).isRequired,
-  processInProgress: PropTypes.bool.isRequired,
-  bookExportInProgress: PropTypes.bool.isRequired,
-  createPreviewInProgress: PropTypes.bool.isRequired,
+  defaultProfile: PropTypes.shape({
+    label: PropTypes.string.isRequired,
+    value: PropTypes.string.isRequired,
+    format: PropTypes.oneOf(['pdf', 'epub']),
+    size: PropTypes.oneOf(['8.5x11', '6x9', '5.5x8.5']),
+    content: PropTypes.arrayOf(
+      PropTypes.oneOf(['includeTitlePage', 'includeCopyrights', 'includeTOC']),
+    ),
+    template: PropTypes.string,
+  }).isRequired,
+  deleteProfile: PropTypes.func.isRequired,
+  download: PropTypes.func.isRequired,
+  isDownloadButtonDisabled: PropTypes.bool.isRequired,
+  isUserConnectedToLulu: PropTypes.bool.isRequired,
+  loadingExport: PropTypes.bool.isRequired,
+  loadingPreview: PropTypes.bool.isRequired,
+  onOptionsChange: PropTypes.func.isRequired,
+  onProfileChange: PropTypes.func.isRequired,
   previewLink: PropTypes.string,
+  profiles: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      value: PropTypes.string.isRequired,
+      format: PropTypes.string.isRequired,
+      size: PropTypes.string,
+      content: PropTypes.arrayOf(PropTypes.string).isRequired,
+      template: PropTypes.string,
+      synced: PropTypes.bool,
+      lastSynced: PropTypes.string,
+      projectId: PropTypes.string,
+      projectUrl: PropTypes.string,
+    }),
+  ).isRequired,
+  renameProfile: PropTypes.func.isRequired,
+  selectedProfile: PropTypes.string.isRequired,
+  sendToLulu: PropTypes.func.isRequired,
   templates: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
-      thumbnail: PropTypes.string,
+      imageUrl: PropTypes.string,
       name: PropTypes.string.isRequired,
     }),
   ).isRequired,
-  doublePageSpread: PropTypes.string.isRequired,
-  zoomPercentage: PropTypes.string.isRequired,
-  zoomMin: PropTypes.number.isRequired,
-  selectedTemplate: PropTypes.string,
-  onSelectTemplate: PropTypes.func.isRequired,
-  onClickDownloadPdf: PropTypes.func.isRequired,
-  onClickDownloadEpub: PropTypes.func.isRequired,
-  onClickZoomIn: PropTypes.func.isRequired,
-  onClickZoomOut: PropTypes.func.isRequired,
-  onChangePageSize: PropTypes.func.isRequired,
-  onChangePageSpread: PropTypes.func.isRequired,
-  onChangeAdditionalExportOptions: PropTypes.func.isRequired,
-  sizeValue: PropTypes.string.isRequired,
-  onChangeExportFormat: PropTypes.func.isRequired,
-  exportFormatValue: PropTypes.string.isRequired,
-  canExport: PropTypes.bool.isRequired,
+  isbns: PropTypes.arrayOf(
+    PropTypes.shape({
+      isbn: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+    }),
+  ).isRequired,
+  updateProfileOptions: PropTypes.func.isRequired,
 }
 
 Preview.defaultProps = {
-  selectedTemplate: null,
-  previewLink: undefined,
+  previewLink: null,
 }
 
 export default Preview

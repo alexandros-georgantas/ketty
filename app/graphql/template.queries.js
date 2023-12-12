@@ -23,6 +23,7 @@ const GET_SPECIFIC_TEMPLATES = gql`
   query GetSpecificTemplates($where: TemplatesWhereInput!) {
     getSpecificTemplates(where: $where) {
       id
+      default
       name
       thumbnail {
         id
@@ -42,39 +43,6 @@ const GET_SPECIFIC_TEMPLATES = gql`
 const TEMPLATE_UPDATED_SUBSCRIPTION = gql`
   subscription TemplatedUpdated($id: ID!) {
     templateUpdated(id: $id)
-  }
-`
-
-const GET_BOOK_ASSOCIATED_TEMPLATES = gql`
-  query GetBook($id: ID!) {
-    getBook(id: $id) {
-      associatedTemplates {
-        pagedjs {
-          trimSize
-          templateId
-          additionalExportOptions {
-            includeTOC
-            includeCopyrights
-            includeTitlePage
-          }
-        }
-        epub {
-          templateId
-          additionalExportOptions {
-            includeTOC
-            includeCopyrights
-            includeTitlePage
-          }
-        }
-      }
-      divisions {
-        id
-        label
-        bookComponents {
-          id
-        }
-      }
-    }
   }
 `
 
@@ -115,6 +83,5 @@ export {
   GET_TEMPLATES,
   GET_SPECIFIC_TEMPLATES,
   TEMPLATE_UPDATED_SUBSCRIPTION,
-  GET_BOOK_ASSOCIATED_TEMPLATES,
   UPDATE_ASSOCIATED_TEMPLATES,
 }

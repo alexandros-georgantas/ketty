@@ -152,26 +152,24 @@ const ChapterItem = props => {
         </ChapterTitle>
         {lockedBy ? <UserAvatar>{getInitials(lockedBy)}</UserAvatar> : null}
       </ChapterContainer>
-      {!uploading && (
-        <MoreActions>
-          <Dropdown
-            disabled={!canEdit}
-            menu={{
-              items: [
-                {
-                  key: 'delete-chapter-action',
-                  label: 'Delete',
-                  onClick: () => onClickDelete(id),
-                },
-              ],
-            }}
-            placement="bottomRight"
-            trigger={['click']}
-          >
-            <MoreOutlined />
-          </Dropdown>
-        </MoreActions>
-      )}
+      <MoreActions>
+        <Dropdown
+          disabled={!canEdit}
+          menu={{
+            items: [
+              {
+                key: 'delete-chapter-action',
+                label: 'Delete',
+                onClick: () => onClickDelete(id),
+              },
+            ],
+          }}
+          placement="bottomRight"
+          trigger={['click']}
+        >
+          <MoreOutlined />
+        </Dropdown>
+      </MoreActions>
     </Chapter>
   )
 }
