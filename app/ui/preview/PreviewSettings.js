@@ -45,7 +45,7 @@ const optionKeys = ['format', 'size', 'content', 'template', 'isbn']
 const getProfileSelectOptions = profile => pick(profile, selectKeys)
 
 const getAllProfileSelectOptions = profiles =>
-  profiles.map(p => getProfileSelectOptions(p))
+  profiles?.map(p => getProfileSelectOptions(p))
 
 const sanitizeOptionData = data => {
   const d = { ...data }
