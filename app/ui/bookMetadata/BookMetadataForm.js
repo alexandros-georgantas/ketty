@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { isEmpty } from 'lodash'
 import { th } from '@coko/client'
 import dayjs from 'dayjs'
 import mapValues from 'lodash/mapValues'
 import { Form, Modal } from 'antd'
 import { Input, TextArea } from '../common'
 import CopyrightLicenseInput from './CopyrightLicenseInput'
+import ISBNList from './ISBNList'
 
 const StyledForm = styled(Form)`
   height: calc(100vh - 156.5px);
@@ -40,6 +42,10 @@ const BookMetadataForm = ({
       ? dayjs(value)
       : value
   })
+
+  if (isEmpty(transformedInitialValues.isbns)) {
+    transformedInitialValues.isbns = []
+  }
 
   useEffect(() => {
     form.setFieldsValue(transformedInitialValues)
@@ -118,16 +124,12 @@ const BookMetadataForm = ({
         <FormSection>
           <h2>COPYRIGHT PAGE</h2>
           <Form.Item
-            label="ISBN"
+            label="ISBN List"
             labelCol={{ span: 24 }}
-            name="isbn"
-            // rules={[{ required: true, message: 'ISBN is required' }]}
+            style={{ marginBottom: '0px' }}
             wrapperCol={{ span: 24 }}
           >
-            <Input
-              disabled={!canChangeMetadata}
-              placeholder="Update this ISBN before exporting versions requiring unique identifier"
-            />
+            <ISBNList canChangeMetadata={canChangeMetadata} name="isbns" />
           </Form.Item>
           <Form.Item
             label="Top of the page"
@@ -171,7 +173,12 @@ BookMetadataForm.propTypes = {
     title: PropTypes.string,
     subtitle: PropTypes.string,
     authors: PropTypes.string.isRequired,
-    isbn: PropTypes.string.isRequired,
+    isbns: PropTypes.arrayOf(
+      PropTypes.shape({
+        label: PropTypes.string,
+        isbn: PropTypes.string.isRequired,
+      }),
+    ).isRequired,
     topPage: PropTypes.string,
     bottomPage: PropTypes.string,
     copyrightLicense: PropTypes.oneOf(['SCL', 'PD', 'CC']),

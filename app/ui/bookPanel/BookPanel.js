@@ -174,7 +174,12 @@ BookPanel.propTypes = {
     title: PropTypes.string,
     subtitle: PropTypes.string,
     authors: PropTypes.string.isRequired,
-    isbn: PropTypes.string.isRequired,
+    isbns: PropTypes.arrayOf(
+      PropTypes.shape({
+        label: PropTypes.string,
+        isbn: PropTypes.string.isRequired,
+      }),
+    ).isRequired,
     topPage: PropTypes.string,
     bottomPage: PropTypes.string,
     copyrightLicense: PropTypes.string,

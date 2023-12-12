@@ -74,8 +74,25 @@ const ExportOptionsSection = props => {
     selectedFormat,
     selectedSize,
     selectedTemplate,
+    selectedIsbn,
     templates,
+    isbns,
   } = props
+
+  const isbnOptions = [
+    {
+      value: '',
+      label: 'Please select',
+    },
+    ...isbns.map((isbnItem, index) => {
+      return {
+        value: isbnItem.isbn,
+        label: isbnItem.label
+          ? `${isbnItem.label}: ${isbnItem.isbn}`
+          : isbnItem.isbn,
+      }
+    }),
+  ]
 
   const isEpub = selectedFormat === 'epub'
   const contentOptions = makeContentOptions(isEpub)
@@ -94,6 +111,10 @@ const ExportOptionsSection = props => {
 
   const handleSizeChange = value => {
     handleChange({ size: value })
+  }
+
+  const handleIsbnChange = value => {
+    handleChange({ isbn: value })
   }
 
   const handleContentChange = value => {
@@ -124,6 +145,18 @@ const ExportOptionsSection = props => {
             onChange={handleSizeChange}
             options={exportSizeOptions}
             value={selectedSize}
+          />
+        </ExportOption>
+      )}
+
+      {isEpub && (
+        <ExportOption inline label="isbn">
+          <Select
+            bordered={false}
+            // disabled={disabled}
+            onChange={handleIsbnChange}
+            options={isbnOptions}
+            value={selectedIsbn || isbnOptions[0]}
           />
         </ExportOption>
       )}
@@ -160,6 +193,7 @@ ExportOptionsSection.propTypes = {
   selectedContent: PropTypes.arrayOf(PropTypes.string).isRequired,
   selectedFormat: PropTypes.string.isRequired,
   selectedSize: PropTypes.string,
+  selectedIsbn: PropTypes.string,
   selectedTemplate: PropTypes.string,
   templates: PropTypes.arrayOf(
     PropTypes.shape({
@@ -168,10 +202,17 @@ ExportOptionsSection.propTypes = {
       name: PropTypes.string.isRequired,
     }),
   ),
+  isbns: PropTypes.arrayOf(
+    PropTypes.shape({
+      isbn: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+    }),
+  ).isRequired,
 }
 
 ExportOptionsSection.defaultProps = {
   selectedSize: null,
+  selectedIsbn: null,
   selectedTemplate: null,
   templates: [],
 }

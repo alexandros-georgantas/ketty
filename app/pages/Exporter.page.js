@@ -48,6 +48,7 @@ export const defaultProfile = {
   size: '8.5x11',
   content: ['includeTitlePage', 'includeCopyrights', 'includeTOC'],
   template: null,
+  isbn: null,
 }
 
 const sanitizeProfileData = input => {
@@ -64,7 +65,7 @@ const sanitizeOptionData = data => {
   return d
 }
 
-const optionKeys = ['format', 'size', 'content', 'template']
+const optionKeys = ['format', 'size', 'content', 'template', 'isbn']
 
 const getProfileExportOptions = profile => {
   const p = pick(profile, optionKeys)
@@ -251,6 +252,7 @@ const PreviewerPage = () => {
       format,
       content,
       template: templateId,
+      isbn,
     } = currentOptions
 
     const data = {
@@ -264,6 +266,7 @@ const PreviewerPage = () => {
       },
       templateId,
       trimSize,
+      isbn,
     }
 
     return createProfile({
@@ -310,6 +313,7 @@ const PreviewerPage = () => {
       format,
       content,
       template: templateId,
+      isbn,
     } = currentOptions
 
     const data = {
@@ -321,6 +325,7 @@ const PreviewerPage = () => {
       },
       templateId,
       trimSize,
+      isbn,
     }
 
     return updateProfileOptions({
@@ -332,8 +337,7 @@ const PreviewerPage = () => {
   }
 
   const handleDownload = () => {
-    const { format, template, content } = currentOptions
-
+    const { format, template, content, isbn } = currentOptions
     return download({
       variables: {
         input: {
@@ -344,6 +348,7 @@ const PreviewerPage = () => {
             includeTOC: content.includes('includeTOC'),
             includeCopyrights: content.includes('includeCopyrights'),
             includeTitlePage: content.includes('includeTitlePage'),
+            isbn,
           },
         },
       },
@@ -519,6 +524,10 @@ const PreviewerPage = () => {
     }
   }, [templatesData, selectedTemplate])
 
+  const isbns = (book?.getBook?.podMetadata?.isbns || []).map(item => {
+    return { isbn: item.isbn, label: item.label }
+  })
+
   const profiles =
     applicationParameters &&
     profilesData?.getBookExportProfiles.result.map(p => {
@@ -546,6 +555,8 @@ const PreviewerPage = () => {
         synced: luluProfile ? luluProfile.inSync : null,
         template: p.templateId,
         value: p.id,
+        // Require that p.isbn is a valid option from podMetadata.isbns
+        isbn: p.isbn && isbns.find(i => i.isbn === p.isbn) ? p.isbn : null,
       }
     })
 
@@ -574,6 +585,7 @@ const PreviewerPage = () => {
       defaultProfile={defaultProfileWithTemplate}
       deleteProfile={handleDeleteProfile}
       download={handleDownload}
+      isbns={isbns}
       isDownloadButtonDisabled={isDownloadButtonDisabled}
       isUserConnectedToLulu={isUserConnectedToLulu}
       loadingExport={false}
