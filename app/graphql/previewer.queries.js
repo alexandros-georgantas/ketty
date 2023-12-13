@@ -120,6 +120,7 @@ const GET_BOOK_COMPONENT_IDS = gql`
         label
         bookComponents {
           id
+          hasContent
         }
       }
       podMetadata {

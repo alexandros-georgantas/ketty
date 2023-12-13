@@ -563,8 +563,9 @@ const PreviewerPage = () => {
   const allProfiles = profiles && [defaultProfileWithTemplate, ...profiles]
 
   const hasContent =
-    book?.getBook.divisions.find(d => d.label === 'Body').bookComponents
-      .length > 0
+    book?.getBook.divisions
+      .find(d => d.label === 'Body')
+      .bookComponents?.find(bc => bc.hasContent) !== undefined
 
   const isOwnerOrAdmin = isAdmin(currentUser) || isOwner(bookId, currentUser)
   const canModify = hasEditAccess(bookId, currentUser)

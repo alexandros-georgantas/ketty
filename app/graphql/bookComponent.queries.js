@@ -86,6 +86,7 @@ const UPDATE_BOOK_COMPONENT_CONTENT = gql`
       divisionId
       # content
       componentType
+      hasContent
       trackChangesEnabled
       uploading
       status
