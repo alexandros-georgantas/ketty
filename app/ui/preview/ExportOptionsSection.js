@@ -82,7 +82,7 @@ const ExportOptionsSection = props => {
   const isbnOptions = [
     {
       value: '',
-      label: 'Please select',
+      label: 'No selection',
     },
     ...isbns.map((isbnItem, index) => {
       return {
