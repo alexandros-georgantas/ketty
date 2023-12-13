@@ -150,7 +150,7 @@ const ExportOptionsSection = props => {
       )}
 
       {isEpub && (
-        <ExportOption inline label="isbn">
+        <ExportOption inline label="ISBN">
           <Select
             bordered={false}
             // disabled={disabled}
