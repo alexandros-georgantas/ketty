@@ -540,9 +540,9 @@ const PreviewerPage = () => {
 
       const content = []
 
-      if (p.includedComponents.copyright) content.push('includeTOC')
+      if (p.includedComponents.copyright) content.push('includeCopyrights')
       if (p.includedComponents.titlePage) content.push('includeTitlePage')
-      if (p.includedComponents.toc) content.push('includeCopyrights')
+      if (p.includedComponents.toc) content.push('includeTOC')
 
       return {
         format: p.format,
