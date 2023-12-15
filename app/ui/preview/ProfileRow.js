@@ -60,6 +60,7 @@ const CollapseArrow = styled(VerticalAlignTopOutlined)`
 
 const ProfileRow = props => {
   const {
+    canModifyProfiles,
     className,
     isCollapsed,
     isNewProfileSelected,
@@ -135,6 +136,7 @@ const ProfileRow = props => {
           />
 
           <StyledButton
+            disabled={!canModifyProfiles}
             hidden={isNewProfileSelected}
             icon={<EditOutlined />}
             onClick={handleClickEdit}
@@ -168,6 +170,7 @@ const ProfileRow = props => {
 }
 
 ProfileRow.propTypes = {
+  canModifyProfiles: PropTypes.bool.isRequired,
   isCollapsed: PropTypes.bool.isRequired,
   profiles: PropTypes.arrayOf(
     PropTypes.shape({
