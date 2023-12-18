@@ -192,6 +192,7 @@ export const Base = () => {
         download={handleClickDownload}
         isbns={isbnData}
         isCollapsed={isCollapsed}
+        canModify
         isDownloadButtonDisabled={false}
         isUserConnectedToLulu
         loadingPreview={false}
