@@ -58,6 +58,7 @@ export const Base = () => {
 
   return (
     <ProfileRow
+      canModifyProfiles
       isCollapsed={isCollapsed}
       isNewProfileSelected={selectedProfile.value === defaultProfile.value}
       onClickCollapse={handleClickCollapse}

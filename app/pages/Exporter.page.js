@@ -54,7 +54,6 @@ export const defaultProfile = {
 const sanitizeProfileData = input => {
   const res = { ...input }
   if (res.format === 'epub') res.trimSize = null
-
   return res
 }
 
