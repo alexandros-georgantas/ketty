@@ -566,11 +566,12 @@ const PreviewerPage = () => {
     book?.getBook.divisions.find(d => d.label === 'Body').bookComponents
       .length > 0
 
-  const isOwnerOrAdmin = isAdmin(currentUser) || isOwner(bookId, currentUser)
-  const canModify = hasEditAccess(bookId, currentUser)
+  const userIsOwner = isOwner(bookId, currentUser)
+  const userIsAdmin = isAdmin(currentUser)
 
   const isDownloadButtonDisabled =
-    !canModify || (!hasContent && currentOptions.format === 'epub')
+    !hasEditAccess(bookId, currentUser) ||
+    (!hasContent && currentOptions.format === 'epub')
   // #endregion data wrangling
 
   if (templatesLoading || profilesLoading || !currentUser || paramsLoading) {
@@ -579,6 +580,8 @@ const PreviewerPage = () => {
 
   return (
     <Preview
+      canModify={userIsOwner || userIsAdmin}
+      canUploadToProvider={userIsOwner}
       connectToLulu={handleConnectToLulu}
       createProfile={handleCreateProfile}
       currentOptions={currentOptions}
@@ -597,7 +600,6 @@ const PreviewerPage = () => {
       renameProfile={handleRenameProfile}
       selectedProfile={selectedProfile}
       sendToLulu={handleSendToLulu}
-      showFooter={isOwnerOrAdmin}
       templates={templates}
       updateProfileOptions={handleUpdateProfileOptions}
     />

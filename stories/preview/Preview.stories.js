@@ -195,6 +195,7 @@ export const Base = () => {
         defaultProfile={defaultProfile}
         deleteProfile={handleDeleteProfile}
         download={handleDownload}
+        canModify
         isbns={isbnData}
         isDownloadButtonDisabled={false}
         isUserConnectedToLulu
