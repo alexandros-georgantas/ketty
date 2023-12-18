@@ -80,10 +80,6 @@ const ExportOptionsSection = props => {
   } = props
 
   const isbnOptions = [
-    {
-      value: '',
-      label: 'Please select',
-    },
     ...isbns.map((isbnItem, index) => {
       return {
         value: isbnItem.isbn,
@@ -152,11 +148,14 @@ const ExportOptionsSection = props => {
       {isEpub && (
         <ExportOption inline label="ISBN">
           <Select
+            allowClear
             bordered={false}
             // disabled={disabled}
             onChange={handleIsbnChange}
             options={isbnOptions}
-            value={selectedIsbn || isbnOptions[0]}
+            placeholder="No selection"
+            style={{ minWidth: '230px' }}
+            value={selectedIsbn || null}
           />
         </ExportOption>
       )}
