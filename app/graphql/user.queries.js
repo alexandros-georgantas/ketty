@@ -28,6 +28,7 @@ const CURRENT_USER = gql`
       identities {
         id
         provider
+        hasValidRefreshToken
       }
     }
   }
