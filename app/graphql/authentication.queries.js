@@ -28,6 +28,7 @@ export const LOGIN = gql`
         identities {
           id
           provider
+          hasValidRefreshToken
         }
       }
       token

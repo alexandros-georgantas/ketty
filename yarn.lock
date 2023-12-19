@@ -1259,10 +1259,10 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@coko/client@0.0.52":
-  version "0.0.52"
-  resolved "https://registry.yarnpkg.com/@coko/client/-/client-0.0.52.tgz#6011fe515296adb0c73893c246347b84e9664456"
-  integrity sha512-hMqusFPLfgpZQcuK9KEZ0/a8LrmeBP3tacVruWnshS10F0VwdNsXdmXYeJLQj3ekfVdTXYlnhl5wPj7PFIVX2Q==
+"@coko/client@0.0.55":
+  version "0.0.55"
+  resolved "https://registry.yarnpkg.com/@coko/client/-/client-0.0.55.tgz#aff9c517c3f72f37ffaedc2c2d477b0e8e760150"
+  integrity sha512-lfX1hbpwoxy99bcV4Urhnfy5pCuYfj+0C2QVDC7dK2IpkagitG29tMsZoPYCuAZlJ3TR7W4Ssvif3DRjvd/WEQ==
   dependencies:
     "@ant-design/icons" "^5.1.4"
     "@babel/cli" "^7.13.14"
