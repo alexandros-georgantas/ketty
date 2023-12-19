@@ -469,9 +469,12 @@ const PreviewerPage = () => {
   // #endregion handlers
 
   // #region data wrangling
-  const isUserConnectedToLulu = !!currentUser?.identities?.find(
+  const luluIdentity = currentUser?.identities?.find(
     id => id.provider === 'lulu',
   )
+
+  const isUserConnectedToLulu =
+    luluIdentity && luluIdentity.hasValidRefreshToken
 
   const storedZoom = localStorage.getItem('zoomPercentage')
   const initialZoom = storedZoom ? parseFloat(storedZoom) : 1
