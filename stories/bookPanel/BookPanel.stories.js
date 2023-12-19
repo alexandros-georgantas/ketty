@@ -34,6 +34,7 @@ const PanelWrapper = styled.div`
 export const Base = args => {
   const { title, chapters: defaultChapters } = args
   const [chapters, setChapters] = useState(defaultChapters)
+  const [metadataModalOpen, setMetadataModalOpen] = useState(false)
 
   const handleChapterUploadClick = () => {
     const input = document.createElement('input')
@@ -110,6 +111,9 @@ export const Base = args => {
     console.log('Clicked Book Metadata')
   }
 
+  const closeModal = () => {
+    setMetadataModalOpen(false)
+  }
   // const handleSubmitBookMetadata = values => console.log(values)
 
   // const handleErrorBookMetadata = err => console.log(err)
@@ -121,7 +125,12 @@ export const Base = args => {
           title: faker.lorem.words(2),
           subtitle: faker.lorem.words(2),
           authors: [faker.name.fullName(), faker.name.fullName()].join(', '),
-          isbn: faker.random.numeric(10),
+          isbns: [
+            {
+              label: faker.lorem.words(),
+              isbn: faker.random.alphaNumeric(10),
+            },
+          ],
           topPage: faker.lorem.words(2),
           bottomPage: faker.lorem.words(2),
           copyrightLicense: 'SCL',
@@ -135,8 +144,11 @@ export const Base = args => {
             ND: true,
           },
           publicDomainType: 'cc0',
+          open: metadataModalOpen,
+          closeModal,
         }}
         chapters={chapters}
+        metadataModalOpen={metadataModalOpen}
         onAddChapter={handleAddChapterClick}
         onChapterClick={handleChapterClick}
         onClickBookMetadata={handleClickBookMetadata}
@@ -146,6 +158,7 @@ export const Base = args => {
         onReorderChapter={onReorderChapter}
         // onSubmitBookMetadata={handleSubmitBookMetadata}
         onUploadChapter={handleChapterUploadClick}
+        setMetadataModalOpen={setMetadataModalOpen}
         title={title}
       />
     </PanelWrapper>

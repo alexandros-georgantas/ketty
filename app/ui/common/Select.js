@@ -23,6 +23,10 @@ const StyledDropdown = styled.div`
   .ant-select-item-option-selected .ant-select-item-option-content {
     color: ${th('colorTextReverse')};
   }
+
+  .ant-select-item-option-disabled .ant-select-item-option-content {
+    filter: brightness(55%);
+  }
 `
 
 const Select = props => {

@@ -19,7 +19,10 @@ const GET_ENTIRE_BOOK = gql`
         authors
         bottomPage
         copyrightLicense
-        isbn
+        isbns {
+          label
+          isbn
+        }
         licenseTypes {
           NC
           SA
@@ -150,7 +153,10 @@ const UPDATE_BOOK_POD_METADATA = gql`
         authors
         bottomPage
         copyrightLicense
-        isbn
+        isbns {
+          label
+          isbn
+        }
         licenseTypes {
           NC
           SA
@@ -220,7 +226,10 @@ const LOCK_BOOK_COMPONENT_POD = gql`
         authors
         bottomPage
         copyrightLicense
-        isbn
+        isbns {
+          label
+          isbn
+        }
         licenseTypes {
           NC
           SA

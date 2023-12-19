@@ -17,12 +17,32 @@ const templateData = Array.from(Array(10)).map((_, j) => {
   }
 })
 
+const isbnData = [
+  {
+    isbn: '978-1-23-456789-0',
+    label: 'Hard cover',
+  },
+  {
+    isbn: '978-1-23-456789-1',
+    label: '',
+  },
+  {
+    isbn: '978-1-23-456789-2',
+    label: 'Soft cover',
+  },
+  {
+    isbn: '978-1-23-456789-3',
+    label: 'EPub',
+  },
+]
+
 export const Base = () => {
   const [values, setValues] = useState({
     format: defaultProfile.format,
     size: defaultProfile.size,
     content: defaultProfile.content,
     template: templateData[2].id,
+    isbn: isbnData[1].isbn,
   })
 
   const handleChange = newValues => {
@@ -32,9 +52,11 @@ export const Base = () => {
   return (
     <ExportOptionsSection
       disabled={false}
+      isbns={isbnData}
       onChange={handleChange}
       selectedContent={values.content}
       selectedFormat={values.format}
+      selectedIsbn={values.isbn}
       selectedSize={values.size}
       selectedTemplate={values.template}
       templates={templateData}
@@ -48,10 +70,12 @@ export const Disabled = () => {
   return (
     <ExportOptionsSection
       disabled
+      isbns={isbnData}
       onChange={() => {}}
       onTemplateClick={handleTemplateClick}
       selectedContent={['includeTitlePage']}
       selectedFormat={defaultProfile.format}
+      selectedIsbn={isbnData[1].isbn}
       selectedSize={defaultProfile.size}
       selectedTemplate={templateData[2].id}
       templates={templateData}

@@ -36,6 +36,8 @@ const Preview = props => {
     deleteProfile,
     defaultProfile,
     download,
+    canModify,
+    canUploadToProvider,
     isDownloadButtonDisabled,
     isUserConnectedToLulu,
     loadingExport,
@@ -48,6 +50,7 @@ const Preview = props => {
     selectedProfile,
     sendToLulu,
     templates,
+    isbns,
     updateProfileOptions,
   } = props
 
@@ -77,11 +80,14 @@ const Preview = props => {
         />
 
         <PreviewSettings
+          canModify={canModify}
+          canUploadToProvider={canUploadToProvider}
           createProfile={createProfile}
           currentOptions={exportOptions}
           defaultProfile={defaultProfile}
           deleteProfile={deleteProfile}
           download={download}
+          isbns={isbns}
           isCollapsed={!showSettings}
           isDownloadButtonDisabled={isDownloadButtonDisabled}
           isUserConnectedToLulu={isUserConnectedToLulu}
@@ -128,6 +134,8 @@ Preview.propTypes = {
   }).isRequired,
   deleteProfile: PropTypes.func.isRequired,
   download: PropTypes.func.isRequired,
+  canModify: PropTypes.bool.isRequired,
+  canUploadToProvider: PropTypes.bool.isRequired,
   isDownloadButtonDisabled: PropTypes.bool.isRequired,
   isUserConnectedToLulu: PropTypes.bool.isRequired,
   loadingExport: PropTypes.bool.isRequired,
@@ -157,6 +165,12 @@ Preview.propTypes = {
       id: PropTypes.string.isRequired,
       imageUrl: PropTypes.string,
       name: PropTypes.string.isRequired,
+    }),
+  ).isRequired,
+  isbns: PropTypes.arrayOf(
+    PropTypes.shape({
+      isbn: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
     }),
   ).isRequired,
   updateProfileOptions: PropTypes.func.isRequired,

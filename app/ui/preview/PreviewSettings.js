@@ -40,12 +40,12 @@ const Wrapper = styled.div`
 
 // #region helpoers
 const selectKeys = ['label', 'value']
-const optionKeys = ['format', 'size', 'content', 'template']
+const optionKeys = ['format', 'size', 'content', 'template', 'isbn']
 
 const getProfileSelectOptions = profile => pick(profile, selectKeys)
 
 const getAllProfileSelectOptions = profiles =>
-  profiles.map(p => getProfileSelectOptions(p))
+  profiles?.map(p => getProfileSelectOptions(p))
 
 const sanitizeOptionData = data => {
   const d = { ...data }
@@ -67,6 +67,8 @@ const PreviewSettings = props => {
     defaultProfile,
     download,
     isCollapsed,
+    canModify,
+    canUploadToProvider,
     isDownloadButtonDisabled,
     isUserConnectedToLulu,
     loadingPreview,
@@ -80,6 +82,7 @@ const PreviewSettings = props => {
     selectedProfile,
     sendToLulu,
     templates,
+    isbns,
     updateProfileOptions,
   } = props
 
@@ -127,6 +130,7 @@ const PreviewSettings = props => {
   return (
     <Wrapper>
       <ProfileRow
+        canModifyProfiles={canModify}
         isCollapsed={isCollapsed}
         isNewProfileSelected={isNewProfileSelected}
         onClickCollapse={handleClickCollapse}
@@ -138,13 +142,17 @@ const PreviewSettings = props => {
 
       {!isCollapsed && (
         <>
-          <Ribbon hide={!hasChanges}>You have unsaved changes</Ribbon>
+          <Ribbon hide={!hasChanges || !canModify}>
+            You have unsaved changes
+          </Ribbon>
 
           <ExportOptionsSection
             disabled={optionsDisabled}
+            isbns={isbns}
             onChange={handleOptionsChange}
             selectedContent={currentOptions.content}
             selectedFormat={currentOptions.format}
+            selectedIsbn={currentOptions.isbn}
             selectedSize={currentOptions.size}
             selectedTemplate={currentOptions.template}
             templates={templates}
@@ -155,6 +163,7 @@ const PreviewSettings = props => {
           <div>
             {!isNewProfileSelected && (
               <LuluIntegration
+                canUploadToProvider={canUploadToProvider}
                 isConnected={isUserConnectedToLulu}
                 isInLulu={isProfileInLulu}
                 isSynced={isProfileSyncedWithLulu}
@@ -168,11 +177,14 @@ const PreviewSettings = props => {
           </div>
 
           <Footer
+            canModify={canModify}
             createProfile={createProfile}
             isDownloadButtonDisabled={isDownloadButtonDisabled}
             isNewProfileSelected={isNewProfileSelected}
             isSaveDisabled={
-              loadingPreview || (!isNewProfileSelected && !hasChanges)
+              !canModify ||
+              loadingPreview ||
+              (!isNewProfileSelected && !hasChanges)
             }
             loadingPreview={loadingPreview}
             onClickDelete={deleteProfile}
@@ -194,6 +206,7 @@ PreviewSettings.propTypes = {
       PropTypes.oneOf(['includeTitlePage', 'includeCopyrights', 'includeTOC']),
     ),
     template: PropTypes.string,
+    isbn: PropTypes.string,
     spread: PropTypes.oneOf(['single', 'double']),
     zoom: PropTypes.number,
   }).isRequired,
@@ -207,9 +220,12 @@ PreviewSettings.propTypes = {
       PropTypes.oneOf(['includeTitlePage', 'includeCopyrights', 'includeTOC']),
     ),
     template: PropTypes.string,
+    isbn: PropTypes.string,
   }).isRequired,
   download: PropTypes.func.isRequired,
   isCollapsed: PropTypes.bool.isRequired,
+  canModify: PropTypes.bool.isRequired,
+  canUploadToProvider: PropTypes.bool.isRequired,
   isDownloadButtonDisabled: PropTypes.bool.isRequired,
   isUserConnectedToLulu: PropTypes.bool.isRequired,
   loadingPreview: PropTypes.bool.isRequired,
@@ -240,6 +256,12 @@ PreviewSettings.propTypes = {
       id: PropTypes.string.isRequired,
       imageUrl: PropTypes.string,
       name: PropTypes.string.isRequired,
+    }),
+  ).isRequired,
+  isbns: PropTypes.arrayOf(
+    PropTypes.shape({
+      isbn: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
     }),
   ).isRequired,
   updateProfileOptions: PropTypes.func.isRequired,

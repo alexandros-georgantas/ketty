@@ -48,6 +48,7 @@ export const defaultProfile = {
   size: '8.5x11',
   content: ['includeTitlePage', 'includeCopyrights', 'includeTOC'],
   template: null,
+  isbn: null,
 }
 
 const sanitizeProfileData = input => {
@@ -64,7 +65,7 @@ const sanitizeOptionData = data => {
   return d
 }
 
-const optionKeys = ['format', 'size', 'content', 'template']
+const optionKeys = ['format', 'size', 'content', 'template', 'isbn']
 
 const getProfileExportOptions = profile => {
   const p = pick(profile, optionKeys)
@@ -134,11 +135,14 @@ const PreviewerPage = () => {
     APPLICATION_PARAMETERS,
   )
 
-  const [getPagedLink] = useLazyQuery(GET_PAGED_PREVIEWER_LINK, {
-    onCompleted: ({ getPagedPreviewerLink: { link } }) => {
-      setPreviewLink(link)
+  const [getPagedLink, { loading: previewIsLoading }] = useLazyQuery(
+    GET_PAGED_PREVIEWER_LINK,
+    {
+      onCompleted: ({ getPagedPreviewerLink: { link } }) => {
+        setPreviewLink(link)
+      },
     },
-  })
+  )
 
   const [createPreview, { called: createPreviewCalled }] = useMutation(
     EXPORT_BOOK,
@@ -251,6 +255,7 @@ const PreviewerPage = () => {
       format,
       content,
       template: templateId,
+      isbn,
     } = currentOptions
 
     const data = {
@@ -264,6 +269,7 @@ const PreviewerPage = () => {
       },
       templateId,
       trimSize,
+      isbn,
     }
 
     return createProfile({
@@ -310,6 +316,7 @@ const PreviewerPage = () => {
       format,
       content,
       template: templateId,
+      isbn,
     } = currentOptions
 
     const data = {
@@ -321,6 +328,7 @@ const PreviewerPage = () => {
       },
       templateId,
       trimSize,
+      isbn,
     }
 
     return updateProfileOptions({
@@ -332,8 +340,7 @@ const PreviewerPage = () => {
   }
 
   const handleDownload = () => {
-    const { format, template, content } = currentOptions
-
+    const { format, template, content, isbn } = currentOptions
     return download({
       variables: {
         input: {
@@ -344,6 +351,7 @@ const PreviewerPage = () => {
             includeTOC: content.includes('includeTOC'),
             includeCopyrights: content.includes('includeCopyrights'),
             includeTitlePage: content.includes('includeTitlePage'),
+            isbn,
           },
         },
       },
@@ -400,7 +408,7 @@ const PreviewerPage = () => {
       spread: options.spread,
     })
 
-    if (target === 'pagedjs') {
+    if (target === 'pagedjs' && !previewIsLoading) {
       createPreview({
         variables: {
           input: previewData,
@@ -461,9 +469,12 @@ const PreviewerPage = () => {
   // #endregion handlers
 
   // #region data wrangling
-  const isUserConnectedToLulu = !!currentUser?.identities?.find(
+  const luluIdentity = currentUser?.identities?.find(
     id => id.provider === 'lulu',
   )
+
+  const isUserConnectedToLulu =
+    luluIdentity && luluIdentity.hasValidRefreshToken
 
   const storedZoom = localStorage.getItem('zoomPercentage')
   const initialZoom = storedZoom ? parseFloat(storedZoom) : 1
@@ -519,6 +530,10 @@ const PreviewerPage = () => {
     }
   }, [templatesData, selectedTemplate])
 
+  const isbns = (book?.getBook?.podMetadata?.isbns || []).map(item => {
+    return { isbn: item.isbn, label: item.label }
+  })
+
   const profiles =
     applicationParameters &&
     profilesData?.getBookExportProfiles.result.map(p => {
@@ -531,9 +546,9 @@ const PreviewerPage = () => {
 
       const content = []
 
-      if (p.includedComponents.copyright) content.push('includeTOC')
+      if (p.includedComponents.copyright) content.push('includeCopyrights')
       if (p.includedComponents.titlePage) content.push('includeTitlePage')
-      if (p.includedComponents.toc) content.push('includeCopyrights')
+      if (p.includedComponents.toc) content.push('includeTOC')
 
       return {
         format: p.format,
@@ -546,6 +561,8 @@ const PreviewerPage = () => {
         synced: luluProfile ? luluProfile.inSync : null,
         template: p.templateId,
         value: p.id,
+        // Require that p.isbn is a valid option from podMetadata.isbns
+        isbn: p.isbn && isbns.find(i => i.isbn === p.isbn) ? p.isbn : null,
       }
     })
 
@@ -555,11 +572,12 @@ const PreviewerPage = () => {
     book?.getBook.divisions.find(d => d.label === 'Body').bookComponents
       .length > 0
 
-  const isOwnerOrAdmin = isAdmin(currentUser) || isOwner(bookId, currentUser)
-  const canModify = hasEditAccess(bookId, currentUser)
+  const userIsOwner = isOwner(bookId, currentUser)
+  const userIsAdmin = isAdmin(currentUser)
 
   const isDownloadButtonDisabled =
-    !canModify || (!hasContent && currentOptions.format === 'epub')
+    !hasEditAccess(bookId, currentUser) ||
+    (!hasContent && currentOptions.format === 'epub')
   // #endregion data wrangling
 
   if (templatesLoading || profilesLoading || !currentUser || paramsLoading) {
@@ -568,12 +586,15 @@ const PreviewerPage = () => {
 
   return (
     <Preview
+      canModify={userIsOwner || userIsAdmin}
+      canUploadToProvider={userIsOwner}
       connectToLulu={handleConnectToLulu}
       createProfile={handleCreateProfile}
       currentOptions={currentOptions}
       defaultProfile={defaultProfileWithTemplate}
       deleteProfile={handleDeleteProfile}
       download={handleDownload}
+      isbns={isbns}
       isDownloadButtonDisabled={isDownloadButtonDisabled}
       isUserConnectedToLulu={isUserConnectedToLulu}
       loadingExport={false}
@@ -585,7 +606,6 @@ const PreviewerPage = () => {
       renameProfile={handleRenameProfile}
       selectedProfile={selectedProfile}
       sendToLulu={handleSendToLulu}
-      showFooter={isOwnerOrAdmin}
       templates={templates}
       updateProfileOptions={handleUpdateProfileOptions}
     />
