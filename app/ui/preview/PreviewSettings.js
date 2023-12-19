@@ -130,6 +130,7 @@ const PreviewSettings = props => {
   return (
     <Wrapper>
       <ProfileRow
+        canModifyProfiles={canModify}
         isCollapsed={isCollapsed}
         isNewProfileSelected={isNewProfileSelected}
         onClickCollapse={handleClickCollapse}
@@ -141,7 +142,9 @@ const PreviewSettings = props => {
 
       {!isCollapsed && (
         <>
-          <Ribbon hide={!hasChanges}>You have unsaved changes</Ribbon>
+          <Ribbon hide={!hasChanges || !canModify}>
+            You have unsaved changes
+          </Ribbon>
 
           <ExportOptionsSection
             disabled={optionsDisabled}
@@ -179,7 +182,9 @@ const PreviewSettings = props => {
             isDownloadButtonDisabled={isDownloadButtonDisabled}
             isNewProfileSelected={isNewProfileSelected}
             isSaveDisabled={
-              loadingPreview || (!isNewProfileSelected && !hasChanges)
+              !canModify ||
+              loadingPreview ||
+              (!isNewProfileSelected && !hasChanges)
             }
             loadingPreview={loadingPreview}
             onClickDelete={deleteProfile}

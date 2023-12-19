@@ -74,7 +74,7 @@ const ISBNList = ({ canChangeMetadata, name }) => {
                   rules={[
                     {
                       validator: (_, value) => {
-                        const trimmedValue = value.trim()
+                        const trimmedValue = value?.trim() || ''
 
                         if (fields.length > 1 && trimmedValue === '') {
                           return Promise.reject(
@@ -103,7 +103,7 @@ const ISBNList = ({ canChangeMetadata, name }) => {
                   rules={[
                     {
                       validator: (_, value) => {
-                        const trimmedValue = value.trim()
+                        const trimmedValue = value?.trim() || ''
 
                         if (!trimmedValue) {
                           return Promise.reject(new Error('ISBN is required'))

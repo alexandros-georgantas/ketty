@@ -135,11 +135,14 @@ const PreviewerPage = () => {
     APPLICATION_PARAMETERS,
   )
 
-  const [getPagedLink] = useLazyQuery(GET_PAGED_PREVIEWER_LINK, {
-    onCompleted: ({ getPagedPreviewerLink: { link } }) => {
-      setPreviewLink(link)
+  const [getPagedLink, { loading: previewIsLoading }] = useLazyQuery(
+    GET_PAGED_PREVIEWER_LINK,
+    {
+      onCompleted: ({ getPagedPreviewerLink: { link } }) => {
+        setPreviewLink(link)
+      },
     },
-  })
+  )
 
   const [createPreview, { called: createPreviewCalled }] = useMutation(
     EXPORT_BOOK,
@@ -405,7 +408,7 @@ const PreviewerPage = () => {
       spread: options.spread,
     })
 
-    if (target === 'pagedjs') {
+    if (target === 'pagedjs' && !previewIsLoading) {
       createPreview({
         variables: {
           input: previewData,
@@ -540,9 +543,9 @@ const PreviewerPage = () => {
 
       const content = []
 
-      if (p.includedComponents.copyright) content.push('includeTOC')
+      if (p.includedComponents.copyright) content.push('includeCopyrights')
       if (p.includedComponents.titlePage) content.push('includeTitlePage')
-      if (p.includedComponents.toc) content.push('includeCopyrights')
+      if (p.includedComponents.toc) content.push('includeTOC')
 
       return {
         format: p.format,
