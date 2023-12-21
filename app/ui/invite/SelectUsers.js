@@ -32,19 +32,19 @@ const SelectUsers = ({
 
   const processFirstSearch = v => {
     // Split values into the current search and the remaining unparsed searches
-    const [currentSearch, unparsed] = v.trimLeft().split(/\s+/g, 2)
+    const [firstSearch, unparsed] = v.trimLeft().split(/\s+/g, 2)
 
     // IF "unparsed" is defined, a search has been triggered:
-    // The user hit space or enter OR currentSearch is an email like string
+    // The user hit space or enter OR firstSearch is an email like string
     if (unparsed !== undefined) {
       // This function clears the first search once it has been processed
       const removeFirstSearch = () =>
-        setUnparsedSearch(` ${v.slice(currentSearch.length).trimLeft()}`)
+        setUnparsedSearch(` ${v.slice(firstSearch.length).trimLeft()}`)
 
       fetchRef.current += 1
       const fetchId = fetchRef.current
       setFetching(true)
-      fetchOptions(currentSearch).then(newOptions => {
+      fetchOptions(firstSearch).then(newOptions => {
         if (fetchId !== fetchRef.current) {
           // for fetch callback order
           return
@@ -68,6 +68,10 @@ const SelectUsers = ({
             onChange([...value, userOptions[0]])
             value.push(userOptions[0])
             noResultsSetter(false)
+            removeFirstSearch()
+          } else if (unparsed.trim()) {
+            // User is starting a new search item and the current item is a
+            // duplicate
             removeFirstSearch()
           }
         }
