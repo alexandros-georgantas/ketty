@@ -1,8 +1,10 @@
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import PropTypes from 'prop-types'
-import debounce from 'lodash/debounce'
+import find from 'lodash/find'
 import styled from 'styled-components'
 import { Spin, Select } from '../common'
+
+const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
 
 const StyledSelect = styled(Select)`
   &.ant-select {
@@ -12,23 +14,37 @@ const StyledSelect = styled(Select)`
 
 const SelectUsers = ({
   fetchOptions,
-  debounceTimeout,
   value,
   onChange,
   noResultsSetter,
   canChangeAccess,
 }) => {
+  const [unparsedSearch, setUnparsedSearch] = useState(null)
   const [fetching, setFetching] = useState(false)
   const [options, setOptions] = useState([])
   const fetchRef = useRef(0)
+  const additionalSelectProps = {}
 
-  const debounceFetcher = useMemo(() => {
-    const loadOptions = v => {
+  if (unparsedSearch !== null) {
+    // The first item in the search text has been auto selected
+    // Reset the search value to reflect the remaining (unparsed) items
+    additionalSelectProps.searchValue = unparsedSearch
+  }
+
+  const loadOptions = v => {
+    // Split values on whitespace; the last value is incomplete OR ''
+    const values = v.trimLeft().split(/\s+/g, 2)
+
+    if (values.length > 1) {
+      // Multiple values imply that the user hit space or enter OR that an email
+      // like string was detected; in each of these cases, "v" will have an
+      // appended whitespace character
+      const currentSearch = values[0]
       fetchRef.current += 1
       const fetchId = fetchRef.current
       setOptions([])
       setFetching(true)
-      fetchOptions(v.trim()).then(newOptions => {
+      fetchOptions(currentSearch).then(newOptions => {
         if (fetchId !== fetchRef.current) {
           // for fetch callback order
           return
@@ -43,38 +59,67 @@ const SelectUsers = ({
           noResultsSetter(true)
         }
 
-        setOptions(userOptions)
+        if (userOptions.length === 1 && userOptions[0].value) {
+          // Exact match of the search email
+          const alreadyAdded = find(value, { value: userOptions[0].value })
+
+          if (!alreadyAdded) {
+            onChange([
+              ...value,
+              { ...userOptions[0], key: userOptions[0].value },
+            ])
+            value.push({ ...userOptions[0], key: userOptions[0].value })
+            setOptions([])
+            noResultsSetter(false)
+            setUnparsedSearch(` ${v.slice(currentSearch.length).trimLeft()}`)
+          }
+        } else {
+          setOptions(userOptions)
+        }
+
         setFetching(false)
       })
     }
-
-    return debounce(loadOptions, debounceTimeout)
-  }, [fetchOptions, debounceTimeout, value])
+  }
 
   return (
     <StyledSelect
+      {...additionalSelectProps}
       disabled={!canChangeAccess}
       filterOption={false}
       labelInValue
       mode="multiple"
       notFoundContent={fetching ? <Spin spinning /> : null}
-      onChange={newValue => {
-        onChange(newValue)
-
-        if (newValue.length === 0) {
-          setOptions([])
-          noResultsSetter(true)
-        } else {
-          noResultsSetter(false)
-        }
-      }}
       onDropdownVisibleChange={open => {
         if (!open && value.length === 0) {
           setOptions([])
           noResultsSetter(true)
         }
       }}
-      onSearch={debounceFetcher}
+      onInputKeyDown={e => {
+        if (e.keyCode === 13 || e.key === 'Enter') {
+          // When user hits enter, try to load the current search item
+          loadOptions(`${e.target.value} `)
+          return
+        }
+
+        const values = e.target.value.trimLeft().split(/\s+/g, 2)
+
+        if (values.length === 1) {
+          // Search contains exactly one value and no partial search
+          if (values[0].search(emailRegex) === 0) {
+            // When the current search term looks like an email, try to load it
+            loadOptions(`${values[0]}${e.key} `)
+            return
+          }
+        }
+
+        // The user is beginning a new search; clear the value of
+        // "unparsedSearch" so that they can continue typing
+        // If this value is not cleared, all keystrokes are blocked
+        setUnparsedSearch(null)
+      }}
+      onSearch={loadOptions}
       options={options}
       placeholder="Email, comma separated"
       value={value}
@@ -84,7 +129,6 @@ const SelectUsers = ({
 
 SelectUsers.propTypes = {
   fetchOptions: PropTypes.func.isRequired,
-  debounceTimeout: PropTypes.number,
   noResultsSetter: PropTypes.func.isRequired,
   value: PropTypes.arrayOf(
     PropTypes.shape({
@@ -100,7 +144,6 @@ SelectUsers.propTypes = {
 }
 
 SelectUsers.defaultProps = {
-  debounceTimeout: 800,
   value: [],
   onChange: () => {},
 }
