@@ -21,7 +21,6 @@ const SelectUsers = ({
 }) => {
   const [unparsedSearch, setUnparsedSearch] = useState(null)
   const [fetching, setFetching] = useState(false)
-  const [options, setOptions] = useState([])
   const fetchRef = useRef(0)
   const additionalSelectProps = {}
 
@@ -31,18 +30,19 @@ const SelectUsers = ({
     additionalSelectProps.searchValue = unparsedSearch
   }
 
-  const loadOptions = v => {
-    // Split values on whitespace; the last value is incomplete OR ''
-    const values = v.trimLeft().split(/\s+/g, 2)
+  const processFirstSearch = v => {
+    // Split values into the current search and the remaining unparsed searches
+    const [currentSearch, unparsed] = v.trimLeft().split(/\s+/g, 2)
 
-    if (values.length > 1) {
-      // Multiple values imply that the user hit space or enter OR that an email
-      // like string was detected; in each of these cases, "v" will have an
-      // appended whitespace character
-      const currentSearch = values[0]
+    // IF "unparsed" is defined, a search has been triggered:
+    // The user hit space or enter OR currentSearch is an email like string
+    if (unparsed !== undefined) {
+      // This function clears the first search once it has been processed
+      const removeFirstSearch = () =>
+        setUnparsedSearch(` ${v.slice(currentSearch.length).trimLeft()}`)
+
       fetchRef.current += 1
       const fetchId = fetchRef.current
-      setOptions([])
       setFetching(true)
       fetchOptions(currentSearch).then(newOptions => {
         if (fetchId !== fetchRef.current) {
@@ -53,6 +53,7 @@ const SelectUsers = ({
         const userOptions = newOptions.map(user => ({
           label: user.displayName,
           value: user.id,
+          key: user.id,
         }))
 
         if (userOptions.length === 0 && value.length === 0) {
@@ -64,17 +65,17 @@ const SelectUsers = ({
           const alreadyAdded = find(value, { value: userOptions[0].value })
 
           if (!alreadyAdded) {
-            onChange([
-              ...value,
-              { ...userOptions[0], key: userOptions[0].value },
-            ])
-            value.push({ ...userOptions[0], key: userOptions[0].value })
-            setOptions([])
+            onChange([...value, userOptions[0]])
+            value.push(userOptions[0])
             noResultsSetter(false)
-            setUnparsedSearch(` ${v.slice(currentSearch.length).trimLeft()}`)
+            removeFirstSearch()
           }
-        } else {
-          setOptions(userOptions)
+        }
+
+        if (userOptions.length === 0 && unparsed.trim()) {
+          // The first search item has no matches AND there is a second item
+          // waiting to be processed; clear the first search item
+          removeFirstSearch()
         }
 
         setFetching(false)
@@ -92,14 +93,13 @@ const SelectUsers = ({
       notFoundContent={fetching ? <Spin spinning /> : null}
       onDropdownVisibleChange={open => {
         if (!open && value.length === 0) {
-          setOptions([])
           noResultsSetter(true)
         }
       }}
       onInputKeyDown={e => {
         if (e.keyCode === 13 || e.key === 'Enter') {
           // When user hits enter, try to load the current search item
-          loadOptions(`${e.target.value} `)
+          processFirstSearch(`${e.target.value} `)
           return
         }
 
@@ -109,7 +109,7 @@ const SelectUsers = ({
           // Search contains exactly one value and no partial search
           if (values[0].search(emailRegex) === 0) {
             // When the current search term looks like an email, try to load it
-            loadOptions(`${values[0]}${e.key} `)
+            processFirstSearch(`${values[0]}${e.key} `)
             return
           }
         }
@@ -119,8 +119,7 @@ const SelectUsers = ({
         // If this value is not cleared, all keystrokes are blocked
         setUnparsedSearch(null)
       }}
-      onSearch={loadOptions}
-      options={options}
+      onSearch={processFirstSearch}
       placeholder="Email, comma separated"
       value={value}
     />
