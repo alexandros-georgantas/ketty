@@ -91,6 +91,15 @@ const SelectUsers = ({
       labelInValue
       mode="multiple"
       notFoundContent={fetching ? <Spin spinning /> : null}
+      onChange={newValue => {
+        onChange(newValue)
+
+        if (newValue.length === 0) {
+          noResultsSetter(true)
+        } else {
+          noResultsSetter(false)
+        }
+      }}
       onDropdownVisibleChange={open => {
         if (!open && value.length === 0) {
           noResultsSetter(true)
