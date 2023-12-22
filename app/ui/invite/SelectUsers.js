@@ -19,72 +19,65 @@ const SelectUsers = ({
   noResultsSetter,
   canChangeAccess,
 }) => {
-  const [unparsedSearch, setUnparsedSearch] = useState(null)
+  const [unresolvedSearch, setUnresolvedSearch] = useState(null)
   const [fetching, setFetching] = useState(false)
   const fetchRef = useRef(0)
   const additionalSelectProps = {}
 
-  if (unparsedSearch !== null) {
-    // The first item in the search text has been auto selected
-    // Reset the search value to reflect the remaining (unparsed) items
-    additionalSelectProps.searchValue = unparsedSearch
+  if (unresolvedSearch !== null) {
+    // The last item in the search text has been auto selected
+    // Reset the search value to reflect the remaining (unresolved) items
+    additionalSelectProps.searchValue = unresolvedSearch
   }
 
-  const processFirstSearch = v => {
-    // Split values into the current search and the remaining unparsed searches
-    const [firstSearch, unparsed] = v.trimLeft().split(/\s+/g, 2)
+  const processLastSearch = searchString => {
+    // Split values into the last search and previous unresolved searches
+    const searchStrings = searchString.trim().split(/\s+/g)
 
-    // IF "unparsed" is defined, a search has been triggered:
-    // The user hit space or enter OR firstSearch is an email like string
-    if (unparsed !== undefined) {
-      // This function clears the first search once it has been processed
-      const removeFirstSearch = () =>
-        setUnparsedSearch(` ${v.slice(firstSearch.length).trimLeft()}`)
+    // Lookup only the most recently entered search
+    const lastSearch = searchStrings[searchStrings.length - 1]
 
-      fetchRef.current += 1
-      const fetchId = fetchRef.current
-      setFetching(true)
-      fetchOptions(firstSearch).then(newOptions => {
-        if (fetchId !== fetchRef.current) {
-          // for fetch callback order
-          return
+    // This function clears the last search once it has been processed
+    const removeLastSearch = () =>
+      setUnresolvedSearch(
+        ` ${searchString
+          .slice(0, searchString.length - lastSearch.length)
+          .trim()} `,
+      )
+
+    fetchRef.current += 1
+    const fetchId = fetchRef.current
+    setFetching(true)
+    fetchOptions(lastSearch).then(newOptions => {
+      if (fetchId !== fetchRef.current) {
+        // for fetch callback order
+        return
+      }
+
+      const userOptions = newOptions.map(user => ({
+        label: user.displayName,
+        value: user.id,
+        key: user.id,
+      }))
+
+      if (userOptions.length === 0 && value.length === 0) {
+        noResultsSetter(true)
+      }
+
+      if (userOptions.length === 1 && userOptions[0].value) {
+        // Exact match of the search email
+        const alreadyAdded = find(value, { value: userOptions[0].value })
+
+        if (!alreadyAdded) {
+          onChange([...value, userOptions[0]])
+          value.push(userOptions[0])
+          noResultsSetter(false)
+          removeLastSearch()
         }
+      }
 
-        const userOptions = newOptions.map(user => ({
-          label: user.displayName,
-          value: user.id,
-          key: user.id,
-        }))
-
-        if (userOptions.length === 0 && value.length === 0) {
-          noResultsSetter(true)
-        }
-
-        if (userOptions.length === 1 && userOptions[0].value) {
-          // Exact match of the search email
-          const alreadyAdded = find(value, { value: userOptions[0].value })
-
-          if (!alreadyAdded) {
-            onChange([...value, userOptions[0]])
-            value.push(userOptions[0])
-            noResultsSetter(false)
-            removeFirstSearch()
-          } else if (unparsed.trim()) {
-            // User is starting a new search item and the current item is a
-            // duplicate
-            removeFirstSearch()
-          }
-        }
-
-        if (userOptions.length === 0 && unparsed.trim()) {
-          // The first search item has no matches AND there is a second item
-          // waiting to be processed; clear the first search item
-          removeFirstSearch()
-        }
-
-        setFetching(false)
-      })
-    }
+      setFetching(false)
+    })
   }
 
   return (
@@ -110,29 +103,66 @@ const SelectUsers = ({
         }
       }}
       onInputKeyDown={e => {
-        if (e.keyCode === 13 || e.key === 'Enter') {
-          // When user hits enter, try to load the current search item
-          processFirstSearch(`${e.target.value} `)
-          return
-        }
+        // Do nothing if there is no search text
+        const trimmedSearch = e.target.value.trim()
 
-        const values = e.target.value.trimLeft().split(/\s+/g, 2)
-
-        if (values.length === 1) {
-          // Search contains exactly one value and no partial search
-          if (values[0].search(emailRegex) === 0) {
-            // When the current search term looks like an email, try to load it
-            processFirstSearch(`${values[0]}${e.key} `)
+        if (trimmedSearch) {
+          // If user hits enter: process the last search
+          if (e.keyCode === 13 || e.key === 'Enter') {
+            processLastSearch(trimmedSearch)
             return
+          }
+
+          // If user hits space (cursor after search): process the last search
+          const isWhiteSpace = !e.key.trim()
+
+          const isCursorAfterSearches =
+            e.target.selectionStart >= e.target.value.trimRight().length
+
+          if (isWhiteSpace && isCursorAfterSearches) {
+            processLastSearch(trimmedSearch)
+            return
+          }
+
+          // If last search looks like email address, process it
+          // Ignore control keys (eg: alt, back, ctrl, delete etc)
+          if (e.keyCode > 40 && isCursorAfterSearches) {
+            const searchString = [
+              e.target.value.slice(0, e.target.selectionStart),
+              e.key,
+              e.target.value.slice(e.target.selectionStart),
+            ].join('')
+
+            const values = searchString.split(/\s+/g)
+
+            if (
+              values.length &&
+              values[values.length - 1].search(emailRegex) === 0
+            ) {
+              processLastSearch(searchString)
+              return
+            }
           }
         }
 
-        // The user is beginning a new search; clear the value of
-        // "unparsedSearch" so that they can continue typing
-        // If this value is not cleared, all keystrokes are blocked
-        setUnparsedSearch(null)
+        // The user is beginning or updating a search; clear the value of
+        // "unresolvedSearch" so that they can continue typing
+        // If this value is not set to null, all keystrokes are blocked
+        setUnresolvedSearch(null)
       }}
-      onSearch={processFirstSearch}
+      onSearch={searchString => {
+        /* const values = searchString.trim().split(/\s+/g)
+
+        if (
+          values.length &&
+          values[values.length - 1].search(emailRegex) === 0
+        ) {
+          // TODO - if you need to edit the email after a typo, this could
+          // trigger a search per input character. Restore debounce?
+          processLastSearch(searchString.trim())
+          return
+        } */
+      }}
       placeholder="Email, comma separated"
       value={value}
     />
