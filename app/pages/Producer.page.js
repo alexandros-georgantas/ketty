@@ -127,7 +127,9 @@ const ProducerPage = () => {
       fetchPolicy: 'network-only',
       skip: !selectedChapterId,
       variables: { id: selectedChapterId },
-      onError: () => showGenericErrorModal(),
+      onError: () => {
+        if (!reconnecting) showGenericErrorModal()
+      },
     },
   )
 
@@ -177,9 +179,7 @@ const ProducerPage = () => {
     onError: err => {
       if (err.toString().includes('Not Authorised')) {
         showUnauthorizedActionModal(false)
-      } else {
-        showGenericErrorModal()
-      }
+      } else if (!reconnecting) showGenericErrorModal()
     },
   })
 
@@ -190,9 +190,7 @@ const ProducerPage = () => {
     onError: err => {
       if (err.toString().includes('Not Authorised')) {
         showUnauthorizedActionModal(false)
-      } else {
-        showGenericErrorModal()
-      }
+      } else if (!reconnecting) showGenericErrorModal()
     },
   })
 
@@ -200,9 +198,7 @@ const ProducerPage = () => {
     onError: err => {
       if (err.toString().includes('Not Authorised')) {
         showUnauthorizedActionModal(false)
-      } else {
-        showGenericErrorModal()
-      }
+      } else if (!reconnecting) showGenericErrorModal()
     },
   })
 
@@ -210,9 +206,7 @@ const ProducerPage = () => {
     onError: err => {
       if (err.toString().includes('Not Authorised')) {
         showUnauthorizedActionModal(false)
-      } else {
-        showGenericErrorModal()
-      }
+      } else if (!reconnecting) showGenericErrorModal()
     },
   })
 
@@ -222,9 +216,7 @@ const ProducerPage = () => {
       onError: err => {
         if (err.toString().includes('Not Authorised')) {
           showUnauthorizedActionModal(false)
-        } else {
-          showGenericErrorModal()
-        }
+        } else if (!reconnecting) showGenericErrorModal()
       },
     })
 
@@ -233,9 +225,7 @@ const ProducerPage = () => {
     onError: err => {
       if (err.toString().includes('Not Authorised')) {
         showUnauthorizedActionModal(false)
-      } else {
-        showGenericErrorModal()
-      }
+      } else if (!reconnecting) showGenericErrorModal()
     },
   })
 
@@ -253,9 +243,7 @@ const ProducerPage = () => {
       onError: err => {
         if (err.toString().includes('Not Authorised')) {
           showUnauthorizedActionModal(false)
-        } else {
-          showGenericErrorModal()
-        }
+        } else if (!reconnecting) showGenericErrorModal()
       },
     })
 
@@ -265,9 +253,7 @@ const ProducerPage = () => {
       onError: err => {
         if (err.toString().includes('Not Authorised')) {
           showUnauthorizedActionModal(false)
-        } else {
-          showGenericErrorModal()
-        }
+        } else if (!reconnecting) showGenericErrorModal()
       },
     })
 
@@ -278,9 +264,7 @@ const ProducerPage = () => {
       onError: err => {
         if (err.toString().includes('Not Authorised')) {
           showUnauthorizedActionModal(false)
-        } else {
-          showGenericErrorModal()
-        }
+        } else if (!reconnecting) showGenericErrorModal()
       },
     },
   )
@@ -289,9 +273,7 @@ const ProducerPage = () => {
     onError: err => {
       if (err.toString().includes('Not Authorised')) {
         showUnauthorizedActionModal(false)
-      } else {
-        showGenericErrorModal()
-      }
+      } else if (!reconnecting) showGenericErrorModal()
     },
   })
 
@@ -693,7 +675,7 @@ const ProducerPage = () => {
   )
 
   // WEBSOCKET SECTION START
-  const { getWebSocket } = useWebSocket(
+  useWebSocket(
     `${webSocketServerUrl}/locks`,
     {
       onOpen: () => {
@@ -705,31 +687,33 @@ const ProducerPage = () => {
           if (reconnecting) {
             setReconnecting(false)
             refetchBook().then(({ data }) => {
-              const { getBook } = data
+              // const { getBook } = data
+              setSelectedChapterId(undefined)
+              // if (selectedChapterId) {
+              //   const found = find(getBook.divisions[1].bookComponents, {
+              //     id: selectedChapterId,
+              //   })
 
-              if (selectedChapterId) {
-                const found = find(getBook.divisions[1].bookComponents, {
-                  id: selectedChapterId,
-                })
+              //   const currentEditorMode =
+              //     calculateEditorMode(
+              //       found.lock,
+              //       canModify,
+              //       currentUser,
+              //       tabId,
+              //     ) !== 'preview'
 
-                const currentEditorMode =
-                  calculateEditorMode(
-                    found.lock,
-                    canModify,
-                    currentUser,
-                    tabId,
-                  ) !== 'preview'
+              //   if (currentEditorMode && currentEditorMode !== 'preview') {
+              //     onBookComponentLock()
+              //   } else {
+              //     const currentWS = getWebSocket()
 
-                if (currentEditorMode && currentEditorMode !== 'preview') {
-                  onBookComponentLock()
-                } else {
-                  const currentWS = getWebSocket()
+              //     if (currentWS) {
+              //       currentWS.close()
+              //     }
+              //   }
+              // }
 
-                  if (currentWS) {
-                    currentWS.close()
-                  }
-                }
-              }
+              // console.log('here', issueInCommunicationModal)
 
               if (issueInCommunicationModal) {
                 issueInCommunicationModal.destroy()
@@ -756,7 +740,7 @@ const ProducerPage = () => {
         bookComponentId: selectedChapterId,
         tabId,
       },
-      share: false,
+      share: true,
       reconnectAttempts: 5000,
       reconnectInterval: (heartbeatInterval?.config || 5000) + 500,
     },
