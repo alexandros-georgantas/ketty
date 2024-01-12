@@ -16,7 +16,7 @@ import {
   AskAiContentService,
 } from 'wax-prosemirror-services'
 
-import { TablesService, columnResizing } from 'wax-table-service'
+import { TablesService, tableEditing, columnResizing } from 'wax-table-service'
 
 import charactersList from './charactersList'
 
@@ -53,6 +53,7 @@ export default {
   SpecialCharactersService: charactersList,
   PmPlugins: [
     columnResizing(),
+    tableEditing(),
     disallowPasteImagesPlugin(() =>
       onInfoModal(
         `Pasting external images is not supported. Please use platform's Asset Manager infrastructure`,
