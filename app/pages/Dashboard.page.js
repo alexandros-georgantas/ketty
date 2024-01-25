@@ -2,7 +2,10 @@ import React, { useState } from 'react'
 import { useQuery, useMutation, useSubscription } from '@apollo/client'
 import { useHistory } from 'react-router-dom'
 import { useCurrentUser } from '@coko/client'
-import { USER_UPDATED_SUBSCRIPTION } from '@coko/client/dist/helpers/currentUserQuery'
+import {
+  USER_UPDATED_SUBSCRIPTION,
+  CURRENT_USER,
+} from '@coko/client/dist/helpers/currentUserQuery'
 import {
   GET_BOOKS,
   CREATE_BOOK,
@@ -152,6 +155,9 @@ const DashboardPage = () => {
           },
         },
       },
+      {
+        query: CURRENT_USER,
+      },
     ],
     awaitRefetchQueries: true,
     onError: () => {
@@ -174,6 +180,9 @@ const DashboardPage = () => {
             pageSize: booksPerPage,
           },
         },
+      },
+      {
+        query: CURRENT_USER,
       },
     ],
     awaitRefetchQueries: true,
@@ -220,6 +229,7 @@ const DashboardPage = () => {
       const { data } = res
       const { createBook: createBookData } = data
       const { id } = createBookData
+
       history.push(`/books/${id}/${whereNext}`)
     })
   }
