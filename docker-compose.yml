@@ -31,12 +31,11 @@ services:
     restart: unless-stopped
     depends_on:
       - db
-      - s3
       - createbucket
-      - xsweet
+      - s3
       - epubchecker
       - pagedjs
-      - icml
+      - xsweet
     entrypoint:
       [
         'sh',
@@ -59,12 +58,6 @@ services:
         '--',
         'sh',
         'scripts/wait-for-it',
-        'http://icml:3002/healthcheck',
-        '-t',
-        '60',
-        '--',
-        'sh',
-        'scripts/wait-for-it',
         'http://pagedjs:3003/healthcheck',
         '-t',
         '60',
@@ -76,7 +69,7 @@ services:
         '60',
         '--',
         'sh',
-        'scripts/setupDevServer.sh',
+        'scripts/setupDevServerKetida2.sh',
       ]
     command: ['node', 'startServer.js']
     ports:
@@ -84,7 +77,6 @@ services:
       - ${WS_SERVER_PORT:-3333}:${WS_SERVER_PORT:-3333}
     environment:
       - NODE_ENV=development
-      - SERVER_IDENTIFIER=${SERVER_IDENTIFIER:-0a3cf3f0-98b6-11ed-87cd-0800200c9a66}
       - KETIDA_FLAVOUR=${KETIDA_FLAVOUR:-POD}
       - PUBSWEET_SECRET=${PUBSWEET_SECRET:-dev_secret}
       - SERVER_URL=${SERVER_URL:-http://server:3000}
@@ -113,17 +105,15 @@ services:
       - S3_PROTOCOL=${S3_PROTOCOL:-http}
       - S3_HOST=${S3_HOST:-s3}
       - S3_PORT=${S3_PORT:-9000}
-      - S3_ACCESS_KEY_ID_ADMIN=${S3_ACCESS_KEY_ID_ADMIN:-admin}
-      - S3_SECRET_ACCESS_KEY_ADMIN=${S3_SECRET_ACCESS_KEY_ADMIN:-superSecretAdminPassword}
       - S3_ACCESS_KEY_ID_USER=${S3_ACCESS_KEY_ID_USER:-ketida}
       - S3_SECRET_ACCESS_KEY_USER=${S3_SECRET_ACCESS_KEY_USER:-superSecretUserPassword}
       - S3_BUCKET=${S3_BUCKET:-uploads}
+      # FOR THE CASE OF GCP
+      # - S3_SEPARATE_DELETE_OPERATIONS=true
+      # - S3_FORCE_PATH_STYLE=false
       - SERVICE_EPUB_CHECKER_CLIENT_ID=59a3392b-0c4f-4318-bbe2-f86eff6d3de4
       - SERVICE_EPUB_CHECKER_SECRET=asldkjLKJLaslkdf897kjhKUJH
       - SERVICE_EPUB_CHECKER_URL=${SERVICE_EPUB_CHECKER_URL:-http://epubchecker:3001}
-      - SERVICE_ICML_CLIENT_ID=59a3392b-0c4f-4318-bbe2-f86eff6d3de4
-      - SERVICE_ICML_SECRET=asldkjLKJLaslkdf897kjhKUJH
-      - SERVICE_ICML_URL=${SERVICE_ICML_URL:-http://icml:3002}
       - SERVICE_PAGEDJS_CLIENT_ID=59a3392b-0c4f-4318-bbe2-f86eff6d3de4
       - SERVICE_PAGEDJS_SECRET=asldkjLKJLaslkdf897kjhKUJH
       - SERVICE_PAGEDJS_URL=${SERVICE_PAGEDJS_URL:-http://pagedjs:3003}
@@ -133,18 +123,18 @@ services:
       - FEATURE_UPLOAD_DOCX_FILES=true
       - FEATURE_BOOK_STRUCTURE=false
       - FEATURE_POD=true
+      # - AI_ENABLED=${AI_ENABLED:-false}
+      # - CHAT_GPT_KEY=${CHAT_GPT_KEY}
       - TEMP_DIRECTORY_CRON_JOB_SCHEDULE=${TEMP_DIRECTORY_CRON_JOB_TIMING:-0 * * * *}
       - TEMP_DIRECTORY_CRON_JOB_OFFSET=${TEMP_DIRECTORY_CRON_JOB_OFFSET:-1800000}
       - TEMP_DIRECTORY_CLEAN_UP=${TEMP_DIRECTORY_CLEAN_UP:-true}
-      - AI_ENABLED=${AI_ENABLED:-false}
-      - CHAT_GPT_KEY=${CHAT_GPT_KEY}
     volumes:
       - ./config/local.js:/home/node/server/config/local.js
 
   epubchecker:
     depends_on:
       - db-epubchecker
-    image: cokoapps/epubchecker:1.2.0
+    image: cokoapps/epubchecker:latest
     ports:
       - ${SERVICE_EPUB_CHECKER_PORT:-3001}:${SERVICE_EPUB_CHECKER_PORT:-3001}
     environment:
@@ -155,6 +145,8 @@ services:
       - POSTGRES_DB=epubchecker_dev
       - POSTGRES_PORT=5432
       - SERVER_PORT=${SERVICE_EPUB_CHECKER_PORT:-3001}
+      - CLIENT_ID=59a3392b-0c4f-4318-bbe2-f86eff6d3de4
+      - CLIENT_SECRET=asldkjLKJLaslkdf897kjhKUJH
     entrypoint:
       [
         'sh',
@@ -162,40 +154,14 @@ services:
         'db-epubchecker:5432',
         '--',
         'sh',
-        'scripts/setupDevServer.sh',
-      ]
-    command: ['node', 'server/startServer.js']
-
-  icml:
-    depends_on:
-      - db-icml
-    image: cokoapps/icml:1.2.1
-    ports:
-      - ${SERVICE_ICML_PORT:-3002}:${SERVICE_ICML_PORT:-3002}
-    environment:
-      - PUBSWEET_SECRET=icml_dev_secret
-      - POSTGRES_USER=icml_user_dev
-      - POSTGRES_PASSWORD=icml_user_password
-      - POSTGRES_HOST=db-icml
-      - POSTGRES_DB=icml_dev
-      - POSTGRES_PORT=5432
-      - SERVER_PORT=${SERVICE_ICML_PORT:-3002}
-      - NODE_ENV=development
-    entrypoint:
-      [
-        'sh',
-        'scripts/wait-for-it',
-        'db-icml:5432',
-        '--',
-        'sh',
-        'scripts/setupDevServer.sh',
+        'scripts/setupProdServer.sh',
       ]
     command: ['node', 'server/startServer.js']
 
   pagedjs:
     depends_on:
       - db-pagedjs
-    image: cokoapps/pagedjs:1.6.9
+    image: cokoapps/pagedjs:latest
     ports:
       - ${SERVICE_PAGEDJS_PORT:-3003}:${SERVICE_PAGEDJS_PORT:-3003}
     environment:
@@ -206,8 +172,9 @@ services:
       - POSTGRES_DB=pagedjs_dev
       - POSTGRES_PORT=5432
       - SERVER_PORT=${SERVICE_PAGEDJS_PORT:-3003}
-      - NODE_ENV=development
       - PUBLIC_URL=${PAGEDJS_PUBLIC_URL:-http://localhost:3003}
+      - CLIENT_ID=59a3392b-0c4f-4318-bbe2-f86eff6d3de4
+      - CLIENT_SECRET=asldkjLKJLaslkdf897kjhKUJH
     security_opt:
       - seccomp:unconfined
     entrypoint:
@@ -219,14 +186,13 @@ services:
         'db-pagedjs:5432',
         '--',
         'sh',
-        'scripts/setupDevServer.sh',
+        'scripts/setupProdServer.sh',
       ]
-    command: ['node', 'server/startServer.js']
 
   xsweet:
     depends_on:
       - db-xsweet
-    image: cokoapps/xsweet:2.2.1
+    image: cokoapps/xsweet:2.2.3
     ports:
       - ${SERVICE_XSWEET_PORT:-3004}:${SERVICE_XSWEET_PORT:-3004}
     environment:
@@ -237,7 +203,8 @@ services:
       - POSTGRES_DB=xsweet_dev
       - POSTGRES_PORT=5432
       - SERVER_PORT=${SERVICE_XSWEET_PORT:-3004}
-      - NODE_ENV=development
+      - CLIENT_ID=59a3392b-0c4f-4318-bbe2-f86eff6d3de4
+      - CLIENT_SECRET=asldkjLKJLaslkdf897kjhKUJH
     entrypoint:
       [
         'sh',
@@ -245,7 +212,7 @@ services:
         'db-xsweet:5432',
         '--',
         'sh',
-        'scripts/setupDevServer.sh',
+        'scripts/setupProdServer.sh',
       ]
     command: ['node', 'server/startServer.js']
 
@@ -269,15 +236,6 @@ services:
     volumes:
       - ./scripts/init-pgboss.sql:/docker-entrypoint-initdb.d/init-pgboss.sql
 
-  db-icml:
-    image: postgres:14.4-alpine
-    environment:
-      - POSTGRES_USER=icml_user_dev
-      - POSTGRES_DB=icml_dev
-      - POSTGRES_PASSWORD=icml_user_password
-    volumes:
-      - ./scripts/init-pgboss.sql:/docker-entrypoint-initdb.d/init-pgboss.sql
-
   db-pagedjs:
     image: postgres:14.4-alpine
     environment:
@@ -297,7 +255,7 @@ services:
       - ./scripts/init-pgboss.sql:/docker-entrypoint-initdb.d/init-pgboss.sql
 
   s3:
-    image: minio/minio:RELEASE.2022-05-26T05-48-41Z
+    image: minio/minio:RELEASE.2023-12-07T04-16-00Z
     ports:
       - ${S3_PORT:-9000}:9000
       - ${MINIO_CONSOLE_PORT:-9001}:9001
@@ -307,19 +265,12 @@ services:
       - MINIO_ROOT_USER=${S3_ACCESS_KEY_ID_ADMIN:-admin}
       - MINIO_ROOT_PASSWORD=${S3_SECRET_ACCESS_KEY_ADMIN:-superSecretAdminPassword}
     command: server --console-address ":9001" /data
-    healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
-      interval: 0.5s
-      timeout: 20s
-      retries: 30
 
   createbucket:
-    image: minio/mc:RELEASE.2022-05-09T04-08-26Z
+    image: minio/mc:RELEASE.2023-12-02T11-24-10Z
     depends_on:
-      s3:
-        condition: service_healthy
+      - s3
     entrypoint: >
-      /bin/sh -c " /usr/bin/mc config host add ketida ${S3_PROTOCOL:-http}://${S3_HOST:-s3}:${S3_PORT:-9000} ${S3_ACCESS_KEY_ID_ADMIN:-admin} ${S3_SECRET_ACCESS_KEY_ADMIN:-superSecretAdminPassword}; /usr/bin/mc admin user add ketida/ ${S3_ACCESS_KEY_ID_USER:-ketida} ${S3_SECRET_ACCESS_KEY_USER:-superSecretUserPassword}; /usr/bin/mc admin user enable ketida/ ${S3_ACCESS_KEY_ID_USER:-ketida}; /usr/bin/mc mb ketida/${S3_BUCKET:-uploads}; /usr/bin/mc admin policy set ketida/ readwrite user=${S3_ACCESS_KEY_ID_USER:-ketida}; exit 0; "
-
+      /bin/sh -c " /usr/bin/mc config host add ketida ${S3_PROTOCOL:-http}://${S3_HOST:-s3}:${S3_PORT:-9000} ${S3_ACCESS_KEY_ID_ADMIN:-admin} ${S3_SECRET_ACCESS_KEY_ADMIN:-superSecretAdminPassword}; /usr/bin/mc admin user add ketida/ ${S3_ACCESS_KEY_ID_USER:-ketida} ${S3_SECRET_ACCESS_KEY_USER:-superSecretUserPassword}; /usr/bin/mc admin user enable ketida/ ${S3_ACCESS_KEY_ID_USER:-ketida}; /usr/bin/mc mb ketida/${S3_BUCKET:-uploads}; /usr/bin/mc admin policy attach ketida readwrite --user ${S3_ACCESS_KEY_ID_USER:-ketida}; exit 0; "
 volumes:
   minio_storage:
