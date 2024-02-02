@@ -360,7 +360,11 @@ const ProducerPage = () => {
     if (found) {
       const { lock } = found
 
-      if (lock && lock.userId !== currentUser.id) {
+      if (
+        lock &&
+        !isOwner(bookId, currentUser) &&
+        lock.userId !== currentUser.id
+      ) {
         showUnauthorizedActionModal(false)
         return
       }
