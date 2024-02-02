@@ -129,6 +129,7 @@ services:
       - TEMP_DIRECTORY_CRON_JOB_OFFSET=${TEMP_DIRECTORY_CRON_JOB_OFFSET:-1800000}
       - TEMP_DIRECTORY_CLEAN_UP=${TEMP_DIRECTORY_CLEAN_UP:-true}
     volumes:
+      - ./config/development.js:/home/node/server/config/development.js
       - ./config/local.js:/home/node/server/config/local.js
 
   epubchecker:
