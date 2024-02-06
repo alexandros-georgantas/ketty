@@ -6,6 +6,7 @@ import {
   USER_UPDATED_SUBSCRIPTION,
   CURRENT_USER,
 } from '@coko/client/dist/helpers/currentUserQuery'
+
 import {
   GET_BOOKS,
   CREATE_BOOK,
@@ -142,6 +143,9 @@ const DashboardPage = () => {
   const [createBook] = useMutation(CREATE_BOOK, {
     refetchQueries: [
       {
+        query: CURRENT_USER,
+      },
+      {
         query: GET_BOOKS,
         variables: {
           options: {
@@ -154,9 +158,6 @@ const DashboardPage = () => {
             pageSize: booksPerPage,
           },
         },
-      },
-      {
-        query: CURRENT_USER,
       },
     ],
     awaitRefetchQueries: true,
@@ -168,6 +169,9 @@ const DashboardPage = () => {
   const [deleteBook] = useMutation(DELETE_BOOK, {
     refetchQueries: [
       {
+        query: CURRENT_USER,
+      },
+      {
         query: GET_BOOKS,
         variables: {
           options: {
@@ -180,9 +184,6 @@ const DashboardPage = () => {
             pageSize: booksPerPage,
           },
         },
-      },
-      {
-        query: CURRENT_USER,
       },
     ],
     awaitRefetchQueries: true,

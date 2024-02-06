@@ -22,6 +22,7 @@ import {
   ProviderConnectionPage,
 } from '@coko/client'
 
+import { CURRENT_USER } from '@coko/client/dist/helpers/currentUserQuery'
 import Header from './ui/common/Header'
 // import Spin from './ui/common/Spin'
 import UserInviteModal from './ui/invite/UserInviteModal'
@@ -41,7 +42,6 @@ import {
   VerifyEmailPage,
 } from './pages'
 
-import { CURRENT_USER } from './graphql'
 // import { isOwner, isCollaborator, isAdmin } from './helpers/permissions'
 // import { showUnauthorizedAccessModal } from './helpers/commonModals'
 
