@@ -12,9 +12,17 @@ const isOwner = (bookId, user) => hasRole(user, 'owner', bookId)
 
 const isCollaborator = (bookId, user) => hasRole(user, 'collaborator', bookId)
 
+const isAdmin = user => {
+  const hasGlobalAdminTeams = user?.teams?.find(
+    t => t.global && t.role === 'admin',
+  )
+
+  return !!hasGlobalAdminTeams
+}
+
 const hasEditAccess = (bookId, user) => {
   const { teams } = user
-  if (user.admin) return !!user.admin
+  if (isAdmin(user)) return true
 
   if (hasRole(user, 'owner', bookId)) return true
 
@@ -27,10 +35,6 @@ const hasEditAccess = (bookId, user) => {
   )
 
   return !!teamMember?.status && teamMember.status === 'write'
-}
-
-const isAdmin = user => {
-  return !!user.admin
 }
 
 module.exports = {
