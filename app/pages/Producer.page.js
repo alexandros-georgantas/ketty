@@ -392,7 +392,7 @@ const ProducerPage = () => {
         !isOwner(bookId, currentUser) &&
         lock.userId !== currentUser.id
       ) {
-        showUnauthorizedActionModal(false)
+        showUnauthorizedActionModal(false, null, 'lockedChapterDelete')
         return
       }
     }
