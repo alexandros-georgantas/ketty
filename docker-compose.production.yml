@@ -11,4 +11,4 @@ services:
       - ${NGINX_PORT_TO_LOCAL:-4000}:80
     environment:
       - SERVER_URL=${SERVER_URL:-http://localhost:3000}
-      - WEBSOCKET_SERVER_URL=${WEBSOCKET_SERVER_URL:-http://localhost:3333}
+      - WEBSOCKET_SERVER_URL=${WEBSOCKET_SERVER_URL:-ws://localhost:3333}
