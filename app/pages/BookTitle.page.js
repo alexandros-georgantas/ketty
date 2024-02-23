@@ -64,7 +64,7 @@ const BookTitlePage = () => {
 
   if ((!currentUser && loading) || renameBookLoading) return <Loader />
 
-  if (!canRename) {
+  if (!canRename && !loading && !renameBookLoading) {
     showUnauthorizedActionModal(true, redirectToDashboard)
   }
 
@@ -72,7 +72,7 @@ const BookTitlePage = () => {
     <BookTitle
       canRename={canRename}
       onClickContinue={onClickContinue}
-      title={queryData?.getBook?.title}
+      title={queryData?.getBook?.title || ''}
     />
   )
 }
