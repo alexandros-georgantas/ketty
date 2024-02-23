@@ -82,7 +82,7 @@ const ImportPage = () => {
 
   if (!currentUser || loading) return <Loader />
 
-  if (!canImport) {
+  if (!canImport && !loading) {
     showUnauthorizedActionModal(true, redirectToDashboard)
   }
 

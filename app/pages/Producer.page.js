@@ -50,8 +50,6 @@ import {
 
 import { Editor, Modal, Paragraph, Spin } from '../ui'
 
-// import { BookMetadataForm } from '../ui/bookMetadata'
-
 const StyledSpin = styled(Spin)`
   display: grid;
   height: 100vh;
@@ -722,36 +720,11 @@ const ProducerPage = () => {
           }
 
           if (reconnecting) {
-            // setReconnecting(false)
             if (selectedChapterId) {
               const tempChapterId = selectedChapterId
               setSelectedChapterId(undefined)
               setSelectedChapterId(tempChapterId)
             }
-            // refetchBook().then(({ data }) => {
-            //   // const { getBook } = data
-            //   //   const found = find(getBook.divisions[1].bookComponents, {
-            //   //     id: selectedChapterId,
-            //   //   })
-            //   //   const currentEditorMode =
-            //   //     calculateEditorMode(
-            //   //       found.lock,
-            //   //       canModify,
-            //   //       currentUser,
-            //   //       tabId,
-            //   //     ) !== 'preview'
-            //   //   if (currentEditorMode && currentEditorMode !== 'preview') {
-            //   //     setSelectedChapterId(undefined)
-            //   //     setSelectedChapterId(tempChapterId)
-            //   //     onBookComponentLock()
-            //   //   } else {
-            //   //     const currentWS = getWebSocket()
-            //   //     if (currentWS) {
-            //   //       currentWS.close()
-            //   //     }
-            //   //   }
-            //   // }
-            // })
 
             if (issueInCommunicationModal) {
               issueInCommunicationModal.destroy()

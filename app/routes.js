@@ -4,13 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Modal, Tooltip } from 'antd'
 import { QuestionCircleOutlined } from '@ant-design/icons'
 import { useApolloClient } from '@apollo/client'
-import {
-  Route,
-  Switch,
-  useHistory,
-  Redirect,
-  // useParams,
-} from 'react-router-dom'
+import { Route, Switch, useHistory, Redirect } from 'react-router-dom'
 import styled, { createGlobalStyle } from 'styled-components'
 
 import {
@@ -24,7 +18,7 @@ import {
 
 import { CURRENT_USER } from '@coko/client/dist/helpers/currentUserQuery'
 import Header from './ui/common/Header'
-// import Spin from './ui/common/Spin'
+
 import UserInviteModal from './ui/invite/UserInviteModal'
 
 import {
@@ -41,9 +35,6 @@ import {
   SignupPage,
   VerifyEmailPage,
 } from './pages'
-
-// import { isOwner, isCollaborator, isAdmin } from './helpers/permissions'
-// import { showUnauthorizedAccessModal } from './helpers/commonModals'
 
 const LayoutWrapper = styled.div`
   display: flex;
@@ -71,55 +62,6 @@ const GlobalStyle = createGlobalStyle`
 const Wrapper = props => {
   const { children } = props
 
-  // useEffect(() => {
-  //   const keyDownListener = e => {
-  //     if (e.key === 'Tab') {
-  //       // select only visible antd modal dialog
-  //       const dialog = document.querySelector(
-  //         ':not([style="display: none;"]) > .ant-modal[role="dialog"]',
-  //       )
-
-  //       if (dialog) {
-  //         const focusableElements = dialog.querySelectorAll(
-  //           [
-  //             'a[href]',
-  //             'area[href]',
-  //             'input:not([disabled]):not([type=hidden])',
-  //             'select:not([disabled])',
-  //             'textarea:not([disabled])',
-  //             'button:not([disabled])',
-  //             'object',
-  //             'embed',
-  //             '[tabindex]:not([tabindex="-1"]):not([aria-hidden="true"])',
-  //             'audio[controls]',
-  //             'video[controls]',
-  //             '[contenteditable]:not([contenteditable="false"])',
-  //           ].join(', '),
-  //         )
-
-  //         const firstFocusableElement = focusableElements[0]
-
-  //         const lastFocusableElement =
-  //           focusableElements[focusableElements.length - 1]
-
-  //         if (e.shiftKey) {
-  //           if (document.activeElement === firstFocusableElement) {
-  //             lastFocusableElement.focus()
-  //             e.preventDefault()
-  //           }
-  //         } else if (document.activeElement === lastFocusableElement) {
-  //           firstFocusableElement.focus()
-  //           e.preventDefault()
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   document.addEventListener('keydown', keyDownListener)
-
-  //   return document.removeEventListener('kaydown', keyDownListener)
-  // }, [])
-
   return <LayoutWrapper>{children}</LayoutWrapper>
 }
 
@@ -127,16 +69,9 @@ const StyledPage = styled(Page)`
   height: calc(100% - 48px);
 
   > div {
-    /* padding: ${grid(2)} ${grid(2)} ${grid(6)}; */
     padding: 0;
   }
 `
-
-// const StyledSpin = styled(Spin)`
-//   display: grid;
-//   height: 100vh;
-//   place-content: center;
-// `
 
 const StyledMembersHeader = styled.div`
   align-items: center;
@@ -147,10 +82,6 @@ const StyledMembersHeader = styled.div`
 const StyledMembersHeaderTitle = styled.span`
   margin-right: ${grid(1)};
 `
-
-// const StyledUserStatus = styled(UserStatus)`
-//   padding-top: 8px;
-// `
 
 const SiteHeader = () => {
   const { currentUser, setCurrentUser } = useCurrentUser()
@@ -254,42 +185,16 @@ const RequireVerifiedUser = ({ children }) => {
   return children
 }
 
-// Find a better way for doing that
-// const RequireTeamMembership = ({ children }) => {
-//   const { currentUser } = useCurrentUser()
-//   const { bookId } = useParams()
-
-//   if (bookId) {
-//     const canAccess =
-//       isAdmin(currentUser) ||
-//       isOwner(bookId, currentUser) ||
-//       isCollaborator(bookId, currentUser)
-
-//     if (!canAccess) {
-//       showUnauthorizedAccessModal()
-//       return <Redirect to="/dashboard" />
-//     }
-//   }
-
-//   return children
-// }
-
 const Authenticated = ({ children }) => {
   return (
     <RequireAuth notAuthenticatedRedirectTo="/login">
-      <RequireVerifiedUser>
-        {/* <RequireTeamMembership>{children}</RequireTeamMembership> */}
-        {children}
-      </RequireVerifiedUser>
+      <RequireVerifiedUser>{children}</RequireVerifiedUser>
     </RequireAuth>
   )
 }
 
 const routes = (
-  <Authenticate
-    currentUserQuery={CURRENT_USER}
-    // loadingComponent={StyledSpin}
-  >
+  <Authenticate currentUserQuery={CURRENT_USER}>
     <GlobalStyle />
     <LayoutWrapper>
       <Wrapper>
