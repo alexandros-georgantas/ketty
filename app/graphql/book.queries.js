@@ -59,6 +59,9 @@ const GET_ENTIRE_BOOK = gql`
           }
         }
       }
+      bookSettings {
+        aiOn
+      }
     }
   }
 `
@@ -73,6 +76,17 @@ const GET_BOOKS = gql`
         thumbnailURL
       }
       totalCount
+    }
+  }
+`
+
+const GET_BOOK_SETTINGS = gql`
+  query GetBook($id: ID!) {
+    getBook(id: $id) {
+      id
+      bookSettings {
+        aiOn
+      }
     }
   }
 `
@@ -98,6 +112,15 @@ const DELETE_BOOK = gql`
 const RENAME_BOOK = gql`
   mutation RenameBook($id: ID!, $title: String!) {
     renameBook(id: $id, title: $title) {
+      id
+    }
+  }
+`
+
+const UPDATE_SETTINGS = gql`
+  mutation UpdateBookSettings($bookId: ID!, $aiOn: Boolean!) {
+    updateBookSettings(bookId: $bookId, settings: { aiOn: $aiOn }) {
+      aiOn
       id
     }
   }
@@ -294,13 +317,21 @@ const BOOK_RENAMED_SUBSCRIPTION = gql`
   }
 `
 
+const BOOK_SETTINGS_UPDATED_SUBSCRIPTION = gql`
+  subscription BookSettingsUpdated {
+    bookSettingsUpdated
+  }
+`
+
 export {
   GET_BOOK,
   GET_ENTIRE_BOOK,
   GET_BOOKS,
+  GET_BOOK_SETTINGS,
   CREATE_BOOK,
   DELETE_BOOK,
   RENAME_BOOK,
+  UPDATE_SETTINGS,
   UPDATE_SUBTITLE,
   ARCHIVE_BOOK,
   INGEST_WORD_FILES,
@@ -312,4 +343,5 @@ export {
   BOOK_CREATED_SUBSCRIPTION,
   BOOK_DELETED_SUBSCRIPTION,
   BOOK_RENAMED_SUBSCRIPTION,
+  BOOK_SETTINGS_UPDATED_SUBSCRIPTION,
 }

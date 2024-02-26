@@ -20,6 +20,7 @@ import { CURRENT_USER } from '@coko/client/dist/helpers/currentUserQuery'
 import Header from './ui/common/Header'
 
 import UserInviteModal from './ui/invite/UserInviteModal'
+import SettingsModal from './ui/settings/SettingsModal'
 
 import {
   BookTitlePage,
@@ -146,6 +147,30 @@ const SiteHeader = () => {
     })
   }
 
+  const triggerSettingsModal = () => {
+    const settingsModal = modal.confirm()
+    return settingsModal.update({
+      title: (
+        <StyledMembersHeader>
+          <StyledMembersHeaderTitle>Book settings</StyledMembersHeaderTitle>
+        </StyledMembersHeader>
+      ),
+      content: (
+        <SettingsModal
+          bookId={isProducerPage || isExporterPage ? getBookId() : undefined}
+        />
+      ),
+      maskClosable: true,
+      width: 680,
+      bodyStyle: {
+        textAlign: 'justify',
+      },
+      closable: true,
+      icon: null,
+      footer: null,
+    })
+  }
+
   const isProducerPage = currentPath.includes('/producer')
   const isExporterPage = currentPath.includes('/exporter')
 
@@ -158,10 +183,12 @@ const SiteHeader = () => {
         homeURL="/dashboard"
         onInvite={triggerInviteModal}
         onLogout={logout}
+        onSettings={triggerSettingsModal}
         showBackToBook={isExporterPage}
         showDashboard={currentPath !== '/dashboard'}
         showInvite={isProducerPage}
         showPreview={isProducerPage}
+        showSettings={isProducerPage}
         userDisplayName={currentUser.displayName}
       />
       {contextHolder}

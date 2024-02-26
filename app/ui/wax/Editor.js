@@ -30,6 +30,7 @@ const EditorWrapper = ({
   selectedChapterId,
   canEdit,
   aiEnabled,
+  aiOn,
 }) => {
   const [luluWax, setLuluWax] = useState({
     onAddChapter,
@@ -67,6 +68,7 @@ const EditorWrapper = ({
   if (aiEnabled) {
     selectedConfig.AskAiContentService = {
       AskAiContentTransformation: queryAI,
+      AiOn: aiOn,
     }
   }
 
@@ -75,6 +77,15 @@ const EditorWrapper = ({
   }
 
   selectedConfig.ImageService = { showAlt: true }
+
+  useEffect(() => {
+    if (aiEnabled) {
+      selectedConfig.AskAiContentService = {
+        ...selectedConfig.AskAiContentService,
+        AiOn: aiOn,
+      }
+    }
+  }, [aiOn])
 
   useEffect(() => {
     setLuluWax({
@@ -112,7 +123,7 @@ const EditorWrapper = ({
       <Wax
         config={selectedConfig}
         fileUpload={onImageUpload}
-        key={`${selectedChapterId}-${isReadOnly}`}
+        key={`${selectedChapterId}-${isReadOnly}-${aiOn}`}
         layout={LuluLayout}
         onChange={onPeriodicBookComponentContentChange}
         readonly={isReadOnly}
