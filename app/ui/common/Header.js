@@ -6,6 +6,7 @@ import { grid, th } from '@coko/client'
 import { Avatar, Dropdown, Menu } from 'antd'
 import find from 'lodash/find'
 import isEmpty from 'lodash/isEmpty'
+import { SettingOutlined } from '@ant-design/icons'
 import Button from './Button'
 
 // #region styles
@@ -84,6 +85,7 @@ const Header = props => {
     brandLogoURL,
     onLogout,
     onInvite,
+    onSettings,
     userDisplayName,
     showDashboard,
     dashboardURL,
@@ -91,6 +93,7 @@ const Header = props => {
     backToBookURL,
     showInvite,
     showPreview,
+    showSettings,
     previewURL,
     dropdownItems,
     bookId,
@@ -146,9 +149,7 @@ const Header = props => {
     navItemsRight.push({
       key: 'export',
       label: (
-        <UnstyledLink to={`/books/${bookId}/exporter`}>
-          Preview & Export
-        </UnstyledLink>
+        <UnstyledLink to={`/books/${bookId}/exporter`}>Preview</UnstyledLink>
       ),
     })
   }
@@ -158,7 +159,18 @@ const Header = props => {
       key: 'invite',
       label: (
         <Button onClick={onInvite} type="text">
-          Book Members
+          Share
+        </Button>
+      ),
+    })
+  }
+
+  if (showSettings) {
+    navItemsRight.push({
+      key: 'settings',
+      label: (
+        <Button onClick={onSettings} type="text">
+          <SettingOutlined />
         </Button>
       ),
     })
@@ -246,7 +258,9 @@ Header.propTypes = {
   showBackToBook: PropTypes.bool.isRequired,
   showDashboard: PropTypes.bool.isRequired,
   showInvite: PropTypes.bool.isRequired,
+  showSettings: PropTypes.bool.isRequired,
   onInvite: PropTypes.func.isRequired,
+  onSettings: PropTypes.func.isRequired,
   showPreview: PropTypes.bool.isRequired,
   dashboardURL: PropTypes.string,
   backToBookURL: PropTypes.string,
