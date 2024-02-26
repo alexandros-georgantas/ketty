@@ -32,6 +32,7 @@ import {
   USE_CHATGPT,
   APPLICATION_PARAMETERS,
   SET_BOOK_COMPONENT_STATUS,
+  BOOK_SETTINGS_UPDATED_SUBSCRIPTION,
 } from '../graphql'
 
 import {
@@ -195,6 +196,14 @@ const ProducerPage = () => {
       if (hasMembership) {
         refetchBook({ id: bookId })
       }
+    },
+  })
+
+  useSubscription(BOOK_SETTINGS_UPDATED_SUBSCRIPTION, {
+    variables: { id: bookId },
+    fetchPolicy: 'network-only',
+    onData: () => {
+      refetchBook({ id: bookId })
     },
   })
   // SUBSCRIPTIONS SECTION END
@@ -787,6 +796,7 @@ const ProducerPage = () => {
   return (
     <Editor
       aiEnabled={isAIEnabled?.config}
+      aiOn={bookQueryData?.getBook.bookSettings.aiOn}
       bookComponentContent={bookComponentData?.getBookComponent?.content}
       bookMetadataValues={bookMetadataValues}
       canEdit={canModify}
