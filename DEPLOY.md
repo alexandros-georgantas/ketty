@@ -1,4 +1,4 @@
-# Deploying Ketida v2 in production
+# Deploying Ketty in production
 
 ---
 
@@ -25,7 +25,7 @@ An S3 or S3-compatible (eg. Minio, Google cloud, Digital ocean and more) object 
 
 ##### Coko Microservices
 
-Each of the microservices will need a client id and a client secret. These values will then be passed to ketida's server as environment variables, so that the server can perform its authentication with the microservices. To get a valid id/secret pair, run `yarn create:client` in the respective microservice.
+Each of the microservices will need a client id and a client secret. These values will then be passed to Ketty's server as environment variables, so that the server can perform its authentication with the microservices. To get a valid id/secret pair, run `yarn create:client` in the respective microservice.
 
 All microservices are published in dockerhub:
 
@@ -41,20 +41,20 @@ For more details on how to run each microservice, check the read me file in the 
 
 ---
 
-### Running ketida
+### Running Ketty
 
-Ketida is provided as two separate docker containers ([ketida client](https://hub.docker.com/r/cokoapps/ketida-client/tags) and [ketida server](https://hub.docker.com/r/cokoapps/ketida-server/tags)). The two containers will run on separate ports (or even separate machines if that suits the specific setup). The client image only serves a static bundle.
+Ketty is provided as two separate docker containers ([Ketty client](https://hub.docker.com/r/cokoapps/ketty-client/tags) and [Ketty server](https://hub.docker.com/r/cokoapps/ketty-server/tags)). The two containers will run on separate ports (or even separate machines if that suits the specific setup). The client image only serves a static bundle.
 
 ##### Repositories
 
-You can find the repos for ketida server & client in the following links:
+You can find the repos for Ketty server & client in the following links:
 
-- Ketida client: https://gitlab.coko.foundation/ketida/ketida
-- Ketida server: https://gitlab.coko.foundation/ketida/server
+- Ketty client: https://gitlab.coko.foundation/ketty/ketty
+- Ketty server: https://gitlab.coko.foundation/ketty/server
 
 ##### Environment variables
 
-First thing to do is to setup the correct environment variables in the environment where the containers will run. The most up to date list of environment variables can be found in the [production compose file](https://gitlab.coko.foundation/ketida/ketida/-/blob/main/docker-compose.demo-deploy.yml?ref_type=heads) in the ketida repo. You can use this compose file as is, or recreate its logic with the docker compose equivalent of your choice (eg. kubernetes).
+First thing to do is to setup the correct environment variables in the environment where the containers will run. The most up to date list of environment variables can be found in the [production compose file](https://gitlab.coko.foundation/ketty/ketty/-/blob/main/docker-compose.demo-deploy.yml?ref_type=heads) in the Ketty repo. You can use this compose file as is, or recreate its logic with the docker compose equivalent of your choice (eg. kubernetes).
 
 Some notes on specific variables:
 
@@ -72,7 +72,7 @@ Some notes on specific variables:
 
 ##### Config file
 
-To enable export templates and integration with lulu, you will also need to mount a config file (eg. [with compose](https://gitlab.coko.foundation/ketida/ketida/-/blob/main/docker-compose.demo-deploy.yml?ref_type=heads#L67)) inside the server container at the `config/local.js` location.  
+To enable export templates and integration with lulu, you will also need to mount a config file (eg. [with compose](https://gitlab.coko.foundation/ketty/ketty/-/blob/main/docker-compose.demo-deploy.yml?ref_type=heads#L67)) inside the server container at the `config/local.js` location.  
 This will enable these specific templates, but you can also replace these with the templates of your choice.  
 Note that in the lulu integration section, you should replace the `{clientUrl}` and `{luluClientId}` with proper values, as well as replace the sandbox values with their non-sandboxes equivalents.
 
@@ -81,50 +81,50 @@ module.exports = {
   templates: [
     {
       label: "lategrey",
-      url: "https://gitlab.coko.foundation/ketida-templates/lategrey",
+      url: "https://gitlab.coko.foundation/ketty-templates/lategrey",
       assetsRoot: "dist",
       supportedNoteTypes: ["footnotes"],
     },
     {
       label: "significa",
-      url: "https://gitlab.coko.foundation/ketida-templates/significa",
+      url: "https://gitlab.coko.foundation/ketty-templates/significa",
       assetsRoot: "dist",
       supportedNoteTypes: ["footnotes"],
     },
     {
       label: "bikini",
-      url: "https://gitlab.coko.foundation/ketida-templates/bikini",
+      url: "https://gitlab.coko.foundation/ketty-templates/bikini",
       assetsRoot: "dist",
       supportedNoteTypes: ["footnotes"],
     },
     {
       label: "vanilla",
-      url: "https://gitlab.coko.foundation/ketida-templates/vanilla",
+      url: "https://gitlab.coko.foundation/ketty-templates/vanilla",
       assetsRoot: "dist",
       default: true,
       supportedNoteTypes: ["footnotes"],
     },
     {
       label: "atosh",
-      url: "https://gitlab.coko.foundation/ketida-templates/atosh.git",
+      url: "https://gitlab.coko.foundation/ketty-templates/atosh.git",
       assetsRoot: "dist",
       supportedNoteTypes: ["footnotes"],
     },
     {
       label: "eclypse",
-      url: "https://gitlab.coko.foundation/ketida-templates/eclypse.git",
+      url: "https://gitlab.coko.foundation/ketty-templates/eclypse.git",
       assetsRoot: "dist",
       supportedNoteTypes: ["footnotes"],
     },
     {
       label: "logical",
-      url: "https://gitlab.coko.foundation/ketida-templates/logical.git",
+      url: "https://gitlab.coko.foundation/ketty-templates/logical.git",
       assetsRoot: "dist",
       supportedNoteTypes: ["footnotes"],
     },
     {
       label: "tenberg",
-      url: "https://gitlab.coko.foundation/ketida-templates/tenberg.git",
+      url: "https://gitlab.coko.foundation/ketty-templates/tenberg.git",
       assetsRoot: "dist",
       supportedNoteTypes: ["footnotes"],
     },
@@ -146,7 +146,7 @@ module.exports = {
 
 ##### Websockets
 
-The server container exposes two different ports, one for the main server and one for the websocket server (used for keeping chapters locked when a user is editing). You should map each of these to a different port on your machine. See [the server port part of the compose file](https://gitlab.coko.foundation/ketida/ketida/-/blob/main/docker-compose.demo-deploy.yml?ref_type=heads#L18-19) for reference.
+The server container exposes two different ports, one for the main server and one for the websocket server (used for keeping chapters locked when a user is editing). You should map each of these to a different port on your machine. See [the server port part of the compose file](https://gitlab.coko.foundation/ketty/ketty/-/blob/main/docker-compose.demo-deploy.yml?ref_type=heads#L18-19) for reference.
 
 ##### SSL
 
