@@ -131,21 +131,22 @@ const ProducerPage = () => {
     },
   })
 
-  const { loading: bookComponentLoading, data: bookComponentData } = useQuery(
-    GET_BOOK_COMPONENT,
-    {
-      fetchPolicy: 'network-only',
-      skip: !selectedChapterId,
-      variables: { id: selectedChapterId },
-      onError: () => {
-        if (!reconnecting) {
-          if (hasMembership) {
-            showGenericErrorModal()
-          }
+  const {
+    loading: bookComponentLoading,
+    data: bookComponentData,
+    refetch: refetchBookComponent,
+  } = useQuery(GET_BOOK_COMPONENT, {
+    fetchPolicy: 'network-only',
+    skip: !selectedChapterId,
+    variables: { id: selectedChapterId },
+    onError: () => {
+      if (!reconnecting) {
+        if (hasMembership) {
+          showGenericErrorModal()
         }
-      },
+      }
     },
-  )
+  })
 
   const [chatGPT] = useLazyQuery(USE_CHATGPT, {
     fetchPolicy: 'network-only',
@@ -204,6 +205,10 @@ const ProducerPage = () => {
     fetchPolicy: 'network-only',
     onData: () => {
       refetchBook({ id: bookId })
+
+      if (selectedChapterId) {
+        refetchBookComponent({ id: selectedChapterId })
+      }
     },
   })
   // SUBSCRIPTIONS SECTION END
