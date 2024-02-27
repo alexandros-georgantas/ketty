@@ -27,7 +27,7 @@ services:
     tty: true
 
   server:
-    image: cokoapps/ketida-server:latest
+    image: cokoapps/ketty-server:latest
     restart: unless-stopped
     depends_on:
       - db
