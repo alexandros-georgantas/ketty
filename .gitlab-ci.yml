@@ -4,12 +4,12 @@ include:
     file: 'ci-templates.yml'
 
 variables:
-  IMAGE_NAME_DEVELOPMENT: ketida-client-ci-development
-  IMAGE_NAME_PREPRODUCTION_DEVELOP: ketida-client-ci-production-develop
-  IMAGE_NAME_PREPRODUCTION_DEMO: ketida-client-ci-production-demo
-  IMAGE_NAME_PRODUCTION_DEVELOP: ketida-client-deploy-develop
-  IMAGE_NAME_PRODUCTION_DEMO: ketida-client
-  IMAGE_NAME_STORYBOOK: ketida-client-storybook
+  IMAGE_NAME_DEVELOPMENT: ketty-client-ci-development
+  IMAGE_NAME_PREPRODUCTION_DEVELOP: ketty-client-ci-production-develop
+  IMAGE_NAME_PREPRODUCTION_DEMO: ketty-client-ci-production-demo
+  IMAGE_NAME_PRODUCTION_DEVELOP: ketty-client-deploy-develop
+  IMAGE_NAME_PRODUCTION_DEMO: ketty-client
+  IMAGE_NAME_STORYBOOK: ketty-client-storybook
   PATH_TO_BUILD: .
   PATH_INSIDE_CONTAINER: /home/node/ketida
   COMPOSE_FILE_STORYBOOK: docker-compose.storybook-deploy.yml

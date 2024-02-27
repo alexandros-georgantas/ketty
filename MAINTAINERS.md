@@ -1,7 +1,7 @@
-Ketida consists of a variety of components providing the functionality needed based on community feature proposals. Contributions are welcome from anyone, and discussed with the community as a whole before being accepted.
+Ketty consists of a variety of components providing the functionality needed based on community feature proposals. Contributions are welcome from anyone, and discussed with the community as a whole before being accepted. See please our [contributing page](https://gitlab.coko.foundation/ketty/ketty/-/blob/main/CONTRIBUTING.md). 
 
-Additionally, Ketida's team, is responsible accept merge requests and do releases of Ketida
+Additionally, Ketty's team is responsible for accepting merge requests and doing releases. 
 
 ## MAINTAINER
 
-- Alexandros Georgantas (alexis@coko.foundation)
+- Grigor Malo (@grgml in Gitlab)
