@@ -248,6 +248,7 @@ const DashboardPage = () => {
     ) {
       const { id, whereNext } = newBookPageData
       setNewBookPageData(null)
+      setActionInProgress(false)
       history.push(`/books/${id}/${whereNext}`)
     }
   }, [currentUser, newBookPageData])
@@ -268,7 +269,7 @@ const DashboardPage = () => {
   }
 
   const onCreateBook = () => {
-    setActionInProgress()
+    setActionInProgress(true)
     return createBookHandler('rename')
   }
 
