@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 import useWebSocket from 'react-use-websocket'
 import { useHistory, useParams } from 'react-router-dom'
@@ -16,6 +16,7 @@ import styled from 'styled-components'
 import { USER_UPDATED_SUBSCRIPTION } from '@coko/client/dist/helpers/currentUserQuery'
 import {
   GET_ENTIRE_BOOK,
+  GET_BOOK_SETTINGS,
   RENAME_BOOK_COMPONENT_TITLE,
   UPDATE_BOOK_COMPONENT_CONTENT,
   DELETE_BOOK_COMPONENT,
@@ -94,6 +95,9 @@ const ProducerPage = () => {
   const [reconnecting, setReconnecting] = useState(false)
   const [metadataModalOpen, setMetadataModalOpen] = useState(false)
 
+  const [currentBookComponentContent, setCurrentBookComponentContent] =
+    useState(null)
+
   const { currentUser } = useCurrentUser()
   const token = localStorage.getItem('token')
   // const [form] = Form.useForm()
@@ -133,8 +137,8 @@ const ProducerPage = () => {
 
   const {
     loading: bookComponentLoading,
-    data: bookComponentData,
-    refetch: refetchBookComponent,
+    // data: bookComponentData,
+    // refetch: refetchBookComponent,
   } = useQuery(GET_BOOK_COMPONENT, {
     fetchPolicy: 'network-only',
     skip: !selectedChapterId,
@@ -145,6 +149,9 @@ const ProducerPage = () => {
           showGenericErrorModal()
         }
       }
+    },
+    onCompleted: data => {
+      setCurrentBookComponentContent(data.getBookComponent.content)
     },
   })
 
@@ -159,14 +166,34 @@ const ProducerPage = () => {
     },
   })
 
-  const queryAI = input =>
-    new Promise((resolve, reject) => {
-      chatGPT({ variables: { input } }).then(({ data }) => {
-        if (!data) return resolve(null)
-        const { chatGPT: res } = data
-        return resolve(res)
+  const [getBookSettings] = useLazyQuery(GET_BOOK_SETTINGS, {
+    fetchPolicy: 'network-only',
+    nextFetchPolicy: 'network-only',
+    variables: {
+      id: bookId,
+    },
+  })
+
+  const queryAI = async input => {
+    const settings = await getBookSettings()
+
+    if (settings?.data.getBook.bookSettings.aiOn) {
+      return new Promise((resolve, reject) => {
+        chatGPT({ variables: { input } }).then(({ data }) => {
+          if (!data) return resolve(null)
+          const { chatGPT: res } = data
+          return resolve(res)
+        })
       })
+    }
+
+    showAiUnavailableModal()
+    return new Promise((resolve, reject) => {
+      reject()
     })
+  }
+
+  const editorRef = useRef(null)
 
   // QUERIES SECTION END
 
@@ -204,10 +231,15 @@ const ProducerPage = () => {
     variables: { id: bookId },
     fetchPolicy: 'network-only',
     onData: () => {
-      refetchBook({ id: bookId })
+      // only owners can change the setting, so only they get an immediate interface update
+      if (isOwner(bookId, currentUser)) {
+        if (selectedChapterId) {
+          setCurrentBookComponentContent(editorRef.current.getContent())
+          // this should work too: await until content is refetched before refetching settings and updating book
+          // await refetchBookComponent({ id: selectedChapterId })
+        }
 
-      if (selectedChapterId) {
-        refetchBookComponent({ id: selectedChapterId })
+        refetchBook({ id: bookId })
       }
     },
   })
@@ -374,7 +406,15 @@ const ProducerPage = () => {
   }
 
   const onBookComponentTitleChange = title => {
-    if (selectedChapterId && canModify) {
+    const currentChapter = find(
+      bookQueryData?.getBook?.divisions[1].bookComponents,
+      {
+        id: selectedChapterId,
+      },
+    )
+
+    // only fire if new title !== current title to avoid unnecessary call
+    if (selectedChapterId && canModify && title !== currentChapter?.title) {
       renameBookComponent({
         variables: {
           input: {
@@ -560,6 +600,26 @@ const ProducerPage = () => {
     })
   }
 
+  const showAiUnavailableModal = () => {
+    const errorModal = Modal.error()
+    return errorModal.update({
+      title: 'Error',
+      content: (
+        <Paragraph>AI use has been disabled by the book owner</Paragraph>
+      ),
+      onOk() {
+        refetchBook()
+      },
+      okButtonProps: { style: { backgroundColor: 'black' } },
+      maskClosable: false,
+      width: 570,
+      bodyStyle: {
+        marginRight: 38,
+        textAlign: 'justify',
+      },
+    })
+  }
+
   const onBookComponentLock = () => {
     if (selectedChapterId && canModify) {
       const userAgent = window.navigator.userAgent || null
@@ -723,6 +783,13 @@ const ProducerPage = () => {
       showUnauthorizedAccessModal(redirectToDashboard)
     }
   }, [hasMembership])
+
+  useEffect(() => {
+    if (!selectedChapterId) {
+      setCurrentBookComponentContent(null)
+    }
+  }, [selectedChapterId])
+
   // WEBSOCKET SECTION START
   useWebSocket(
     `${webSocketServerUrl}/locks`,
@@ -801,12 +868,14 @@ const ProducerPage = () => {
   return (
     <Editor
       aiEnabled={isAIEnabled?.config}
-      aiOn={bookQueryData?.getBook.bookSettings.aiOn}
-      bookComponentContent={bookComponentData?.getBookComponent?.content}
+      aiOn={bookQueryData?.getBook.bookSettings?.aiOn}
+      // bookComponentContent={bookComponentData?.getBookComponent?.content}
+      bookComponentContent={currentBookComponentContent}
       bookMetadataValues={bookMetadataValues}
       canEdit={canModify}
       chapters={bookQueryData?.getBook?.divisions[1].bookComponents}
       chaptersActionInProgress={chaptersActionInProgress}
+      editorRef={editorRef}
       isReadOnly={
         !selectedChapterId ||
         (editorMode && editorMode === 'preview') ||

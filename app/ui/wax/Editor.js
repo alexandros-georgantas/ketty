@@ -31,6 +31,7 @@ const EditorWrapper = ({
   canEdit,
   aiEnabled,
   aiOn,
+  editorRef,
 }) => {
   const [luluWax, setLuluWax] = useState({
     onAddChapter,
@@ -121,6 +122,7 @@ const EditorWrapper = ({
   return (
     <LuluWaxContext.Provider value={{ luluWax, setLuluWax }}>
       <Wax
+        ref={editorRef}
         config={selectedConfig}
         fileUpload={onImageUpload}
         key={`${selectedChapterId}-${isReadOnly}-${aiOn}`}
