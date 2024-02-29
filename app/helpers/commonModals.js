@@ -56,16 +56,26 @@ const showChangeInPermissionsModal = () => {
 const showUnauthorizedActionModal = (
   shouldRedirect = false,
   callback = undefined,
+  key = undefined,
 ) => {
   const unauthorizedActionModal = Modal.warning()
+
+  let errorMessage
+
+  switch (key) {
+    case 'lockedChapterDelete':
+      errorMessage = `You can’t delete a chapter that is currently being edited by another book member with edit access.`
+      break
+
+    default:
+      errorMessage = `You don't have permissions to perform this action. Please contact book's
+      owner`
+      break
+  }
+
   return unauthorizedActionModal.update({
     title: 'Unauthorized action',
-    content: (
-      <Paragraph>
-        {`You don't have permissions to perform this action. Please contact book's
-        owner`}
-      </Paragraph>
-    ),
+    content: <Paragraph>{errorMessage}</Paragraph>,
     onOk() {
       if (shouldRedirect) {
         callback()

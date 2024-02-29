@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 import useWebSocket from 'react-use-websocket'
 import { useHistory, useParams } from 'react-router-dom'
@@ -16,6 +16,7 @@ import styled from 'styled-components'
 import { USER_UPDATED_SUBSCRIPTION } from '@coko/client/dist/helpers/currentUserQuery'
 import {
   GET_ENTIRE_BOOK,
+  GET_BOOK_SETTINGS,
   RENAME_BOOK_COMPONENT_TITLE,
   UPDATE_BOOK_COMPONENT_CONTENT,
   DELETE_BOOK_COMPONENT,
@@ -32,6 +33,7 @@ import {
   USE_CHATGPT,
   APPLICATION_PARAMETERS,
   SET_BOOK_COMPONENT_STATUS,
+  BOOK_SETTINGS_UPDATED_SUBSCRIPTION,
 } from '../graphql'
 
 import {
@@ -49,8 +51,6 @@ import {
 } from '../helpers/commonModals'
 
 import { Editor, Modal, Paragraph, Spin } from '../ui'
-
-// import { BookMetadataForm } from '../ui/bookMetadata'
 
 const StyledSpin = styled(Spin)`
   display: grid;
@@ -95,6 +95,9 @@ const ProducerPage = () => {
   const [reconnecting, setReconnecting] = useState(false)
   const [metadataModalOpen, setMetadataModalOpen] = useState(false)
 
+  const [currentBookComponentContent, setCurrentBookComponentContent] =
+    useState(null)
+
   const { currentUser } = useCurrentUser()
   const token = localStorage.getItem('token')
   // const [form] = Form.useForm()
@@ -132,21 +135,25 @@ const ProducerPage = () => {
     },
   })
 
-  const { loading: bookComponentLoading, data: bookComponentData } = useQuery(
-    GET_BOOK_COMPONENT,
-    {
-      fetchPolicy: 'network-only',
-      skip: !selectedChapterId,
-      variables: { id: selectedChapterId },
-      onError: () => {
-        if (!reconnecting) {
-          if (hasMembership) {
-            showGenericErrorModal()
-          }
+  const {
+    loading: bookComponentLoading,
+    // data: bookComponentData,
+    // refetch: refetchBookComponent,
+  } = useQuery(GET_BOOK_COMPONENT, {
+    fetchPolicy: 'network-only',
+    skip: !selectedChapterId,
+    variables: { id: selectedChapterId },
+    onError: () => {
+      if (!reconnecting) {
+        if (hasMembership) {
+          showGenericErrorModal()
         }
-      },
+      }
     },
-  )
+    onCompleted: data => {
+      setCurrentBookComponentContent(data.getBookComponent.content)
+    },
+  })
 
   const [chatGPT] = useLazyQuery(USE_CHATGPT, {
     fetchPolicy: 'network-only',
@@ -159,14 +166,34 @@ const ProducerPage = () => {
     },
   })
 
-  const queryAI = input =>
-    new Promise((resolve, reject) => {
-      chatGPT({ variables: { input } }).then(({ data }) => {
-        if (!data) return resolve(null)
-        const { chatGPT: res } = data
-        return resolve(res)
+  const [getBookSettings] = useLazyQuery(GET_BOOK_SETTINGS, {
+    fetchPolicy: 'network-only',
+    nextFetchPolicy: 'network-only',
+    variables: {
+      id: bookId,
+    },
+  })
+
+  const queryAI = async input => {
+    const settings = await getBookSettings()
+
+    if (settings?.data.getBook.bookSettings.aiOn) {
+      return new Promise((resolve, reject) => {
+        chatGPT({ variables: { input } }).then(({ data }) => {
+          if (!data) return resolve(null)
+          const { chatGPT: res } = data
+          return resolve(res)
+        })
       })
+    }
+
+    showAiUnavailableModal()
+    return new Promise((resolve, reject) => {
+      reject()
     })
+  }
+
+  const editorRef = useRef(null)
 
   // QUERIES SECTION END
 
@@ -195,6 +222,23 @@ const ProducerPage = () => {
     fetchPolicy: 'network-only',
     onData: () => {
       if (hasMembership) {
+        refetchBook({ id: bookId })
+      }
+    },
+  })
+
+  useSubscription(BOOK_SETTINGS_UPDATED_SUBSCRIPTION, {
+    variables: { id: bookId },
+    fetchPolicy: 'network-only',
+    onData: () => {
+      // only owners can change the setting, so only they get an immediate interface update
+      if (isOwner(bookId, currentUser)) {
+        if (selectedChapterId) {
+          setCurrentBookComponentContent(editorRef.current.getContent())
+          // this should work too: await until content is refetched before refetching settings and updating book
+          // await refetchBookComponent({ id: selectedChapterId })
+        }
+
         refetchBook({ id: bookId })
       }
     },
@@ -362,7 +406,15 @@ const ProducerPage = () => {
   }
 
   const onBookComponentTitleChange = title => {
-    if (selectedChapterId && canModify) {
+    const currentChapter = find(
+      bookQueryData?.getBook?.divisions[1].bookComponents,
+      {
+        id: selectedChapterId,
+      },
+    )
+
+    // only fire if new title !== current title to avoid unnecessary call
+    if (selectedChapterId && canModify && title !== currentChapter?.title) {
       renameBookComponent({
         variables: {
           input: {
@@ -392,7 +444,7 @@ const ProducerPage = () => {
         !isOwner(bookId, currentUser) &&
         lock.userId !== currentUser.id
       ) {
-        showUnauthorizedActionModal(false)
+        showUnauthorizedActionModal(false, null, 'lockedChapterDelete')
         return
       }
     }
@@ -540,6 +592,26 @@ const ProducerPage = () => {
         errorModal.destroy()
       },
       okButtonProps: { style: { backgroundColor: 'black' } },
+      width: 570,
+      bodyStyle: {
+        marginRight: 38,
+        textAlign: 'justify',
+      },
+    })
+  }
+
+  const showAiUnavailableModal = () => {
+    const errorModal = Modal.error()
+    return errorModal.update({
+      title: 'Error',
+      content: (
+        <Paragraph>AI use has been disabled by the book owner</Paragraph>
+      ),
+      onOk() {
+        refetchBook()
+      },
+      okButtonProps: { style: { backgroundColor: 'black' } },
+      maskClosable: false,
       width: 570,
       bodyStyle: {
         marginRight: 38,
@@ -711,6 +783,13 @@ const ProducerPage = () => {
       showUnauthorizedAccessModal(redirectToDashboard)
     }
   }, [hasMembership])
+
+  useEffect(() => {
+    if (!selectedChapterId) {
+      setCurrentBookComponentContent(null)
+    }
+  }, [selectedChapterId])
+
   // WEBSOCKET SECTION START
   useWebSocket(
     `${webSocketServerUrl}/locks`,
@@ -722,36 +801,11 @@ const ProducerPage = () => {
           }
 
           if (reconnecting) {
-            // setReconnecting(false)
             if (selectedChapterId) {
               const tempChapterId = selectedChapterId
               setSelectedChapterId(undefined)
               setSelectedChapterId(tempChapterId)
             }
-            // refetchBook().then(({ data }) => {
-            //   // const { getBook } = data
-            //   //   const found = find(getBook.divisions[1].bookComponents, {
-            //   //     id: selectedChapterId,
-            //   //   })
-            //   //   const currentEditorMode =
-            //   //     calculateEditorMode(
-            //   //       found.lock,
-            //   //       canModify,
-            //   //       currentUser,
-            //   //       tabId,
-            //   //     ) !== 'preview'
-            //   //   if (currentEditorMode && currentEditorMode !== 'preview') {
-            //   //     setSelectedChapterId(undefined)
-            //   //     setSelectedChapterId(tempChapterId)
-            //   //     onBookComponentLock()
-            //   //   } else {
-            //   //     const currentWS = getWebSocket()
-            //   //     if (currentWS) {
-            //   //       currentWS.close()
-            //   //     }
-            //   //   }
-            //   // }
-            // })
 
             if (issueInCommunicationModal) {
               issueInCommunicationModal.destroy()
@@ -814,11 +868,14 @@ const ProducerPage = () => {
   return (
     <Editor
       aiEnabled={isAIEnabled?.config}
-      bookComponentContent={bookComponentData?.getBookComponent?.content}
+      aiOn={bookQueryData?.getBook.bookSettings?.aiOn}
+      // bookComponentContent={bookComponentData?.getBookComponent?.content}
+      bookComponentContent={currentBookComponentContent}
       bookMetadataValues={bookMetadataValues}
       canEdit={canModify}
       chapters={bookQueryData?.getBook?.divisions[1].bookComponents}
       chaptersActionInProgress={chaptersActionInProgress}
+      editorRef={editorRef}
       isReadOnly={
         !selectedChapterId ||
         (editorMode && editorMode === 'preview') ||

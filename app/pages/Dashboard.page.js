@@ -1,11 +1,8 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useQuery, useMutation, useSubscription } from '@apollo/client'
 import { useHistory } from 'react-router-dom'
 import { useCurrentUser } from '@coko/client'
-import {
-  USER_UPDATED_SUBSCRIPTION,
-  CURRENT_USER,
-} from '@coko/client/dist/helpers/currentUserQuery'
+import { USER_UPDATED_SUBSCRIPTION } from '@coko/client/dist/helpers/currentUserQuery'
 
 import {
   GET_BOOKS,
@@ -19,15 +16,18 @@ import {
 
 import Dashboard from '../ui/dashboard/Dashboard'
 import { isAdmin, isOwner } from '../helpers/permissions'
-
 import {
   showUnauthorizedActionModal,
   showGenericErrorModal,
 } from '../helpers/commonModals'
 
+const loaderDelay = 700
+
 const DashboardPage = () => {
   const history = useHistory()
   const { currentUser } = useCurrentUser()
+  const [actionInProgress, setActionInProgress] = useState(false)
+  const [newBookPageData, setNewBookPageData] = useState(null)
 
   const canTakeActionOnBook = bookId =>
     isAdmin(currentUser) || isOwner(bookId, currentUser)
@@ -36,6 +36,8 @@ const DashboardPage = () => {
     currentPage: 1,
     booksPerPage: 10,
   })
+
+  const [books, setBooks] = useState({ result: [], totalCount: 0 })
 
   const { currentPage, booksPerPage } = paginationParams
 
@@ -58,6 +60,13 @@ const DashboardPage = () => {
       },
     },
   })
+
+  useEffect(() => {
+    if (queryData) {
+      // store results in local state to use it when queryData becomes undefined because of refetch
+      setBooks(queryData?.getBooks)
+    }
+  }, [queryData])
 
   useSubscription(USER_UPDATED_SUBSCRIPTION, {
     variables: { userId: currentUser.id },
@@ -108,17 +117,30 @@ const DashboardPage = () => {
 
   useSubscription(BOOK_DELETED_SUBSCRIPTION, {
     onData: () => {
-      refetch({
-        options: {
-          archived: false,
-          orderBy: {
-            column: 'title',
-            order: 'asc',
+      const nrOfPages = Math.ceil(books.totalCount / booksPerPage)
+
+      if (
+        currentPage > 1 &&
+        currentPage === nrOfPages &&
+        books.result.length === 1
+      ) {
+        setPaginationParams({
+          currentPage: currentPage - 1,
+          booksPerPage,
+        })
+      } else {
+        refetch({
+          options: {
+            archived: false,
+            orderBy: {
+              column: 'title',
+              order: 'asc',
+            },
+            page: currentPage - 1,
+            pageSize: booksPerPage,
           },
-          page: currentPage - 1,
-          pageSize: booksPerPage,
-        },
-      })
+        })
+      }
     },
     onError: error => console.error(error),
   })
@@ -141,39 +163,33 @@ const DashboardPage = () => {
   })
 
   const [createBook] = useMutation(CREATE_BOOK, {
-    refetchQueries: [
-      {
-        query: CURRENT_USER,
-      },
-      {
-        query: GET_BOOKS,
-        variables: {
-          options: {
-            archived: false,
-            orderBy: {
-              column: 'title',
-              order: 'asc',
-            },
-            page: currentPage - 1,
-            pageSize: booksPerPage,
-          },
-        },
-      },
-    ],
-    awaitRefetchQueries: true,
     onError: () => {
       return showGenericErrorModal()
     },
   })
 
   const [deleteBook] = useMutation(DELETE_BOOK, {
-    refetchQueries: [
-      {
-        query: CURRENT_USER,
-      },
-      {
-        query: GET_BOOKS,
-        variables: {
+    update(cache) {
+      cache.modify({
+        fields: {
+          getBooks() {},
+        },
+      })
+    },
+    onCompleted: () => {
+      const nrOfPages = Math.ceil(books.totalCount / booksPerPage)
+
+      if (
+        currentPage > 1 &&
+        currentPage === nrOfPages &&
+        books.result.length === 1
+      ) {
+        setPaginationParams({
+          currentPage: currentPage - 1,
+          booksPerPage,
+        })
+      } else {
+        refetch({
           options: {
             archived: false,
             orderBy: {
@@ -183,10 +199,9 @@ const DashboardPage = () => {
             page: currentPage - 1,
             pageSize: booksPerPage,
           },
-        },
-      },
-    ],
-    awaitRefetchQueries: true,
+        })
+      }
+    },
     onError: err => {
       if (err.toString().includes('Not Authorised')) {
         return showUnauthorizedActionModal(false)
@@ -223,6 +238,21 @@ const DashboardPage = () => {
     })
   }
 
+  useEffect(() => {
+    // go to next page if all necessary data (new book data updated user) has been fetched
+    if (
+      newBookPageData &&
+      currentUser.teams.find(
+        team => team.role === 'owner' && team.objectId === newBookPageData?.id,
+      )
+    ) {
+      const { id, whereNext } = newBookPageData
+      setNewBookPageData(null)
+      setActionInProgress(false)
+      history.push(`/books/${id}/${whereNext}`)
+    }
+  }, [currentUser, newBookPageData])
+
   const createBookHandler = whereNext => {
     const variables = { input: { addUserToBookTeams: ['owner'] } }
 
@@ -231,15 +261,20 @@ const DashboardPage = () => {
       const { createBook: createBookData } = data
       const { id } = createBookData
 
-      history.push(`/books/${id}/${whereNext}`)
+      setNewBookPageData({
+        id,
+        whereNext,
+      })
     })
   }
 
   const onCreateBook = () => {
+    setActionInProgress(true)
     return createBookHandler('rename')
   }
 
   const onImportBook = () => {
+    setActionInProgress(true)
     return createBookHandler('import')
   }
 
@@ -248,7 +283,12 @@ const DashboardPage = () => {
       return showUnauthorizedActionModal(false)
     }
 
-    return deleteBook({ variables: { id: bookId } })
+    setActionInProgress(true)
+    return deleteBook({ variables: { id: bookId } }).then(() =>
+      setTimeout(() => {
+        setActionInProgress(false)
+      }, loaderDelay),
+    )
   }
 
   const onUploadBookThumbnail = (bookId, file) => {
@@ -270,19 +310,19 @@ const DashboardPage = () => {
 
   return (
     <Dashboard
-      books={queryData?.getBooks.result || []}
+      books={books.result}
       booksPerPage={booksPerPage}
       canDeleteBook={canTakeActionOnBook}
       canUploadBookThumbnail={canTakeActionOnBook}
       currentPage={currentPage}
-      loading={loading}
+      loading={loading || actionInProgress}
       onClickDelete={onClickDelete}
       onCreateBook={onCreateBook}
       onImportBook={onImportBook}
       onPageChange={onPageChange}
       onUploadBookThumbnail={onUploadBookThumbnail}
       title="Your books"
-      totalCount={queryData?.getBooks.totalCount || 0}
+      totalCount={books.totalCount}
     />
   )
 }
