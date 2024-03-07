@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { useQuery, useMutation, useSubscription } from '@apollo/client'
 import { useHistory } from 'react-router-dom'
 import { useCurrentUser } from '@coko/client'
-import { USER_UPDATED_SUBSCRIPTION } from '@coko/client/dist/helpers/currentUserQuery'
 
 import {
   GET_BOOKS,
@@ -25,9 +24,8 @@ const loaderDelay = 700
 
 const DashboardPage = () => {
   const history = useHistory()
-  const { currentUser } = useCurrentUser()
+  const { currentUser, setCurrentUser } = useCurrentUser()
   const [actionInProgress, setActionInProgress] = useState(false)
-  const [newBookPageData, setNewBookPageData] = useState(null)
 
   const canTakeActionOnBook = bookId =>
     isAdmin(currentUser) || isOwner(bookId, currentUser)
@@ -68,35 +66,20 @@ const DashboardPage = () => {
     }
   }, [queryData])
 
-  useSubscription(USER_UPDATED_SUBSCRIPTION, {
-    variables: { userId: currentUser.id },
-    onData: ({
-      data: {
-        data: { userUpdated },
+  // listen for changes to currentUser
+  useEffect(() => {
+    refetch({
+      options: {
+        archived: false,
+        orderBy: {
+          column: 'title',
+          order: 'asc',
+        },
+        page: currentPage - 1,
+        pageSize: booksPerPage,
       },
-    }) => {
-      const { teams: currentTeams } = currentUser
-      const { teams: updatedTeams } = userUpdated
-
-      if (
-        !currentTeams ||
-        (currentTeams && currentTeams.length !== updatedTeams.length)
-      ) {
-        refetch({
-          options: {
-            archived: false,
-            orderBy: {
-              column: 'title',
-              order: 'asc',
-            },
-            page: currentPage - 1,
-            pageSize: booksPerPage,
-          },
-        })
-      }
-    },
-    onError: error => console.error(error),
-  })
+    })
+  }, [currentUser])
 
   useSubscription(BOOK_CREATED_SUBSCRIPTION, {
     onData: () => {
@@ -238,21 +221,6 @@ const DashboardPage = () => {
     })
   }
 
-  useEffect(() => {
-    // go to next page if all necessary data (new book data updated user) has been fetched
-    if (
-      newBookPageData &&
-      currentUser.teams.find(
-        team => team.role === 'owner' && team.objectId === newBookPageData?.id,
-      )
-    ) {
-      const { id, whereNext } = newBookPageData
-      setNewBookPageData(null)
-      setActionInProgress(false)
-      history.push(`/books/${id}/${whereNext}`)
-    }
-  }, [currentUser, newBookPageData])
-
   const createBookHandler = whereNext => {
     const variables = { input: { addUserToBookTeams: ['owner'] } }
 
@@ -261,10 +229,20 @@ const DashboardPage = () => {
       const { createBook: createBookData } = data
       const { id } = createBookData
 
-      setNewBookPageData({
-        id,
-        whereNext,
+      setCurrentUser({
+        ...currentUser,
+        teams: [
+          ...currentUser.teams,
+          {
+            id: 'randomId',
+            global: false,
+            objectId: id,
+            role: 'owner',
+          },
+        ],
       })
+
+      history.push(`/books/${id}/${whereNext}`)
     })
   }
 
