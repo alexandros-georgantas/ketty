@@ -13,7 +13,6 @@ import debounce from 'lodash/debounce'
 import { uuid, useCurrentUser } from '@coko/client'
 import { webSocketServerUrl } from '@coko/client/dist/helpers/getUrl'
 import styled from 'styled-components'
-import { USER_UPDATED_SUBSCRIPTION } from '@coko/client/dist/helpers/currentUserQuery'
 import {
   GET_ENTIRE_BOOK,
   GET_BOOK_SETTINGS,
@@ -122,6 +121,12 @@ const ProducerPage = () => {
     fetchPolicy: 'network-only',
   })
 
+  const hasRendered = useRef(false)
+
+  // useEffect(() => {
+  //   hasRendered.current = true
+  // }, [])
+
   const {
     loading,
     error,
@@ -197,25 +202,22 @@ const ProducerPage = () => {
 
   // QUERIES SECTION END
 
-  // SUBSCRIPTIONS SECTION START
-  useSubscription(USER_UPDATED_SUBSCRIPTION, {
-    variables: { userId: currentUser.id },
-    skip: !currentUser,
-    fetchPolicy: 'network-only',
-    onData: ({ data }) => {
-      const { data: payload } = data
-      const { userUpdated } = payload
-
+  useEffect(() => {
+    if (currentUser && !hasRendered.current) {
+      hasRendered.current = true
+    } else if (hasRendered.current) {
       const stillMember =
-        isAdmin(userUpdated) ||
-        isOwner(bookId, userUpdated) ||
-        isCollaborator(bookId, userUpdated)
+        isAdmin(currentUser) ||
+        isOwner(bookId, currentUser) ||
+        isCollaborator(bookId, currentUser)
 
       if (stillMember) {
         showChangeInPermissionsModal()
       }
-    },
-  })
+    }
+  }, [currentUser])
+
+  // SUBSCRIPTIONS SECTION START
 
   useSubscription(BOOK_UPDATED_SUBSCRIPTION, {
     variables: { id: bookId },
