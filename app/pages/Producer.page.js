@@ -32,7 +32,7 @@ import {
   USE_CHATGPT,
   APPLICATION_PARAMETERS,
   SET_BOOK_COMPONENT_STATUS,
-  BOOK_SETTINGS_UPDATED_SUBSCRIPTION,
+  // BOOK_SETTINGS_UPDATED_SUBSCRIPTION,
 } from '../graphql'
 
 import {
@@ -93,6 +93,7 @@ const ProducerPage = () => {
   const [selectedChapterId, setSelectedChapterId] = useState(undefined)
   const [reconnecting, setReconnecting] = useState(false)
   const [metadataModalOpen, setMetadataModalOpen] = useState(false)
+  const [aiOn, setAiOn] = useState(false)
 
   const [currentBookComponentContent, setCurrentBookComponentContent] =
     useState(null)
@@ -123,10 +124,6 @@ const ProducerPage = () => {
 
   const hasRendered = useRef(false)
 
-  // useEffect(() => {
-  //   hasRendered.current = true
-  // }, [])
-
   const {
     loading,
     error,
@@ -137,6 +134,9 @@ const ProducerPage = () => {
     nextFetchPolicy: 'network-only',
     variables: {
       id: bookId,
+    },
+    onCompleted: data => {
+      setAiOn(data?.getBook?.bookSettings?.aiOn)
     },
   })
 
@@ -229,23 +229,33 @@ const ProducerPage = () => {
     },
   })
 
-  useSubscription(BOOK_SETTINGS_UPDATED_SUBSCRIPTION, {
-    variables: { id: bookId },
-    fetchPolicy: 'network-only',
-    onData: () => {
-      // only owners can change the setting, so only they get an immediate interface update
-      if (isOwner(bookId, currentUser)) {
-        if (selectedChapterId) {
-          setCurrentBookComponentContent(editorRef.current.getContent())
-          // this should work too: await until content is refetched before refetching settings and updating book
-          // await refetchBookComponent({ id: selectedChapterId })
-        }
+  // useSubscription(BOOK_SETTINGS_UPDATED_SUBSCRIPTION, {
+  //   variables: { id: bookId },
+  //   fetchPolicy: 'network-only',
+  //   onData: () => {
+  //     // only owners can change the setting, so only they get an immediate interface update
+  //     if (isOwner(bookId, currentUser)) {
+  //       if (selectedChapterId) {
+  //         setCurrentBookComponentContent(editorRef.current.getContent())
+  //         // this should work too: await until content is refetched before refetching settings and updating book
+  //         // await refetchBookComponent({ id: selectedChapterId })
+  //       }
 
-        refetchBook({ id: bookId })
-      }
-    },
-  })
+  //       refetchBook({ id: bookId })
+  //     }
+  //   },
+  // })
   // SUBSCRIPTIONS SECTION END
+
+  useEffect(() => {
+    if (isOwner(bookId, currentUser)) {
+      if (selectedChapterId) {
+        setCurrentBookComponentContent(editorRef.current.getContent())
+      }
+
+      refetchBook({ id: bookId })
+    }
+  }, [bookQueryData?.getBook.bookSettings?.aiOn])
 
   // MUTATIONS SECTION START
   const [updateContent] = useMutation(UPDATE_BOOK_COMPONENT_CONTENT, {
@@ -870,7 +880,7 @@ const ProducerPage = () => {
   return (
     <Editor
       aiEnabled={isAIEnabled?.config}
-      aiOn={bookQueryData?.getBook.bookSettings?.aiOn}
+      aiOn={aiOn}
       // bookComponentContent={bookComponentData?.getBookComponent?.content}
       bookComponentContent={currentBookComponentContent}
       bookMetadataValues={bookMetadataValues}
