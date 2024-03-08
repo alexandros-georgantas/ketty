@@ -13,7 +13,6 @@ import debounce from 'lodash/debounce'
 import { uuid, useCurrentUser } from '@coko/client'
 import { webSocketServerUrl } from '@coko/client/dist/helpers/getUrl'
 import styled from 'styled-components'
-import { USER_UPDATED_SUBSCRIPTION } from '@coko/client/dist/helpers/currentUserQuery'
 import {
   GET_ENTIRE_BOOK,
   GET_BOOK_SETTINGS,
@@ -33,7 +32,7 @@ import {
   USE_CHATGPT,
   APPLICATION_PARAMETERS,
   SET_BOOK_COMPONENT_STATUS,
-  BOOK_SETTINGS_UPDATED_SUBSCRIPTION,
+  // BOOK_SETTINGS_UPDATED_SUBSCRIPTION,
 } from '../graphql'
 
 import {
@@ -94,6 +93,7 @@ const ProducerPage = () => {
   const [selectedChapterId, setSelectedChapterId] = useState(undefined)
   const [reconnecting, setReconnecting] = useState(false)
   const [metadataModalOpen, setMetadataModalOpen] = useState(false)
+  const [aiOn, setAiOn] = useState(false)
 
   const [currentBookComponentContent, setCurrentBookComponentContent] =
     useState(null)
@@ -122,6 +122,8 @@ const ProducerPage = () => {
     fetchPolicy: 'network-only',
   })
 
+  const hasRendered = useRef(false)
+
   const {
     loading,
     error,
@@ -132,6 +134,9 @@ const ProducerPage = () => {
     nextFetchPolicy: 'network-only',
     variables: {
       id: bookId,
+    },
+    onCompleted: data => {
+      setAiOn(data?.getBook?.bookSettings?.aiOn)
     },
   })
 
@@ -197,25 +202,22 @@ const ProducerPage = () => {
 
   // QUERIES SECTION END
 
-  // SUBSCRIPTIONS SECTION START
-  useSubscription(USER_UPDATED_SUBSCRIPTION, {
-    variables: { userId: currentUser.id },
-    skip: !currentUser,
-    fetchPolicy: 'network-only',
-    onData: ({ data }) => {
-      const { data: payload } = data
-      const { userUpdated } = payload
-
+  useEffect(() => {
+    if (currentUser && !hasRendered.current) {
+      hasRendered.current = true
+    } else if (hasRendered.current) {
       const stillMember =
-        isAdmin(userUpdated) ||
-        isOwner(bookId, userUpdated) ||
-        isCollaborator(bookId, userUpdated)
+        isAdmin(currentUser) ||
+        isOwner(bookId, currentUser) ||
+        isCollaborator(bookId, currentUser)
 
       if (stillMember) {
         showChangeInPermissionsModal()
       }
-    },
-  })
+    }
+  }, [currentUser])
+
+  // SUBSCRIPTIONS SECTION START
 
   useSubscription(BOOK_UPDATED_SUBSCRIPTION, {
     variables: { id: bookId },
@@ -227,23 +229,33 @@ const ProducerPage = () => {
     },
   })
 
-  useSubscription(BOOK_SETTINGS_UPDATED_SUBSCRIPTION, {
-    variables: { id: bookId },
-    fetchPolicy: 'network-only',
-    onData: () => {
-      // only owners can change the setting, so only they get an immediate interface update
-      if (isOwner(bookId, currentUser)) {
-        if (selectedChapterId) {
-          setCurrentBookComponentContent(editorRef.current.getContent())
-          // this should work too: await until content is refetched before refetching settings and updating book
-          // await refetchBookComponent({ id: selectedChapterId })
-        }
+  // useSubscription(BOOK_SETTINGS_UPDATED_SUBSCRIPTION, {
+  //   variables: { id: bookId },
+  //   fetchPolicy: 'network-only',
+  //   onData: () => {
+  //     // only owners can change the setting, so only they get an immediate interface update
+  //     if (isOwner(bookId, currentUser)) {
+  //       if (selectedChapterId) {
+  //         setCurrentBookComponentContent(editorRef.current.getContent())
+  //         // this should work too: await until content is refetched before refetching settings and updating book
+  //         // await refetchBookComponent({ id: selectedChapterId })
+  //       }
 
-        refetchBook({ id: bookId })
-      }
-    },
-  })
+  //       refetchBook({ id: bookId })
+  //     }
+  //   },
+  // })
   // SUBSCRIPTIONS SECTION END
+
+  useEffect(() => {
+    if (isOwner(bookId, currentUser)) {
+      if (selectedChapterId) {
+        setCurrentBookComponentContent(editorRef.current.getContent())
+      }
+
+      refetchBook({ id: bookId })
+    }
+  }, [bookQueryData?.getBook.bookSettings?.aiOn])
 
   // MUTATIONS SECTION START
   const [updateContent] = useMutation(UPDATE_BOOK_COMPONENT_CONTENT, {
@@ -868,7 +880,7 @@ const ProducerPage = () => {
   return (
     <Editor
       aiEnabled={isAIEnabled?.config}
-      aiOn={bookQueryData?.getBook.bookSettings?.aiOn}
+      aiOn={aiOn}
       // bookComponentContent={bookComponentData?.getBookComponent?.content}
       bookComponentContent={currentBookComponentContent}
       bookMetadataValues={bookMetadataValues}
