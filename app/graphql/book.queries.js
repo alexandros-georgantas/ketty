@@ -61,6 +61,7 @@ const GET_ENTIRE_BOOK = gql`
       }
       bookSettings {
         aiOn
+        aiPdfDesignerOn
       }
     }
   }
@@ -86,6 +87,7 @@ const GET_BOOK_SETTINGS = gql`
       id
       bookSettings {
         aiOn
+        aiPdfDesignerOn
       }
     }
   }
@@ -118,9 +120,17 @@ const RENAME_BOOK = gql`
 `
 
 const UPDATE_SETTINGS = gql`
-  mutation UpdateBookSettings($bookId: ID!, $aiOn: Boolean!) {
-    updateBookSettings(bookId: $bookId, settings: { aiOn: $aiOn }) {
+  mutation UpdateBookSettings(
+    $bookId: ID!
+    $aiOn: Boolean
+    $aiPdfDesignerOn: Boolean
+  ) {
+    updateBookSettings(
+      bookId: $bookId
+      settings: { aiOn: $aiOn, aiPdfDesignerOn: $aiPdfDesignerOn }
+    ) {
       aiOn
+      aiPdfDesignerOn
       id
     }
   }

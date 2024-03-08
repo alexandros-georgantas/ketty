@@ -10,3 +10,6 @@ export { default as BookTitlePage } from './BookTitle.page'
 export { default as ImportPage } from './Import.page'
 export { default as VerifyEmailPage } from './VerifyEmail.page'
 export { default as ExporterPage } from './Exporter.page'
+// import AiPDFDesignerPage false
+// console.log(AiPDFDesignerPage)
+export { default as AiPDFDesignerPage } from './AiPDFDesigner.page'
