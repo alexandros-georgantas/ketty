@@ -4,7 +4,6 @@ import { CssAssistantContext } from '../hooks/CssAssistantContext'
 
 const StyledEditor = styled.div`
   border: none;
-  height: 100%;
   outline: none;
   width: 100%;
   z-index: 1;

@@ -88,9 +88,9 @@ const SettingsModal = ({
       </SettingsWrapper>
 
       <SettingsWrapper>
-        <SettingTitle>AI PDF Designer (Beta)</SettingTitle>
+        <SettingTitle>AI Book Designer (Beta)</SettingTitle>
         <SettingItem>
-          Users with edit access to this book can use the AI PDF Designer
+          Users with edit access to this book can use the AI Book Designer
           <Switch
             checked={isAiPdfOn}
             disabled={updateLoading || !canChangeSettings}

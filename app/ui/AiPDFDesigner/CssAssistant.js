@@ -1,6 +1,6 @@
 import React, { useEffect, useContext } from 'react'
 import styled from 'styled-components'
-import { debounce } from 'lodash'
+import { debounce, takeRight } from 'lodash'
 import { rotate360 } from '@coko/client'
 import PropTypes from 'prop-types'
 import { gql, useLazyQuery } from '@apollo/client'
@@ -129,7 +129,7 @@ const CssAssistant = ({
             setCss(styleSheetRef.current.textContent)
           }
 
-          textContent && (selectedCtx.node.textContent = textContent)
+          textContent && (selectedCtx.node.innerHTML = textContent)
           feedback && setFeedback(feedback)
           feedback &&
             selectedCtx.history.push({ role: 'assistant', content: feedback })
@@ -234,7 +234,7 @@ const CssAssistant = ({
                   // selectedNode !== htmlSrc && selectedCtx.node.textContent,
                 }),
               },
-              ...(selectedCtx.history || []),
+              ...(takeRight(selectedCtx.history, 14) || []),
             ],
           },
         })

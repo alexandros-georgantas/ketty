@@ -163,7 +163,7 @@ const ChatHistory = () => {
                       >
                         AI
                       </span>
-                      <strong>Coko AI PDF designer:</strong>
+                      <strong>Coko AI Book designer:</strong>
                     </>
                   )}
                 </MessageHeader>
