@@ -189,7 +189,7 @@ const ChatBubble = ({ forceHide }) => {
             justifyContent: 'space-between',
           }}
         >
-          <SmallText>Studio:</SmallText>
+          <SmallText>Coko AI Book Designer:</SmallText>
           <UnStyledButton
             onClick={() => setHideMessage(!hideMessage)}
             style={{ objectFit: 'contain', width: '18px', height: '18px' }}
@@ -201,7 +201,7 @@ const ChatBubble = ({ forceHide }) => {
           {feedback || (
             <>
               <span>Hello there!</span>
-              <span>{`I'm here to help with your pdf design`}</span>
+              <span>{`I'm here to help with your book's design`}</span>
               <span>Also, you can ask for the current property values</span>
               <span>for example: Which is the title margin/color/size?</span>
               <span style={{ marginBottom: '8px' }}>

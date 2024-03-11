@@ -195,11 +195,16 @@ const AiPDFDesigner = ({ bookTitle }) => {
   const [livePreview, setLivePreview] = useState(true)
   const [showEditor, setShowEditor] = useState(true)
   const [showPreview, setShowPreview] = useState(false)
-  const [showChat, setShowChat] = useState(true)
+  const [showChat, setShowChat] = useState(false)
 
   useEffect(() => {
     showPreview && livePreview && updatePreview()
   }, [htmlSrc, css])
+
+  useEffect(() => {
+    const timeoutID = setTimeout(() => setShowPreview(true), 1000)
+    return () => clearTimeout(timeoutID)
+  }, [])
 
   useEffect(() => {
     showPreview && updatePreview()
@@ -218,6 +223,7 @@ const AiPDFDesigner = ({ bookTitle }) => {
 
   const updatePreview = () => {
     previewRef?.current?.contentDocument?.documentElement &&
+      previewRef?.current?.contentDocument?.documentElement?.scrollTop > 0 &&
       (previewScrollTopRef.current =
         previewRef.current.contentDocument.documentElement.scrollTop)
 
@@ -258,7 +264,7 @@ const AiPDFDesigner = ({ bookTitle }) => {
               checked={showPreview}
               handleChange={() => setShowPreview(!showPreview)}
               id="showPreview"
-              label="PDF Preview"
+              label="Book Preview"
               style={{ margin: 0 }}
             />
             <StyledCheckbox
@@ -303,7 +309,7 @@ const AiPDFDesigner = ({ bookTitle }) => {
         {showEditor && showPreview && <WindowDivision />}
         <StyledWindow $show={showPreview}>
           <WindowHeading>
-            <span>PDF PREVIEW{bookTitle ? ` for: "${bookTitle}"` : ':'}</span>
+            <span>BOOK PREVIEW{bookTitle ? ` for: "${bookTitle}"` : ':'}</span>
             <StyledRefreshButton>
               <button
                 onClick={updatePreview}
@@ -332,7 +338,7 @@ const AiPDFDesigner = ({ bookTitle }) => {
             onLoad={updatePreview}
             ref={previewRef}
             srcDoc={previewSource}
-            title="PDF preview"
+            title="Book preview"
           />
         </StyledWindow>
       </WindowsContainer>

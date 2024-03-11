@@ -172,7 +172,7 @@ const Header = props => {
       key: 'aiPdfDesigner',
       label: (
         <UnstyledLink to={`/books/${bookId}/ai-pdf`}>
-          AI PDF Designer (Beta)
+          AI Book Designer (Beta)
         </UnstyledLink>
       ),
     })

@@ -732,7 +732,7 @@ template,
     --color-body: #222;
     --color-une: #8b8b8b;
     --color-deux: #0f0e0f;
-    --font-size: 13pt;
+    --font-size: 12pt;
     --font-lineHeight: 17pt;
     --indent-block: calc(var(--page-margin-left) * .3);
     --list-padding: 3mm;
@@ -1302,14 +1302,33 @@ The book is designed with pagedjs, so you will need to apply pagedjs css in some
 Here you have some pagedJs guidleines: ${values(PAGEDJS_GUIDELINES).join('\n')}
 `
 
-const CONTEXT = (sheet, inlineStyles, providedText) => `${
-  sheet ? `This style sheet is the css context:\n${sheet}\n` : ''
+const TASK_AND_ROLE_DEFINITIONS_SINGLE_ELEMENT =
+  elementTagName => `You are a CSS and HTML expert.
+
+Your task is to assist 'user' to style this ${elementTagName}(${htmlTagNames[elementTagName]}) element.
+
+You must interpret and translate the 'user' request, into css properties/values.
+
+Keep in mind that 'user' don't know how to code, so the prompt must be analysed carefully in order to complete the task.
+
+IMPORTANT: 
+- You must never say to user what to code, and never give him instructions.
+
+- Your mission and prupose is to style a ${htmlTagNames[elementTagName]}.
+
+- Your response must be ALWAYS the valid JSON (described below), NEVER text.
+`
+
+const CONTEXT = (sheet, inlineStyles, providedText, isSingleElement) => `${
+  !isSingleElement && sheet
+    ? `This style sheet is the css context:\n${sheet}\n`
+    : ''
 }${
-  inlineStyles
+  isSingleElement && inlineStyles
     ? `\nThis are the inline styles for the element in context: ${inlineStyles}`
     : ''
 }${
-  providedText
+  isSingleElement && providedText
     ? `\nThis is the current text of the element in context: "${providedText}"\n`
     : ''
 }
@@ -1326,7 +1345,7 @@ const SELECTOR_SHAPE = ({
  
  The only element types that exists in this context are the ones mentioned above. 
  
- But can be more than one element with te same selector, so, if you have for example: div#some-id > div > h2 as valid selector for the h2, and user request to change the first h2, you must do div#some-id > div:nth-of-type(1) > h2, It means you must target the container, not the h2 itselc, this applies to all elements/selectors
+ But can be more than one element with the same selector, so, if you have for example: div#some-id > div > h2 as valid selector for the h2, and user request to change the first h2, you must do div#some-id > div:nth-of-type(1) > h2, It means you must target the container, not the h2 itself, this applies to all elements/selectors
  
  If the prompt refers to an HTML element and it's tagname matches one of these valid selectors use it, otherwise use "${'@page'}" as default value. 
 
@@ -1351,21 +1370,19 @@ font-family property values can never be with quotes, eg: don't use 'sans-serif'
 
 const JSON_FORMAT = (
   providedText,
-  needsRules,
+  isSingleElement,
 ) => `The output must be always in the following JSON format: {
   ${
-    needsRules
+    isSingleElement
       ? `"rules": {"validCSSProperty": "validCSSValue", ...moreValidCssPropertiesAndValues},
 },`
-      : ''
+      : `"css": "${CSS_FORMAT}",`
   }
-"css": "${CSS_FORMAT}",${
-  providedText ? `\ntextContent: ${TEXT_CONTENT_FORMAT},` : ''
-}
+${providedText ? `\n"textContent": ${TEXT_CONTENT_FORMAT},` : ''}
 "feedback": you must provide here a string with the feedback: 
 this string can contain:
 
-- In case the user request can be fullfiled: The changes that where applied, if there is a list, then provide a list.
+- In case the user request can be fullfiled: The last changes that where applied, if there is a list, then provide a list.
 
 - If 'user' ask for the value of a property on the css sheet context, respond in natural(non-technical) language, for example: The [property] of the [requested element by user] is [value].
 
@@ -1377,7 +1394,7 @@ this string can contain:
 
 - If none of the above, Ask user again to improve his prompt in order to help you to style or modify his book.
 
-- Ensure the text is well formatted including line breaks (/n) and indentation (/t)
+- Ensure the text is well formatted including line breaks (/n) and indentation (/t),
 }
 `
 
@@ -1393,20 +1410,24 @@ IMPORTANT:
      - You must modify all necessary styles, including pagedjs rules.
      - It needs to be as detailed as possible, change colors, fonts, margins, padding, footers and any other pagedjs and css styles to achieve the most similar appearence.
 
-- The Response must be ALWAYS the expected valid JSON, never text, if you have something to say it must be on the feedback from the JSON object.
+- Your Response must be ALWAYS the expected valid JSON, never text, if you have something to say it must be on the feedback from the JSON object.
 `
 
-export const systemGuidelinesV2 = ({ ctx, sheet, selectors, providedText }) => `
+export const systemGuidelinesV2 = ({ ctx, sheet, selectors, providedText }) => {
+  const isSingleElement = ctx.node.id !== 'assistant-ctx'
+  return `${
+    !isSingleElement
+      ? TASK_AND_ROLE_DEFINITIONS
+      : TASK_AND_ROLE_DEFINITIONS_SINGLE_ELEMENT(ctx.tagName)
+  }
 
-${TASK_AND_ROLE_DEFINITIONS}
+${CONTEXT(sheet, ctx.node.getAttribute('style'), providedText, isSingleElement)}
 
-${CONTEXT(sheet, ctx.node.getAttribute('style'), providedText)}
-
-${CSS_LIMITS}
-
-${SELECTOR_SHAPE({ ...ctx, selectors })}
-
-${JSON_FORMAT(providedText, ctx.node.id !== 'assistant-ctx')}
+${CSS_LIMITS}${
+    !isSingleElement ? `\n${SELECTOR_SHAPE({ ...ctx, selectors })}` : ''
+  }
+${JSON_FORMAT(providedText, isSingleElement)}
 
 ${IMPORTANT_NOTES}
 `
+}
