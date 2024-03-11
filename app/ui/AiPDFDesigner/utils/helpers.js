@@ -20,9 +20,13 @@ export const srcdoc = (scope, css, template, scrollPos) => /* html */ `
             scopeIsReady && PagedPolyfill.preview(scopeIsReady);
           }
           catch (e) { console.log(e) }
-
-          // setTimeout(() => document.documentElement.scrollTo(0, ${scrollPos}), 2000) 
+          setTimeout(() => document.documentElement.scrollTo(0, ${scrollPos}), 100)
         });
+          document.addEventListener("scroll", () => {
+            if(document.documentElement.scrollTop < 10) {
+              document.documentElement.scrollTo(0, 10)
+            }
+          })
       </script>
     </body>
     </html>

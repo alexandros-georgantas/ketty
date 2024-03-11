@@ -1,6 +1,5 @@
 /* eslint-disable react/jsx-no-constructed-context-values */
 /* eslint-disable no-param-reassign */
-/* eslint-disable no-unused-vars */
 import React, { createContext, useMemo, useRef, useState } from 'react'
 import { callOn, htmlTagNames, onEntries, safeCall } from '../utils'
 
