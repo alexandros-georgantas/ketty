@@ -72,3 +72,18 @@ export const setInlineStyle = (node, styles) => {
     nodeRef.style[k] = v
   })
 }
+
+export const setImagesDefaultStyles = node => {
+  ;['picture', 'img'].includes(node.tagName) &&
+    setInlineStyle(node, {
+      'object-fit': 'contain',
+      width: '100%',
+      height: 'auto',
+    })
+}
+
+export const getScrollPercent = node =>
+  (node.scrollTop / node.scrollHeight) * 100
+
+export const setScrollFromPercent = (node, percentage) =>
+  (percentage * node.scrollHeight) / 100
