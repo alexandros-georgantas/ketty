@@ -1354,6 +1354,7 @@ const SELECTOR_SHAPE = ({
 
 const CSS_FORMAT = `A well formed valid CSS string that will be the complete provided context stylesheet with the following: 
     - You must add, to the provided stylesheet, the required changes that 'user' requested.
+    - Never remove declarations or rules that user has not requested to be removed from the original provided stylesheet.
     - if a declaration exists on the provided stylesheet apply the changes on that declaration, instead of creating a new one.
     - With this guides in mind you will always return a well formed valid CSS string including line breaks (/n) and indentation (/t)
 `

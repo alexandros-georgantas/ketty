@@ -4,7 +4,13 @@ import { debounce, takeRight } from 'lodash'
 import { rotate360 } from '@coko/client'
 import PropTypes from 'prop-types'
 import { gql, useLazyQuery } from '@apollo/client'
-import { autoResize, callOn, setInlineStyle, systemGuidelinesV2 } from './utils'
+import {
+  autoResize,
+  callOn,
+  setImagesDefaultStyles,
+  setInlineStyle,
+  systemGuidelinesV2,
+} from './utils'
 import SendIcon from './SendButton'
 import { CssAssistantContext } from './hooks/CssAssistantContext'
 
@@ -163,8 +169,10 @@ const CssAssistant = ({
       setSelectedCtx(getCtxBy('node', htmlSrc))
       setSelectedNode(htmlSrc)
       setCss(styleSheetRef.current.textContent)
+
       allChilds.forEach(child => {
         child.addEventListener('click', handleSelection)
+        setImagesDefaultStyles(child)
       })
       getValidSelectors(htmlSrc)
 

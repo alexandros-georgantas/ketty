@@ -9,8 +9,9 @@ import {
   initialPagedJSCSS,
   htmlTagNames,
   cssTemplate1,
-  // cssTemplate2,
   cssTemplate3,
+  setScrollFromPercent,
+  getScrollPercent,
 } from './utils'
 import SelectionBox from './SelectionBox'
 import { CssAssistantContext } from './hooks/CssAssistantContext'
@@ -194,17 +195,12 @@ const AiPDFDesigner = ({ bookTitle }) => {
   const [previewSource, setPreviewSource] = useState(null)
   const [livePreview, setLivePreview] = useState(true)
   const [showEditor, setShowEditor] = useState(true)
-  const [showPreview, setShowPreview] = useState(false)
+  const [showPreview, setShowPreview] = useState(true)
   const [showChat, setShowChat] = useState(false)
 
   useEffect(() => {
     showPreview && livePreview && updatePreview()
-  }, [htmlSrc, css])
-
-  useEffect(() => {
-    const timeoutID = setTimeout(() => setShowPreview(true), 1000)
-    return () => clearTimeout(timeoutID)
-  }, [])
+  }, [htmlSrc, css, passedContent])
 
   useEffect(() => {
     showPreview && updatePreview()
@@ -220,6 +216,14 @@ const AiPDFDesigner = ({ bookTitle }) => {
 
     updatePreview()
   }, [showEditor])
+
+  const handleScroll = e => {
+    const iframeElement = previewRef?.current?.contentDocument?.documentElement
+    iframeElement.scrollTo(
+      0,
+      setScrollFromPercent(iframeElement, getScrollPercent(e.target)),
+    )
+  }
 
   const updatePreview = () => {
     previewRef?.current?.contentDocument?.documentElement &&
@@ -298,7 +302,7 @@ const AiPDFDesigner = ({ bookTitle }) => {
                 : 'Book'}
             </span>
           </WindowHeading>
-          <EditorContainer>
+          <EditorContainer onScroll={handleScroll}>
             <Editor
               passedContent={passedContent}
               updatePreview={updatePreview}
