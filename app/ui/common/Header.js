@@ -91,11 +91,13 @@ const Header = props => {
     dashboardURL,
     showBackToBook,
     backToBookURL,
+    showAiPdfDesigner,
     showInvite,
     showPreview,
     showSettings,
     previewURL,
     dropdownItems,
+    showAiAssistantLink,
     bookId,
     ...rest
   } = props
@@ -161,6 +163,17 @@ const Header = props => {
         <Button onClick={onInvite} type="text">
           Share
         </Button>
+      ),
+    })
+  }
+
+  if (showAiAssistantLink) {
+    navItemsRight.push({
+      key: 'aiPdfDesigner',
+      label: (
+        <UnstyledLink to={`/books/${bookId}/ai-pdf`}>
+          AI Book Designer (Beta)
+        </UnstyledLink>
       ),
     })
   }
@@ -257,11 +270,13 @@ Header.propTypes = {
   onLogout: PropTypes.func.isRequired,
   showBackToBook: PropTypes.bool.isRequired,
   showDashboard: PropTypes.bool.isRequired,
+  showAiAssistantLink: PropTypes.bool,
   showInvite: PropTypes.bool.isRequired,
   showSettings: PropTypes.bool.isRequired,
   onInvite: PropTypes.func.isRequired,
   onSettings: PropTypes.func.isRequired,
   showPreview: PropTypes.bool.isRequired,
+  showAiPdfDesigner: PropTypes.bool.isRequired,
   dashboardURL: PropTypes.string,
   backToBookURL: PropTypes.string,
   previewURL: PropTypes.string,
@@ -281,6 +296,7 @@ Header.defaultProps = {
   dashboardURL: null,
   backToBookURL: null,
   previewURL: null,
+  showAiAssistantLink: false,
 }
 
 export default Header

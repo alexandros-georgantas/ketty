@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { Switch } from 'antd'
-import { useMutation, useQuery, useSubscription } from '@apollo/client'
-import { useCurrentUser } from '@coko/client'
+import { useMutation, useSubscription } from '@apollo/client'
+import { useCurrentUser, grid } from '@coko/client'
 import {
   BOOK_SETTINGS_UPDATED_SUBSCRIPTION,
-  GET_BOOK_SETTINGS,
   UPDATE_SETTINGS,
 } from '../../graphql'
 import { isAdmin, isOwner } from '../../helpers/permissions'
+import { Button } from '../common'
 
 const Wrapper = styled.div``
 
 const SettingsWrapper = styled.div`
-  margin-top: 8px;
+  margin: 24px 0;
 `
 
 const SettingTitle = styled.strong``
@@ -24,51 +24,49 @@ const SettingItem = styled.div`
   justify-content: space-between;
 `
 
-const SettingsModal = ({ bookId }) => {
+const ButtonsContainer = styled.div`
+  display: flex;
+  gap: ${grid(4)};
+  justify-content: right;
+  margin-top: 36px;
+`
+
+const StyledButton = styled(Button)`
+  box-shadow: none;
+  padding: 0 2%;
+`
+
+const SettingsModal = ({
+  bookId,
+  bookSettings,
+  closeModal,
+  refetchBookSettings,
+}) => {
   const { currentUser } = useCurrentUser()
 
-  const [checked, setChecked] = useState(false)
-
-  const {
-    loading,
-    data: bookQueryData,
-    refetch: refetchBookSettings,
-  } = useQuery(GET_BOOK_SETTINGS, {
-    fetchPolicy: 'network-only',
-    nextFetchPolicy: 'network-only',
-    variables: {
-      id: bookId,
-    },
-  })
-
-  useEffect(() => {
-    if (bookQueryData) {
-      const {
-        getBook: { bookSettings },
-      } = bookQueryData
-
-      const { aiOn } = bookSettings
-      setChecked(aiOn)
-    }
-  }, [bookQueryData])
+  const [isAiOn, setIsAiOn] = useState(bookSettings.aiOn)
+  const [isAiPdfOn, setIsAiPdfOn] = useState(!!bookSettings.aiPdfDesignerOn)
 
   // MUTATIONS SECTION START
-  const [updateBookSettings] = useMutation(UPDATE_SETTINGS)
+  const [updateBookSettings, { loading: updateLoading }] = useMutation(
+    UPDATE_SETTINGS,
+    {
+      onCompleted: closeModal,
+    },
+  )
 
   useSubscription(BOOK_SETTINGS_UPDATED_SUBSCRIPTION, {
     variables: { id: bookId },
     fetchPolicy: 'network-only',
-    onData: () => {
-      refetchBookSettings({ id: bookId })
-    },
+    onData: () => refetchBookSettings({ id: bookId }),
   })
 
-  const handleToggleAiOn = aiOn => {
-    setChecked(aiOn)
+  const handleUpdateBookSettings = () => {
     updateBookSettings({
       variables: {
         bookId,
-        aiOn,
+        aiOn: isAiOn,
+        aiPdfDesignerOn: isAiPdfOn,
       },
     })
   }
@@ -78,22 +76,65 @@ const SettingsModal = ({ bookId }) => {
   return (
     <Wrapper>
       <SettingsWrapper>
-        <SettingTitle>Use AI</SettingTitle>
+        <SettingTitle>AI writing prompt use</SettingTitle>
         <SettingItem>
-          Users with edit access can use AI writing prompts
+          Users with edit access to this book can use AI writing prompts
           <Switch
-            checked={checked}
-            disabled={loading || !canChangeSettings}
-            onChange={e => handleToggleAiOn(e)}
+            checked={isAiOn}
+            disabled={updateLoading || !canChangeSettings}
+            onChange={e => setIsAiOn(e)}
           />
         </SettingItem>
       </SettingsWrapper>
+
+      <SettingsWrapper>
+        <SettingTitle>AI Book Designer (Beta)</SettingTitle>
+        <SettingItem>
+          Users with edit access to this book can use the AI Book Designer
+          <Switch
+            checked={isAiPdfOn}
+            disabled={updateLoading || !canChangeSettings}
+            onChange={e => setIsAiPdfOn(e)}
+          />
+        </SettingItem>
+      </SettingsWrapper>
+      <ButtonsContainer>
+        <StyledButton
+          disabled={!canChangeSettings}
+          htmlType="submit"
+          loading={updateLoading}
+          onClick={handleUpdateBookSettings}
+          type="primary"
+        >
+          Save
+        </StyledButton>
+
+        <StyledButton
+          disabled={updateLoading}
+          htmlType="reset"
+          onClick={closeModal}
+        >
+          Cancel
+        </StyledButton>
+      </ButtonsContainer>
     </Wrapper>
   )
 }
 
 SettingsModal.propTypes = {
   bookId: PropTypes.string.isRequired,
+  bookSettings: PropTypes.shape({
+    aiOn: PropTypes.bool,
+    aiPdfDesignerOn: PropTypes.bool,
+  }),
+  closeModal: PropTypes.func.isRequired,
+  refetchBookSettings: PropTypes.func.isRequired,
 }
 
+SettingsModal.defaultProps = {
+  bookSettings: {
+    aiOn: false,
+    aiPdfDesignerOn: false,
+  },
+}
 export default SettingsModal

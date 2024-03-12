@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Modal, Tooltip } from 'antd'
 import { QuestionCircleOutlined } from '@ant-design/icons'
-import { useApolloClient } from '@apollo/client'
+import { useApolloClient, useQuery } from '@apollo/client'
 import { Route, Switch, useHistory, Redirect } from 'react-router-dom'
 import styled, { createGlobalStyle } from 'styled-components'
 
@@ -35,7 +35,10 @@ import {
   ResetPasswordPage,
   SignupPage,
   VerifyEmailPage,
+  AiPDFDesignerPage,
 } from './pages'
+import { GET_BOOK_SETTINGS } from './graphql'
+import { CssAssistantProvider } from './ui/AiPDFDesigner/hooks/CssAssistantContext'
 
 const LayoutWrapper = styled.div`
   display: flex;
@@ -108,6 +111,19 @@ const SiteHeader = () => {
     return currentPath.split('/')[2]
   }
 
+  // This can be placed in a custom hook
+  const { data: bookQueryData, refetch: refetchBookSettings } = useQuery(
+    GET_BOOK_SETTINGS,
+    {
+      fetchPolicy: 'network-only',
+      nextFetchPolicy: 'network-only',
+      variables: {
+        id: getBookId(),
+      },
+      skip: !getBookId(),
+    },
+  )
+
   const triggerInviteModal = () => {
     const inviteModal = modal.confirm()
     return inviteModal.update({
@@ -158,6 +174,9 @@ const SiteHeader = () => {
       content: (
         <SettingsModal
           bookId={isProducerPage || isExporterPage ? getBookId() : undefined}
+          bookSettings={bookQueryData?.getBook.bookSettings}
+          closeModal={() => settingsModal.destroy()}
+          refetchBookSettings={refetchBookSettings}
         />
       ),
       maskClosable: true,
@@ -173,18 +192,28 @@ const SiteHeader = () => {
 
   const isProducerPage = currentPath.includes('/producer')
   const isExporterPage = currentPath.includes('/exporter')
+  const isAiAssistantPage = currentPath.includes('/ai-pdf')
 
   return currentUser ? (
     <>
       <Header
-        bookId={isProducerPage || isExporterPage ? getBookId() : undefined}
+        bookId={
+          isProducerPage || isExporterPage || isAiAssistantPage
+            ? getBookId()
+            : undefined
+        }
         brandLabel="Lulu"
         brandLogoURL="/ketida.png"
         homeURL="/dashboard"
         onInvite={triggerInviteModal}
         onLogout={logout}
         onSettings={triggerSettingsModal}
-        showBackToBook={isExporterPage}
+        showAiAssistantLink={
+          bookQueryData?.getBook.bookSettings.aiPdfDesignerOn &&
+          !isAiAssistantPage &&
+          !isExporterPage
+        }
+        showBackToBook={isExporterPage || isAiAssistantPage}
         showDashboard={currentPath !== '/dashboard'}
         showInvite={isProducerPage}
         showPreview={isProducerPage}
@@ -299,6 +328,14 @@ const routes = (
               <Route exact path="/books/:bookId/exporter">
                 <Authenticated>
                   <ExporterPage />
+                </Authenticated>
+              </Route>
+
+              <Route exact path="/books/:bookId/ai-pdf">
+                <Authenticated>
+                  <CssAssistantProvider>
+                    <AiPDFDesignerPage />
+                  </CssAssistantProvider>
                 </Authenticated>
               </Route>
 
