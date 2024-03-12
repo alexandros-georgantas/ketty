@@ -74,9 +74,9 @@ export const setInlineStyle = (node, styles) => {
 }
 
 export const setImagesDefaultStyles = node => {
-  ;['picture', 'img'].includes(node.tagName) &&
+  ;['picture', 'img', 'figure'].includes(node.localName) &&
     setInlineStyle(node, {
-      'object-fit': 'contain',
+      objectFit: 'contain',
       width: '100%',
       height: 'auto',
     })

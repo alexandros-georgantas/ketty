@@ -210,7 +210,8 @@ const SiteHeader = () => {
         onSettings={triggerSettingsModal}
         showAiAssistantLink={
           bookQueryData?.getBook.bookSettings.aiPdfDesignerOn &&
-          !isAiAssistantPage
+          !isAiAssistantPage &&
+          !isExporterPage
         }
         showBackToBook={isExporterPage || isAiAssistantPage}
         showDashboard={currentPath !== '/dashboard'}
