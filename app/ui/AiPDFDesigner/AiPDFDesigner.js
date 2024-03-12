@@ -250,7 +250,7 @@ const AiPDFDesigner = ({ bookTitle }) => {
           <ChatBubble forceHide={showChat} onRight />
           <Assistant
             enabled
-            placeholder="Type here how your book should look..."
+            placeholder="Type your book design instruction or question here ..."
             stylesFromSource={initialPagedJSCSS}
             updatePreview={updatePreview}
           />

@@ -202,17 +202,15 @@ const ChatBubble = ({ forceHide }) => {
             <>
               <span>Hello there!</span>
               <span>{`I'm here to help with your book's design`}</span>
-              <span>Also, you can ask for the current property values</span>
-              <span>for example: Which is the title margin/color/size?</span>
+              <span>You can also ask for the current property values</span>
+              <span>for example: What is the page size of the book?</span>
               <span style={{ marginBottom: '8px' }}>
-                Here you have some suggestions to get started:
+                Here are some suggestions to get started:
               </span>
               <ul>
-                <OptionsTemplate content="Make the Title blue, and add a underline" />
-                <OptionsTemplate content="Wich is the size of the page?" />
-                <OptionsTemplate content="The back should be Black and text white" />
-                <OptionsTemplate content="Make the text sans serif" />
-                <OptionsTemplate content="Paragraphs should be dark grey" />
+                <OptionsTemplate content="Change the page size 5 x 8 inches" />
+                <OptionsTemplate content="Change the title font to sans serif" />
+                <OptionsTemplate content="Make all the headings blue" />
               </ul>
             </>
           )}
