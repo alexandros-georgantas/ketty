@@ -139,10 +139,40 @@ const onInfoModal = errorMessage => {
   })
 }
 
+const showOpenAiRateLimitModal = () => {
+  const modal = Modal.warning()
+  return modal.update({
+    title: 'Rate Limit Exceeded',
+    content: (
+      <>
+        <Paragraph>
+          It looks like you’ve made too many requests in a short period. We have
+          usage limits to ensure service reliability. Please wait for a few
+          minutes before trying again.
+        </Paragraph>
+        <Paragraph>
+          If you’re repeatedly getting this message, please contact your admin.
+        </Paragraph>
+      </>
+    ),
+    onOk() {
+      modal.destroy()
+    },
+    okButtonProps: { style: { backgroundColor: 'black' } },
+    maskClosable: false,
+    width: 570,
+    bodyStyle: {
+      marginRight: 38,
+      textAlign: 'justify',
+    },
+  })
+}
+
 export {
   showUnauthorizedAccessModal,
   showGenericErrorModal,
   showUnauthorizedActionModal,
   showChangeInPermissionsModal,
+  showOpenAiRateLimitModal,
   onInfoModal,
 }
