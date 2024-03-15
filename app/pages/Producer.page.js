@@ -47,6 +47,7 @@ import {
   showGenericErrorModal,
   showChangeInPermissionsModal,
   onInfoModal,
+  showOpenAiRateLimitModal,
 } from '../helpers/commonModals'
 
 import { Editor, Modal, Paragraph, Spin } from '../ui'
@@ -165,6 +166,10 @@ const ProducerPage = () => {
     onError: err => {
       if (err.toString().includes('Missing access key')) {
         onInfoModal('Access key is missing or invalid')
+      } else if (
+        err.toString().includes('Request failed with status code 429')
+      ) {
+        showOpenAiRateLimitModal()
       } else {
         showGenericErrorModal()
       }
