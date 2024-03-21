@@ -37,7 +37,7 @@ import {
   VerifyEmailPage,
   AiPDFDesignerPage,
 } from './pages'
-import { GET_BOOK_SETTINGS } from './graphql'
+import { GET_BOOK_SETTINGS, APPLICATION_PARAMETERS } from './graphql'
 import { CssAssistantProvider } from './ui/AiPDFDesigner/hooks/CssAssistantContext'
 
 const LayoutWrapper = styled.div`
@@ -122,6 +122,14 @@ const SiteHeader = () => {
       },
       skip: !getBookId(),
     },
+  )
+
+  const { data: applicationParametersData } = useQuery(APPLICATION_PARAMETERS, {
+    fetchPolicy: 'network-only',
+  })
+
+  const isAIEnabled = applicationParametersData?.getApplicationParameters.find(
+    c => c.area === 'aiEnabled',
   )
 
   const triggerInviteModal = () => {
@@ -209,6 +217,7 @@ const SiteHeader = () => {
         onLogout={logout}
         onSettings={triggerSettingsModal}
         showAiAssistantLink={
+          isAIEnabled?.config &&
           bookQueryData?.getBook.bookSettings.aiPdfDesignerOn &&
           !isAiAssistantPage &&
           !isExporterPage
@@ -217,7 +226,7 @@ const SiteHeader = () => {
         showDashboard={currentPath !== '/dashboard'}
         showInvite={isProducerPage}
         showPreview={isProducerPage}
-        showSettings={isProducerPage}
+        showSettings={isProducerPage && isAIEnabled?.config}
         userDisplayName={currentUser.displayName}
       />
       {contextHolder}
