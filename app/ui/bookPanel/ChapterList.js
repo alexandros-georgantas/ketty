@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { List, Empty } from 'antd'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
@@ -11,6 +11,10 @@ const ChapterListWrapper = styled.div`
   overflow-y: auto;
 `
 
+const StyledList = styled(List)`
+  padding: 2px;
+`
+
 const ChapterList = ({
   chapters,
   onChapterClick,
@@ -21,6 +25,8 @@ const ChapterList = ({
   className,
   canEdit,
 }) => {
+  const chapterList = useRef()
+
   const handleDragEnd = result => {
     if (!canEdit || !result.destination) {
       return
@@ -39,15 +45,48 @@ const ChapterList = ({
 
   const handleChapterDelete = id => {
     onDeleteChapter(id)
+    setFocusedChapter(id === selectedChapterId ? 0 : selectedChapterId || 0)
+  }
+
+  const [focusedChapter, setFocusedChapter] = useState(
+    selectedChapterId
+      ? chapters.findIndex(chapter => chapter.id === selectedChapterId)
+      : 0,
+  )
+
+  useEffect(() => {
+    const handleKeyDown = event => {
+      if (event.key === 'ArrowUp') {
+        setFocusedChapter(prevIndex => (prevIndex > 0 ? prevIndex - 1 : 0))
+      } else if (event.key === 'ArrowDown') {
+        setFocusedChapter(prevIndex =>
+          prevIndex < chapters.length - 1 ? prevIndex + 1 : prevIndex,
+        )
+      }
+    }
+
+    chapterList?.current?.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      chapterList?.current?.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [chapters, focusedChapter])
+
+  const handleChapterClick = id => {
+    if (
+      !chapterList.current?.getAttribute('data-rbd-scroll-container-context-id')
+    ) {
+      onChapterClick(id)
+    }
   }
 
   return (
-    <ChapterListWrapper className={className}>
+    <ChapterListWrapper className={className} ref={chapterList}>
       <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="book-chapters">
+        <Droppable droppableId="book-chapters" type="group">
           {provided => (
             <div {...provided.droppableProps} ref={provided.innerRef}>
-              <List
+              <StyledList
                 dataSource={chapters}
                 loading={chaptersActionInProgress}
                 locale={{
@@ -66,11 +105,12 @@ const ChapterList = ({
                     key={chapter.id}
                   >
                     {(innerProvided, snapshot) => (
-                      <div ref={innerProvided.innerRef}>
+                      <li ref={innerProvided.innerRef}>
                         <ChapterItem
                           {...innerProvided.draggableProps}
-                          {...innerProvided.dragHandleProps}
                           canEdit={canEdit}
+                          dragHandleProps={innerProvided.dragHandleProps}
+                          focused={focusedChapter === index}
                           id={chapter.id}
                           isDragging={snapshot.isDragging}
                           lockedBy={
@@ -78,17 +118,18 @@ const ChapterList = ({
                               ? `${chapter.lock.givenNames} ${chapter.lock.surname}`
                               : null
                           }
-                          onChapterClick={onChapterClick}
+                          onChapterClick={handleChapterClick}
                           onClickDelete={handleChapterDelete}
                           selectedChapterId={selectedChapterId}
                           status={chapter.status}
                           title={chapter.title}
                           uploading={chapter.uploading}
                         />
-                      </div>
+                      </li>
                     )}
                   </Draggable>
                 )}
+                role="menu"
               />
               {provided.placeholder}
             </div>
