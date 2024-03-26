@@ -160,15 +160,17 @@ const Footer = props => {
       {notificationContextHolder}
 
       <ButtonGroup>
-        <Button
-          // disabled={isSaveDisabled || updateLoading || loadingPreview}
-          disabled={isSaveDisabled || updateLoading || !canModify}
-          loading={updateLoading}
-          onClick={handleClickSave}
-          type="primary"
-        >
-          Save
-        </Button>
+        {canModify && (
+          <Button
+            // disabled={isSaveDisabled || updateLoading || loadingPreview}
+            disabled={isSaveDisabled || updateLoading || !canModify}
+            loading={updateLoading}
+            onClick={handleClickSave}
+            type="primary"
+          >
+            Save
+          </Button>
+        )}
 
         <Button
           // disabled={isDownloadButtonDisabled || loadingPreview}
