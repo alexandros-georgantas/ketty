@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import styled, { css } from 'styled-components'
-import { EditOutlined, VerticalAlignTopOutlined } from '@ant-design/icons'
+import { EditOutlined } from '@ant-design/icons'
 
 import { grid, th } from '@coko/client'
 
@@ -10,6 +10,7 @@ import { Button, Input, Modal, Select } from '../common'
 // #region styled
 const Wrapper = styled.div`
   display: flex;
+  flex-grow: 1;
   gap: ${grid(2)};
 `
 
@@ -50,12 +51,6 @@ const StyledButton = styled(Button)`
     font-size: 20px !important;
   }
 `
-
-const CollapseArrow = styled(VerticalAlignTopOutlined)`
-  transform: ${props =>
-    props.$isCollapsed ? 'rotate(270deg)' : 'rotate(90deg)'};
-  transition: transform 0.3s ease-out;
-`
 // #endregion styled
 
 const ProfileRow = props => {
@@ -64,7 +59,6 @@ const ProfileRow = props => {
     className,
     isCollapsed,
     isNewProfileSelected,
-    onClickCollapse,
     onProfileChange,
     onProfileRename,
     profiles,
@@ -159,12 +153,6 @@ const ProfileRow = props => {
           </Modal>
         </>
       )}
-
-      <StyledButton
-        icon={<CollapseArrow $isCollapsed={isCollapsed} />}
-        onClick={onClickCollapse}
-        type="text"
-      />
     </Wrapper>
   )
 }
@@ -183,7 +171,6 @@ ProfileRow.propTypes = {
     value: PropTypes.string.isRequired,
   }).isRequired,
   isNewProfileSelected: PropTypes.bool.isRequired,
-  onClickCollapse: PropTypes.func.isRequired,
   onProfileChange: PropTypes.func.isRequired,
   onProfileRename: PropTypes.func.isRequired,
 }
