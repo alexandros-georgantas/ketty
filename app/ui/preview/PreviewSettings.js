@@ -6,10 +6,12 @@ import styled from 'styled-components'
 import { Divider } from 'antd'
 import pick from 'lodash/pick'
 import isEqual from 'lodash/isEqual'
+import { VerticalAlignTopOutlined } from '@ant-design/icons'
 
 import { grid } from '@coko/client'
 
 import {
+  Button,
   Ribbon,
   //  Spin
 } from '../common'
@@ -25,17 +27,23 @@ const Wrapper = styled.div`
   height: 100%;
   padding: ${grid(4)};
 
-  > div:first-child {
-    margin-bottom: ${grid(2)};
+  > * + * {
+    margin-block-start: ${grid(2)};
   }
 
-  > div:nth-child(2) {
-    margin-bottom: ${grid(1)} 0;
+  > :last-child:not(:first-child) {
+    margin-block-start: auto;
   }
+`
 
-  > div:nth-child(5) {
-    flex-grow: 1;
-  }
+const TopRowWrapper = styled.div`
+  display: flex;
+`
+
+const CollapseArrow = styled(VerticalAlignTopOutlined)`
+  transform: ${props =>
+    props.$isCollapsed ? 'rotate(270deg)' : 'rotate(90deg)'};
+  transition: transform 0.3s ease-out;
 `
 
 // #region helpoers
@@ -72,6 +80,7 @@ const PreviewSettings = props => {
     isDownloadButtonDisabled,
     isUserConnectedToLulu,
     loadingPreview,
+    luluConfig,
     onClickCollapse,
     onClickConnectToLulu,
     onOptionsChange,
@@ -129,22 +138,32 @@ const PreviewSettings = props => {
 
   return (
     <Wrapper>
-      <ProfileRow
-        canModifyProfiles={canModify}
-        isCollapsed={isCollapsed}
-        isNewProfileSelected={isNewProfileSelected}
-        onClickCollapse={handleClickCollapse}
-        onProfileChange={handleProfileChange}
-        onProfileRename={renameProfile}
-        profiles={profileSelectOptions}
-        selectedProfile={selectedProfileSelectOption}
-      />
+      <TopRowWrapper>
+        {luluConfig && (
+          <ProfileRow
+            canModifyProfiles={canModify}
+            isCollapsed={isCollapsed}
+            isNewProfileSelected={isNewProfileSelected}
+            onProfileChange={handleProfileChange}
+            onProfileRename={renameProfile}
+            profiles={profileSelectOptions}
+            selectedProfile={selectedProfileSelectOption}
+          />
+        )}
+        <Button
+          icon={<CollapseArrow $isCollapsed={isCollapsed} />}
+          onClick={handleClickCollapse}
+          type="text"
+        />
+      </TopRowWrapper>
 
       {!isCollapsed && (
         <>
-          <Ribbon hide={!hasChanges || !canModify}>
-            You have unsaved changes
-          </Ribbon>
+          {canModify && hasChanges && (
+            <Ribbon hide={!hasChanges || !canModify}>
+              You have unsaved changes
+            </Ribbon>
+          )}
 
           <ExportOptionsSection
             disabled={optionsDisabled}
@@ -160,21 +179,19 @@ const PreviewSettings = props => {
 
           <Divider />
 
-          <div>
-            {!isNewProfileSelected && (
-              <LuluIntegration
-                canUploadToProvider={canUploadToProvider}
-                isConnected={isUserConnectedToLulu}
-                isInLulu={isProfileInLulu}
-                isSynced={isProfileSyncedWithLulu}
-                lastSynced={lastSynced}
-                onClickConnect={onClickConnectToLulu}
-                onClickSendToLulu={sendToLulu}
-                projectId={projectId}
-                projectUrl={projectUrl}
-              />
-            )}
-          </div>
+          {!isNewProfileSelected && (
+            <LuluIntegration
+              canUploadToProvider={canUploadToProvider}
+              isConnected={isUserConnectedToLulu}
+              isInLulu={isProfileInLulu}
+              isSynced={isProfileSyncedWithLulu}
+              lastSynced={lastSynced}
+              onClickConnect={onClickConnectToLulu}
+              onClickSendToLulu={sendToLulu}
+              projectId={projectId}
+              projectUrl={projectUrl}
+            />
+          )}
 
           <Footer
             canModify={canModify}
@@ -229,6 +246,7 @@ PreviewSettings.propTypes = {
   isDownloadButtonDisabled: PropTypes.bool.isRequired,
   isUserConnectedToLulu: PropTypes.bool.isRequired,
   loadingPreview: PropTypes.bool.isRequired,
+  luluConfig: PropTypes.shape(),
   onClickCollapse: PropTypes.func.isRequired,
   onClickConnectToLulu: PropTypes.func.isRequired,
   onOptionsChange: PropTypes.func.isRequired,
@@ -267,6 +285,8 @@ PreviewSettings.propTypes = {
   updateProfileOptions: PropTypes.func.isRequired,
 }
 
-PreviewSettings.defaultProps = {}
+PreviewSettings.defaultProps = {
+  luluConfig: null,
+}
 
 export default PreviewSettings
