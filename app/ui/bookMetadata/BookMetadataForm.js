@@ -55,7 +55,7 @@ const BookMetadataForm = ({
     <Modal
       cancelText="Close"
       centered
-      destroyOnClose
+      forceRender
       maskClosable={false}
       okButtonProps={{
         style: { backgroundColor: canChangeMetadata ? 'black' : '' },
@@ -181,7 +181,7 @@ BookMetadataForm.propTypes = {
     ).isRequired,
     topPage: PropTypes.string,
     bottomPage: PropTypes.string,
-    copyrightLicense: PropTypes.oneOf(['SCL', 'PD', 'CC']),
+    copyrightLicense: PropTypes.oneOf(['SCL', 'PD', 'CC', '']),
     ncCopyrightHolder: PropTypes.string,
     ncCopyrightYear: PropTypes.string,
     // ncCopyrightYear: PropTypes.instanceOf(dayjs),
@@ -194,7 +194,7 @@ BookMetadataForm.propTypes = {
       SA: PropTypes.bool,
       ND: PropTypes.bool,
     }),
-    publicDomainType: PropTypes.oneOf(['cc0', 'public']),
+    publicDomainType: PropTypes.oneOf(['cc0', 'public', '']),
   }).isRequired,
   open: PropTypes.bool.isRequired,
   closeModal: PropTypes.func.isRequired,

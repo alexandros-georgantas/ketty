@@ -222,16 +222,16 @@ const PreviewerPage = () => {
 
   const luluConfig = getApplicationParameters?.find(
     p => p.area === 'integrations',
-  ).config.lulu
+  )?.config.lulu
   // #endregion queries
 
   // #region handlers
   const getLuluConfigValue = value => {
     const config = getApplicationParameters?.find(
       p => p.area === 'integrations',
-    ).config.lulu
+    )?.config.lulu
 
-    return config[value]
+    return config && config[value]
   }
 
   const handleConnectToLulu = () => {

@@ -27,7 +27,6 @@ const CopyrightLicenseOption = props => {
     description,
     link,
     linkText,
-    key,
     children,
     selected,
     onChange,
@@ -65,7 +64,6 @@ const CopyrightLicenseOption = props => {
           </div>
         </Wrapper>
       }
-      key={key}
       showArrow={selected}
       {...rest}
     >
@@ -76,7 +74,6 @@ const CopyrightLicenseOption = props => {
 
 CopyrightLicenseOption.propTypes = {
   title: PropTypes.string.isRequired,
-  key: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
   link: PropTypes.string,
   linkText: PropTypes.string,

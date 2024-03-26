@@ -91,7 +91,6 @@ const Header = props => {
     dashboardURL,
     showBackToBook,
     backToBookURL,
-    showAiPdfDesigner,
     showInvite,
     showPreview,
     showSettings,
@@ -272,11 +271,10 @@ Header.propTypes = {
   showDashboard: PropTypes.bool.isRequired,
   showAiAssistantLink: PropTypes.bool,
   showInvite: PropTypes.bool.isRequired,
-  showSettings: PropTypes.bool.isRequired,
+  showSettings: PropTypes.bool,
   onInvite: PropTypes.func.isRequired,
   onSettings: PropTypes.func.isRequired,
   showPreview: PropTypes.bool.isRequired,
-  showAiPdfDesigner: PropTypes.bool.isRequired,
   dashboardURL: PropTypes.string,
   backToBookURL: PropTypes.string,
   previewURL: PropTypes.string,
@@ -297,6 +295,7 @@ Header.defaultProps = {
   backToBookURL: null,
   previewURL: null,
   showAiAssistantLink: false,
+  showSettings: false,
 }
 
 export default Header

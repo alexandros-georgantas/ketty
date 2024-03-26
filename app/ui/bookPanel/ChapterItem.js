@@ -236,11 +236,12 @@ ChapterItem.propTypes = {
   onClickDelete: PropTypes.func.isRequired,
   onChapterClick: PropTypes.func.isRequired,
   canEdit: PropTypes.bool.isRequired,
-  dragHandleProps: PropTypes.func.isRequired,
+  dragHandleProps: PropTypes.shape(),
   focused: PropTypes.bool.isRequired,
 }
 
 ChapterItem.defaultProps = {
+  dragHandleProps: null,
   lockedBy: null,
   uploading: false,
   title: null,
