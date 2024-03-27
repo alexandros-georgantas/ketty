@@ -1,5 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import styled from 'styled-components'
+import { grid } from '@coko/client'
 
 import AuthenticationForm from './AuthenticationForm'
 import AuthenticationHeader from './AuthenticationHeader'
@@ -18,6 +20,12 @@ import {
 
 const ModalContext = React.createContext(null)
 
+const TCWrapper = styled.section`
+  max-height: 500px;
+  overflow: auto;
+  padding-inline-end: ${grid(2)};
+`
+
 const Signup = props => {
   const {
     className,
@@ -26,25 +34,31 @@ const Signup = props => {
     hasSuccess,
     loading,
     onSubmit,
+    termsAndConditions,
     // userEmail,
   } = props
 
   const [modal, contextHolder] = Modal.useModal()
 
+  const [form] = Form.useForm()
+
+  const handleTCAgree = () => {
+    form.setFieldValue('agreedTc', true)
+  }
+
   const showTermsAndConditions = e => {
     e.preventDefault()
     const termsAndConditionsModal = modal.info()
     termsAndConditionsModal.update({
-      title: 'Agreeing to Terms and Conditions',
+      title: 'Usage Terms and Conditions',
       content: (
-        <Paragraph>
-          By checking “I agree” and selecting “Sign up” below, I accept the
-          terms.
-        </Paragraph>
+        <TCWrapper dangerouslySetInnerHTML={{ __html: termsAndConditions }} />
       ),
       onOk() {
+        handleTCAgree()
         termsAndConditionsModal.destroy()
       },
+      okText: 'Agree',
       maskClosable: true,
       width: 570,
       bodyStyle: {
@@ -80,6 +94,7 @@ const Signup = props => {
             alternativeActionLabel="Do you want to log in instead?"
             alternativeActionLink="/login"
             errorMessage={errorMessage}
+            form={form}
             hasError={hasError}
             loading={loading}
             onSubmit={onSubmit}
@@ -217,6 +232,7 @@ Signup.propTypes = {
   hasError: PropTypes.bool,
   hasSuccess: PropTypes.bool,
   loading: PropTypes.bool,
+  termsAndConditions: PropTypes.string,
 }
 
 Signup.defaultProps = {
@@ -224,6 +240,7 @@ Signup.defaultProps = {
   hasError: false,
   hasSuccess: false,
   loading: false,
+  termsAndConditions: '',
 }
 
 export default Signup

@@ -46,11 +46,14 @@ const AuthenticationForm = props => {
     onSubmit,
     showForgotPassword,
     submitButtonLabel,
+    /* eslint-disable-next-line react/prop-types */
+    form,
   } = props
 
   return (
     <Wrapper className={className}>
       <Form
+        form={form}
         layout="vertical"
         onFinish={onSubmit}
         ribbonMessage={errorMessage}
