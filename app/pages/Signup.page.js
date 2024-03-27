@@ -1,10 +1,20 @@
 import React from 'react'
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 
 import { Signup } from '../ui'
-import { SIGNUP } from '../graphql'
+import { SIGNUP, APPLICATION_PARAMETERS } from '../graphql'
 
 const SignupPage = () => {
+  const { data: { getApplicationParameters } = {} } = useQuery(
+    APPLICATION_PARAMETERS,
+    {
+      variables: {
+        context: 'bookBuilder',
+        area: 'termsAndConditions',
+      },
+    },
+  )
+
   const [signupMutation, { data, loading, error }] = useMutation(SIGNUP)
 
   const signup = formData => {
@@ -25,6 +35,10 @@ const SignupPage = () => {
     signupMutation(mutationData).catch(e => console.error(e))
   }
 
+  const termsAndConditions = getApplicationParameters?.find(
+    p => p.area === 'termsAndConditions',
+  )?.config
+
   return (
     <Signup
       errorMessage={error?.message}
@@ -32,6 +46,7 @@ const SignupPage = () => {
       hasSuccess={!!data}
       loading={loading}
       onSubmit={signup}
+      termsAndConditions={termsAndConditions}
     />
   )
 }
