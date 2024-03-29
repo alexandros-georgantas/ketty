@@ -83,7 +83,7 @@ export const setImagesDefaultStyles = node => {
 }
 
 export const getScrollPercent = node =>
-  (node.scrollTop / node.scrollHeight) * 100
+  (node.scrollTop / (node.scrollHeight - node.offsetHeight)) * 100
 
 export const setScrollFromPercent = (node, percentage) =>
   (percentage * node.scrollHeight) / 100
