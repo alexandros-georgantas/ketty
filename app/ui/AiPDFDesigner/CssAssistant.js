@@ -88,6 +88,11 @@ const SendButton = styled.button`
   }
 `
 
+const responses = {
+  error1:
+    'There was an error generating the response\n Please, try again in a few seconds',
+}
+
 const CssAssistant = ({
   enabled,
   className,
@@ -141,13 +146,14 @@ const CssAssistant = ({
             selectedCtx.history.push({ role: 'assistant', content: feedback })
           updatePreview()
         } catch (err) {
-          setFeedback(
-            'There was an error generating the response\n Please, try again in a few seconds',
-          )
+          setFeedback(responses.error1)
         }
       } else {
-        setFeedback(openAi)
-        selectedCtx.history.push({ role: 'assistant', content: openAi })
+        setFeedback(responses.error1)
+        selectedCtx.history.push({
+          role: 'assistant',
+          content: responses.error1,
+        })
       }
 
       setUserPrompt('')
@@ -230,7 +236,7 @@ const CssAssistant = ({
     userPrompt
       ? callOpenAi({
           variables: {
-            input: userPrompt,
+            input: `${userPrompt}.\nNOTE: Ensure to output the expected valid JSON`,
             history: [
               {
                 role: 'system',
