@@ -65,6 +65,11 @@ const EditorContainer = styled.div`
   transition: width 0.5s;
   user-select: none;
 
+  div#assistant-ctx > div.chapter {
+    background-color: #fff;
+    padding: 60px;
+  }
+
   ::-webkit-scrollbar {
     height: 5px;
     width: 5px;
@@ -219,10 +224,9 @@ const AiPDFDesigner = ({ bookTitle }) => {
 
   const handleScroll = e => {
     const iframeElement = previewRef?.current?.contentDocument?.documentElement
-    iframeElement.scrollTo(
-      0,
-      setScrollFromPercent(iframeElement, getScrollPercent(e.target)),
-    )
+    if (!iframeElement) return
+    const percentage = Math.round(getScrollPercent(e.target))
+    iframeElement.scrollTo(0, setScrollFromPercent(iframeElement, percentage))
   }
 
   const updatePreview = () => {
