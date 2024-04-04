@@ -24,7 +24,7 @@ const loaderDelay = 700
 
 const DashboardPage = () => {
   const history = useHistory()
-  const { currentUser, setCurrentUser } = useCurrentUser()
+  const { currentUser /*, setCurrentUser */ } = useCurrentUser()
   const [actionInProgress, setActionInProgress] = useState(false)
 
   const canTakeActionOnBook = bookId =>
@@ -36,6 +36,7 @@ const DashboardPage = () => {
   })
 
   const [books, setBooks] = useState({ result: [], totalCount: 0 })
+  const [newBookPageData, setNewBookPageData] = useState(null)
 
   const { currentPage, booksPerPage } = paginationParams
 
@@ -145,6 +146,21 @@ const DashboardPage = () => {
     onError: error => console.error(error),
   })
 
+  useEffect(() => {
+    // go to next page if all necessary data (new book data updated user) has been fetched
+    if (
+      newBookPageData &&
+      currentUser.teams.find(
+        team => team.role === 'owner' && team.objectId === newBookPageData?.id,
+      )
+    ) {
+      const { id, whereNext } = newBookPageData
+      setNewBookPageData(null)
+      setActionInProgress(false)
+      history.push(`/books/${id}/${whereNext}`)
+    }
+  }, [currentUser, newBookPageData])
+
   const [createBook] = useMutation(CREATE_BOOK, {
     onError: () => {
       return showGenericErrorModal()
@@ -229,20 +245,25 @@ const DashboardPage = () => {
       const { createBook: createBookData } = data
       const { id } = createBookData
 
-      setCurrentUser({
-        ...currentUser,
-        teams: [
-          ...currentUser.teams,
-          {
-            id: 'randomId',
-            global: false,
-            objectId: id,
-            role: 'owner',
-          },
-        ],
+      setNewBookPageData({
+        id,
+        whereNext,
       })
 
-      history.push(`/books/${id}/${whereNext}`)
+      // setCurrentUser({
+      //   ...currentUser,
+      //   teams: [
+      //     ...currentUser.teams,
+      //     {
+      //       id: 'randomId',
+      //       global: false,
+      //       objectId: id,
+      //       role: 'owner',
+      //     },
+      //   ],
+      // })
+
+      // history.push(`/books/${id}/${whereNext}`)
     })
   }
 
