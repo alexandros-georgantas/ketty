@@ -1,8 +1,10 @@
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import PropTypes from 'prop-types'
-import debounce from 'lodash/debounce'
+import find from 'lodash/find'
 import styled from 'styled-components'
 import { Spin, Select } from '../common'
+
+const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
 
 const StyledSelect = styled(Select)`
   &.ant-select {
@@ -12,47 +14,75 @@ const StyledSelect = styled(Select)`
 
 const SelectUsers = ({
   fetchOptions,
-  debounceTimeout,
   value,
   onChange,
   noResultsSetter,
   canChangeAccess,
 }) => {
+  const [unresolvedSearch, setUnresolvedSearch] = useState(null)
   const [fetching, setFetching] = useState(false)
-  const [options, setOptions] = useState([])
   const fetchRef = useRef(0)
+  const additionalSelectProps = {}
 
-  const debounceFetcher = useMemo(() => {
-    const loadOptions = v => {
-      fetchRef.current += 1
-      const fetchId = fetchRef.current
-      setOptions([])
-      setFetching(true)
-      fetchOptions(v.trim()).then(newOptions => {
-        if (fetchId !== fetchRef.current) {
-          // for fetch callback order
-          return
+  if (unresolvedSearch !== null) {
+    // The last item in the search text has been auto selected
+    // Reset the search value to reflect the remaining (unresolved) items
+    additionalSelectProps.searchValue = unresolvedSearch
+  }
+
+  const processLastSearch = searchString => {
+    // Split values into the last search and previous unresolved searches
+    const searchStrings = searchString.trim().split(/\s+/g)
+
+    // Lookup only the most recently entered search
+    const lastSearch = searchStrings[searchStrings.length - 1]
+
+    // This function clears the last search once it has been processed
+    const removeLastSearch = () =>
+      setUnresolvedSearch(
+        ` ${searchString
+          .slice(0, searchString.length - lastSearch.length)
+          .trim()} `,
+      )
+
+    fetchRef.current += 1
+    const fetchId = fetchRef.current
+    setFetching(true)
+    fetchOptions(lastSearch).then(newOptions => {
+      if (fetchId !== fetchRef.current) {
+        // for fetch callback order
+        return
+      }
+
+      const userOptions = newOptions.map(user => ({
+        label: user.displayName,
+        value: user.id,
+        key: user.id,
+      }))
+
+      if (userOptions.length === 0 && value.length === 0) {
+        noResultsSetter(true)
+      }
+
+      if (userOptions.length === 1 && userOptions[0].value) {
+        // Exact match of the search email
+        const alreadyAdded = find(value, { value: userOptions[0].value })
+
+        if (!alreadyAdded) {
+          onChange([...value, userOptions[0]])
+          value.push(userOptions[0])
+          noResultsSetter(false)
+          removeLastSearch()
         }
+      }
 
-        const userOptions = newOptions.map(user => ({
-          label: user.displayName,
-          value: user.id,
-        }))
-
-        if (userOptions.length === 0 && value.length === 0) {
-          noResultsSetter(true)
-        }
-
-        setOptions(userOptions)
-        setFetching(false)
-      })
-    }
-
-    return debounce(loadOptions, debounceTimeout)
-  }, [fetchOptions, debounceTimeout, value])
+      setFetching(false)
+    })
+  }
 
   return (
     <StyledSelect
+      {...additionalSelectProps}
       disabled={!canChangeAccess}
       filterOption={false}
       labelInValue
@@ -62,7 +92,6 @@ const SelectUsers = ({
         onChange(newValue)
 
         if (newValue.length === 0) {
-          setOptions([])
           noResultsSetter(true)
         } else {
           noResultsSetter(false)
@@ -70,12 +99,70 @@ const SelectUsers = ({
       }}
       onDropdownVisibleChange={open => {
         if (!open && value.length === 0) {
-          setOptions([])
           noResultsSetter(true)
         }
       }}
-      onSearch={debounceFetcher}
-      options={options}
+      onInputKeyDown={e => {
+        // Do nothing if there is no search text
+        const trimmedSearch = e.target.value.trim()
+
+        if (trimmedSearch) {
+          // If user hits enter: process the last search
+          if (e.keyCode === 13 || e.key === 'Enter') {
+            processLastSearch(trimmedSearch)
+            return
+          }
+
+          // If user hits space (cursor after search): process the last search
+          const isWhiteSpace = !e.key.trim()
+
+          const isCursorAfterSearches =
+            e.target.selectionStart >= e.target.value.trimRight().length
+
+          if (isWhiteSpace && isCursorAfterSearches) {
+            processLastSearch(trimmedSearch)
+            return
+          }
+
+          // If last search looks like email address, process it
+          // Ignore control keys (eg: alt, back, ctrl, delete etc)
+          if (e.keyCode > 40 && isCursorAfterSearches) {
+            const searchString = [
+              e.target.value.slice(0, e.target.selectionStart),
+              e.key,
+              e.target.value.slice(e.target.selectionStart),
+            ].join('')
+
+            const values = searchString.split(/\s+/g)
+
+            if (
+              values.length &&
+              values[values.length - 1].search(emailRegex) === 0
+            ) {
+              processLastSearch(searchString)
+              return
+            }
+          }
+        }
+
+        // The user is beginning or updating a search; clear the value of
+        // "unresolvedSearch" so that they can continue typing
+        // If this value is not set to null, all keystrokes are blocked
+        setUnresolvedSearch(null)
+      }}
+      onSearch={searchString => {
+        /* const values = searchString.trim().split(/\s+/g)
+
+        if (
+          values.length &&
+          values[values.length - 1].search(emailRegex) === 0
+        ) {
+          // TODO - if you need to edit the email after a typo, this could
+          // trigger a search per input character. Restore debounce?
+          processLastSearch(searchString.trim())
+          return
+        } */
+      }}
       placeholder="Email, comma separated"
       value={value}
     />
@@ -84,7 +171,6 @@ const SelectUsers = ({
 
 SelectUsers.propTypes = {
   fetchOptions: PropTypes.func.isRequired,
-  debounceTimeout: PropTypes.number,
   noResultsSetter: PropTypes.func.isRequired,
   value: PropTypes.arrayOf(
     PropTypes.shape({
@@ -100,7 +186,6 @@ SelectUsers.propTypes = {
 }
 
 SelectUsers.defaultProps = {
-  debounceTimeout: 800,
   value: [],
   onChange: () => {},
 }
