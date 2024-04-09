@@ -17,6 +17,7 @@ import {
 } from '@coko/client'
 
 import { CURRENT_USER } from '@coko/client/dist/helpers/currentUserQuery'
+import { isAdmin } from './helpers/permissions'
 import Header from './ui/common/Header'
 
 import UserInviteModal from './ui/invite/UserInviteModal'
@@ -36,6 +37,7 @@ import {
   SignupPage,
   VerifyEmailPage,
   AiPDFDesignerPage,
+  AdminPage,
 } from './pages'
 import { GET_BOOK_SETTINGS, APPLICATION_PARAMETERS } from './graphql'
 import { CssAssistantProvider } from './ui/AiPDFDesigner/hooks/CssAssistantContext'
@@ -209,6 +211,7 @@ const SiteHeader = () => {
         }
         brandLabel="Lulu"
         brandLogoURL="/ketida.png"
+        canAccessAdminPage={isAdmin(currentUser)}
         homeURL="/dashboard"
         onInvite={triggerInviteModal}
         onLogout={logout}
@@ -347,6 +350,12 @@ const routes = (
 
               <Route exact path="/provider-redirect/:provider">
                 <ProviderConnectionPage closeOnSuccess />
+              </Route>
+
+              <Route exact path="/admin">
+                <Authenticated>
+                  <AdminPage />
+                </Authenticated>
               </Route>
             </Switch>
           </StyledMain>

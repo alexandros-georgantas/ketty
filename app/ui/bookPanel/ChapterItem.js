@@ -203,9 +203,9 @@ const ChapterItem = props => {
         position="inline-start"
         toggle={
           <MoreActions
-            tabIndex={focused ? 0 : -1}
             onKeyDown={e => e.key === 'Enter' && e.stopPropagation()}
             onKeyUp={e => e.key === 'Enter' && e.stopPropagation()}
+            tabIndex={focused ? 0 : -1}
           >
             <MoreOutlined />
           </MoreActions>

@@ -122,13 +122,13 @@ const EditorWrapper = ({
   return (
     <LuluWaxContext.Provider value={{ luluWax, setLuluWax }}>
       <Wax
-        ref={editorRef}
         config={selectedConfig}
         fileUpload={onImageUpload}
         key={`${selectedChapterId}-${isReadOnly}-${aiOn}`}
         layout={LuluLayout}
         onChange={onPeriodicBookComponentContentChange}
         readonly={isReadOnly}
+        ref={editorRef}
         value={bookComponentContent || ''}
       />
     </LuluWaxContext.Provider>
