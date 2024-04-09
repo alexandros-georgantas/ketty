@@ -75,7 +75,7 @@ const UserInviteForm = ({ form, fetchOptions, onInvite, canChangeAccess }) => {
             htmlType="submit"
             type="primary"
           >
-            Add user
+            Share
           </Button>
         </StyledSpace>
       </Form>

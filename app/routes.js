@@ -137,19 +137,16 @@ const SiteHeader = () => {
     return inviteModal.update({
       title: (
         <StyledMembersHeader>
-          <StyledMembersHeaderTitle>Book members</StyledMembersHeaderTitle>
+          <StyledMembersHeaderTitle>Share book</StyledMembersHeaderTitle>
           <Tooltip
             arrow={false}
             color="black"
             overlayInnerStyle={{ width: '480px' }}
             placement="right"
-            title="Only the book owner can add team members who are already
-            signed up on the system, and can determine their permissions.
-            Collaborators with Edit access can change book content or metadata,
-            view export previews, and download PDF and Epub files, but cannot
-            delete the book. Collaborators with View access cannot delete the
-            book, change book content or metadata, or download PDF or Epub
-            files, but can view export previews."
+            title="Only the book owner can share the book. Collaborators with
+            'edit access' can edit the book and its metadata, view the preview,
+            and download PDF and Epub files. Collaborators with 'view access'
+            can view the book, its metadata, and the preview."
           >
             <QuestionCircleOutlined />
           </Tooltip>
