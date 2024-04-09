@@ -13,3 +13,4 @@ export { default as ExporterPage } from './Exporter.page'
 // import AiPDFDesignerPage false
 // console.log(AiPDFDesignerPage)
 export { default as AiPDFDesignerPage } from './AiPDFDesigner.page'
+export { default as AdminPage } from './Admin.page'

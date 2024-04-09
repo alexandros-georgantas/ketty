@@ -191,7 +191,7 @@ const ProducerPage = () => {
       return new Promise((resolve, reject) => {
         chatGPT({ variables: { input } }).then(({ data }) => {
           if (!data) return resolve(null)
-          const { chatGPT: res } = data
+          const { openAi: res } = data
           return resolve(res)
         })
       })

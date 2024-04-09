@@ -12,4 +12,12 @@ const APPLICATION_PARAMETERS = gql`
   }
 `
 
-export { APPLICATION_PARAMETERS }
+const UPDATE_APPLICATION_PARAMETERS = gql`
+  mutation UpdateApplicationParameters($input: updateParametersInput!) {
+    updateApplicationParameters(input: $input) {
+      id
+    }
+  }
+`
+
+export { APPLICATION_PARAMETERS, UPDATE_APPLICATION_PARAMETERS }
