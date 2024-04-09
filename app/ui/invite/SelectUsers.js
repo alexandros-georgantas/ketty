@@ -37,6 +37,7 @@ const SelectUsers = ({
         const userOptions = newOptions.map(user => ({
           label: user.displayName,
           value: user.id,
+          title: user.title,
         }))
 
         if (userOptions.length === 0 && value.length === 0) {
