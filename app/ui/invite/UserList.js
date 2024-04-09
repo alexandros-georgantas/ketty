@@ -22,6 +22,10 @@ const getInitials = fullname => {
   }`
 }
 
+const getEmailInitials = email => {
+  return `${email[0].toUpperCase()}${email[1] && email[1].toUpperCase()}`
+}
+
 const UserRow = styled.div`
   align-items: center;
   display: flex;
@@ -71,13 +75,15 @@ const UserListItem = ({
     { value: 'remove', label: 'Remove access' },
   ]
 
-  const { displayName, id: userId } = user
+  const { displayName, id: userId, email } = user
 
   return (
     <StyledListItem key={id}>
       <UserRow>
         <UserDetails>
-          <UserAvatar>{getInitials(displayName)}</UserAvatar>
+          <UserAvatar>
+            {email ? getEmailInitials(email) : getInitials(displayName)}
+          </UserAvatar>
           <span>{displayName}</span>
         </UserDetails>
         {role === 'owner' ? (
@@ -89,9 +95,9 @@ const UserListItem = ({
             disabled={!canChangeAccess}
             onChange={value => {
               if (value === 'remove') {
-                onRemoveAccess({ teamId, userId })
+                onRemoveAccess({ teamId, userId, email }, role)
               } else {
-                onChangeAccess({ teamMemberId: id, value })
+                onChangeAccess({ teamMemberId: id, value, email }, role)
               }
             }}
             options={dropdownItems}
@@ -112,6 +118,7 @@ UserListItem.propTypes = {
   user: PropTypes.shape({
     displayName: PropTypes.string.isRequired,
     id: PropTypes.string.isRequired,
+    email: PropTypes.string,
   }).isRequired,
   canChangeAccess: PropTypes.bool.isRequired,
 }
