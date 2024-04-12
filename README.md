@@ -24,3 +24,5 @@ Ketty has separate server and client applications. Refer to the following pages 
 
 - the [Ketty server README](https://gitlab.coko.foundation/ketty/server/-/blob/main/README.md)
 - the [Ketty server installation docs](https://gitlab.coko.foundation/ketty/server/-/blob/main/INSTALL.md)
+
+For an easier local setup, check out the [Ketty Development Kit](https://gitlab.coko.foundation/ketty/kdk)
