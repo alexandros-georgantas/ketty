@@ -189,13 +189,13 @@ export const Base = () => {
   return (
     <Wrapper>
       <Preview
+        canModify
         connectToLulu={handleConnectToLulu}
         createProfile={handleCreateProfile}
         currentOptions={currentOptions}
         defaultProfile={defaultProfile}
         deleteProfile={handleDeleteProfile}
         download={handleDownload}
-        canModify
         isbns={isbnData}
         isDownloadButtonDisabled={false}
         isUserConnectedToLulu
