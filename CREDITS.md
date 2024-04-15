@@ -1,6 +1,6 @@
 ### Ketty, 2024
 
-Ketty, is build on the strong foundations of Editoria. It has a completely new frontend with a flexible writing and publishing workflow, as well as a streamlined Wax Editor. 
+Ketty, is build on the strong foundations of Editoria. It has a completely new frontend with a flexible writing and publishing workflow, as well as a streamlined Wax Editor.
 
 Those involved in conceptualising, designing, and building Ketty (including the Wax Editor) include:
 
