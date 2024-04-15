@@ -185,6 +185,7 @@ export const Base = () => {
   return (
     <Wrapper>
       <PreviewSettings
+        canModify
         createProfile={handleCreateProfile}
         currentOptions={currentOptions}
         defaultProfile={defaultProfile}
@@ -192,7 +193,6 @@ export const Base = () => {
         download={handleClickDownload}
         isbns={isbnData}
         isCollapsed={isCollapsed}
-        canModify
         isDownloadButtonDisabled={false}
         isUserConnectedToLulu
         loadingPreview={false}

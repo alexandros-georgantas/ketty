@@ -29,8 +29,8 @@ export const Base = () => {
 
   return (
     <Footer
-      createProfile={createProfile}
       canModify
+      createProfile={createProfile}
       isDownloadButtonDisabled={false}
       isNewProfileSelected={false}
       isSaveDisabled={false}
@@ -50,8 +50,8 @@ export const NewProfileSelected = () => {
 
   return (
     <Footer
-      createProfile={createProfile}
       canModify
+      createProfile={createProfile}
       isDownloadButtonDisabled={false}
       isNewProfileSelected
       isSaveDisabled={false}
@@ -71,8 +71,8 @@ export const FailingActions = () => {
 
   return (
     <Footer
-      createProfile={createProfile}
       canModify
+      createProfile={createProfile}
       isDownloadButtonDisabled={false}
       isNewProfileSelected={false}
       isSaveDisabled={false}
@@ -92,8 +92,8 @@ export const FailingActionsNewProfileSelected = () => {
 
   return (
     <Footer
-      createProfile={createProfile}
       canModify
+      createProfile={createProfile}
       isDownloadButtonDisabled={false}
       isNewProfileSelected
       isSaveDisabled={false}
