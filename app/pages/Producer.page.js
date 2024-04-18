@@ -110,9 +110,7 @@ const ProducerPage = () => {
     hasEditAccess(bookId, currentUser)
 
   const hasMembership =
-    isAdmin(currentUser) ||
-    isOwner(bookId, currentUser) ||
-    isCollaborator(bookId, currentUser)
+    isOwner(bookId, currentUser) || isCollaborator(bookId, currentUser)
 
   // INITIALIZATION SECTION END
   // QUERIES SECTION START
