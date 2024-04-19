@@ -43,8 +43,18 @@ const REMOVE_TEAM_MEMBER = gql`
 // `
 
 const ADD_TEAM_MEMBERS = gql`
-  mutation AddTeamMembers($teamId: ID!, $members: [ID!]!, $status: String) {
-    addTeamMembers(teamId: $teamId, members: $members, status: $status) {
+  mutation AddTeamMembers(
+    $teamId: ID!
+    $members: [ID!]!
+    $bookId: ID!
+    $status: String
+  ) {
+    addTeamMembers(
+      teamId: $teamId
+      members: $members
+      bookId: $bookId
+      status: $status
+    ) {
       id
       role
       displayName
