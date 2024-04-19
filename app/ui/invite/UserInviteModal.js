@@ -77,13 +77,9 @@ const UserInviteModal = ({ bookId }) => {
   const [form] = Form.useForm()
 
   const fetchUserList = async searchQuery => {
-    const existingUserIds = bookTeams.flatMap(team =>
-      team.members.map(member => member.user.id),
-    )
-
     const variables = {
       search: searchQuery,
-      exclude: existingUserIds,
+      exclude: [],
       exactMatch: true,
     }
 
@@ -106,7 +102,16 @@ const UserInviteModal = ({ bookId }) => {
           ]
       }
 
-      return searchForUsersData
+      const existingUserIds = bookTeams.flatMap(team =>
+        team.members.map(member => member.user.id),
+      )
+
+      // Exclude users that are already in the team
+      const filteredExistingUsers = searchForUsersData.filter(
+        user => !existingUserIds.includes(user.id),
+      )
+
+      return filteredExistingUsers
     })
   }
 
@@ -148,6 +153,7 @@ const UserInviteModal = ({ bookId }) => {
     return addTeamMembers({
       variables: {
         ...variables,
+        bookId,
         members: existingInvites.map(user => user.value),
       },
       skip: !existingInvites.length,
