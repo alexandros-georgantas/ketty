@@ -9,8 +9,7 @@ const showUnauthorizedAccessModal = callback => {
     title: 'Unauthorized action',
     content: (
       <Paragraph>
-        {`You don't have permissions to access this resource you will be
-        redirected back to a safe place`}
+        {`You don't have permission to access this book. Select 'OK' to be redirected to your Dashboard.`}
       </Paragraph>
     ),
     onOk() {
