@@ -46,6 +46,7 @@ pages:
     expire_in: 30min
     paths:
       - docs/build
+  publish: docs/build
   only:
     - main
 
