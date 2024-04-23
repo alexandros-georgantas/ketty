@@ -20,7 +20,7 @@ ENV SERVER_URL=$server_url
 ENV WEBSOCKET_SERVER_URL=$websocket_server_url
 
 ENV NODE_ENV='production'
-ENV CLIENT_PAGE_TITLE='Ketida'
+ENV CLIENT_PAGE_TITLE='Ketty'
 ENV CLIENT_FAVICON_PATH='../static/ketida.ico'
 ENV CLIENT_LANGUAGE='en-US'
 
