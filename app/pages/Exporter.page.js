@@ -45,7 +45,7 @@ export const defaultProfile = {
   label: 'New export',
   value: 'new-export',
   format: 'pdf',
-  size: '8.5x11',
+  size: '5.5x8.5',
   content: ['includeTitlePage', 'includeCopyrights', 'includeTOC'],
   template: null,
   isbn: null,
