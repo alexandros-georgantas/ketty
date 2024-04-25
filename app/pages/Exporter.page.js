@@ -45,7 +45,7 @@ export const defaultProfile = {
   label: 'New export',
   value: 'new-export',
   format: 'pdf',
-  size: '8.5x11',
+  size: '5.5x8.5',
   content: ['includeTitlePage', 'includeCopyrights', 'includeTOC'],
   template: null,
   isbn: null,
@@ -131,9 +131,8 @@ const PreviewerPage = () => {
     },
   })
 
-  const { data: applicationParameters, loading: paramsLoading } = useQuery(
-    APPLICATION_PARAMETERS,
-  )
+  const { data: { getApplicationParameters } = {}, loading: paramsLoading } =
+    useQuery(APPLICATION_PARAMETERS)
 
   const [getPagedLink, { loading: previewIsLoading }] = useLazyQuery(
     GET_PAGED_PREVIEWER_LINK,
@@ -220,15 +219,19 @@ const PreviewerPage = () => {
       refetchProfiles({ id: bookId })
     },
   })
+
+  const luluConfig = getApplicationParameters?.find(
+    p => p.area === 'integrations',
+  ).config.lulu
   // #endregion queries
 
   // #region handlers
   const getLuluConfigValue = value => {
-    const luluConfig = applicationParameters.getApplicationParameters.find(
+    const config = getApplicationParameters?.find(
       p => p.area === 'integrations',
     ).config.lulu
 
-    return luluConfig[value]
+    return config[value]
   }
 
   const handleConnectToLulu = () => {
@@ -535,7 +538,7 @@ const PreviewerPage = () => {
   })
 
   const profiles =
-    applicationParameters &&
+    getApplicationParameters &&
     profilesData?.getBookExportProfiles.result.map(p => {
       const luluProfile = p.providerInfo.find(x => x.providerLabel === 'lulu')
       const projectId = luluProfile ? luluProfile.externalProjectId : null
@@ -586,7 +589,9 @@ const PreviewerPage = () => {
 
   return (
     <Preview
-      canModify={userIsOwner || userIsAdmin}
+      canModify={
+        luluConfig && !luluConfig?.disabled && (userIsOwner || userIsAdmin)
+      }
       canUploadToProvider={userIsOwner}
       connectToLulu={handleConnectToLulu}
       createProfile={handleCreateProfile}
@@ -599,6 +604,7 @@ const PreviewerPage = () => {
       isUserConnectedToLulu={isUserConnectedToLulu}
       loadingExport={false}
       loadingPreview={creatingPreview}
+      luluConfig={luluConfig && !luluConfig?.disabled}
       onOptionsChange={handleOptionsChange}
       onProfileChange={handleProfileChange}
       previewLink={previewLink}

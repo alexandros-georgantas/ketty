@@ -22,16 +22,16 @@ const exportFormatOptions = [
 
 const exportSizeOptions = [
   {
-    value: '8.5x11',
-    label: '8.5 x 11 inches, 216 x 279 mm (A4)',
+    value: '5.5x8.5',
+    label: 'Digest: 5.5 × 8.5 in | 140 × 216 mm',
   },
   {
     value: '6x9',
-    label: '6 x 9 inches, 152 x 229 mm',
+    label: 'US Trade: 6 × 9 in | 152 × 229 mm',
   },
   {
-    value: '5.5x8.5',
-    label: '5.5 x 8.5, 140 x 216 (A5)',
+    value: '8.5x11',
+    label: 'US Letter: 8.5 × 11 in | 216 × 279 mm',
   },
 ]
 

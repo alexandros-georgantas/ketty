@@ -8,7 +8,6 @@ import {
   CREATE_BOOK,
   DELETE_BOOK,
   UPLOAD_BOOK_THUMBNAIL,
-  BOOK_CREATED_SUBSCRIPTION,
   BOOK_DELETED_SUBSCRIPTION,
   BOOK_RENAMED_SUBSCRIPTION,
 } from '../graphql'
@@ -36,7 +35,6 @@ const DashboardPage = () => {
   })
 
   const [books, setBooks] = useState({ result: [], totalCount: 0 })
-
   const { currentPage, booksPerPage } = paginationParams
 
   const {
@@ -80,23 +78,6 @@ const DashboardPage = () => {
       },
     })
   }, [currentUser])
-
-  useSubscription(BOOK_CREATED_SUBSCRIPTION, {
-    onData: () => {
-      refetch({
-        options: {
-          archived: false,
-          orderBy: {
-            column: 'title',
-            order: 'asc',
-          },
-          page: currentPage - 1,
-          pageSize: booksPerPage,
-        },
-      })
-    },
-    onError: error => console.error(error),
-  })
 
   useSubscription(BOOK_DELETED_SUBSCRIPTION, {
     onData: () => {
@@ -227,19 +208,11 @@ const DashboardPage = () => {
     return createBook({ variables }).then(res => {
       const { data } = res
       const { createBook: createBookData } = data
-      const { id } = createBookData
+      const { book: { id } = {}, newUserTeam } = createBookData
 
       setCurrentUser({
         ...currentUser,
-        teams: [
-          ...currentUser.teams,
-          {
-            id: 'randomId',
-            global: false,
-            objectId: id,
-            role: 'owner',
-          },
-        ],
+        teams: [...currentUser.teams, newUserTeam],
       })
 
       history.push(`/books/${id}/${whereNext}`)

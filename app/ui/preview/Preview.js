@@ -42,6 +42,7 @@ const Preview = props => {
     isUserConnectedToLulu,
     loadingExport,
     loadingPreview,
+    luluConfig,
     onOptionsChange,
     onProfileChange,
     previewLink,
@@ -92,6 +93,7 @@ const Preview = props => {
           isDownloadButtonDisabled={isDownloadButtonDisabled}
           isUserConnectedToLulu={isUserConnectedToLulu}
           loadingPreview={loadingPreview}
+          luluConfig={luluConfig}
           onClickCollapse={handleClickCollapse}
           onClickConnectToLulu={connectToLulu}
           onOptionsChange={handleOptionsChange}
@@ -140,6 +142,7 @@ Preview.propTypes = {
   isUserConnectedToLulu: PropTypes.bool.isRequired,
   loadingExport: PropTypes.bool.isRequired,
   loadingPreview: PropTypes.bool.isRequired,
+  luluConfig: PropTypes.shape(),
   onOptionsChange: PropTypes.func.isRequired,
   onProfileChange: PropTypes.func.isRequired,
   previewLink: PropTypes.string,
@@ -177,6 +180,7 @@ Preview.propTypes = {
 }
 
 Preview.defaultProps = {
+  luluConfig: null,
   previewLink: null,
 }
 

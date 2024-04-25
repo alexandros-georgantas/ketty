@@ -3,7 +3,11 @@ import { useHistory, useParams } from 'react-router-dom'
 import { useMutation } from '@apollo/client'
 
 import { VerifyEmail } from '../ui'
-import { REQUEST_VERIFICATION_EMAIL, VERIFY_EMAIL } from '../graphql'
+import {
+  HANDLE_INVITATION,
+  REQUEST_VERIFICATION_EMAIL,
+  VERIFY_EMAIL,
+} from '../graphql'
 
 const VerifyEmailPage = () => {
   const { token } = useParams()
@@ -25,6 +29,10 @@ const VerifyEmailPage = () => {
     },
   ] = useMutation(VERIFY_EMAIL, { variables: { token } })
 
+  const [handleInvitation] = useMutation(HANDLE_INVITATION, {
+    variables: { token },
+  })
+
   const [
     resendVerificationEmailMutation,
     { data: resendData, loading: resending },
@@ -34,6 +42,7 @@ const VerifyEmailPage = () => {
     verifyEmailMutation().catch(e => {})
     setVerifyingLoader(true)
     setTimeout(() => setVerifyingLoader(false), loaderDelay)
+    handleInvitation().catch(e => {})
   }
 
   const resendVerificationEmail = () => {

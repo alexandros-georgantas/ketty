@@ -13,6 +13,10 @@ import {
   GET_BOOK_TEAMS,
   UPDATE_TEAM_MEMBER_STATUS,
   REMOVE_TEAM_MEMBER,
+  SEND_INVITATIONS,
+  GET_INVITATIONS,
+  DELETE_INVITATION,
+  UPDATE_INVITATION,
 } from '../../graphql'
 
 import { isAdmin, isOwner } from '../../helpers/permissions'
@@ -38,31 +42,76 @@ const UserInviteModal = ({ bookId }) => {
     },
   )
 
+  const { data: invitationsData, loading: loadingInvitationsData } = useQuery(
+    GET_INVITATIONS,
+    {
+      variables: {
+        bookId,
+      },
+    },
+  )
+
   const bookTeams = bookTeamsData?.getObjectTeams?.result || []
+
+  const bookInvites = invitationsData?.getInvitations || []
+
+  const bookTeamsAndInvites = bookTeams.concat(bookInvites)
 
   const [searchForUsers] = useMutation(SEARCH_USERS)
   const [addTeamMembers] = useMutation(ADD_TEAM_MEMBERS)
   const [updateTeamMemberStatus] = useMutation(UPDATE_TEAM_MEMBER_STATUS)
   const [removeTeamMember] = useMutation(REMOVE_TEAM_MEMBER)
+
+  const [sendInvitations] = useMutation(SEND_INVITATIONS, {
+    refetchQueries: [{ query: GET_INVITATIONS, variables: { bookId } }],
+  })
+
+  const [updateInvitation] = useMutation(UPDATE_INVITATION)
+
+  const [deleteInvitation] = useMutation(DELETE_INVITATION, {
+    refetchQueries: [{ query: GET_INVITATIONS, variables: { bookId } }],
+  })
+
   const { currentUser } = useCurrentUser()
 
   const [form] = Form.useForm()
 
   const fetchUserList = async searchQuery => {
-    const existingUserIds = bookTeams.flatMap(team =>
-      team.members.map(member => member.user.id),
-    )
-
     const variables = {
       search: searchQuery,
-      exclude: existingUserIds,
+      exclude: [],
       exactMatch: true,
     }
 
     return searchForUsers({ variables }).then(res => {
       const { data } = res
       const { searchForUsers: searchForUsersData } = data
-      return searchForUsersData
+
+      if (!searchForUsersData.length) {
+        const existingEmails = bookInvites
+          .flatMap(team => team.members.map(member => member.user.email))
+          .find(email => email.toLowerCase() === searchQuery.toLowerCase())
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!existingEmails && emailRegex.test(searchQuery))
+          return [
+            {
+              displayName: `Invite "${searchQuery}" by email`,
+              id: searchQuery,
+            },
+          ]
+      }
+
+      const existingUserIds = bookTeams.flatMap(team =>
+        team.members.map(member => member.user.id),
+      )
+
+      // Exclude users that are already in the team
+      const filteredExistingUsers = searchForUsersData.filter(
+        user => !existingUserIds.includes(user.id),
+      )
+
+      return filteredExistingUsers
     })
   }
 
@@ -78,21 +127,54 @@ const UserInviteModal = ({ bookId }) => {
       team => team.role === 'collaborator',
     )
 
-    const members = inviteData.users.map(user => user.value)
-
     const variables = {
       teamId: collaboratorTeam.id,
-      members,
       status: inviteData.access,
     }
 
-    return addTeamMembers({ variables }).then(() => {
+    const emailInvites = inviteData.users.filter(user =>
+      user.label.includes('Invite'),
+    )
+
+    if (emailInvites.length) {
+      await sendInvitations({
+        variables: {
+          ...variables,
+          bookId,
+          members: emailInvites.map(user => user.value),
+        },
+      })
+    }
+
+    const existingInvites = inviteData.users.filter(
+      user => !user.label.includes('Invite'),
+    )
+
+    return addTeamMembers({
+      variables: {
+        ...variables,
+        bookId,
+        members: existingInvites.map(user => user.value),
+      },
+      skip: !existingInvites.length,
+    }).then(() => {
       form.resetFields()
     })
   }
 
-  const handleUpdateTeamMemberStatus = updateData => {
-    const { teamMemberId, value: status } = updateData
+  const handleUpdateTeamMemberStatus = (updateData, role) => {
+    const { teamMemberId, value: status, email } = updateData
+
+    if (role === 'invitations') {
+      return updateInvitation({
+        variables: {
+          email,
+          status,
+          bookId,
+        },
+      })
+    }
+
     return updateTeamMemberStatus({
       variables: {
         teamMemberId,
@@ -101,7 +183,16 @@ const UserInviteModal = ({ bookId }) => {
     })
   }
 
-  const handleRemoveTeamMember = removeData => {
+  const handleRemoveTeamMember = (removeData, role) => {
+    if (role === 'invitations') {
+      return deleteInvitation({
+        variables: {
+          email: removeData.email,
+          bookId,
+        },
+      })
+    }
+
     return removeTeamMember({
       variables: removeData,
     })
@@ -120,9 +211,9 @@ const UserInviteModal = ({ bookId }) => {
 
       <ScrollWrapper>
         <UserList
-          bookTeams={bookTeams}
+          bookTeams={bookTeamsAndInvites}
           canChangeAccess={canChangeAccess}
-          loading={loadingBookTeamsData}
+          loading={loadingBookTeamsData || loadingInvitationsData}
           onChangeAccess={handleUpdateTeamMemberStatus}
           onRemoveAccess={handleRemoveTeamMember}
         />

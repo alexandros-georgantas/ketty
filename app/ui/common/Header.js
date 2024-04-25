@@ -1,12 +1,15 @@
+/* stylelint-disable declaration-no-important */
+/* stylelint-disable string-quotes */
+/* stylelint-disable value-list-comma-newline-after */
 import React from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { grid, th } from '@coko/client'
-import { Avatar, Dropdown, Menu } from 'antd'
-import find from 'lodash/find'
+import { Avatar, Menu } from 'antd'
 import isEmpty from 'lodash/isEmpty'
 import { SettingOutlined } from '@ant-design/icons'
+import Popup from '@coko/client/dist/ui/common/Popup'
 import Button from './Button'
 
 // #region styles
@@ -51,6 +54,7 @@ const BrandingContainer = styled.div`
 
 const UnstyledLink = styled(Link)`
   color: inherit;
+  line-height: 22px;
   text-decoration: none;
 
   &:hover,
@@ -69,6 +73,53 @@ const BrandLabel = styled.div`
   font-size: ${th('fontSizeLarge')};
   font-weight: bold;
 `
+
+const StyledPopup = styled(Popup)`
+  border: medium;
+  border-radius: 0;
+  box-shadow: 0 6px 16px 0 rgb(0 0 0 / 8%), 0 3px 6px -4px rgb(0 0 0 / 12%),
+    0 9px 28px 8px rgb(0 0 0 / 5%);
+  margin-top: ${grid(3)};
+  padding: 5px;
+
+  &::before {
+    background-color: inherit;
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    content: '';
+    height: 7px;
+    overflow: hidden;
+    pointer-events: none;
+    position: absolute;
+    right: 12px;
+    top: -7px;
+    width: 16px;
+    z-index: 1;
+  }
+`
+
+const PopupContentWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  > * {
+    background-color: transparent;
+    border: none;
+    border-radius: 3px;
+    padding: 5px 12px;
+
+    &:focus,
+    &:hover {
+      background-color: rgb(105 105 105 / 4%);
+      color: inherit !important;
+      outline: none;
+    }
+
+    &:focus-visible {
+      outline: 2px solid black !important;
+      outline-offset: 1px !important;
+    }
+  }
+`
 // #endregion styles
 
 const getInitials = fullname => {
@@ -83,6 +134,7 @@ const Header = props => {
     homeURL,
     brandLabel,
     brandLogoURL,
+    canAccessAdminPage,
     onLogout,
     onInvite,
     onSettings,
@@ -91,7 +143,6 @@ const Header = props => {
     dashboardURL,
     showBackToBook,
     backToBookURL,
-    showAiPdfDesigner,
     showInvite,
     showPreview,
     showSettings,
@@ -102,7 +153,6 @@ const Header = props => {
     ...rest
   } = props
 
-  const curatedDropdownItems = [{ key: 'logout', label: 'Logout' }]
   // const [navLeftCurrentSelected, setNavLeftCurrentSelected] = useState([])
   // const [navRightCurrentSelected, setNavRightCurrentSelected] = useState([])
 
@@ -113,18 +163,6 @@ const Header = props => {
   // const navLeftSelectHandler = e => {
   //   setNavLeftCurrentSelected([])
   // }
-
-  if (!isEmpty(dropdownItems)) {
-    curatedDropdownItems.unshift({
-      type: 'divider',
-    })
-    dropdownItems
-      .slice()
-      .reverse()
-      .forEach(item => {
-        curatedDropdownItems.unshift({ key: item.key, label: item.label })
-      })
-  }
 
   const navItemsLeft = []
   const navItemsRight = []
@@ -189,22 +227,6 @@ const Header = props => {
     })
   }
 
-  const dropdownItemsOnClickHandler = ({ key }) => {
-    const itemClicked = find(dropdownItems, { key })
-
-    if (key === 'logout') {
-      return onLogout()
-    }
-
-    if (!itemClicked) {
-      return console.warn(
-        `no handler declared for dropdown item with key ${key}`,
-      )
-    }
-
-    return itemClicked.onClickHandler()
-  }
-
   return (
     <StyledHeader role="banner" {...rest}>
       <BrandingContainer>
@@ -242,19 +264,29 @@ const Header = props => {
               style={{ borderBottom: 'none' }}
             />
           )}
-          <Dropdown
-            arrow
-            menu={{
-              items: curatedDropdownItems,
-              onClick: dropdownItemsOnClickHandler,
-            }}
-            placement="bottomRight"
-            trigger={['click']}
+          <StyledPopup
+            alignment="end"
+            position="block-end"
+            toggle={
+              <Button type="text">
+                <Avatar>{getInitials(userDisplayName)}</Avatar>
+              </Button>
+            }
           >
-            <Button type="text">
-              <Avatar>{getInitials(userDisplayName)}</Avatar>
-            </Button>
-          </Dropdown>
+            <PopupContentWrapper>
+              {canAccessAdminPage && (
+                <UnstyledLink
+                  to="/admin"
+                  onClick={() => {
+                    document.querySelector('#main-content').focus()
+                  }}
+                >
+                  Admin
+                </UnstyledLink>
+              )}
+              <Button onClick={onLogout}>Logout</Button>
+            </PopupContentWrapper>
+          </StyledPopup>
         </RightNavContainer>
       </Navigation>
     </StyledHeader>
@@ -265,6 +297,7 @@ Header.propTypes = {
   bookId: PropTypes.string,
   brandLabel: PropTypes.string.isRequired,
   brandLogoURL: PropTypes.string,
+  canAccessAdminPage: PropTypes.bool,
   homeURL: PropTypes.string.isRequired,
   userDisplayName: PropTypes.string.isRequired,
   onLogout: PropTypes.func.isRequired,
@@ -276,7 +309,6 @@ Header.propTypes = {
   onInvite: PropTypes.func.isRequired,
   onSettings: PropTypes.func.isRequired,
   showPreview: PropTypes.bool.isRequired,
-  showAiPdfDesigner: PropTypes.bool.isRequired,
   dashboardURL: PropTypes.string,
   backToBookURL: PropTypes.string,
   previewURL: PropTypes.string,
@@ -292,6 +324,7 @@ Header.propTypes = {
 Header.defaultProps = {
   bookId: undefined,
   brandLogoURL: null,
+  canAccessAdminPage: false,
   dropdownItems: [],
   dashboardURL: null,
   backToBookURL: null,

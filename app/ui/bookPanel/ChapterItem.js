@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
-import { Dropdown } from 'antd'
 import { HolderOutlined, MoreOutlined } from '@ant-design/icons'
 import styled, { keyframes, css } from 'styled-components'
-
+import Popup from '@coko/client/dist/ui/common/Popup'
 import { grid, th } from '@coko/client'
+import { Button } from '../common'
 
 const animation = keyframes`
   0% { opacity: 1; }
@@ -15,7 +15,7 @@ const animation = keyframes`
 `
 
 const Chapter = styled.div`
-  align-items: center;
+  align-items: stretch;
 
   background-color: ${({ selected }) => {
     return selected ? th('colorBackgroundHue') : 'unset'
@@ -40,7 +40,6 @@ const Chapter = styled.div`
     return false
   }}
 
-  padding: ${grid(2)};
   text-overflow: ellipsis;
   white-space: nowrap;
 
@@ -62,10 +61,16 @@ const Chapter = styled.div`
       opacity: 1;
     } */
   }
+
+  &:focus-visible,
+  &:focus-within {
+    outline: 2px solid black;
+  }
 `
 
 const ChapterContainer = styled.div`
   align-items: center;
+  cursor: pointer;
   display: flex;
   flex-grow: 1;
   overflow: hidden;
@@ -107,7 +112,33 @@ const ChapterTitle = styled.div`
   text-overflow: ellipsis;
 `
 
-const MoreActions = styled.div``
+const MoreActions = styled.button`
+  background-color: transparent;
+  border: none;
+  margin-block-start: 50%;
+
+  &:focus-visible,
+  &:focus-within {
+    outline: 2px solid black;
+  }
+`
+
+const StyledPopup = styled(Popup)`
+  border-radius: ${grid(1)};
+  inset-block-start: ${grid(5)};
+  inset-inline-end: ${grid(1)};
+  padding: ${grid(1)};
+`
+
+const PopupContentWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${grid(2)};
+
+  > *:focus {
+    outline: none;
+  }
+`
 
 const getInitials = fullname => {
   const deconstructName = fullname.split(' ')
@@ -129,47 +160,66 @@ const ChapterItem = props => {
     uploading,
     status,
     canEdit,
+    dragHandleProps,
+    focused,
     ...rest
   } = props
+
+  const chapterRef = useRef(null)
+
+  useEffect(() => {
+    // apply focus if current element recieves `focused=true`
+    // and the focus is within the chapter list (current element's parent's parent)
+    if (
+      focused &&
+      chapterRef?.current?.parentElement.parentElement.contains(
+        document.activeElement,
+      )
+    ) {
+      chapterRef?.current?.focus()
+    }
+  }, [focused])
 
   return (
     <Chapter
       isDragging={isDragging}
+      onKeyDown={({ key }) => {
+        key === 'Enter' && focused && onChapterClick(id)
+      }}
       selected={selectedChapterId === id}
       uploading={uploading}
       {...rest}
+      ref={chapterRef}
+      tabIndex={-1}
     >
-      <HolderOutlined />
-      <ChapterContainer
-        onClick={() => {
-          // if (!uploading) {
-          onChapterClick(id)
-          // }
-        }}
-      >
+      <HolderOutlined {...dragHandleProps} tabIndex={focused ? 0 : -1} />
+      <ChapterContainer onClick={() => onChapterClick(id)}>
         <ChapterTitle status={status}>
           {!uploading ? title || 'Untitled Chapter' : 'Processing'}
         </ChapterTitle>
         {lockedBy ? <UserAvatar>{getInitials(lockedBy)}</UserAvatar> : null}
       </ChapterContainer>
-      <MoreActions>
-        <Dropdown
-          disabled={!canEdit}
-          menu={{
-            items: [
-              {
-                key: 'delete-chapter-action',
-                label: 'Delete',
-                onClick: () => onClickDelete(id),
-              },
-            ],
-          }}
-          placement="bottomRight"
-          trigger={['click']}
-        >
-          <MoreOutlined />
-        </Dropdown>
-      </MoreActions>
+      <StyledPopup
+        position="inline-start"
+        toggle={
+          <MoreActions
+            onKeyDown={e => e.key === 'Enter' && e.stopPropagation()}
+            onKeyUp={e => e.key === 'Enter' && e.stopPropagation()}
+            tabIndex={focused ? 0 : -1}
+          >
+            <MoreOutlined />
+          </MoreActions>
+        }
+      >
+        <PopupContentWrapper>
+          <Button
+            onClick={() => onClickDelete(id)}
+            onKeyDown={e => e.key === 'Enter' && e.stopPropagation()}
+          >
+            Delete
+          </Button>
+        </PopupContentWrapper>
+      </StyledPopup>
     </Chapter>
   )
 }
@@ -186,6 +236,8 @@ ChapterItem.propTypes = {
   onClickDelete: PropTypes.func.isRequired,
   onChapterClick: PropTypes.func.isRequired,
   canEdit: PropTypes.bool.isRequired,
+  dragHandleProps: PropTypes.func.isRequired,
+  focused: PropTypes.bool.isRequired,
 }
 
 ChapterItem.defaultProps = {

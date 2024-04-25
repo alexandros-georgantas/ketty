@@ -37,6 +37,7 @@ const SelectUsers = ({
         const userOptions = newOptions.map(user => ({
           label: user.displayName,
           value: user.id,
+          title: user.title,
         }))
 
         if (userOptions.length === 0 && value.length === 0) {
@@ -76,7 +77,7 @@ const SelectUsers = ({
       }}
       onSearch={debounceFetcher}
       options={options}
-      placeholder="Email, comma separated"
+      placeholder="Enter email addresses, separated by commas"
       value={value}
     />
   )

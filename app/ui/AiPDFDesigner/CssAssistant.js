@@ -3,7 +3,8 @@ import styled from 'styled-components'
 import { debounce, takeRight } from 'lodash'
 import { rotate360 } from '@coko/client'
 import PropTypes from 'prop-types'
-import { gql, useLazyQuery } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
+import { USE_CHATGPT } from '../../graphql'
 import {
   autoResize,
   callOn,
@@ -67,12 +68,6 @@ const StyledSpinner = styled.div`
   }
 `
 
-const CALL_OPEN_AI = gql`
-  query OpenAi($input: String!, $history: [OpenAiMessage!]) {
-    openAi(input: $input, history: $history)
-  }
-`
-
 const SendButton = styled.button`
   aspect-ratio: 1 /1;
   background: none;
@@ -87,6 +82,11 @@ const SendButton = styled.button`
     transform: scale(1.35);
   }
 `
+
+const responses = {
+  error1:
+    'There was an error generating the response\n Please, try again in a few seconds',
+}
 
 const CssAssistant = ({
   enabled,
@@ -118,7 +118,7 @@ const CssAssistant = ({
     getValidSelectors,
   } = useContext(CssAssistantContext)
 
-  const [callOpenAi, { loading }] = useLazyQuery(CALL_OPEN_AI, {
+  const [callOpenAi, { loading }] = useLazyQuery(USE_CHATGPT, {
     onCompleted: ({ openAi }) => {
       if (openAi.startsWith('{')) {
         try {
@@ -141,13 +141,14 @@ const CssAssistant = ({
             selectedCtx.history.push({ role: 'assistant', content: feedback })
           updatePreview()
         } catch (err) {
-          setFeedback(
-            'There was an error generating the response\n Please, try again in a few seconds',
-          )
+          setFeedback(responses.error1)
         }
       } else {
-        setFeedback(openAi)
-        selectedCtx.history.push({ role: 'assistant', content: openAi })
+        setFeedback(responses.error1)
+        selectedCtx.history.push({
+          role: 'assistant',
+          content: responses.error1,
+        })
       }
 
       setUserPrompt('')
@@ -230,7 +231,7 @@ const CssAssistant = ({
     userPrompt
       ? callOpenAi({
           variables: {
-            input: userPrompt,
+            input: `${userPrompt}.\nNOTE: Ensure to output the expected valid JSON`,
             history: [
               {
                 role: 'system',
