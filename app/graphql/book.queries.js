@@ -96,8 +96,23 @@ const GET_BOOK_SETTINGS = gql`
 const CREATE_BOOK = gql`
   mutation CreateBook($input: CreateBookInput!) {
     createBook(input: $input) {
-      id
-      title
+      book {
+        id
+        title
+      }
+      newUserTeam {
+        id
+        objectId
+        role
+        global
+        members {
+          id
+          user {
+            id
+          }
+          status
+        }
+      }
     }
   }
 `

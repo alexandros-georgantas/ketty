@@ -8,7 +8,6 @@ import {
   CREATE_BOOK,
   DELETE_BOOK,
   UPLOAD_BOOK_THUMBNAIL,
-  BOOK_CREATED_SUBSCRIPTION,
   BOOK_DELETED_SUBSCRIPTION,
   BOOK_RENAMED_SUBSCRIPTION,
 } from '../graphql'
@@ -24,7 +23,7 @@ const loaderDelay = 700
 
 const DashboardPage = () => {
   const history = useHistory()
-  const { currentUser /*, setCurrentUser */ } = useCurrentUser()
+  const { currentUser, setCurrentUser } = useCurrentUser()
   const [actionInProgress, setActionInProgress] = useState(false)
 
   const canTakeActionOnBook = bookId =>
@@ -36,8 +35,6 @@ const DashboardPage = () => {
   })
 
   const [books, setBooks] = useState({ result: [], totalCount: 0 })
-  const [newBookPageData, setNewBookPageData] = useState(null)
-
   const { currentPage, booksPerPage } = paginationParams
 
   const {
@@ -81,23 +78,6 @@ const DashboardPage = () => {
       },
     })
   }, [currentUser])
-
-  useSubscription(BOOK_CREATED_SUBSCRIPTION, {
-    onData: () => {
-      refetch({
-        options: {
-          archived: false,
-          orderBy: {
-            column: 'title',
-            order: 'asc',
-          },
-          page: currentPage - 1,
-          pageSize: booksPerPage,
-        },
-      })
-    },
-    onError: error => console.error(error),
-  })
 
   useSubscription(BOOK_DELETED_SUBSCRIPTION, {
     onData: () => {
@@ -145,21 +125,6 @@ const DashboardPage = () => {
     },
     onError: error => console.error(error),
   })
-
-  useEffect(() => {
-    // go to next page if all necessary data (new book data updated user) has been fetched
-    if (
-      newBookPageData &&
-      currentUser.teams.find(
-        team => team.role === 'owner' && team.objectId === newBookPageData?.id,
-      )
-    ) {
-      const { id, whereNext } = newBookPageData
-      setNewBookPageData(null)
-      setActionInProgress(false)
-      history.push(`/books/${id}/${whereNext}`)
-    }
-  }, [currentUser, newBookPageData])
 
   const [createBook] = useMutation(CREATE_BOOK, {
     onError: () => {
@@ -243,27 +208,14 @@ const DashboardPage = () => {
     return createBook({ variables }).then(res => {
       const { data } = res
       const { createBook: createBookData } = data
-      const { id } = createBookData
+      const { book: { id } = {}, newUserTeam } = createBookData
 
-      setNewBookPageData({
-        id,
-        whereNext,
+      setCurrentUser({
+        ...currentUser,
+        teams: [...currentUser.teams, newUserTeam],
       })
 
-      // setCurrentUser({
-      //   ...currentUser,
-      //   teams: [
-      //     ...currentUser.teams,
-      //     {
-      //       id: 'randomId',
-      //       global: false,
-      //       objectId: id,
-      //       role: 'owner',
-      //     },
-      //   ],
-      // })
-
-      // history.push(`/books/${id}/${whereNext}`)
+      history.push(`/books/${id}/${whereNext}`)
     })
   }
 
