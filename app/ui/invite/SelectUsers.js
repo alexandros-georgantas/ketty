@@ -77,7 +77,7 @@ const SelectUsers = ({
       }}
       onSearch={debounceFetcher}
       options={options}
-      placeholder="Enter usernames or email addresses, separated by commas"
+      placeholder="Enter email addresses, separated by commas"
       value={value}
     />
   )
