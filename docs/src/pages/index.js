@@ -32,9 +32,7 @@ const Home = () => {
       title={`Hello from ${siteConfig.title}`}
     >
       <HomepageHeader />
-      <main>
-        <HomepageFeatures />
-      </main>
+      <main>{/* <HomepageFeatures /> */}</main>
     </Layout>
   )
 }
