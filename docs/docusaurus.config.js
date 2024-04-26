@@ -122,10 +122,10 @@ const config = {
           {
             title: 'More',
             items: [
-              {
-                label: 'Blog',
-                to: '/blog',
-              },
+              // {
+              //   label: 'Blog',
+              //   to: '/blog',
+              // },
               {
                 label: 'Gitlab',
                 href: 'https://gitlab.coko.foundation/ketty/ketty',
