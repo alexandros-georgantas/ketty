@@ -12,17 +12,12 @@ Visit the project's [website](https://ketty.community/) or our [chat channel](ht
 
 ## Contribute
 
-Contributions are welcome! Please read our [Community Products Collaboration Guidelines](https://docs.coko.foundation/s/community-collab) and join our [chat channel](https://mattermost.coko.foundation/coko/channels/ketty).
+Contributions are welcome! Please read our [Collaboration Guidelines](https://forum.ketty.community/t/community-collaboration-on-ketty/24) and join our [chat channel](https://mattermost.coko.foundation/coko/channels/ketty).
 
-## Bug reporting
+## Get help or report a bug
 
-To report a bug, [open a GitLab issue](https://gitlab.coko.foundation/ketty/ketty/-/issues/new) and use the bug-report template contained in the issue.
+If you're stuck or want to report a bug, you can reach out to us at the [Ketty Help Forum](https://forum.ketty.community/) or [open a GitLab issue](https://gitlab.coko.foundation/ketty/ketty/-/issues/new) and use the bug-report template contained in the issue.
 
-## Installation
+## Install and deploy
 
-Ketty has separate server and client applications. Refer to the following pages for the prerequisites and installation steps:
-
-- the [Ketty server README](https://gitlab.coko.foundation/ketty/server/-/blob/main/README.md)
-- the [Ketty server installation docs](https://gitlab.coko.foundation/ketty/server/-/blob/main/INSTALL.md)
-
-For an easier local installation, check out the [Ketty Development Kit](https://gitlab.coko.foundation/ketty/kdk)
+Refer to the [Ketty Developer Docs](https://devdocs.ketty.community/)
