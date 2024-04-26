@@ -140,6 +140,10 @@ module.exports = {
 };
 ```
 
+### Terms and Conditions
+
+You can setup terms and conditions for using the website by creating a file at `config/termsAndConditions.md`. It's content will show up in the terms and conditions that the user needs to accept when signing up to your instance. You can later modify those terms with your admin user in the admin dashboard.
+
 ### Websockets
 
 The server container exposes two different ports, one for the main server and one for the websocket server (used for keeping chapters locked when a user is editing). You should map each of these to a different port on your machine. See [the server port part of the compose file](https://gitlab.coko.foundation/ketty/ketty/-/blob/main/docker-compose.demo-deploy.yml?ref_type=heads#L18-19) for reference.
