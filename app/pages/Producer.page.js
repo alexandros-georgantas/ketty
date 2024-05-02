@@ -95,6 +95,8 @@ const ProducerPage = () => {
   const [reconnecting, setReconnecting] = useState(false)
   const [metadataModalOpen, setMetadataModalOpen] = useState(false)
   const [aiOn, setAiOn] = useState(false)
+  const [customPrompts, setCustomPrompts] = useState([])
+  const [freeTextPromptsOn, setFreeTextPromptsOn] = useState(false)
 
   const [currentBookComponentContent, setCurrentBookComponentContent] =
     useState(null)
@@ -136,6 +138,8 @@ const ProducerPage = () => {
     },
     onCompleted: data => {
       setAiOn(data?.getBook?.bookSettings?.aiOn)
+      setCustomPrompts(data?.getBook?.bookSettings?.customPrompts)
+      setFreeTextPromptsOn(data?.getBook?.bookSettings?.freeTextPromptsOn)
     },
   })
 
@@ -890,7 +894,9 @@ const ProducerPage = () => {
       canEdit={canModify}
       chapters={bookQueryData?.getBook?.divisions[1].bookComponents}
       chaptersActionInProgress={chaptersActionInProgress}
+      customPrompts={customPrompts}
       editorRef={editorRef}
+      freeTextPromptsOn={freeTextPromptsOn}
       isReadOnly={
         !selectedChapterId ||
         (editorMode && editorMode === 'preview') ||
