@@ -186,7 +186,7 @@ const SiteHeader = () => {
           refetchBookSettings={refetchBookSettings}
         />
       ),
-      maskClosable: true,
+      maskClosable: false,
       width: 680,
       bodyStyle: {
         textAlign: 'justify',
