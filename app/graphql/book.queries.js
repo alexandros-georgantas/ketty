@@ -62,6 +62,9 @@ const GET_ENTIRE_BOOK = gql`
       bookSettings {
         aiOn
         aiPdfDesignerOn
+        customPrompts
+        freeTextPromptsOn
+        customPromptsOn
       }
     }
   }
@@ -88,6 +91,10 @@ const GET_BOOK_SETTINGS = gql`
       bookSettings {
         aiOn
         aiPdfDesignerOn
+        id
+        customPrompts
+        freeTextPromptsOn
+        customPromptsOn
       }
     }
   }
@@ -139,14 +146,26 @@ const UPDATE_SETTINGS = gql`
     $bookId: ID!
     $aiOn: Boolean
     $aiPdfDesignerOn: Boolean
+    $freeTextPromptsOn: Boolean
+    $customPrompts: [String]
+    $customPromptsOn: Boolean
   ) {
     updateBookSettings(
       bookId: $bookId
-      settings: { aiOn: $aiOn, aiPdfDesignerOn: $aiPdfDesignerOn }
+      settings: {
+        aiOn: $aiOn
+        aiPdfDesignerOn: $aiPdfDesignerOn
+        freeTextPromptsOn: $freeTextPromptsOn
+        customPrompts: $customPrompts
+        customPromptsOn: $customPromptsOn
+      }
     ) {
       aiOn
       aiPdfDesignerOn
       id
+      customPrompts
+      freeTextPromptsOn
+      customPromptsOn
     }
   }
 `
