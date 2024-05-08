@@ -128,7 +128,7 @@ const EditorWrapper = ({
       <Wax
         config={selectedConfig}
         fileUpload={onImageUpload}
-        key={`${selectedChapterId}-${isReadOnly}-${aiOn}-${customPrompts.length}-${freeTextPromptsOn}`}
+        key={`${selectedChapterId}-${isReadOnly}-${aiOn}-${customPrompts?.length}-${freeTextPromptsOn}`}
         layout={LuluLayout}
         onChange={onPeriodicBookComponentContentChange}
         readonly={isReadOnly}
