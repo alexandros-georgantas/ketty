@@ -127,7 +127,7 @@ const BookPanel = props => {
           <StyledHeading>Chapters</StyledHeading>
           <ChaptersActions>
             <IconWrapper
-              disabled={!canEdit}
+              disabled={!canEdit || chapters.some(ch => ch.uploading)}
               icon={<CloudUploadOutlined />}
               onClick={onUploadChapter}
               type="text"

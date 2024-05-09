@@ -37,6 +37,7 @@ const Import = ({ onClickContinue, canImport }) => {
               <Upload
                 accept=".docx"
                 disabled={!canImport}
+                maxCount={3}
                 multiple
                 onFilesChange={setFilesToImport}
               />

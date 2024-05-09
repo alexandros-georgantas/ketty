@@ -48,7 +48,7 @@ const FilesList = styled.div`
 `
 
 const Upload = props => {
-  const { multiple, onFilesChange } = props
+  const { multiple, onFilesChange, maxCount } = props
 
   const [files, setFiles] = useState([])
 
@@ -58,7 +58,11 @@ const Upload = props => {
 
   const onFileSelect = ({ file }) => {
     if (multiple) {
-      setFiles(prevFiles => [...prevFiles, file])
+      if (files.length < maxCount) {
+        setFiles(prevFiles => [...prevFiles, file])
+      } else {
+        // console.log('no more than 3 files at a time')
+      }
     } else {
       setFiles([file])
     }
@@ -110,11 +114,13 @@ const Upload = props => {
 }
 
 Upload.propTypes = {
+  maxCount: PropTypes.number,
   multiple: PropTypes.bool,
   onFilesChange: PropTypes.func,
 }
 
 Upload.defaultProps = {
+  maxCount: 3,
   multiple: false,
   onFilesChange: () => {},
 }
