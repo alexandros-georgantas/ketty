@@ -27,6 +27,10 @@ const StyledLink = styled(LinkWithoutStyles)`
   overflow: hidden;
 `
 
+const StyledCard = styled(Card)`
+  width: 100%;
+`
+
 const TitleAndActionsWrapper = styled.div`
   align-items: center;
   display: flex;
@@ -76,7 +80,7 @@ const BookCard = ({
   ]
 
   return (
-    <Card
+    <StyledCard
       cover={
         <LinkWithoutStyles to={`/books/${id}/producer`}>
           <BookCover src={thumbnailURL} title={title} />
@@ -101,7 +105,7 @@ const BookCard = ({
           </MoreActions>
         )}
       </TitleAndActionsWrapper>
-    </Card>
+    </StyledCard>
   )
 }
 

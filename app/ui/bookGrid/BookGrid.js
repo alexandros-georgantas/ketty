@@ -7,12 +7,19 @@ import BookCard from './BookCard'
 import { List } from '../common'
 
 const StyledList = styled(List)`
-  height: calc(100% - 40px - ${grid(4)});
-`
+  ul.ant-list-items {
+    display: grid;
+    gap: 3em;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    padding: 2em;
 
-const StyledListItem = styled(List.Item)`
-  && {
-    padding: 0;
+    @media (min-width: 1250px) {
+      grid-template-columns: repeat(4, minmax(200px, 1fr));
+    }
+
+    @media (min-width: 1500px) {
+      grid-template-columns: repeat(6, minmax(200px, 1fr));
+    }
   }
 `
 
@@ -60,15 +67,6 @@ const BookGrid = ({
 
       <StyledList
         dataSource={books}
-        grid={{
-          gutter: 64,
-          xs: 1,
-          sm: 2,
-          md: 4,
-          lg: 5,
-          xl: 5,
-          xxl: 5,
-        }}
         itemLayout="horizontal"
         loading={loading}
         locale={{
@@ -81,16 +79,14 @@ const BookGrid = ({
         }}
         pagination={paginationConfig}
         renderItem={book => (
-          <StyledListItem>
-            <BookCard
-              {...book}
-              canDeleteBook={canDeleteBook}
-              canUploadBookThumbnail={canUploadBookThumbnail}
-              onClickDelete={onClickDelete}
-              onUploadBookThumbnail={onUploadBookThumbnail}
-              showActions
-            />
-          </StyledListItem>
+          <BookCard
+            {...book}
+            canDeleteBook={canDeleteBook}
+            canUploadBookThumbnail={canUploadBookThumbnail}
+            onClickDelete={onClickDelete}
+            onUploadBookThumbnail={onUploadBookThumbnail}
+            showActions
+          />
         )}
         showPagination={totalCount > 10}
         totalCount={totalCount}

@@ -31,7 +31,7 @@ const DashboardPage = () => {
 
   const [paginationParams, setPaginationParams] = useState({
     currentPage: 1,
-    booksPerPage: 10,
+    booksPerPage: 12,
   })
 
   const [books, setBooks] = useState({ result: [], totalCount: 0 })
