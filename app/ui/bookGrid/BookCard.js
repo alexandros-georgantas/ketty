@@ -1,3 +1,4 @@
+/* stylelint-disable string-quotes */
 import React from 'react'
 import {
   DeleteOutlined,
@@ -25,21 +26,47 @@ const DeleteBookLabel = styled.span`
 
 const StyledLink = styled(LinkWithoutStyles)`
   overflow: hidden;
+
+  &::before {
+    content: '';
+    inset: 0;
+    position: absolute;
+  }
 `
 
 const StyledCard = styled(Card)`
+  position: relative;
   width: 100%;
+
+  &[data-gridview='false'] {
+    display: flex;
+    height: 60px;
+
+    > :last-child {
+      display: inline-flex;
+      flex-grow: 1;
+    }
+    /* .ant-card-cover {
+      display: none;
+    } */
+  }
+
+  &:focus-within {
+    outline: 2px solid ${th('colorOutline')};
+  }
 `
 
 const TitleAndActionsWrapper = styled.div`
   align-items: center;
   display: flex;
   justify-content: space-between;
+  width: 100%;
 `
 
 const MoreActions = styled.div`
   display: flex;
   justify-content: flex-end;
+  z-index: 1;
 `
 
 const BookCard = ({
@@ -51,6 +78,7 @@ const BookCard = ({
   onUploadBookThumbnail,
   canDeleteBook,
   canUploadBookThumbnail,
+  gridView,
 }) => {
   const items = [
     {
@@ -81,11 +109,8 @@ const BookCard = ({
 
   return (
     <StyledCard
-      cover={
-        <LinkWithoutStyles to={`/books/${id}/producer`}>
-          <BookCover src={thumbnailURL} title={title} />
-        </LinkWithoutStyles>
-      }
+      cover={<BookCover src={thumbnailURL} title={title} />}
+      data-gridview={gridView}
       hoverable
       size="small"
     >
@@ -108,6 +133,7 @@ const BookCard = ({
     </StyledCard>
   )
 }
+// </LinkWithoutStyles>
 
 BookCard.propTypes = {
   id: PropTypes.string.isRequired,
@@ -118,6 +144,7 @@ BookCard.propTypes = {
   onUploadBookThumbnail: PropTypes.func,
   canDeleteBook: PropTypes.func.isRequired,
   canUploadBookThumbnail: PropTypes.func.isRequired,
+  gridView: PropTypes.bool,
 }
 
 BookCard.defaultProps = {
@@ -126,6 +153,7 @@ BookCard.defaultProps = {
   showActions: false,
   onClickDelete: () => {},
   onUploadBookThumbnail: () => {},
+  gridView: true,
 }
 
 export default BookCard

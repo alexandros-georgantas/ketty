@@ -1,10 +1,12 @@
-import React from 'react'
+/* stylelint-disable string-quotes */
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { grid } from '@coko/client'
 import { Empty } from 'antd'
+import { DatabaseOutlined, AppstoreOutlined } from '@ant-design/icons'
 import BookCard from './BookCard'
-import { List } from '../common'
+import { Button, List } from '../common'
 
 const StyledList = styled(List)`
   ul.ant-list-items {
@@ -19,6 +21,15 @@ const StyledList = styled(List)`
 
     @media (min-width: 1500px) {
       grid-template-columns: repeat(6, minmax(200px, 1fr));
+    }
+  }
+
+  [data-gridview='false'] {
+    ul.ant-list-items {
+      gap: 0;
+      grid-template-columns: 1fr;
+      margin-inline: auto;
+      max-width: 120ch;
     }
   }
 `
@@ -61,11 +72,22 @@ const BookGrid = ({
     onChange: onPageChange,
   }
 
+  const [gridView, setGridView] = useState(true)
+
   return (
     <Wrapper>
       <SectionHeader>{title && <h2>{title}</h2>}</SectionHeader>
 
+      <div style={{ display: 'flex', justifyContent: 'end', gap: '16px' }}>
+        <Button
+          icon={<DatabaseOutlined />}
+          onClick={() => setGridView(false)}
+        />
+        <Button icon={<AppstoreOutlined />} onClick={() => setGridView(true)} />
+      </div>
+
       <StyledList
+        data-gridview={gridView}
         dataSource={books}
         itemLayout="horizontal"
         loading={loading}
@@ -83,6 +105,7 @@ const BookGrid = ({
             {...book}
             canDeleteBook={canDeleteBook}
             canUploadBookThumbnail={canUploadBookThumbnail}
+            gridView={gridView}
             onClickDelete={onClickDelete}
             onUploadBookThumbnail={onUploadBookThumbnail}
             showActions
