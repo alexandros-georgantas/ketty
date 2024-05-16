@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { grid } from '@coko/client'
+import { grid, th } from '@coko/client'
 import { Empty } from 'antd'
 import { DatabaseOutlined, AppstoreOutlined } from '@ant-design/icons'
 import BookCard from './BookCard'
@@ -43,13 +43,35 @@ const SectionHeader = styled.div`
   h2 {
     margin: 0;
   }
-  margin-bottom: ${grid(4)};
+`
+
+const SectionCustomize = styled.div`
+  display: flex;
+  gap: ${grid(4)};
+  justify-content: end;
+
+  button {
+    border: none;
+    border-radius: 0;
+
+    &[data-active='true'] {
+      border: 2px solid ${th('colorOutline')};
+
+      svg {
+        fill: ${th('colorOutline')};
+      }
+    }
+  }
 `
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   height: calc(100% - 40px - ${grid(4)});
+
+  > * + * {
+    margin-block-start: ${grid(4)};
+  }
 `
 
 const BookGrid = ({
@@ -78,13 +100,22 @@ const BookGrid = ({
     <Wrapper>
       <SectionHeader>{title && <h2>{title}</h2>}</SectionHeader>
 
-      <div style={{ display: 'flex', justifyContent: 'end', gap: '16px' }}>
+      <SectionCustomize>
         <Button
+          aria-label="Render books in list view"
+          data-active={!gridView}
           icon={<DatabaseOutlined />}
           onClick={() => setGridView(false)}
+          title="List view"
         />
-        <Button icon={<AppstoreOutlined />} onClick={() => setGridView(true)} />
-      </div>
+        <Button
+          aria-label="Render books in grid view"
+          data-active={gridView}
+          icon={<AppstoreOutlined />}
+          onClick={() => setGridView(true)}
+          title="Grid view"
+        />
+      </SectionCustomize>
 
       <StyledList
         data-gridview={gridView}

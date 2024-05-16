@@ -14,6 +14,7 @@ import {
   grid,
   useCurrentUser,
   ProviderConnectionPage,
+  th,
 } from '@coko/client'
 
 import { CURRENT_USER } from '@coko/client/dist/helpers/currentUserQuery'
@@ -55,6 +56,16 @@ const GlobalStyle = createGlobalStyle`
 
       > div.ant-spin-container {
         height: 100%;
+      }
+
+      * {
+        &:focus {
+          outline: none;
+        }
+
+        &:focus-visible {
+          outline: 2px solid ${th('colorOutline')};
+        }
       }
     }
   }

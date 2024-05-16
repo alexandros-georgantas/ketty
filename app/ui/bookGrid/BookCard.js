@@ -41,6 +41,7 @@ const StyledCard = styled(Card)`
   &[data-gridview='false'] {
     display: flex;
     height: 60px;
+    margin-block-start: 2px;
 
     > :last-child {
       display: inline-flex;
@@ -61,6 +62,11 @@ const TitleAndActionsWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
+
+  a:focus-visible {
+    /* stylelint-disable-next-line declaration-no-important */
+    outline: none !important;
+  }
 `
 
 const MoreActions = styled.div`
