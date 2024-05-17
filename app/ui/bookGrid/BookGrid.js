@@ -57,6 +57,10 @@ const SectionCustomize = styled.div`
     &[data-active='true'] {
       border: 2px solid ${th('colorOutline')};
 
+      &:hover {
+        border-color: ${th('colorOutline')};
+      }
+
       svg {
         fill: ${th('colorOutline')};
       }
@@ -94,26 +98,32 @@ const BookGrid = ({
     onChange: onPageChange,
   }
 
-  const [gridView, setGridView] = useState(true)
+  const [gridView, setGridView] = useState(
+    () => localStorage.getItem('ketty-gridview') !== 'false',
+  )
+
+  const switchGridView = newState => {
+    setGridView(newState)
+    localStorage.setItem('ketty-gridview', newState)
+  }
 
   return (
     <Wrapper>
       <SectionHeader>{title && <h2>{title}</h2>}</SectionHeader>
-
       <SectionCustomize>
-        <Button
-          aria-label="Render books in list view"
-          data-active={!gridView}
-          icon={<DatabaseOutlined />}
-          onClick={() => setGridView(false)}
-          title="List view"
-        />
         <Button
           aria-label="Render books in grid view"
           data-active={gridView}
           icon={<AppstoreOutlined />}
-          onClick={() => setGridView(true)}
+          onClick={() => switchGridView(true)}
           title="Grid view"
+        />
+        <Button
+          aria-label="Render books in list view"
+          data-active={!gridView}
+          icon={<DatabaseOutlined />}
+          onClick={() => switchGridView(false)}
+          title="List view"
         />
       </SectionCustomize>
 
