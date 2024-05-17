@@ -1,3 +1,4 @@
+/* stylelint-disable value-list-comma-newline-after */
 /* stylelint-disable string-quotes */
 import React from 'react'
 import {
@@ -5,21 +6,17 @@ import {
   MoreOutlined,
   FileImageOutlined,
 } from '@ant-design/icons'
-import { Card, Dropdown } from 'antd'
+import { Card } from 'antd'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { th } from '@coko/client'
-import { LinkWithoutStyles, SimpleUpload } from '../common'
+import { grid, th } from '@coko/client'
+import Popup from '@coko/client/dist/ui/common/Popup'
+import { Button, LinkWithoutStyles, SimpleUpload } from '../common'
 import BookCover from './BookCover'
 
 const { Meta } = Card
 
 const StyledDeleteOutlined = styled(DeleteOutlined)`
-  color: ${th('colorError')};
-  opacity: ${({ disabled }) => (disabled ? 0.4 : 1)};
-`
-
-const DeleteBookLabel = styled.span`
   color: ${th('colorError')};
   opacity: ${({ disabled }) => (disabled ? 0.4 : 1)};
 `
@@ -38,18 +35,24 @@ const StyledCard = styled(Card)`
   position: relative;
   width: 100%;
 
+  .ant-card-body {
+    padding: ${grid(2)} ${grid(1)} ${grid(2)} ${grid(3)};
+  }
+
   &[data-gridview='false'] {
     display: flex;
     height: 60px;
     margin-block-start: 2px;
 
+    .ant-card-cover {
+      flex-basis: 10%;
+      min-width: 60px;
+    }
+
     > :last-child {
       display: inline-flex;
       flex-grow: 1;
     }
-    /* .ant-card-cover {
-      display: none;
-    } */
   }
 
   &:focus-within {
@@ -70,9 +73,45 @@ const TitleAndActionsWrapper = styled.div`
 `
 
 const MoreActions = styled.div`
+  button {
+    border-radius: 0;
+    z-index: 1;
+  }
+`
+
+const PopupContentWrapper = styled.div`
   display: flex;
-  justify-content: flex-end;
-  z-index: 1;
+  flex-direction: column;
+  z-index: 2;
+
+  > * {
+    display: flex;
+    gap: 8px;
+    margin: 0;
+    padding: 4px;
+
+    &:focus,
+    &:hover {
+      background-color: rgb(105 105 105 / 4%);
+      color: inherit;
+      outline: none;
+    }
+
+    button {
+      flex-grow: 1;
+      padding: 0;
+      text-align: start;
+    }
+  }
+`
+
+const StyledPopup = styled(Popup)`
+  border: medium;
+  border-radius: 0;
+  box-shadow: 0 6px 16px 0 rgb(0 0 0 / 8%), 0 3px 6px -4px rgb(0 0 0 / 12%),
+    0 9px 28px 8px rgb(0 0 0 / 5%);
+  margin-top: 0;
+  padding: 5px;
 `
 
 const BookCard = ({
@@ -86,33 +125,6 @@ const BookCard = ({
   canUploadBookThumbnail,
   gridView,
 }) => {
-  const items = [
-    {
-      key: 'uploadBookImage',
-      icon: <FileImageOutlined />,
-      label: (
-        <SimpleUpload
-          acceptedTypes="image/*"
-          disabled={!canUploadBookThumbnail(id)}
-          handleFileChange={file => onUploadBookThumbnail(id, file)}
-          label="Upload book placeholder image"
-        />
-      ),
-      disabled: !canUploadBookThumbnail(id),
-    },
-    {
-      key: 'deleteBook',
-      icon: <StyledDeleteOutlined disabled={!canDeleteBook(id)} />,
-      label: (
-        <DeleteBookLabel disabled={!canDeleteBook(id)}>
-          Delete book
-        </DeleteBookLabel>
-      ),
-      onClick: () => onClickDelete(id),
-      disabled: !canDeleteBook(id),
-    },
-  ]
-
   return (
     <StyledCard
       cover={<BookCover src={thumbnailURL} title={title} />}
@@ -126,13 +138,35 @@ const BookCard = ({
         </StyledLink>
         {showActions && (
           <MoreActions>
-            <Dropdown
-              menu={{ items }}
-              placement="bottomRight"
-              trigger={['click']}
+            <StyledPopup
+              alignment="end"
+              focusableContent={['button']}
+              id={`more-actions-${id}`}
+              position="block-end"
+              toggle={<Button icon={<MoreOutlined />} type="text" />}
             >
-              <MoreOutlined />
-            </Dropdown>
+              <PopupContentWrapper>
+                <p>
+                  <FileImageOutlined />
+                  <SimpleUpload
+                    acceptedTypes="image/*"
+                    disabled={!canUploadBookThumbnail(id)}
+                    handleFileChange={file => onUploadBookThumbnail(id, file)}
+                    label="Upload book placeholder image"
+                  />
+                </p>
+                <p>
+                  <StyledDeleteOutlined disabled={!canDeleteBook(id)} />
+                  <Button
+                    disabled={!canDeleteBook(id)}
+                    onClick={() => onClickDelete(id)}
+                    type="text"
+                  >
+                    Delete book
+                  </Button>
+                </p>
+              </PopupContentWrapper>
+            </StyledPopup>
           </MoreActions>
         )}
       </TitleAndActionsWrapper>
