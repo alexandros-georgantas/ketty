@@ -57,7 +57,7 @@ const getAllProfileSelectOptions = profiles =>
 
 const sanitizeOptionData = data => {
   const d = { ...data }
-  d.content = d.content.sort()
+  d.content = d.content?.sort()
   return d
 }
 
@@ -97,7 +97,7 @@ const PreviewSettings = props => {
 
   // #region functions
   const findProfile = profileValue => {
-    return profiles.find(p => p.value === profileValue)
+    return profiles?.find(p => p.value === profileValue)
   }
 
   const handleProfileChange = val => {
@@ -121,7 +121,7 @@ const PreviewSettings = props => {
   // #region data wrangling
   const profileSelectOptions = getAllProfileSelectOptions(profiles)
 
-  const fullSelectedProfile = findProfile(selectedProfile)
+  const fullSelectedProfile = findProfile(selectedProfile) || {}
 
   const selectedProfileSelectOption =
     getProfileSelectOptions(fullSelectedProfile)
