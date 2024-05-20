@@ -1,6 +1,6 @@
 // #region import
 import React, { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 import {
   useQuery,
@@ -30,6 +30,7 @@ import {
 } from '../graphql'
 
 import { isOwner, hasEditAccess, isAdmin } from '../helpers/permissions'
+import { showErrorModal } from '../helpers/commonModals'
 import { Preview, Spin } from '../ui'
 // #endregion import
 
@@ -83,6 +84,7 @@ const chooseZoom = screenWidth => {
 const PreviewerPage = () => {
   // #region init
   const params = useParams()
+  const history = useHistory()
   const { bookId } = params
   const { currentUser } = useCurrentUser()
   const [previewLink, setPreviewLink] = useState(null)
@@ -125,7 +127,11 @@ const PreviewerPage = () => {
     },
   })
 
-  const { data: book } = useQuery(GET_BOOK_COMPONENT_IDS, {
+  const {
+    data: book,
+    loading: bookLoading,
+    error,
+  } = useQuery(GET_BOOK_COMPONENT_IDS, {
     variables: {
       bookId,
     },
@@ -520,21 +526,23 @@ const PreviewerPage = () => {
 
   // initial preview
   React.useEffect(() => {
-    if (!selectedTemplate && !createPreviewCalled) {
-      setSelectedTemplate(defaultTemplate)
-    }
+    if (!bookLoading && !error) {
+      if (!selectedTemplate && !createPreviewCalled) {
+        setSelectedTemplate(defaultTemplate)
+      }
 
-    if (templatesData && selectedTemplate && !createPreviewCalled) {
-      handleCreatePreview(
-        templatesData.getSpecificTemplates,
-        currentOptions,
-        getFormatTarget(currentOptions.format),
-      )
+      if (templatesData && selectedTemplate && !createPreviewCalled) {
+        handleCreatePreview(
+          templatesData.getSpecificTemplates,
+          currentOptions,
+          getFormatTarget(currentOptions.format),
+        )
+      }
     }
-  }, [templatesData, selectedTemplate])
+  }, [templatesData, selectedTemplate, bookLoading, error])
 
   const isbns = (book?.getBook?.podMetadata?.isbns || []).map(item => {
-    return { isbn: item.isbn, label: item.label }
+    return { isbn: item?.isbn, label: item?.label }
   })
 
   const profiles =
@@ -572,7 +580,7 @@ const PreviewerPage = () => {
   const allProfiles = profiles && [defaultProfileWithTemplate, ...profiles]
 
   const hasContent =
-    book?.getBook.divisions.find(d => d.label === 'Body').bookComponents
+    book?.getBook.divisions.find(d => d?.label === 'Body').bookComponents
       .length > 0
 
   const userIsOwner = isOwner(bookId, currentUser)
@@ -583,8 +591,18 @@ const PreviewerPage = () => {
     (!hasContent && currentOptions.format === 'epub')
   // #endregion data wrangling
 
-  if (templatesLoading || profilesLoading || !currentUser || paramsLoading) {
+  if (
+    templatesLoading ||
+    profilesLoading ||
+    !currentUser ||
+    paramsLoading ||
+    bookLoading
+  ) {
     return <StyledSpin spinning />
+  }
+
+  if (!bookLoading && error?.message?.includes('does not exist')) {
+    showErrorModal(() => history.push('/dashboard'))
   }
 
   return (
