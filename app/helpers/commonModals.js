@@ -167,6 +167,30 @@ const showOpenAiRateLimitModal = () => {
   })
 }
 
+const showErrorModal = callback => {
+  const warningModal = Modal.error()
+  return warningModal.update({
+    title: 'Error',
+    content: (
+      <Paragraph>
+        There is something wrong with the book you have requested. You will be
+        redirected back to your dashboard
+      </Paragraph>
+    ),
+    onOk() {
+      warningModal.destroy()
+      callback()
+    },
+    okButtonProps: { style: { backgroundColor: 'black' } },
+    maskClosable: false,
+    width: 570,
+    bodyStyle: {
+      marginRight: 38,
+      textAlign: 'justify',
+    },
+  })
+}
+
 export {
   showUnauthorizedAccessModal,
   showGenericErrorModal,
@@ -174,4 +198,5 @@ export {
   showChangeInPermissionsModal,
   showOpenAiRateLimitModal,
   onInfoModal,
+  showErrorModal,
 }

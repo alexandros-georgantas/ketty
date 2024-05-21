@@ -32,6 +32,8 @@ const EditorWrapper = ({
   aiEnabled,
   aiOn,
   editorRef,
+  freeTextPromptsOn,
+  customPrompts,
 }) => {
   const [luluWax, setLuluWax] = useState({
     onAddChapter,
@@ -70,6 +72,8 @@ const EditorWrapper = ({
     selectedConfig.AskAiContentService = {
       AskAiContentTransformation: queryAI,
       AiOn: aiOn,
+      FreeTextPromptsOn: freeTextPromptsOn,
+      CustomPrompts: customPrompts,
     }
   }
 
@@ -124,7 +128,7 @@ const EditorWrapper = ({
       <Wax
         config={selectedConfig}
         fileUpload={onImageUpload}
-        key={`${selectedChapterId}-${isReadOnly}-${aiOn}`}
+        key={`${selectedChapterId}-${isReadOnly}-${aiOn}-${customPrompts?.length}-${freeTextPromptsOn}`}
         layout={LuluLayout}
         onChange={onPeriodicBookComponentContentChange}
         readonly={isReadOnly}

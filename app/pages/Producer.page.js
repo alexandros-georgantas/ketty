@@ -48,6 +48,7 @@ import {
   showChangeInPermissionsModal,
   onInfoModal,
   showOpenAiRateLimitModal,
+  showErrorModal,
 } from '../helpers/commonModals'
 
 import { Editor, Modal, Paragraph, Spin } from '../ui'
@@ -95,6 +96,8 @@ const ProducerPage = () => {
   const [reconnecting, setReconnecting] = useState(false)
   const [metadataModalOpen, setMetadataModalOpen] = useState(false)
   const [aiOn, setAiOn] = useState(false)
+  const [customPrompts, setCustomPrompts] = useState([])
+  const [freeTextPromptsOn, setFreeTextPromptsOn] = useState(false)
 
   const [currentBookComponentContent, setCurrentBookComponentContent] =
     useState(null)
@@ -136,6 +139,8 @@ const ProducerPage = () => {
     },
     onCompleted: data => {
       setAiOn(data?.getBook?.bookSettings?.aiOn)
+      setCustomPrompts(data?.getBook?.bookSettings?.customPrompts)
+      setFreeTextPromptsOn(data?.getBook?.bookSettings?.freeTextPromptsOn)
     },
   })
 
@@ -253,7 +258,7 @@ const ProducerPage = () => {
   useEffect(() => {
     if (isOwner(bookId, currentUser)) {
       if (selectedChapterId) {
-        setCurrentBookComponentContent(editorRef.current.getContent())
+        setCurrentBookComponentContent(editorRef?.current?.getContent())
       }
 
       refetchBook({ id: bookId })
@@ -490,30 +495,6 @@ const ProducerPage = () => {
     }
 
     updatePODMetadata({ variables: { bookId, metadata: rest } })
-  }
-
-  const showErrorModal = () => {
-    const warningModal = Modal.error()
-    return warningModal.update({
-      title: 'Error',
-      content: (
-        <Paragraph>
-          There is something wrong with the book you have requested. You will be
-          redirected back to your dashboard
-        </Paragraph>
-      ),
-      onOk() {
-        history.push('/dashboard')
-        warningModal.destroy()
-      },
-      okButtonProps: { style: { backgroundColor: 'black' } },
-      maskClosable: false,
-      width: 570,
-      bodyStyle: {
-        marginRight: 38,
-        textAlign: 'justify',
-      },
-    })
   }
 
   const showOfflineModal = () => {
@@ -793,7 +774,11 @@ const ProducerPage = () => {
   )
 
   useEffect(() => {
-    if (!hasMembership) {
+    if (
+      !loading &&
+      !hasMembership &&
+      !error?.message?.includes('does not exist')
+    ) {
       const redirectToDashboard = () => history.push('/dashboard')
       showUnauthorizedAccessModal(redirectToDashboard)
     }
@@ -858,7 +843,7 @@ const ProducerPage = () => {
   // WEBSOCKET SECTION END
 
   if (!loading && error?.message?.includes('does not exist')) {
-    showErrorModal()
+    showErrorModal(() => history.push('/dashboard'))
   }
 
   if (reconnecting) {
@@ -890,7 +875,9 @@ const ProducerPage = () => {
       canEdit={canModify}
       chapters={bookQueryData?.getBook?.divisions[1].bookComponents}
       chaptersActionInProgress={chaptersActionInProgress}
+      customPrompts={customPrompts}
       editorRef={editorRef}
+      freeTextPromptsOn={freeTextPromptsOn}
       isReadOnly={
         !selectedChapterId ||
         (editorMode && editorMode === 'preview') ||
