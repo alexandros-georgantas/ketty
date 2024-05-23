@@ -197,6 +197,7 @@ const ProducerPage = () => {
             input: {
               text: [input],
             },
+            format: 'text',
           },
         }).then(({ data }) => {
           if (!data) return resolve(null)
