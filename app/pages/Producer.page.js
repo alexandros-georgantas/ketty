@@ -202,7 +202,7 @@ const ProducerPage = () => {
         }).then(({ data }) => {
           if (!data) return resolve(null)
           const { openAi: res } = data
-          return resolve(res)
+          return resolve(JSON.parse(res).message.content)
         })
       })
     }
