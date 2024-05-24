@@ -120,10 +120,11 @@ const CssAssistant = ({
 
   const [callOpenAi, { loading }] = useLazyQuery(USE_CHATGPT, {
     onCompleted: ({ openAi }) => {
-      if (openAi.startsWith('{')) {
+      const { message = '' } = JSON.parse(openAi)
+
+      if (message.content.startsWith('{')) {
         try {
-          const response = JSON.parse(openAi)
-          // console.log(response)
+          const response = JSON.parse(message.content)
           const { css, rules, feedback, textContent = '' } = response
           const ctxIsHtmlSrc = selectedCtx.node === htmlSrc
 
