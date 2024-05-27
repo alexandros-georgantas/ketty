@@ -191,6 +191,30 @@ const showErrorModal = callback => {
   })
 }
 
+const showDeletedBookModal = callback => {
+  const warningModal = Modal.error()
+  return warningModal.update({
+    title: 'Error',
+    content: (
+      <Paragraph>
+        This book has been deleted by the Owner. Select &quot;OK&quot; to be
+        redirected to your Dashboard
+      </Paragraph>
+    ),
+    onOk() {
+      warningModal.destroy()
+      callback()
+    },
+    okButtonProps: { style: { backgroundColor: 'black' } },
+    maskClosable: false,
+    width: 570,
+    bodyStyle: {
+      marginRight: 38,
+      textAlign: 'justify',
+    },
+  })
+}
+
 export {
   showUnauthorizedAccessModal,
   showGenericErrorModal,
@@ -199,4 +223,5 @@ export {
   showOpenAiRateLimitModal,
   onInfoModal,
   showErrorModal,
+  showDeletedBookModal,
 }
