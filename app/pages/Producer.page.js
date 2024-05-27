@@ -49,6 +49,7 @@ import {
   onInfoModal,
   showOpenAiRateLimitModal,
   showErrorModal,
+  showDeletedBookModal,
 } from '../helpers/commonModals'
 
 import { Editor, Modal, Paragraph, Spin } from '../ui'
@@ -844,6 +845,10 @@ const ProducerPage = () => {
 
   if (!loading && error?.message?.includes('does not exist')) {
     showErrorModal(() => history.push('/dashboard'))
+  }
+
+  if (!loading && error?.message?.includes('has been deleted')) {
+    showDeletedBookModal(() => history.push('/dashboard'))
   }
 
   if (reconnecting) {
