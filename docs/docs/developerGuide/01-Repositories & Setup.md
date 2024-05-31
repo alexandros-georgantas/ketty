@@ -84,6 +84,19 @@ Editoria (and by extension OEN) are not currently being published as images on d
 Having these different repos can make it difficult to work in development. To get around that, we have the KDK (ketida development toolkit) that brings all the repos together in an environment that would let the developer be more productive.  
 Link: https://gitlab.coko.foundation/ketty/kdk
 
+The KDK has 3 different docker compose files, one for each ketty version (Editoria, OEN and Ketty), that will start all necessary servers and microservices for your selected version. After executing `setup.sh`:
+
+- if you want to develop for Ketty run `docker-compose up`
+- if you want to develop for OEN run `docker-compose -f docker-compose.oen.yml up`
+- if you want to develop for Editoria run `docker-compose -f docker-compose.vanilla.yml up`
+
+Once the containers are up,
+
+- open your browser at `https://localhost:4000`
+- log in with the default admin credentials: admin@example.com / password
+
 :::note
 
 There is a very good chance that we’ll move all the corresponding `ketty/*` repos under one single repo in the near future. For the time being, work with the KDK.
+
+:::
