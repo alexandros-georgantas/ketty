@@ -126,6 +126,7 @@ const EditorWrapper = ({
   return (
     <LuluWaxContext.Provider value={{ luluWax, setLuluWax }}>
       <Wax
+        autoFocus
         config={selectedConfig}
         fileUpload={onImageUpload}
         key={`${selectedChapterId}-${isReadOnly}-${aiOn}-${customPrompts?.length}-${freeTextPromptsOn}`}

@@ -96,6 +96,13 @@ const StyledBookPanel = styled(BookPanel)`
   width: 20%;
 `
 
+const NoSelectedChapterWrapper = styled.div`
+  display: grid;
+  font-size: 16px;
+  height: 80%;
+  place-content: center;
+`
+
 const MainMenuToolBar = ComponentPlugin('mainMenuToolBar')
 
 const LuluLayout = ({ editor }) => {
@@ -166,7 +173,14 @@ const LuluLayout = ({ editor }) => {
         <EditorArea isFullscreen={options.fullScreen}>
           <WaxSurfaceScroll>
             <EditorContainer selectedChapterId={selectedChapterId}>
-              {editor}
+              {selectedChapterId ? (
+                editor
+              ) : (
+                <NoSelectedChapterWrapper>
+                  Create or select a chapter in the chapters panel to start
+                  writing
+                </NoSelectedChapterWrapper>
+              )}
             </EditorContainer>
           </WaxSurfaceScroll>
         </EditorArea>

@@ -127,15 +127,19 @@ const BookPanel = props => {
           <StyledHeading>Chapters</StyledHeading>
           <ChaptersActions>
             <IconWrapper
+              aria-label="Upload a chapter"
               disabled={!canEdit}
               icon={<CloudUploadOutlined />}
               onClick={onUploadChapter}
+              title="Upload a chapter"
               type="text"
             />
             <IconWrapper
+              aria-label="Create a chapter"
               disabled={!canEdit}
               icon={<PlusOutlined />}
               onClick={onAddChapter}
+              title="Create a chapter"
               type="text"
             />
           </ChaptersActions>
