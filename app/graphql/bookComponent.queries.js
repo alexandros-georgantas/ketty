@@ -5,50 +5,12 @@ const CREATE_BOOK_COMPONENT = gql`
     podAddBookComponent(input: $input) {
       id
       title
-      podMetadata {
-        authors
-        bottomPage
-        copyrightLicense
-        isbns {
-          label
-          isbn
-        }
-        licenseTypes {
-          NC
-          SA
-          ND
-        }
-        ncCopyrightHolder
-        ncCopyrightYear
-        publicDomainType
-        saCopyrightHolder
-        saCopyrightYear
-        topPage
-      }
-      divisions {
-        id
-        label
-        bookComponents {
-          id
-          title
-          divisionId
-          # content
-          componentType
-          trackChangesEnabled
-          uploading
-          status
-          lock {
-            userId
-            created
-            givenNames
-            tabId
-            foreignId
-            isAdmin
-            surname
-            id
-          }
-        }
-      }
+      divisionId
+      # content
+      componentType
+      trackChangesEnabled
+      uploading
+      status
     }
   }
 `

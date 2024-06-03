@@ -208,14 +208,17 @@ const DashboardPage = () => {
     return createBook({ variables }).then(res => {
       const { data } = res
       const { createBook: createBookData } = data
-      const { book: { id } = {}, newUserTeam } = createBookData
+      const { book: { id, divisions } = {}, newUserTeam } = createBookData
 
       setCurrentUser({
         ...currentUser,
         teams: [...currentUser.teams, newUserTeam],
       })
 
-      history.push(`/books/${id}/${whereNext}`)
+      history.push({
+        pathname: `/books/${id}/${whereNext}`,
+        state: { createdChapterId: divisions[1]?.bookComponents[0]?.id },
+      })
     })
   }
 
