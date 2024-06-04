@@ -14,7 +14,7 @@ const Wrapper = styled.div`
   padding: ${grid(4)};
 `
 
-const Import = ({ onClickContinue, canImport }) => {
+const Import = ({ onClickContinue, canImport, loading }) => {
   const [filesToImport, setFilesToImport] = useState([])
 
   return (
@@ -43,7 +43,8 @@ const Import = ({ onClickContinue, canImport }) => {
 
               <Row justify="end">
                 <Button
-                  disabled={!filesToImport.length || !canImport}
+                  disabled={!filesToImport.length || !canImport || loading}
+                  loading={loading}
                   onClick={() => onClickContinue(filesToImport)}
                   size="large"
                   type="primary"
@@ -62,9 +63,11 @@ const Import = ({ onClickContinue, canImport }) => {
 Import.propTypes = {
   onClickContinue: PropTypes.func.isRequired,
   canImport: PropTypes.bool,
+  loading: PropTypes.bool,
 }
 Import.defaultProps = {
   canImport: false,
+  loading: false,
 }
 
 export default Import

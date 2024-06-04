@@ -49,6 +49,7 @@ import {
   onInfoModal,
   showOpenAiRateLimitModal,
   showErrorModal,
+  showDeletedBookModal,
 } from '../helpers/commonModals'
 
 import { Editor, Modal, Paragraph, Spin } from '../ui'
@@ -91,8 +92,13 @@ const ProducerPage = () => {
   // INITIALIZATION SECTION START
   const history = useHistory()
   const params = useParams()
+  const { bookId } = params
   const [tabId] = useState(uuid())
-  const [selectedChapterId, setSelectedChapterId] = useState(undefined)
+
+  const [selectedChapterId, setSelectedChapterId] = useState(
+    () => localStorage.getItem(`${bookId}-selected-chapter`) || undefined,
+  )
+
   const [reconnecting, setReconnecting] = useState(false)
   const [metadataModalOpen, setMetadataModalOpen] = useState(false)
   const [aiOn, setAiOn] = useState(false)
@@ -105,7 +111,6 @@ const ProducerPage = () => {
   const { currentUser } = useCurrentUser()
   const token = localStorage.getItem('token')
   // const [form] = Form.useForm()
-  const { bookId } = params
 
   const canModify =
     isAdmin(currentUser) ||
@@ -141,6 +146,15 @@ const ProducerPage = () => {
       setAiOn(data?.getBook?.bookSettings?.aiOn)
       setCustomPrompts(data?.getBook?.bookSettings?.customPrompts)
       setFreeTextPromptsOn(data?.getBook?.bookSettings?.freeTextPromptsOn)
+
+      // if loading page the first time and no chapter is preselected, select the first one
+      if (selectedChapterId === undefined) {
+        const firstChapter = data?.getBook?.divisions[1].bookComponents[0]
+
+        if (!firstChapter.uploading) {
+          setSelectedChapterId(data?.getBook?.divisions[1].bookComponents[0].id)
+        }
+      }
     },
   })
 
@@ -150,7 +164,7 @@ const ProducerPage = () => {
     // refetch: refetchBookComponent,
   } = useQuery(GET_BOOK_COMPONENT, {
     fetchPolicy: 'network-only',
-    skip: !selectedChapterId,
+    skip: !selectedChapterId || !bookQueryData,
     variables: { id: selectedChapterId },
     onError: () => {
       if (!reconnecting) {
@@ -328,7 +342,7 @@ const ProducerPage = () => {
         const { id: deletedId } = input
 
         if (selectedChapterId && selectedChapterId === deletedId) {
-          setSelectedChapterId(undefined)
+          setSelectedChapterId(null)
         }
       },
       onError: err => {
@@ -422,6 +436,8 @@ const ProducerPage = () => {
           componentType: 'chapter',
         },
       },
+    }).then(({ data }) => {
+      setSelectedChapterId(data?.podAddBookComponent?.id)
     })
   }
 
@@ -672,7 +688,7 @@ const ProducerPage = () => {
     }
 
     if (isAlreadySelected) {
-      setSelectedChapterId(undefined)
+      setSelectedChapterId(null)
       return
     }
 
@@ -787,6 +803,9 @@ const ProducerPage = () => {
   useEffect(() => {
     if (!selectedChapterId) {
       setCurrentBookComponentContent(null)
+      localStorage.removeItem(`${bookId}-selected-chapter`)
+    } else {
+      localStorage.setItem(`${bookId}-selected-chapter`, selectedChapterId)
     }
   }, [selectedChapterId])
 
@@ -803,7 +822,7 @@ const ProducerPage = () => {
           if (reconnecting) {
             if (selectedChapterId) {
               const tempChapterId = selectedChapterId
-              setSelectedChapterId(undefined)
+              setSelectedChapterId(null)
               setSelectedChapterId(tempChapterId)
             }
 
@@ -844,6 +863,10 @@ const ProducerPage = () => {
 
   if (!loading && error?.message?.includes('does not exist')) {
     showErrorModal(() => history.push('/dashboard'))
+  }
+
+  if (!loading && error?.message?.includes('has been deleted')) {
+    showDeletedBookModal(() => history.push('/dashboard'))
   }
 
   if (reconnecting) {

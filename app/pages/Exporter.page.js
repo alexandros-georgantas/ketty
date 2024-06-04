@@ -30,7 +30,7 @@ import {
 } from '../graphql'
 
 import { isOwner, hasEditAccess, isAdmin } from '../helpers/permissions'
-import { showErrorModal } from '../helpers/commonModals'
+import { showErrorModal, showDeletedBookModal } from '../helpers/commonModals'
 import { Preview, Spin } from '../ui'
 // #endregion import
 
@@ -603,6 +603,10 @@ const PreviewerPage = () => {
 
   if (!bookLoading && error?.message?.includes('does not exist')) {
     showErrorModal(() => history.push('/dashboard'))
+  }
+
+  if (!bookLoading && error?.message?.includes('has been deleted')) {
+    showDeletedBookModal(() => history.push('/dashboard'))
   }
 
   return (

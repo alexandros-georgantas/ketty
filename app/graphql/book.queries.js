@@ -106,6 +106,12 @@ const CREATE_BOOK = gql`
       book {
         id
         title
+        divisions {
+          id
+          bookComponents {
+            id
+          }
+        }
       }
       newUserTeam {
         id
