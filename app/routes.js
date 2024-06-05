@@ -12,6 +12,7 @@ import {
   PageLayout as Page,
   RequireAuth,
   grid,
+  th,
   useCurrentUser,
   ProviderConnectionPage,
 } from '@coko/client'
@@ -38,6 +39,7 @@ import {
   VerifyEmailPage,
   AiPDFDesignerPage,
   AdminPage,
+  CreateBook,
 } from './pages'
 import { GET_BOOK_SETTINGS, APPLICATION_PARAMETERS } from './graphql'
 import { CssAssistantProvider } from './ui/AiPDFDesigner/hooks/CssAssistantContext'
@@ -55,6 +57,16 @@ const GlobalStyle = createGlobalStyle`
 
       > div.ant-spin-container {
         height: 100%;
+      }
+    }
+
+    * {
+      &:focus {
+        outline: none;
+      }
+
+      &:focus-visible {
+        outline: 2px solid ${th('colorOutline')};
       }
     }
   }
@@ -303,6 +315,15 @@ const routes = (
                 render={() => (
                   <Authenticated>
                     <DashboardPage />
+                  </Authenticated>
+                )}
+              />
+              <Route
+                exact
+                path="/create-book"
+                render={() => (
+                  <Authenticated>
+                    <CreateBook />
                   </Authenticated>
                 )}
               />
