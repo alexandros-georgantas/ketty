@@ -40,6 +40,7 @@ const TopMenu = styled.div`
 const EditorArea = styled.div`
   background: #e8e8e8;
   border-bottom: 1px solid lightgrey;
+  flex-grow: 1;
   height: 100%;
   padding: 4px 0 0;
   width: ${({ isFullscreen }) => (isFullscreen ? '100%' : '80%')};
@@ -93,7 +94,11 @@ const EditorContainer = styled.div`
 
 const StyledBookPanel = styled(BookPanel)`
   border-right: ${th('borderWidth')} ${th('borderStyle')} ${th('colorBorder')};
-  width: 20%;
+  width: 32%;
+
+  @media (min-width: 1200px) {
+    flex: 0 0 49ch;
+  }
 `
 
 const NoSelectedChapterWrapper = styled.div`
@@ -132,6 +137,8 @@ const LuluLayout = ({ editor }) => {
     onChapterClick,
     onReorderChapter,
     onUploadChapter,
+    onBookComponentTypeChange,
+    onBookComponentParentIdChange,
     selectedChapterId,
     title,
     subtitle,
@@ -158,6 +165,8 @@ const LuluLayout = ({ editor }) => {
             chaptersActionInProgress={chaptersActionInProgress}
             metadataModalOpen={metadataModalOpen}
             onAddChapter={onAddChapter}
+            onBookComponentParentIdChange={onBookComponentParentIdChange}
+            onBookComponentTypeChange={onBookComponentTypeChange}
             onChapterClick={onChapterClick}
             onDeleteChapter={onDeleteChapter}
             onReorderChapter={onReorderChapter}

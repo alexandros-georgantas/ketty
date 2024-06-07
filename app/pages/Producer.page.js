@@ -18,6 +18,7 @@ import {
   GET_BOOK_SETTINGS,
   RENAME_BOOK_COMPONENT_TITLE,
   UPDATE_BOOK_COMPONENT_CONTENT,
+  UPDATE_BOOK_COMPONENT_TYPE,
   DELETE_BOOK_COMPONENT,
   CREATE_BOOK_COMPONENT,
   INGEST_WORD_FILES,
@@ -32,6 +33,7 @@ import {
   USE_CHATGPT,
   APPLICATION_PARAMETERS,
   SET_BOOK_COMPONENT_STATUS,
+  UPDATE_BOOK_COMPONENT_PARENT_ID,
   // BOOK_SETTINGS_UPDATED_SUBSCRIPTION,
 } from '../graphql'
 
@@ -288,6 +290,25 @@ const ProducerPage = () => {
     },
   })
 
+  const [updateBookComponentType, { loading: componentTypeInProgress }] =
+    useMutation(UPDATE_BOOK_COMPONENT_TYPE, {
+      onError: err => {
+        if (err.toString().includes('Not Authorised')) {
+          showUnauthorizedActionModal(false)
+        } else if (!reconnecting) showGenericErrorModal()
+      },
+    })
+
+  const [updateBookComponentParentId, { loading: parentIdInProgress }] =
+    useMutation(UPDATE_BOOK_COMPONENT_PARENT_ID, {
+      refetchQueries: [GET_ENTIRE_BOOK],
+      onError: err => {
+        if (err.toString().includes('Not Authorised')) {
+          showUnauthorizedActionModal(false)
+        } else if (!reconnecting) showGenericErrorModal()
+      },
+    })
+
   const [
     setBookComponentStatus,
     { loading: setBookComponentStatusInProgress },
@@ -409,6 +430,32 @@ const ProducerPage = () => {
           input: {
             id: selectedChapterId,
             content,
+          },
+        },
+      })
+    }
+  }
+
+  const onBookComponentTypeChange = (componentId, componentType) => {
+    if (componentId && componentType && canModify) {
+      updateBookComponentType({
+        variables: {
+          input: {
+            id: componentId,
+            componentType,
+          },
+        },
+      })
+    }
+  }
+
+  const onBookComponentParentIdChange = (componentId, parentComponentId) => {
+    if (componentId && canModify) {
+      updateBookComponentParentId({
+        variables: {
+          input: {
+            id: componentId,
+            parentComponentId,
           },
         },
       })
@@ -881,7 +928,9 @@ const ProducerPage = () => {
     addBookComponentInProgress ||
     deleteBookComponentInProgress ||
     ingestWordFileInProgress ||
-    setBookComponentStatusInProgress
+    setBookComponentStatusInProgress ||
+    componentTypeInProgress ||
+    parentIdInProgress
 
   const isAIEnabled = find(
     applicationParametersData?.getApplicationParameters,
@@ -908,7 +957,9 @@ const ProducerPage = () => {
       }
       metadataModalOpen={metadataModalOpen}
       onAddChapter={onAddChapter}
+      onBookComponentParentIdChange={onBookComponentParentIdChange}
       onBookComponentTitleChange={onBookComponentTitleChange}
+      onBookComponentTypeChange={onBookComponentTypeChange}
       onChapterClick={onChapterClick}
       onDeleteChapter={onDeleteChapter}
       onImageUpload={handleImageUpload}
