@@ -102,7 +102,6 @@ const PopupContentWrapper = styled.div`
   > * {
     background-color: transparent;
     border: none;
-    border-radius: 3px;
     padding: 5px 12px;
 
     &:focus,

@@ -15,6 +15,8 @@ const EditorWrapper = ({
   isReadOnly,
   onImageUpload,
   onBookComponentTitleChange,
+  onBookComponentTypeChange,
+  onBookComponentParentIdChange,
   onAddChapter,
   onChapterClick,
   bookComponentContent,
@@ -40,6 +42,7 @@ const EditorWrapper = ({
     onChapterClick,
     onDeleteChapter,
     onReorderChapter,
+    onBookComponentTypeChange,
     chapters,
     selectedChapterId,
     onUploadChapter,
@@ -109,6 +112,8 @@ const EditorWrapper = ({
       canEdit,
       metadataModalOpen,
       setMetadataModalOpen,
+      onBookComponentTypeChange,
+      onBookComponentParentIdChange,
     })
   }, [
     title,
