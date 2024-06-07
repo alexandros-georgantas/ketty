@@ -51,7 +51,12 @@ const ChaptersHeader = styled.div`
   display: flex;
   flex-shrink: 0;
   margin-bottom: ${grid(2)};
+  padding: ${grid(1)};
   width: 100%;
+
+  button {
+    border-radius: 0;
+  }
 `
 
 const ChaptersActions = styled(Space)``
@@ -66,6 +71,7 @@ const IconWrapper = styled(Button)`
 `
 
 const StyledModalButton = styled(Button)`
+  border-radius: 0;
   text-align: left;
   width: 100%;
 `
@@ -87,6 +93,8 @@ const BookPanel = props => {
     canEdit,
     metadataModalOpen,
     setMetadataModalOpen,
+    onBookComponentTypeChange,
+    onBookComponentParentIdChange,
   } = props
 
   const closeModal = () => {
@@ -148,6 +156,8 @@ const BookPanel = props => {
           canEdit={canEdit}
           chapters={chapters}
           chaptersActionInProgress={chaptersActionInProgress}
+          onBookComponentParentIdChange={onBookComponentParentIdChange}
+          onBookComponentTypeChange={onBookComponentTypeChange}
           onChapterClick={onChapterClick}
           onDeleteChapter={onDeleteChapter}
           onReorderChapter={onReorderChapter}
@@ -202,10 +212,14 @@ BookPanel.propTypes = {
   metadataModalOpen: PropTypes.bool.isRequired,
   setMetadataModalOpen: PropTypes.func.isRequired,
   chaptersActionInProgress: PropTypes.bool.isRequired,
+  onBookComponentTypeChange: PropTypes.func,
+  onBookComponentParentIdChange: PropTypes.func,
 }
 BookPanel.defaultProps = {
   selectedChapterId: undefined,
   title: null,
+  onBookComponentTypeChange: null,
+  onBookComponentParentIdChange: null,
 }
 
 export default BookPanel

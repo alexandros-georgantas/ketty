@@ -57,6 +57,7 @@ const GET_ENTIRE_BOOK = gql`
             surname
             id
           }
+          parentComponentId
         }
       }
       bookSettings {
