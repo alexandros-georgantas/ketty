@@ -1,3 +1,4 @@
+/* stylelint-disable string-quotes */
 /* eslint-disable react/prop-types */
 import React, { useContext } from 'react'
 import styled from 'styled-components'
@@ -36,6 +37,12 @@ const TopMenu = styled.div`
   height: 48px;
   justify-content: center;
   user-select: none;
+
+  &[data-loading='true'] [aria-controls='block-level-options'] {
+    > span {
+      opacity: 0;
+    }
+  }
 `
 
 const EditorArea = styled.div`
@@ -54,12 +61,6 @@ const WaxSurfaceScroll = styled.div`
   overflow-y: auto;
   position: relative;
   width: 100%;
-
-  .ProseMirror {
-    /* figcaption {
-      width: 640px;
-    } */
-  }
 `
 
 const EditorContainer = styled.div`
@@ -167,7 +168,7 @@ const LuluLayout = ({ editor }) => {
 
   return (
     <Wrapper id="wax-container" style={fullScreenStyles}>
-      <TopMenu>
+      <TopMenu data-loading={editorLoading}>
         <MainMenuToolBar />
       </TopMenu>
       <Main>
