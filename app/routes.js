@@ -41,6 +41,7 @@ import {
   AdminPage,
   CreateBook,
 } from './pages'
+
 import { GET_BOOK_SETTINGS, APPLICATION_PARAMETERS } from './graphql'
 import { CssAssistantProvider } from './ui/AiPDFDesigner/hooks/CssAssistantContext'
 
@@ -212,6 +213,7 @@ const SiteHeader = () => {
   const isProducerPage = currentPath.includes('/producer')
   const isExporterPage = currentPath.includes('/exporter')
   const isAiAssistantPage = currentPath.includes('/ai-pdf')
+  const isKnowledgeBasePage = currentPath.includes('/knowledge-base')
 
   return currentUser ? (
     <>
@@ -237,6 +239,12 @@ const SiteHeader = () => {
         showBackToBook={isExporterPage || isAiAssistantPage}
         showDashboard={currentPath !== '/dashboard'}
         showInvite={isProducerPage}
+        showKnowledgeBaseLink={
+          isAIEnabled?.config &&
+          bookQueryData?.getBook.bookSettings.knowledgeBaseOn &&
+          !isKnowledgeBasePage &&
+          !isExporterPage
+        }
         showPreview={isProducerPage}
         showSettings={isProducerPage && isAIEnabled?.config}
         userDisplayName={currentUser.displayName}
