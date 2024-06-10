@@ -141,6 +141,7 @@ const Header = props => {
     previewURL,
     dropdownItems,
     showAiAssistantLink,
+    showKnowledgeBaseLink,
     bookId,
     ...rest
   } = props
@@ -178,6 +179,18 @@ const Header = props => {
         Share
       </Button>,
     )
+  }
+
+  if (showKnowledgeBaseLink) {
+    navItemsRight.push({
+      key: 'knowledgeBase',
+      label: (
+        /** TODO: update link */
+        <UnstyledLink to={`/knowledge-base/${bookId}`}>
+          Knowledge base
+        </UnstyledLink>
+      ),
+    })
   }
 
   if (showAiAssistantLink) {
@@ -259,6 +272,7 @@ Header.propTypes = {
   showBackToBook: PropTypes.bool.isRequired,
   showDashboard: PropTypes.bool.isRequired,
   showAiAssistantLink: PropTypes.bool,
+  showKnowledgeBaseLink: PropTypes.bool,
   showInvite: PropTypes.bool.isRequired,
   showSettings: PropTypes.bool.isRequired,
   onInvite: PropTypes.func.isRequired,
@@ -285,6 +299,7 @@ Header.defaultProps = {
   backToBookURL: null,
   previewURL: null,
   showAiAssistantLink: false,
+  showKnowledgeBaseLink: false,
 }
 
 export default Header
