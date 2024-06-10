@@ -89,6 +89,10 @@ const SettingsModal = ({
 
   const [prompts, setPrompts] = useState(bookSettings.customPrompts || [])
 
+  const [isKnowledgeBaseOn, setIsKnowledgeBaseOnn] = useState(
+    !!bookSettings.knowledgeBaseOn,
+  )
+
   // MUTATIONS SECTION START
   const [updateBookSettings, { loading: updateLoading }] = useMutation(
     UPDATE_SETTINGS,
@@ -133,6 +137,7 @@ const SettingsModal = ({
         freeTextPromptsOn: isFreeTextPromptsOn,
         customPrompts: prompts,
         customPromptsOn: isCustomPromptsOn,
+        knowledgeBaseOn: isKnowledgeBaseOn,
       },
     })
   }
@@ -283,6 +288,18 @@ const SettingsModal = ({
         </SettingItem>
       </SettingsWrapper>
 
+      <SettingsWrapper>
+        <SettingTitle>Knowledge Base</SettingTitle>
+        <SettingItem>
+          Users with edit access to this book can create and query a knowledge
+          base
+          <Switch
+            checked={isKnowledgeBaseOn}
+            disabled={updateLoading || !canChangeSettings}
+            onChange={e => setIsKnowledgeBaseOnn(e)}
+          />
+        </SettingItem>
+      </SettingsWrapper>
       <ButtonsContainer>
         <StyledButton
           disabled={!canChangeSettings}
@@ -314,6 +331,7 @@ SettingsModal.propTypes = {
     freeTextPromptsOn: PropTypes.bool,
     customPrompts: PropTypes.arrayOf(PropTypes.string),
     customPromptsOn: PropTypes.bool,
+    knowledgeBaseOn: PropTypes.bool,
   }),
   closeModal: PropTypes.func.isRequired,
   refetchBookSettings: PropTypes.func.isRequired,
@@ -325,6 +343,7 @@ SettingsModal.defaultProps = {
     aiPdfDesignerOn: false,
     freeTextPromptsOn: false,
     customPromptsOn: false,
+    knowledgeBaseOn: false,
   },
 }
 export default SettingsModal
