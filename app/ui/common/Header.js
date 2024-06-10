@@ -143,6 +143,7 @@ const Header = props => {
     showAiAssistantLink,
     showKnowledgeBaseLink,
     bookId,
+    showKbLink,
     ...rest
   } = props
 
@@ -196,6 +197,17 @@ const Header = props => {
         AI Book Designer (Beta)
       </UnstyledLink>,
     )
+  }
+
+  if (showKbLink) {
+    navItemsRight.push({
+      key: 'aiPdfDesigner',
+      label: (
+        <UnstyledLink to={`/books/${bookId}/knowledge-base`}>
+          Knowledge Base
+        </UnstyledLink>
+      ),
+    })
   }
 
   if (showSettings) {

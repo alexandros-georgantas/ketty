@@ -2,7 +2,7 @@
 import { gql } from '@apollo/client'
 
 const USE_CHATGPT = gql`
-  query OpenAi($input: String!, $history: [OpenAiMessage!]) {
+  query OpenAi($input: UserInput!, $history: [OpenAiMessage]) {
     openAi(input: $input, history: $history)
   }
 `

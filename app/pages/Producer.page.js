@@ -202,10 +202,17 @@ const ProducerPage = () => {
 
     if (settings?.data.getBook.bookSettings.aiOn) {
       return new Promise((resolve, reject) => {
-        chatGPT({ variables: { input } }).then(({ data }) => {
+        chatGPT({
+          variables: {
+            input: {
+              text: [input],
+            },
+            format: 'text',
+          },
+        }).then(({ data }) => {
           if (!data) return resolve(null)
           const { openAi: res } = data
-          return resolve(res)
+          return resolve(JSON.parse(res).message.content)
         })
       })
     }
