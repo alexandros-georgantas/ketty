@@ -200,14 +200,11 @@ const Header = props => {
   }
 
   if (showKbLink) {
-    navItemsRight.push({
-      key: 'aiPdfDesigner',
-      label: (
-        <UnstyledLink to={`/books/${bookId}/knowledge-base`}>
-          Knowledge Base
-        </UnstyledLink>
-      ),
-    })
+    navItemsRight.push(
+      <UnstyledLink to={`/books/${bookId}/knowledge-base`}>
+        Knowledge Base
+      </UnstyledLink>,
+    )
   }
 
   if (showSettings) {

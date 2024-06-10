@@ -80,6 +80,7 @@ const EditorWrapper = ({
       AiOn: aiOn,
       FreeTextPromptsOn: freeTextPromptsOn,
       CustomPrompts: customPrompts,
+      AskKb: false,
     }
   }
 
