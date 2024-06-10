@@ -67,7 +67,7 @@ const GlobalStyle = createGlobalStyle`
         outline: none;
       }
 
-      &:focus-visible {
+      &:focus-visible:not(#ai-overlay input) {
         outline: 2px solid ${th('colorOutline')};
       }
     }
@@ -240,7 +240,9 @@ const SiteHeader = () => {
           !isAiAssistantPage &&
           !isExporterPage
         }
-        showBackToBook={isExporterPage || isAiAssistantPage}
+        showBackToBook={
+          isExporterPage || isAiAssistantPage || isKnowledgeBasePage
+        }
         showDashboard={currentPath !== '/dashboard'}
         showInvite={isProducerPage}
         showKnowledgeBaseLink={
