@@ -25,7 +25,7 @@ const SectionHeader = styled.div`
   box-shadow: 0 6px 6px 1px rgb(180 180 180 / 5%);
   display: flex;
   justify-content: space-between;
-  padding: ${grid(4)} ${grid(8)};
+  padding: ${grid(4)} clamp(${grid(4)}, 10.4348px + 1.7391vi, ${grid(8)});
   z-index: 1;
 
   h1 {
