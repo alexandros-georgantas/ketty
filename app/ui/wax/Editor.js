@@ -36,6 +36,7 @@ const EditorWrapper = ({
   editorRef,
   freeTextPromptsOn,
   customPrompts,
+  customPromptsOn,
   editorLoading,
 }) => {
   const [luluWax, setLuluWax] = useState({
@@ -81,6 +82,7 @@ const EditorWrapper = ({
       FreeTextPromptsOn: freeTextPromptsOn,
       CustomPrompts: customPrompts,
       AskKb: false,
+      CustomPromptsOn: customPromptsOn,
     }
   }
 

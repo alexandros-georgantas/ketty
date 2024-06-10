@@ -125,6 +125,7 @@ const ProducerPage = () => {
   const [aiOn, setAiOn] = useState(false)
   const [customPrompts, setCustomPrompts] = useState([])
   const [freeTextPromptsOn, setFreeTextPromptsOn] = useState(false)
+  const [customPromptsOn, setCustomPromptsOn] = useState(false)
 
   const [currentBookComponentContent, setCurrentBookComponentContent] =
     useState(null)
@@ -166,6 +167,7 @@ const ProducerPage = () => {
       setAiOn(data?.getBook?.bookSettings?.aiOn)
       setCustomPrompts(data?.getBook?.bookSettings?.customPrompts)
       setFreeTextPromptsOn(data?.getBook?.bookSettings?.freeTextPromptsOn)
+      setCustomPromptsOn(data?.getBook?.bookSettings?.customPromptsOn)
 
       // if loading page the first time and no chapter is preselected, select the first one
       if (selectedChapterId === undefined) {
@@ -986,6 +988,7 @@ const ProducerPage = () => {
       chapters={bookQueryData?.getBook?.divisions[1].bookComponents}
       chaptersActionInProgress={chaptersActionInProgress}
       customPrompts={customPrompts}
+      customPromptsOn={customPromptsOn}
       editorLoading={editorLoading}
       editorRef={editorRef}
       freeTextPromptsOn={freeTextPromptsOn}
@@ -1013,6 +1016,7 @@ const ProducerPage = () => {
       setMetadataModalOpen={setMetadataModalOpen}
       subtitle={bookQueryData?.getBook.subtitle}
       title={bookQueryData?.getBook.title}
+      // bookComponentContent={bookComponentData?.getBookComponent?.content}
     />
   )
 }

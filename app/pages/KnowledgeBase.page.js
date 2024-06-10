@@ -118,7 +118,7 @@ const FilesHeading = styled(Header)`
   font-size: 11px;
   gap: 8px;
   justify-content: space-between;
-  padding: 5px 10px 5px 31px;
+  padding: 5px 0 5px 31px;
   text-rendering: optimizeLegibility;
   text-transform: uppercase;
 
