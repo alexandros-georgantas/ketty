@@ -34,6 +34,8 @@ import {
   APPLICATION_PARAMETERS,
   SET_BOOK_COMPONENT_STATUS,
   UPDATE_BOOK_COMPONENT_PARENT_ID,
+  RAG_SEARCH,
+  // BOOK_SETTINGS_UPDATED_SUBSCRIPTION,
 } from '../graphql'
 
 import {
@@ -54,6 +56,24 @@ import {
 } from '../helpers/commonModals'
 
 import { Editor, Modal, Paragraph, Spin } from '../ui'
+
+const AI_ASSISTANT_SYSTEM = `
+You are a co-writing assistant, specifically the Ketty AI assistant. Your role is to assist users in enhancing their books. Users can highlight text from their books and request modifications or the creation of new text based on these highlights. Your responses should be formatted as a stringified JSON object with the following structure:
+
+\`\`\`json
+{
+  "content": "This must be a string with your natural language response.",
+  "text": "You must provide here a string with the resulting text from user queries. The user will paste this text directly into their book. If there is nothing to add, simply omit this property.",
+  "citations": ["An array of strings containing citations if needed, otherwise omit it."],
+  "links": ["An array of strings containing links if needed, otherwise omit it."]
+}
+\`\`\`
+
+**Note:** 
+
+- These properties will appear as tabs in the UI, allowing the user to switch between them to replace or add text.
+- Since the user will interact with these properties through tabs, so always suggest 'user' to navigate to the of interest.
+`
 
 const StyledSpin = styled(Spin)`
   display: grid;
@@ -90,7 +110,7 @@ const constructMetadataValues = (title, subtitle, podMetadata) => {
 let issueInCommunicationModal
 
 const ProducerPage = () => {
-  // INITIALIZATION SECTION START
+  // #region INITIALIZATION SECTION START
   const history = useHistory()
   const params = useParams()
   const { bookId } = params
@@ -120,7 +140,7 @@ const ProducerPage = () => {
   const hasMembership =
     isOwner(bookId, currentUser) || isCollaborator(bookId, currentUser)
 
-  // INITIALIZATION SECTION END
+  // #endregion INITIALIZATION SECTION
   // QUERIES SECTION START
   const {
     loading: applicationParametersLoading,
@@ -189,6 +209,8 @@ const ProducerPage = () => {
     },
   })
 
+  const [ragSearch] = useLazyQuery(RAG_SEARCH)
+
   const [getBookSettings] = useLazyQuery(GET_BOOK_SETTINGS, {
     fetchPolicy: 'network-only',
     nextFetchPolicy: 'network-only',
@@ -197,23 +219,42 @@ const ProducerPage = () => {
     },
   })
 
-  const queryAI = async input => {
+  const queryAI = async (input, { askKb }) => {
     const settings = await getBookSettings()
+    let response = 'hello'
+
+    if (!askKb) {
+      const {
+        data: { openAi },
+      } = await chatGPT({
+        variables: {
+          system: AI_ASSISTANT_SYSTEM,
+          input,
+        },
+      })
+
+      const {
+        message: { content },
+      } = JSON.parse(openAi)
+
+      response = content
+    } else {
+      const { data } = await ragSearch({
+        variables: {
+          input,
+        },
+      })
+
+      const {
+        message: { content },
+      } = JSON.parse(data.ragSearch)
+
+      response = content
+    }
 
     if (settings?.data.getBook.bookSettings.aiOn) {
       return new Promise((resolve, reject) => {
-        chatGPT({
-          variables: {
-            input: {
-              text: [input],
-            },
-            format: 'text',
-          },
-        }).then(({ data }) => {
-          if (!data) return resolve(null)
-          const { openAi: res } = data
-          return resolve(JSON.parse(res).message.content)
-        })
+        resolve(response)
       })
     }
 

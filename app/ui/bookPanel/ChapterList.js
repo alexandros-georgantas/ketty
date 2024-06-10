@@ -452,8 +452,8 @@ const ChapterList = ({
                     }
                     focused={focusedChapter === index}
                     id={id}
-                    index={index}
                     indentationWidth={indentationWidth}
+                    index={index}
                     isPart={componentType === 'part'}
                     key={id}
                     onChapterClick={handleChapterClick}

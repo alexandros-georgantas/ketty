@@ -40,6 +40,7 @@ import {
   AiPDFDesignerPage,
   AdminPage,
   CreateBook,
+  KnowledgeBasePage,
 } from './pages'
 
 import { GET_BOOK_SETTINGS, APPLICATION_PARAMETERS } from './graphql'
@@ -219,7 +220,10 @@ const SiteHeader = () => {
     <>
       <Header
         bookId={
-          isProducerPage || isExporterPage || isAiAssistantPage
+          isProducerPage ||
+          isExporterPage ||
+          isAiAssistantPage ||
+          isKnowledgeBasePage
             ? getBookId()
             : undefined
         }
@@ -374,6 +378,12 @@ const routes = (
                   <CssAssistantProvider>
                     <AiPDFDesignerPage />
                   </CssAssistantProvider>
+                </Authenticated>
+              </Route>
+
+              <Route exact path="/books/:bookId/knowledge-base">
+                <Authenticated>
+                  <KnowledgeBasePage />
                 </Authenticated>
               </Route>
 
