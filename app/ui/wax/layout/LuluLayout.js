@@ -2,6 +2,7 @@
 import React, { useContext } from 'react'
 import styled from 'styled-components'
 import { grid, th } from '@coko/client'
+import { Spin } from 'antd'
 import { WaxContext, ComponentPlugin } from 'wax-prosemirror-core'
 import BookPanel from '../../bookPanel/BookPanel'
 import { useLuluWaxContext } from '../luluWaxContext'
@@ -90,6 +91,18 @@ const EditorContainer = styled.div`
       outline: none;
     }
   }
+`
+
+const StyledSpin = styled(Spin)`
+  background-color: white;
+  display: grid;
+  height: 100vh;
+  inset: 0;
+  justify-content: center;
+  margin-inline: auto;
+  padding-block-start: 20%;
+  position: absolute;
+  width: 816px;
 `
 
 const StyledBookPanel = styled(BookPanel)`
@@ -191,18 +204,8 @@ const LuluLayout = ({ editor }) => {
                   writing
                 </NoSelectedChapterWrapper>
               )}
-              {editorLoading && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    backgroundColor: 'white',
-                    inset: '0',
-                  }}
-                >
-                  Loading .....
-                </div>
-              )}
             </EditorContainer>
+            {editorLoading && <StyledSpin spinning={editorLoading} />}
           </WaxSurfaceScroll>
         </EditorArea>
       </Main>

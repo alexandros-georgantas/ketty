@@ -34,7 +34,6 @@ import {
   APPLICATION_PARAMETERS,
   SET_BOOK_COMPONENT_STATUS,
   UPDATE_BOOK_COMPONENT_PARENT_ID,
-  // BOOK_SETTINGS_UPDATED_SUBSCRIPTION,
 } from '../graphql'
 
 import {
@@ -112,7 +111,6 @@ const ProducerPage = () => {
 
   const { currentUser } = useCurrentUser()
   const token = localStorage.getItem('token')
-  // const [form] = Form.useForm()
 
   const canModify =
     isAdmin(currentUser) ||
@@ -160,11 +158,7 @@ const ProducerPage = () => {
     },
   })
 
-  const {
-    loading: bookComponentLoading,
-    // data: bookComponentData,
-    // refetch: refetchBookComponent,
-  } = useQuery(GET_BOOK_COMPONENT, {
+  const { loading: bookComponentLoading } = useQuery(GET_BOOK_COMPONENT, {
     fetchPolicy: 'network-only',
     skip: !selectedChapterId || !bookQueryData,
     variables: { id: selectedChapterId },
@@ -252,23 +246,6 @@ const ProducerPage = () => {
       }
     },
   })
-
-  // useSubscription(BOOK_SETTINGS_UPDATED_SUBSCRIPTION, {
-  //   variables: { id: bookId },
-  //   fetchPolicy: 'network-only',
-  //   onData: () => {
-  //     // only owners can change the setting, so only they get an immediate interface update
-  //     if (isOwner(bookId, currentUser)) {
-  //       if (selectedChapterId) {
-  //         setCurrentBookComponentContent(editorRef.current.getContent())
-  //         // this should work too: await until content is refetched before refetching settings and updating book
-  //         // await refetchBookComponent({ id: selectedChapterId })
-  //       }
-
-  //       refetchBook({ id: bookId })
-  //     }
-  //   },
-  // })
   // SUBSCRIPTIONS SECTION END
 
   useEffect(() => {
@@ -930,15 +907,12 @@ const ProducerPage = () => {
   useEffect(() => {
     if (applicationParametersLoading || loading || bookComponentLoading) {
       setEditorLoading(true)
-    } else {
+    } else if (!bookComponentLoading) {
       setTimeout(() => {
         setEditorLoading(false)
       }, 500)
     }
   }, [applicationParametersLoading, loading, bookComponentLoading])
-
-  // if (applicationParametersLoading || loading || bookComponentLoading)
-  //   return <StyledSpin spinning />
 
   const chaptersActionInProgress =
     changeOrderInProgress ||
@@ -958,7 +932,6 @@ const ProducerPage = () => {
     <Editor
       aiEnabled={isAIEnabled?.config}
       aiOn={aiOn}
-      // bookComponentContent={bookComponentData?.getBookComponent?.content}
       bookComponentContent={currentBookComponentContent}
       bookMetadataValues={bookMetadataValues}
       canEdit={canModify}
@@ -973,7 +946,6 @@ const ProducerPage = () => {
         (editorMode && editorMode === 'preview') ||
         !canModify
       }
-      // loading={editorLoading}
       metadataModalOpen={metadataModalOpen}
       onAddChapter={onAddChapter}
       onBookComponentParentIdChange={onBookComponentParentIdChange}
