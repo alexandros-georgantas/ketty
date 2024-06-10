@@ -182,15 +182,12 @@ const Header = props => {
   }
 
   if (showKnowledgeBaseLink) {
-    navItemsRight.push({
-      key: 'knowledgeBase',
-      label: (
-        /** TODO: update link */
-        <UnstyledLink to={`/knowledge-base/${bookId}`}>
-          Knowledge base
-        </UnstyledLink>
-      ),
-    })
+    navItemsRight.push(
+      /** TODO: update link */
+      <UnstyledLink to={`/knowledge-base/${bookId}`}>
+        Knowledge base
+      </UnstyledLink>,
+    )
   }
 
   if (showAiAssistantLink) {
