@@ -149,6 +149,7 @@ const LuluLayout = ({ editor }) => {
     canEdit,
     metadataModalOpen,
     setMetadataModalOpen,
+    editorLoading,
   } = luluWax
 
   return (
@@ -180,7 +181,7 @@ const LuluLayout = ({ editor }) => {
         )}
 
         <EditorArea isFullscreen={options.fullScreen}>
-          <WaxSurfaceScroll>
+          <WaxSurfaceScroll style={{ position: 'relative' }}>
             <EditorContainer selectedChapterId={selectedChapterId}>
               {selectedChapterId ? (
                 editor
@@ -189,6 +190,17 @@ const LuluLayout = ({ editor }) => {
                   Create or select a chapter in the chapters panel to start
                   writing
                 </NoSelectedChapterWrapper>
+              )}
+              {editorLoading && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    backgroundColor: 'white',
+                    inset: '0',
+                  }}
+                >
+                  Loading .....
+                </div>
               )}
             </EditorContainer>
           </WaxSurfaceScroll>

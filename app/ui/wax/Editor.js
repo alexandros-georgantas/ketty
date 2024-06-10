@@ -1,11 +1,23 @@
 /* eslint-disable react/prop-types, react/jsx-no-constructed-context-values */
 import React, { useEffect, useState } from 'react'
+// import styled from 'styled-components'
 import { Wax } from 'wax-prosemirror-core'
 import debounce from 'lodash/debounce'
+// import { th } from '@coko/client'
 import { LuluLayout } from './layout'
 import defaultConfig from './config/config'
 import configWithAi from './config/configWithAI'
 import { LuluWaxContext } from './luluWaxContext'
+// import BookPanel from '../bookPanel/BookPanel'
+
+// const StyledBookPanel = styled(BookPanel)`
+//   border-right: ${th('borderWidth')} ${th('borderStyle')} ${th('colorBorder')};
+
+//   @media (min-width: 1200px) {
+//     flex: 0 0 49ch;
+//   }
+//   /* width: 40ch; */
+// `
 
 const EditorWrapper = ({
   title,
@@ -15,8 +27,6 @@ const EditorWrapper = ({
   isReadOnly,
   onImageUpload,
   onBookComponentTitleChange,
-  onBookComponentTypeChange,
-  onBookComponentParentIdChange,
   onAddChapter,
   onChapterClick,
   bookComponentContent,
@@ -36,13 +46,13 @@ const EditorWrapper = ({
   editorRef,
   freeTextPromptsOn,
   customPrompts,
+  editorLoading,
 }) => {
   const [luluWax, setLuluWax] = useState({
     onAddChapter,
     onChapterClick,
     onDeleteChapter,
     onReorderChapter,
-    onBookComponentTypeChange,
     chapters,
     selectedChapterId,
     onUploadChapter,
@@ -54,6 +64,7 @@ const EditorWrapper = ({
     bookMetadataValues,
     metadataModalOpen,
     setMetadataModalOpen,
+    editorLoading,
   })
 
   const selectedConfig = aiEnabled ? configWithAi : defaultConfig
@@ -112,8 +123,7 @@ const EditorWrapper = ({
       canEdit,
       metadataModalOpen,
       setMetadataModalOpen,
-      onBookComponentTypeChange,
-      onBookComponentParentIdChange,
+      editorLoading,
     })
   }, [
     title,
@@ -124,6 +134,7 @@ const EditorWrapper = ({
     chaptersActionInProgress,
     canEdit,
     metadataModalOpen,
+    editorLoading,
   ])
 
   if (!selectedConfig) return null
@@ -134,7 +145,7 @@ const EditorWrapper = ({
         autoFocus
         config={selectedConfig}
         fileUpload={onImageUpload}
-        key={`${selectedChapterId}-${isReadOnly}-${aiOn}-${customPrompts?.length}-${freeTextPromptsOn}`}
+        key={`${editorLoading}-${selectedChapterId}-${isReadOnly}-${aiOn}-${customPrompts?.length}-${freeTextPromptsOn}`}
         layout={LuluLayout}
         onChange={onPeriodicBookComponentContentChange}
         readonly={isReadOnly}

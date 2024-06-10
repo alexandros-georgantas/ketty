@@ -497,7 +497,12 @@ const ProducerPage = () => {
     )
 
     // only fire if new title !== current title to avoid unnecessary call
-    if (selectedChapterId && canModify && title !== currentChapter?.title) {
+    if (
+      selectedChapterId &&
+      canModify &&
+      title !== currentChapter?.title &&
+      !(applicationParametersLoading || loading || bookComponentLoading)
+    ) {
       renameBookComponent({
         variables: {
           input: {
@@ -920,8 +925,20 @@ const ProducerPage = () => {
     return <StyledSpin spinning />
   }
 
-  if (applicationParametersLoading || loading || bookComponentLoading)
-    return <StyledSpin spinning />
+  const [editorLoading, setEditorLoading] = useState(false)
+
+  useEffect(() => {
+    if (applicationParametersLoading || loading || bookComponentLoading) {
+      setEditorLoading(true)
+    } else {
+      setTimeout(() => {
+        setEditorLoading(false)
+      }, 500)
+    }
+  }, [applicationParametersLoading, loading, bookComponentLoading])
+
+  // if (applicationParametersLoading || loading || bookComponentLoading)
+  //   return <StyledSpin spinning />
 
   const chaptersActionInProgress =
     changeOrderInProgress ||
@@ -948,6 +965,7 @@ const ProducerPage = () => {
       chapters={bookQueryData?.getBook?.divisions[1].bookComponents}
       chaptersActionInProgress={chaptersActionInProgress}
       customPrompts={customPrompts}
+      editorLoading={editorLoading}
       editorRef={editorRef}
       freeTextPromptsOn={freeTextPromptsOn}
       isReadOnly={
@@ -955,6 +973,7 @@ const ProducerPage = () => {
         (editorMode && editorMode === 'preview') ||
         !canModify
       }
+      // loading={editorLoading}
       metadataModalOpen={metadataModalOpen}
       onAddChapter={onAddChapter}
       onBookComponentParentIdChange={onBookComponentParentIdChange}
