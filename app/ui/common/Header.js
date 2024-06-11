@@ -143,7 +143,6 @@ const Header = props => {
     showAiAssistantLink,
     showKnowledgeBaseLink,
     bookId,
-    showKbLink,
     ...rest
   } = props
 
@@ -184,8 +183,7 @@ const Header = props => {
 
   if (showKnowledgeBaseLink) {
     navItemsRight.push(
-      /** TODO: update link */
-      <UnstyledLink to={`/knowledge-base/${bookId}`}>
+      <UnstyledLink to={`/books/${bookId}/knowledge-base`}>
         Knowledge base
       </UnstyledLink>,
     )
@@ -195,14 +193,6 @@ const Header = props => {
     navItemsRight.push(
       <UnstyledLink key="ai-designer" to={`/books/${bookId}/ai-pdf`}>
         AI Book Designer (Beta)
-      </UnstyledLink>,
-    )
-  }
-
-  if (showKbLink) {
-    navItemsRight.push(
-      <UnstyledLink to={`/books/${bookId}/knowledge-base`}>
-        Knowledge Base
       </UnstyledLink>,
     )
   }
