@@ -1,12 +1,13 @@
 /* stylelint-disable string-quotes */
 /* eslint-disable react/prop-types */
 import React, { useContext } from 'react'
-import styled from 'styled-components'
+import styled, { ThemeProvider } from 'styled-components'
 import { grid, th } from '@coko/client'
 import { Spin } from 'antd'
 import { WaxContext, ComponentPlugin } from 'wax-prosemirror-core'
 import BookPanel from '../../bookPanel/BookPanel'
 import { useLuluWaxContext } from '../luluWaxContext'
+import theme from '../../../theme'
 
 import 'wax-prosemirror-core/dist/index.css'
 import 'wax-prosemirror-services/dist/index.css'
@@ -167,50 +168,52 @@ const LuluLayout = ({ editor }) => {
   } = luluWax
 
   return (
-    <Wrapper id="wax-container" style={fullScreenStyles}>
-      <TopMenu data-loading={editorLoading}>
-        <MainMenuToolBar />
-      </TopMenu>
-      <Main>
-        {!options.fullScreen && (
-          <StyledBookPanel
-            bookMetadataValues={bookMetadataValues}
-            canEdit={canEdit}
-            chapters={chapters}
-            chaptersActionInProgress={chaptersActionInProgress}
-            metadataModalOpen={metadataModalOpen}
-            onAddChapter={onAddChapter}
-            onBookComponentParentIdChange={onBookComponentParentIdChange}
-            onBookComponentTypeChange={onBookComponentTypeChange}
-            onChapterClick={onChapterClick}
-            onDeleteChapter={onDeleteChapter}
-            onReorderChapter={onReorderChapter}
-            onSubmitBookMetadata={onSubmitBookMetadata}
-            onUploadChapter={onUploadChapter}
-            selectedChapterId={selectedChapterId}
-            setMetadataModalOpen={setMetadataModalOpen}
-            subtitle={subtitle}
-            title={title}
-          />
-        )}
+    <ThemeProvider theme={theme}>
+      <Wrapper id="wax-container" style={fullScreenStyles}>
+        <TopMenu data-loading={editorLoading}>
+          <MainMenuToolBar />
+        </TopMenu>
+        <Main>
+          {!options.fullScreen && (
+            <StyledBookPanel
+              bookMetadataValues={bookMetadataValues}
+              canEdit={canEdit}
+              chapters={chapters}
+              chaptersActionInProgress={chaptersActionInProgress}
+              metadataModalOpen={metadataModalOpen}
+              onAddChapter={onAddChapter}
+              onBookComponentParentIdChange={onBookComponentParentIdChange}
+              onBookComponentTypeChange={onBookComponentTypeChange}
+              onChapterClick={onChapterClick}
+              onDeleteChapter={onDeleteChapter}
+              onReorderChapter={onReorderChapter}
+              onSubmitBookMetadata={onSubmitBookMetadata}
+              onUploadChapter={onUploadChapter}
+              selectedChapterId={selectedChapterId}
+              setMetadataModalOpen={setMetadataModalOpen}
+              subtitle={subtitle}
+              title={title}
+            />
+          )}
 
-        <EditorArea isFullscreen={options.fullScreen}>
-          <WaxSurfaceScroll style={{ position: 'relative' }}>
-            <EditorContainer selectedChapterId={selectedChapterId}>
-              {selectedChapterId ? (
-                editor
-              ) : (
-                <NoSelectedChapterWrapper>
-                  Create or select a chapter in the chapters panel to start
-                  writing
-                </NoSelectedChapterWrapper>
-              )}
-            </EditorContainer>
-            {editorLoading && <StyledSpin spinning={editorLoading} />}
-          </WaxSurfaceScroll>
-        </EditorArea>
-      </Main>
-    </Wrapper>
+          <EditorArea isFullscreen={options.fullScreen}>
+            <WaxSurfaceScroll style={{ position: 'relative' }}>
+              <EditorContainer selectedChapterId={selectedChapterId}>
+                {selectedChapterId ? (
+                  editor
+                ) : (
+                  <NoSelectedChapterWrapper>
+                    Create or select a chapter in the chapters panel to start
+                    writing
+                  </NoSelectedChapterWrapper>
+                )}
+              </EditorContainer>
+              {editorLoading && <StyledSpin spinning={editorLoading} />}
+            </WaxSurfaceScroll>
+          </EditorArea>
+        </Main>
+      </Wrapper>
+    </ThemeProvider>
   )
 }
 
