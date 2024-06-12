@@ -36,6 +36,7 @@ const EditorWrapper = ({
   editorRef,
   freeTextPromptsOn,
   customPrompts,
+  editorLoading,
 }) => {
   const [luluWax, setLuluWax] = useState({
     onAddChapter,
@@ -43,6 +44,7 @@ const EditorWrapper = ({
     onDeleteChapter,
     onReorderChapter,
     onBookComponentTypeChange,
+    onBookComponentParentIdChange,
     chapters,
     selectedChapterId,
     onUploadChapter,
@@ -54,6 +56,7 @@ const EditorWrapper = ({
     bookMetadataValues,
     metadataModalOpen,
     setMetadataModalOpen,
+    editorLoading,
   })
 
   const selectedConfig = aiEnabled ? configWithAi : defaultConfig
@@ -114,6 +117,7 @@ const EditorWrapper = ({
       setMetadataModalOpen,
       onBookComponentTypeChange,
       onBookComponentParentIdChange,
+      editorLoading,
     })
   }, [
     title,
@@ -124,6 +128,7 @@ const EditorWrapper = ({
     chaptersActionInProgress,
     canEdit,
     metadataModalOpen,
+    editorLoading,
   ])
 
   if (!selectedConfig) return null
@@ -134,7 +139,7 @@ const EditorWrapper = ({
         autoFocus
         config={selectedConfig}
         fileUpload={onImageUpload}
-        key={`${selectedChapterId}-${isReadOnly}-${aiOn}-${customPrompts?.length}-${freeTextPromptsOn}`}
+        key={`${editorLoading}-${selectedChapterId}-${isReadOnly}-${aiOn}-${customPrompts?.length}-${freeTextPromptsOn}`}
         layout={LuluLayout}
         onChange={onPeriodicBookComponentContentChange}
         readonly={isReadOnly}

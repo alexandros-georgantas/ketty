@@ -373,9 +373,8 @@ ChapterItem.propTypes = {
     surname: PropTypes.string,
   }),
   selectedChapterId: PropTypes.string,
-  isDragging: PropTypes.bool.isRequired,
+  isDragging: PropTypes.bool,
   status: PropTypes.number,
-  // onClickDuplicate: PropTypes.func.isRequired,
   onClickDelete: PropTypes.func.isRequired,
   onChapterClick: PropTypes.func.isRequired,
   onChapterConvert: PropTypes.func,
@@ -388,6 +387,7 @@ ChapterItem.propTypes = {
 ChapterItem.defaultProps = {
   lock: null,
   uploading: false,
+  isDragging: false,
   title: null,
   status: null,
   selectedChapterId: undefined,
