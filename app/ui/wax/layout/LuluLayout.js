@@ -1,7 +1,9 @@
+/* stylelint-disable string-quotes */
 /* eslint-disable react/prop-types */
 import React, { useContext } from 'react'
 import styled from 'styled-components'
 import { grid, th } from '@coko/client'
+import { Spin } from 'antd'
 import { WaxContext, ComponentPlugin } from 'wax-prosemirror-core'
 import BookPanel from '../../bookPanel/BookPanel'
 import { useLuluWaxContext } from '../luluWaxContext'
@@ -35,6 +37,12 @@ const TopMenu = styled.div`
   height: 48px;
   justify-content: center;
   user-select: none;
+
+  &[data-loading='true'] [aria-controls='block-level-options'] {
+    > span {
+      opacity: 0;
+    }
+  }
 `
 
 const EditorArea = styled.div`
@@ -53,12 +61,6 @@ const WaxSurfaceScroll = styled.div`
   overflow-y: auto;
   position: relative;
   width: 100%;
-
-  .ProseMirror {
-    /* figcaption {
-      width: 640px;
-    } */
-  }
 `
 
 const EditorContainer = styled.div`
@@ -90,6 +92,18 @@ const EditorContainer = styled.div`
       outline: none;
     }
   }
+`
+
+const StyledSpin = styled(Spin)`
+  background-color: white;
+  display: grid;
+  height: 100vh;
+  inset: 0;
+  justify-content: center;
+  margin-inline: auto;
+  padding-block-start: 20%;
+  position: absolute;
+  width: 816px;
 `
 
 const StyledBookPanel = styled(BookPanel)`
@@ -149,11 +163,12 @@ const LuluLayout = ({ editor }) => {
     canEdit,
     metadataModalOpen,
     setMetadataModalOpen,
+    editorLoading,
   } = luluWax
 
   return (
     <Wrapper id="wax-container" style={fullScreenStyles}>
-      <TopMenu>
+      <TopMenu data-loading={editorLoading}>
         <MainMenuToolBar />
       </TopMenu>
       <Main>
@@ -180,7 +195,7 @@ const LuluLayout = ({ editor }) => {
         )}
 
         <EditorArea isFullscreen={options.fullScreen}>
-          <WaxSurfaceScroll>
+          <WaxSurfaceScroll style={{ position: 'relative' }}>
             <EditorContainer selectedChapterId={selectedChapterId}>
               {selectedChapterId ? (
                 editor
@@ -191,6 +206,7 @@ const LuluLayout = ({ editor }) => {
                 </NoSelectedChapterWrapper>
               )}
             </EditorContainer>
+            {editorLoading && <StyledSpin spinning={editorLoading} />}
           </WaxSurfaceScroll>
         </EditorArea>
       </Main>

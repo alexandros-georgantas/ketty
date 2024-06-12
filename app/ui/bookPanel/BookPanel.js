@@ -176,7 +176,7 @@ BookPanel.propTypes = {
       title: PropTypes.string,
       lockedBy: PropTypes.string,
     }),
-  ).isRequired,
+  ),
   onDeleteChapter: PropTypes.func.isRequired,
   selectedChapterId: PropTypes.string,
   onAddChapter: PropTypes.func.isRequired,
@@ -216,6 +216,7 @@ BookPanel.propTypes = {
   onBookComponentParentIdChange: PropTypes.func,
 }
 BookPanel.defaultProps = {
+  chapters: [],
   selectedChapterId: undefined,
   title: null,
   onBookComponentTypeChange: null,
