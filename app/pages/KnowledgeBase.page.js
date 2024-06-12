@@ -16,6 +16,7 @@ import {
 } from '@ant-design/icons'
 import { Upload } from 'antd'
 import { keys } from 'lodash'
+import { useHistory } from 'react-router-dom'
 import {
   GET_DOCUMENTS,
   CREATE_DOCUMENT,
@@ -332,15 +333,22 @@ export const KnowledgeBasePage = () => {
   const [selectedFiles, setSelectedFiles] = useState([])
   const [filesToUpload, setFilesToUpload] = useState([])
   const [fileBeingUploaded, setFileBeingUploaded] = useState([])
+  const history = useHistory()
+
+  const getBookId = () => {
+    return history.location.pathname.split('/')[2]
+  }
 
   useEffect(() => {
-    getDocuments()
+    const bookId = getBookId()
+    bookId && getDocuments({ variables: { bookId } })
   }, [])
 
   // #endregion REACT Hooks ---------------
 
   // #region GQL Hooks --------------------
   const [getDocuments] = useLazyQuery(GET_DOCUMENTS, {
+    variables: { bookId: getBookId() },
     onCompleted: data => data?.getDocuments && setDocs(data.getDocuments),
   })
 
@@ -368,8 +376,9 @@ export const KnowledgeBasePage = () => {
   }
 
   const handleUpload = async file => {
+    const bookId = getBookId()
     setFileBeingUploaded(file.name)
-    await createDocument({ variables: { file } })
+    await createDocument({ variables: { file, bookId } })
     setFilesToUpload(currentFiles =>
       currentFiles.filter(f => f.uid !== file.uid),
     )
