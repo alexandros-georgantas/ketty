@@ -1,12 +1,13 @@
 import { gql } from '@apollo/client'
 
 export const CREATE_DOCUMENT = gql`
-  mutation CreateDocument($file: Upload!, $maxLng: Int) {
-    createDocument(file: $file, maxLng: $maxLng) {
+  mutation CreateDocument($file: Upload!, $maxLng: Int, $bookId: String!) {
+    createDocument(file: $file, maxLng: $maxLng, bookId: $bookId) {
       id
       name
       extension
       sectionsKeys
+      bookId
     }
   }
 `
@@ -18,12 +19,13 @@ export const DELETE_DOCUMENT = gql`
 `
 
 export const GET_DOCUMENTS = gql`
-  query GetAllDocuments {
-    getDocuments {
+  query GetAllDocuments($bookId: String!) {
+    getDocuments(bookId: $bookId) {
       id
       name
       extension
       sectionsKeys
+      bookId
     }
   }
 `
