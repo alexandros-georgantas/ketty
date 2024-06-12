@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import styled from 'styled-components'
-import { rotate360 } from '@coko/client'
+import { rotate360, grid, th } from '@coko/client'
 import {
   CloseOutlined,
   DeleteOutlined,
@@ -103,15 +103,14 @@ const Header = styled.div`
   align-items: center;
   border-bottom: 1px solid gainsboro;
   display: flex;
-  padding: 0 30px 0 0;
+  justify-content: space-between;
+  padding: ${grid(2)} ${grid(7)};
   white-space: nowrap;
 
   h2 {
-    color: #999;
+    color: ${th('colorTextLight')};
     font-size: 28px;
     margin: 0;
-    padding: 24px 30px;
-    width: 100%;
   }
 `
 
@@ -214,7 +213,10 @@ const UploadButton = styled(Button)`
   border: none;
   outline: none;
   padding: 0;
-  text-decoration: underline;
+
+  > * {
+    text-decoration: underline;
+  }
 `
 
 const MainSection = styled.div`
@@ -432,18 +434,19 @@ export const KnowledgeBasePage = () => {
       <MainSection>
         <Header>
           <h2>Knowledge Base</h2>
-          Drop your files below or
-          <Upload
-            accept={filesToAccept}
-            customRequest={handleFileChange}
-            multiple
-            showUploadList={false}
-            style={{ paddingRight: '30px' }}
-          >
-            <UploadButton>
-              <p style={{ marginLeft: '1ch' }}>Browse</p>
-            </UploadButton>
-          </Upload>
+          <p>
+            Drop your files below or{' '}
+            <Upload
+              accept={filesToAccept}
+              aria-label="Upload files"
+              customRequest={handleFileChange}
+              multiple
+              showUploadList={false}
+              style={{ paddingRight: '30px' }}
+            >
+              <UploadButton>browse</UploadButton>
+            </Upload>
+          </p>
         </Header>
         <FilesHeading>
           <Checkbox
