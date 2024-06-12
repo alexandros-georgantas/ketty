@@ -987,6 +987,7 @@ const ProducerPage = () => {
         (editorMode && editorMode === 'preview') ||
         !canModify
       }
+      kbOn={bookQueryData?.getBook.bookSettings.knowledgeBaseOn}
       metadataModalOpen={metadataModalOpen}
       onAddChapter={onAddChapter}
       onBookComponentParentIdChange={onBookComponentParentIdChange}
