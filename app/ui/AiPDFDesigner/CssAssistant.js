@@ -234,12 +234,15 @@ const CssAssistant = ({
           variables: {
             input: { text: [userPrompt] },
             history: takeRight(selectedCtx.history, 14) || [],
-            system: systemGuidelinesV2({
-              ctx: selectedCtx || getCtxBy('node', htmlSrc),
-              sheet: styleSheetRef?.current?.textContent,
-              selectors: validSelectors?.current?.join(', '),
-              providedText: '',
-            }),
+            // TODO: update the system message and pass it as object
+            system: {
+              text: systemGuidelinesV2({
+                ctx: selectedCtx || getCtxBy('node', htmlSrc),
+                sheet: styleSheetRef?.current?.textContent,
+                selectors: validSelectors?.current?.join(', '),
+                providedText: '',
+              }),
+            },
           },
         })
       : setFeedback('Please, tell me what you want to do')

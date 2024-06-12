@@ -56,24 +56,7 @@ import {
 } from '../helpers/commonModals'
 
 import { Editor, Modal, Paragraph, Spin } from '../ui'
-
-const AI_ASSISTANT_SYSTEM = `
-You are a co-writing assistant, specifically the Ketty AI assistant. Your role is to assist users in enhancing their books. Users can highlight text from their books and request modifications or the creation of new text based on these highlights. Your responses should be formatted as a stringified JSON object with the following structure:
-
-\`\`\`json
-{
-  "content": "This must be a string with your natural language response.",
-  "text": "You must provide here a string with the resulting text from user queries. The user will paste this text directly into their book. If there is nothing to add, simply omit this property.",
-  "citations": ["An array of strings containing citations if needed, otherwise omit it."],
-  "links": ["An array of strings containing links if needed, otherwise omit it."]
-}
-\`\`\`
-
-**Note:** 
-
-- These properties will appear as tabs in the UI, allowing the user to switch between them to replace or add text.
-- Since the user will interact with these properties through tabs, so always suggest 'user' to navigate to the of interest.
-`
+import { waxAiToolRagSystem, waxAiToolSystem } from '../helpers/openAi'
 
 const StyledSpin = styled(Spin)`
   display: grid;
@@ -223,6 +206,12 @@ const ProducerPage = () => {
 
   const queryAI = async (input, { askKb }) => {
     const settings = await getBookSettings()
+    const [userInput, highlightedText] = input.text
+
+    const formattedInput = {
+      text: [`${userInput}.\nHighlighted text: ${highlightedText}`],
+    }
+
     let response = 'hello'
 
     if (!askKb) {
@@ -230,8 +219,8 @@ const ProducerPage = () => {
         data: { openAi },
       } = await chatGPT({
         variables: {
-          system: AI_ASSISTANT_SYSTEM,
-          input,
+          system: waxAiToolSystem,
+          input: formattedInput,
         },
       })
 
@@ -243,7 +232,8 @@ const ProducerPage = () => {
     } else {
       const { data } = await ragSearch({
         variables: {
-          input,
+          input: formattedInput,
+          system: waxAiToolRagSystem,
         },
       })
 

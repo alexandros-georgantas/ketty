@@ -5,7 +5,7 @@ const USE_CHATGPT = gql`
   query OpenAi(
     $input: UserMessage!
     $history: [OpenAiMessage]
-    $system: String
+    $system: SystemMessage
     $format: String
   ) {
     openAi(input: $input, history: $history, format: $format, system: $system)
@@ -17,11 +17,13 @@ const RAG_SEARCH = gql`
     $input: UserMessage!
     $history: [OpenAiMessage]
     $embeddingOptions: EmbeddingOptions
+    $system: SystemMessage
   ) {
     ragSearch(
       input: $input
       history: $history
       embeddingOptions: $embeddingOptions
+      system: $system
     )
   }
 `
