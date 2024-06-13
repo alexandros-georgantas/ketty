@@ -15,7 +15,7 @@ import { Button, Checkbox, Each } from '../common'
 const FileMapRoot = styled.li`
   align-items: center;
   background-color: #ffffff3b;
-  border-bottom: 1px solid #0002;
+  border-bottom: 1px solid ${th('colorBorder')};
   cursor: pointer;
   display: flex;
   gap: 10px;
@@ -23,7 +23,6 @@ const FileMapRoot = styled.li`
   padding: 10px ${grid(7)};
   transition: transform 0.3s;
   user-select: none;
-  width: 100%;
   word-break: break-all;
 
   &[data-uploaded='false'] {
@@ -31,17 +30,13 @@ const FileMapRoot = styled.li`
     opacity: 0.5;
   }
 
-  > :first-child {
-    align-items: center;
-    display: flex;
-  }
-
   svg {
     height: 16px;
     width: 16px;
   }
 
-  > div {
+  > div:first-child {
+    align-items: center;
     display: flex;
     gap: 15px;
 
@@ -52,15 +47,10 @@ const FileMapRoot = styled.li`
     }
   }
 
-  > span {
+  > span:nth-child(2) {
     align-items: center;
     display: flex;
     gap: 10px;
-
-    > p {
-      color: var(--color-blue);
-      margin: 0;
-    }
   }
 
   > img {
