@@ -31,6 +31,11 @@ const FileMapRoot = styled.li`
     opacity: 0.5;
   }
 
+  > :first-child {
+    align-items: center;
+    display: flex;
+  }
+
   svg {
     height: 16px;
     width: 16px;
@@ -127,7 +132,7 @@ const FilesToUploadMap = ({
         of={filesToUpload}
         render={file => (
           <FileMapRoot data-uploaded="false">
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div>
               <Checkbox disabled />
               {fileBeingUploaded === file.name ? <Spinner /> : <FileOutlined />}
               <p>
@@ -142,6 +147,7 @@ const FilesToUploadMap = ({
                   aria-label="Upload"
                   icon={<UploadOutlined />}
                   onClick={async () => handleUpload(file)}
+                  title="Upload"
                   type="text"
                 />
                 <Button
@@ -152,15 +158,8 @@ const FilesToUploadMap = ({
                       filesToUpload.filter(f => f.uid !== file.uid),
                     )
                   }
+                  title="Remove"
                   type="text"
-                />
-                <UploadOutlined />
-                <CloseOutlined
-                  onClick={() =>
-                    setFilesToUpload(
-                      filesToUpload.filter(f => f.uid !== file.uid),
-                    )
-                  }
                 />
               </span>
             ) : (
@@ -214,7 +213,7 @@ const FilesMap = ({
 
           return (
             <FileMapRoot $color={color} onClick={() => select(id)} title={name}>
-              <div style={{ display: 'flex' }}>
+              <div>
                 <Checkbox checked={selectedFiles.includes(id)} />
                 <FileIcon />
                 <span>
@@ -222,8 +221,11 @@ const FilesMap = ({
                 </span>
               </div>
               <span>
-                <DeleteOutlined
+                <Button
+                  aria-label="Delete file"
                   onClick={e => handleRemove(e, id)}
+                  icon={<DeleteOutlined />}
+                  type="text"
                   title="Delete file"
                 />
               </span>
