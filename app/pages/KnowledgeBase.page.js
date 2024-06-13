@@ -22,9 +22,7 @@ import {
   CREATE_DOCUMENT,
   DELETE_DOCUMENT,
 } from '../graphql/knowledgeBase.queries'
-import Each from '../ui/common/Each'
-import { Button, Checkbox } from '../ui'
-import UploadHiddenDropZone from '../ui/knowledgeBase/Upload'
+import { Button, Checkbox, KBDrop } from '../ui'
 
 const xlFileExtensions = [
   '.xls',
@@ -68,8 +66,6 @@ const Spinner = styled.div`
 `
 
 const Root = styled.div`
-  --scrollbar: gainsboro;
-
   display: flex;
   height: 100%;
   overflow: hidden;
@@ -82,7 +78,7 @@ const Root = styled.div`
     }
 
     ::-webkit-scrollbar-thumb {
-      background: var(--scrollbar);
+      background: ${th('colorSecondary')};
       border-radius: 5px;
       width: 5px;
     }
@@ -101,7 +97,7 @@ const Root = styled.div`
 
 const Header = styled.div`
   align-items: center;
-  border-bottom: 1px solid gainsboro;
+  border-block-end: 1px solid ${th('colorBorder')};
   display: flex;
   justify-content: space-between;
   padding: ${grid(2)} ${grid(7)};
@@ -115,26 +111,21 @@ const Header = styled.div`
 `
 
 const FilesHeading = styled(Header)`
-  font-size: 11px;
-  gap: 8px;
+  font-size: ${th('fontSizeBaseSmall')};
+  gap: ${grid(2)};
   justify-content: space-between;
-  padding: 5px 0 5px 31px;
+  padding: ${grid(1)} ${grid(7)};
   text-rendering: optimizeLegibility;
   text-transform: uppercase;
-
-  p {
-    margin: 0 30px 0 0;
-  }
 `
 
-const FilesList = styled(UploadHiddenDropZone)`
-  background-color: #f8f8f8;
-  height: 100%;
-  margin: 0;
-  overflow-y: scroll;
-  padding: 0;
-  position: relative;
-  width: 100%;
+const FilesList = styled(KBDrop)`
+  background-color: ${th('colorBackgroundHue')};
+  overflow-y: auto;
+
+  ul {
+    padding-inline-start: 0;
+  }
 `
 
 const FileMapRoot = styled.li`
@@ -143,10 +134,12 @@ const FileMapRoot = styled.li`
   border-bottom: 1px solid #0002;
   cursor: pointer;
   display: flex;
+  filter: grayscale(100%);
   gap: 10px;
   height: fit-content;
   justify-content: space-between;
-  padding: 10px 31px;
+  opacity: 0.5;
+  padding: 10px 30px;
   transition: transform 0.3s;
   user-select: none;
   width: 100%;
@@ -197,7 +190,7 @@ const ActionsSidebar = styled.div`
   > :first-child {
     background: #f8f8f8;
     border-bottom: 1px solid gainsboro;
-    font-size: 11px;
+    font-size: ${th('fontSizeBaseSmall')};
     padding: 9px 15px;
   }
 `
@@ -235,17 +228,9 @@ const FilesToUploadMap = ({
   setFilesToUpload,
 }) => {
   return (
-    <Each
-      condition={filesToUpload.length > 0}
-      of={filesToUpload.filter(Boolean)}
-      render={file => (
-        <FileMapRoot
-          style={{
-            filter: 'grayscale(100%)',
-            opacity: 0.5,
-            background: '#f2f2f2',
-          }}
-        >
+    <ul>
+      {filesToUpload.map(file => (
+        <FileMapRoot>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Checkbox disabled />
             {fileBeingUploaded === file.name ? <Spinner /> : <FileOutlined />}
@@ -270,8 +255,8 @@ const FilesToUploadMap = ({
             <span>uploading...</span>
           )}
         </FileMapRoot>
-      )}
-    />
+      ))}
+    </ul>
   )
 }
 
@@ -298,10 +283,8 @@ const FilesMap = ({ documents, remove, selectedFiles, setSelectedFiles }) => {
   }
 
   return (
-    <Each
-      condition={documents?.length > 0}
-      of={documents || []}
-      render={({ id, extension, name }) => {
+    <ul>
+      {documents.map(({ id, extension, name }) => {
         const ext = xlFileExtensions.includes(extension) ? 'xls' : extension
         const { icon, color } = fileIcons[ext]
 
@@ -324,8 +307,8 @@ const FilesMap = ({ documents, remove, selectedFiles, setSelectedFiles }) => {
             </span>
           </FileMapRoot>
         )
-      }}
-    />
+      })}
+    </ul>
   )
 }
 
