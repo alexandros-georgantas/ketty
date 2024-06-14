@@ -89,7 +89,8 @@ const EditorContainer = styled.div`
     }
 
     &:focus-visible {
-      outline: none;
+      /* stylelint-disable-next-line declaration-no-important */
+      outline: none !important;
     }
   }
 `

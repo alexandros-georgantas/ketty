@@ -16,7 +16,7 @@ import {
   AskAiContentService,
 } from 'wax-prosemirror-services'
 
-// import { TablesService, tableEditing, columnResizing } from 'wax-table-service'
+import { TablesService, tableEditing } from 'wax-table-service'
 
 import charactersList from './charactersList'
 
@@ -42,6 +42,7 @@ export default {
             'Superscript',
           ],
         },
+        'Tables',
         'SpecialCharacters',
         'FindAndReplaceTool',
         'ToggleAi',
@@ -53,7 +54,7 @@ export default {
   SpecialCharactersService: charactersList,
   PmPlugins: [
     // columnResizing(),
-    // tableEditing(),
+    tableEditing(),
     disallowPasteImagesPlugin(() =>
       onInfoModal(
         `Pasting external images is not supported. Please use platform's Asset Manager infrastructure`,
@@ -67,7 +68,7 @@ export default {
     new ImageService(),
     new LinkService(),
     new ListsService(),
-    // new TablesService(),
+    new TablesService(),
     new BaseService(),
     new DisplayBlockLevelService(),
     new TextBlockLevelService(),
