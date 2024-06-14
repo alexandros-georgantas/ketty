@@ -53,12 +53,6 @@ const WaxSurfaceScroll = styled.div`
   overflow-y: auto;
   position: relative;
   width: 100%;
-
-  .ProseMirror {
-    /* figcaption {
-      width: 640px;
-    } */
-  }
 `
 
 const EditorContainer = styled.div`
@@ -87,7 +81,8 @@ const EditorContainer = styled.div`
     }
 
     &:focus-visible {
-      outline: none;
+      /* stylelint-disable-next-line declaration-no-important */
+      outline: none !important;
     }
   }
 `

@@ -15,6 +15,8 @@ import {
   disallowPasteImagesPlugin,
 } from 'wax-prosemirror-services'
 
+import { TablesService, tableEditing } from 'wax-table-service'
+
 import charactersList from './charactersList'
 
 import { onInfoModal } from '../../../helpers/commonModals'
@@ -38,6 +40,7 @@ export default {
             'Superscript',
           ],
         },
+        'Tables',
         'SpecialCharacters',
         'FindAndReplaceTool',
         'FullScreen',
@@ -47,6 +50,7 @@ export default {
   SchemaService: DefaultSchema,
   SpecialCharactersService: charactersList,
   PmPlugins: [
+    tableEditing(),
     disallowPasteImagesPlugin(() =>
       onInfoModal(
         `Pasting external images is not supported. Please use platform's Asset Manager infrastructure`,
@@ -60,6 +64,7 @@ export default {
     new LinkService(),
     new ListsService(),
     new BaseService(),
+    new TablesService(),
     new DisplayBlockLevelService(),
     new TextBlockLevelService(),
     new SpecialCharactersService(),
