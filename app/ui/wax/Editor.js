@@ -36,7 +36,9 @@ const EditorWrapper = ({
   editorRef,
   freeTextPromptsOn,
   customPrompts,
+  customPromptsOn,
   editorLoading,
+  kbOn,
 }) => {
   const [luluWax, setLuluWax] = useState({
     onAddChapter,
@@ -79,7 +81,9 @@ const EditorWrapper = ({
       AskAiContentTransformation: queryAI,
       AiOn: aiOn,
       FreeTextPromptsOn: freeTextPromptsOn,
-      CustomPrompts: customPrompts,
+      CustomPromptsOn: customPromptsOn,
+      CustomPrompts: customPromptsOn ? customPrompts : [],
+      ...(kbOn ? { AskKb: true } : {}),
     }
   }
 

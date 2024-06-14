@@ -23,7 +23,7 @@ module.exports = {
 
   gridUnit: '4px',
 
-  borderRadius: '3px',
+  borderRadius: '0px',
   borderWidth: '1px',
   borderStyle: 'solid',
 

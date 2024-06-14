@@ -34,6 +34,8 @@ import {
   APPLICATION_PARAMETERS,
   SET_BOOK_COMPONENT_STATUS,
   UPDATE_BOOK_COMPONENT_PARENT_ID,
+  RAG_SEARCH,
+  // BOOK_SETTINGS_UPDATED_SUBSCRIPTION,
 } from '../graphql'
 
 import {
@@ -54,6 +56,7 @@ import {
 } from '../helpers/commonModals'
 
 import { Editor, Modal, Paragraph, Spin } from '../ui'
+import { waxAiToolRagSystem, waxAiToolSystem } from '../helpers/openAi'
 
 const StyledSpin = styled(Spin)`
   display: grid;
@@ -90,7 +93,7 @@ const constructMetadataValues = (title, subtitle, podMetadata) => {
 let issueInCommunicationModal
 
 const ProducerPage = () => {
-  // INITIALIZATION SECTION START
+  // #region INITIALIZATION SECTION START
   const history = useHistory()
   const params = useParams()
   const { bookId } = params
@@ -105,6 +108,7 @@ const ProducerPage = () => {
   const [aiOn, setAiOn] = useState(false)
   const [customPrompts, setCustomPrompts] = useState([])
   const [freeTextPromptsOn, setFreeTextPromptsOn] = useState(false)
+  const [customPromptsOn, setCustomPromptsOn] = useState(false)
 
   const [currentBookComponentContent, setCurrentBookComponentContent] =
     useState(null)
@@ -120,7 +124,7 @@ const ProducerPage = () => {
   const hasMembership =
     isOwner(bookId, currentUser) || isCollaborator(bookId, currentUser)
 
-  // INITIALIZATION SECTION END
+  // #endregion INITIALIZATION SECTION
   // QUERIES SECTION START
   const {
     loading: applicationParametersLoading,
@@ -146,6 +150,7 @@ const ProducerPage = () => {
       setAiOn(data?.getBook?.bookSettings?.aiOn)
       setCustomPrompts(data?.getBook?.bookSettings?.customPrompts)
       setFreeTextPromptsOn(data?.getBook?.bookSettings?.freeTextPromptsOn)
+      setCustomPromptsOn(data?.getBook?.bookSettings?.customPromptsOn)
 
       // if loading page the first time and no chapter is preselected, select the first one
       if (selectedChapterId === undefined) {
@@ -189,6 +194,8 @@ const ProducerPage = () => {
     },
   })
 
+  const [ragSearch] = useLazyQuery(RAG_SEARCH)
+
   const [getBookSettings] = useLazyQuery(GET_BOOK_SETTINGS, {
     fetchPolicy: 'network-only',
     nextFetchPolicy: 'network-only',
@@ -197,16 +204,49 @@ const ProducerPage = () => {
     },
   })
 
-  const queryAI = async input => {
+  const queryAI = async (input, { askKb }) => {
     const settings = await getBookSettings()
+    const [userInput, highlightedText] = input.text
+
+    const formattedInput = {
+      text: [`${userInput}.\nHighlighted text: ${highlightedText}`],
+    }
+
+    let response = 'hello'
+
+    if (!askKb) {
+      const {
+        data: { openAi },
+      } = await chatGPT({
+        variables: {
+          system: waxAiToolSystem,
+          input: formattedInput,
+        },
+      })
+
+      const {
+        message: { content },
+      } = JSON.parse(openAi)
+
+      response = content
+    } else {
+      const { data } = await ragSearch({
+        variables: {
+          input: formattedInput,
+          system: waxAiToolRagSystem,
+        },
+      })
+
+      const {
+        message: { content },
+      } = JSON.parse(data.ragSearch)
+
+      response = content
+    }
 
     if (settings?.data.getBook.bookSettings.aiOn) {
       return new Promise((resolve, reject) => {
-        chatGPT({ variables: { input } }).then(({ data }) => {
-          if (!data) return resolve(null)
-          const { openAi: res } = data
-          return resolve(res)
-        })
+        resolve(response)
       })
     }
 
@@ -938,6 +978,7 @@ const ProducerPage = () => {
       chapters={bookQueryData?.getBook?.divisions[1].bookComponents}
       chaptersActionInProgress={chaptersActionInProgress}
       customPrompts={customPrompts}
+      customPromptsOn={customPromptsOn}
       editorLoading={editorLoading}
       editorRef={editorRef}
       freeTextPromptsOn={freeTextPromptsOn}
@@ -946,6 +987,7 @@ const ProducerPage = () => {
         (editorMode && editorMode === 'preview') ||
         !canModify
       }
+      kbOn={bookQueryData?.getBook.bookSettings.knowledgeBaseOn}
       metadataModalOpen={metadataModalOpen}
       onAddChapter={onAddChapter}
       onBookComponentParentIdChange={onBookComponentParentIdChange}
@@ -965,6 +1007,7 @@ const ProducerPage = () => {
       setMetadataModalOpen={setMetadataModalOpen}
       subtitle={bookQueryData?.getBook.subtitle}
       title={bookQueryData?.getBook.title}
+      // bookComponentContent={bookComponentData?.getBookComponent?.content}
     />
   )
 }

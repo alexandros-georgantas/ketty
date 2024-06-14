@@ -183,8 +183,7 @@ const Header = props => {
 
   if (showKnowledgeBaseLink) {
     navItemsRight.push(
-      /** TODO: update link */
-      <UnstyledLink to={`/knowledge-base/${bookId}`}>
+      <UnstyledLink to={`/books/${bookId}/knowledge-base`}>
         Knowledge base
       </UnstyledLink>,
     )

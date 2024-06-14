@@ -40,6 +40,7 @@ import {
   AiPDFDesignerPage,
   AdminPage,
   CreateBook,
+  KnowledgeBasePage,
 } from './pages'
 
 import { GET_BOOK_SETTINGS, APPLICATION_PARAMETERS } from './graphql'
@@ -66,7 +67,7 @@ const GlobalStyle = createGlobalStyle`
         outline: none;
       }
 
-      &:focus-visible {
+      &:focus-visible:not(#ai-overlay input) {
         outline: 2px solid ${th('colorOutline')};
       }
     }
@@ -219,7 +220,10 @@ const SiteHeader = () => {
     <>
       <Header
         bookId={
-          isProducerPage || isExporterPage || isAiAssistantPage
+          isProducerPage ||
+          isExporterPage ||
+          isAiAssistantPage ||
+          isKnowledgeBasePage
             ? getBookId()
             : undefined
         }
@@ -236,7 +240,9 @@ const SiteHeader = () => {
           !isAiAssistantPage &&
           !isExporterPage
         }
-        showBackToBook={isExporterPage || isAiAssistantPage}
+        showBackToBook={
+          isExporterPage || isAiAssistantPage || isKnowledgeBasePage
+        }
         showDashboard={currentPath !== '/dashboard'}
         showInvite={isProducerPage}
         showKnowledgeBaseLink={
@@ -374,6 +380,12 @@ const routes = (
                   <CssAssistantProvider>
                     <AiPDFDesignerPage />
                   </CssAssistantProvider>
+                </Authenticated>
+              </Route>
+
+              <Route exact path="/books/:bookId/knowledge-base">
+                <Authenticated>
+                  <KnowledgeBasePage />
                 </Authenticated>
               </Route>
 
