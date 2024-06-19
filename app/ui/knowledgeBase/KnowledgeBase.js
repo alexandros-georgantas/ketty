@@ -39,6 +39,7 @@ const Wrapper = styled.div`
 
   height: 100%;
   overflow: hidden;
+  position: relative;
 
   * {
     ::-webkit-scrollbar {
@@ -70,6 +71,8 @@ const Sidebar = styled(ActionsSidebar)`
 
 const FileList = styled(FilesList)`
   grid-area: main;
+  inset: 0 0 48px 0;
+  position: absolute;
 `
 
 const KnowledgeBase = props => {
