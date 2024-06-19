@@ -39,6 +39,7 @@ const EditorWrapper = ({
   customPromptsOn,
   editorLoading,
   kbOn,
+  editorKey,
 }) => {
   const [luluWax, setLuluWax] = useState({
     onAddChapter,
@@ -143,7 +144,7 @@ const EditorWrapper = ({
         autoFocus
         config={selectedConfig}
         fileUpload={onImageUpload}
-        key={`${editorLoading}-${selectedChapterId}-${isReadOnly}-${aiOn}-${customPrompts?.length}-${freeTextPromptsOn}`}
+        key={editorKey}
         layout={LuluLayout}
         onChange={onPeriodicBookComponentContentChange}
         readonly={isReadOnly}

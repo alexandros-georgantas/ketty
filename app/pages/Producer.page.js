@@ -29,6 +29,7 @@ import {
   RENAME_BOOK,
   UPDATE_SUBTITLE,
   BOOK_UPDATED_SUBSCRIPTION,
+  BOOK_SETTINGS_UPDATED_SUBSCRIPTION,
   GET_BOOK_COMPONENT,
   USE_CHATGPT,
   APPLICATION_PARAMETERS,
@@ -109,6 +110,8 @@ const ProducerPage = () => {
   const [customPrompts, setCustomPrompts] = useState([])
   const [freeTextPromptsOn, setFreeTextPromptsOn] = useState(false)
   const [customPromptsOn, setCustomPromptsOn] = useState(false)
+  const [editorLoading, setEditorLoading] = useState(false)
+  const [key, setKey] = useState()
 
   const [currentBookComponentContent, setCurrentBookComponentContent] =
     useState(null)
@@ -163,21 +166,22 @@ const ProducerPage = () => {
     },
   })
 
-  const { loading: bookComponentLoading } = useQuery(GET_BOOK_COMPONENT, {
-    fetchPolicy: 'network-only',
-    skip: !selectedChapterId || !bookQueryData,
-    variables: { id: selectedChapterId },
-    onError: () => {
-      if (!reconnecting) {
-        if (hasMembership) {
-          showGenericErrorModal()
+  const { loading: bookComponentLoading, refetch: refetchBookComponent } =
+    useQuery(GET_BOOK_COMPONENT, {
+      fetchPolicy: 'network-only',
+      skip: !selectedChapterId || !bookQueryData,
+      variables: { id: selectedChapterId },
+      onError: () => {
+        if (!reconnecting) {
+          if (hasMembership) {
+            showGenericErrorModal()
+          }
         }
-      }
-    },
-    onCompleted: data => {
-      setCurrentBookComponentContent(data.getBookComponent.content)
-    },
-  })
+      },
+      onCompleted: data => {
+        setCurrentBookComponentContent(data.getBookComponent.content)
+      },
+    })
 
   const [chatGPT] = useLazyQuery(USE_CHATGPT, {
     fetchPolicy: 'network-only',
@@ -204,58 +208,6 @@ const ProducerPage = () => {
     },
   })
 
-  const queryAI = async (input, { askKb }) => {
-    const settings = await getBookSettings()
-    const [userInput, highlightedText] = input.text
-
-    const formattedInput = {
-      text: [`${userInput}.\nHighlighted text: ${highlightedText}`],
-    }
-
-    let response = 'hello'
-
-    if (!askKb) {
-      const {
-        data: { openAi },
-      } = await chatGPT({
-        variables: {
-          system: waxAiToolSystem,
-          input: formattedInput,
-        },
-      })
-
-      const {
-        message: { content },
-      } = JSON.parse(openAi)
-
-      response = content
-    } else {
-      const { data } = await ragSearch({
-        variables: {
-          input: formattedInput,
-          system: waxAiToolRagSystem,
-        },
-      })
-
-      const {
-        message: { content },
-      } = JSON.parse(data.ragSearch)
-
-      response = content
-    }
-
-    if (settings?.data.getBook.bookSettings.aiOn) {
-      return new Promise((resolve, reject) => {
-        resolve(response)
-      })
-    }
-
-    showAiUnavailableModal()
-    return new Promise((resolve, reject) => {
-      reject()
-    })
-  }
-
   const editorRef = useRef(null)
 
   // QUERIES SECTION END
@@ -275,6 +227,53 @@ const ProducerPage = () => {
     }
   }, [currentUser])
 
+  const bookComponent =
+    !loading &&
+    selectedChapterId &&
+    find(bookQueryData?.getBook?.divisions[1].bookComponents, {
+      id: selectedChapterId,
+    })
+
+  const editorMode =
+    !loading &&
+    selectedChapterId &&
+    calculateEditorMode(bookComponent?.lock, canModify, currentUser, tabId)
+
+  const isReadOnly =
+    !selectedChapterId || (editorMode && editorMode === 'preview') || !canModify
+
+  const bookMetadataValues = constructMetadataValues(
+    bookQueryData?.getBook.title,
+    bookQueryData?.getBook.subtitle,
+    bookQueryData?.getBook?.podMetadata,
+  )
+
+  useEffect(() => {
+    if (
+      !loading &&
+      !hasMembership &&
+      !error?.message?.includes('does not exist')
+    ) {
+      const redirectToDashboard = () => history.push('/dashboard')
+      showUnauthorizedAccessModal(redirectToDashboard)
+    }
+  }, [hasMembership])
+
+  useEffect(() => {
+    if (!selectedChapterId) {
+      setCurrentBookComponentContent(null)
+      localStorage.removeItem(`${bookId}-selected-chapter`)
+    } else {
+      localStorage.setItem(`${bookId}-selected-chapter`, selectedChapterId)
+    }
+  }, [selectedChapterId])
+
+  useEffect(() => {
+    if (!bookComponentLoading) {
+      setKey(uuid())
+    }
+  }, [editorLoading, bookComponentLoading, isReadOnly])
+
   // SUBSCRIPTIONS SECTION START
 
   useSubscription(BOOK_UPDATED_SUBSCRIPTION, {
@@ -284,6 +283,15 @@ const ProducerPage = () => {
       if (hasMembership) {
         refetchBook({ id: bookId })
       }
+    },
+  })
+
+  useSubscription(BOOK_SETTINGS_UPDATED_SUBSCRIPTION, {
+    variables: { id: bookId },
+    fetchPolicy: 'network-only',
+    onData: async () => {
+      await refetchBookComponent()
+      setKey(uuid())
     },
   })
   // SUBSCRIPTIONS SECTION END
@@ -364,7 +372,6 @@ const ProducerPage = () => {
     })
 
   const [renameBookComponent] = useMutation(RENAME_BOOK_COMPONENT_TITLE, {
-    refetchQueries: [GET_ENTIRE_BOOK],
     onError: err => {
       if (err.toString().includes('Not Authorised')) {
         showUnauthorizedActionModal(false)
@@ -714,6 +721,58 @@ const ProducerPage = () => {
     }
   }
 
+  const queryAI = async (input, { askKb }) => {
+    const settings = await getBookSettings()
+    const [userInput, highlightedText] = input.text
+
+    const formattedInput = {
+      text: [`${userInput}.\nHighlighted text: ${highlightedText}`],
+    }
+
+    let response = 'hello'
+
+    if (!askKb) {
+      const {
+        data: { openAi },
+      } = await chatGPT({
+        variables: {
+          system: waxAiToolSystem,
+          input: formattedInput,
+        },
+      })
+
+      const {
+        message: { content },
+      } = JSON.parse(openAi)
+
+      response = content
+    } else {
+      const { data } = await ragSearch({
+        variables: {
+          input: formattedInput,
+          system: waxAiToolRagSystem,
+        },
+      })
+
+      const {
+        message: { content },
+      } = JSON.parse(data.ragSearch)
+
+      response = content
+    }
+
+    if (settings?.data.getBook.bookSettings.aiOn) {
+      return new Promise((resolve, reject) => {
+        resolve(response)
+      })
+    }
+
+    showAiUnavailableModal()
+    return new Promise((resolve, reject) => {
+      reject()
+    })
+  }
+
   const heartbeatInterval = find(
     applicationParametersData?.getApplicationParameters,
     { area: 'heartbeatInterval' },
@@ -840,43 +899,6 @@ const ProducerPage = () => {
   }
 
   // HANDLERS SECTION END
-  const bookComponent =
-    !loading &&
-    selectedChapterId &&
-    find(bookQueryData?.getBook?.divisions[1].bookComponents, {
-      id: selectedChapterId,
-    })
-
-  const editorMode =
-    !loading &&
-    selectedChapterId &&
-    calculateEditorMode(bookComponent?.lock, canModify, currentUser, tabId)
-
-  const bookMetadataValues = constructMetadataValues(
-    bookQueryData?.getBook.title,
-    bookQueryData?.getBook.subtitle,
-    bookQueryData?.getBook?.podMetadata,
-  )
-
-  useEffect(() => {
-    if (
-      !loading &&
-      !hasMembership &&
-      !error?.message?.includes('does not exist')
-    ) {
-      const redirectToDashboard = () => history.push('/dashboard')
-      showUnauthorizedAccessModal(redirectToDashboard)
-    }
-  }, [hasMembership])
-
-  useEffect(() => {
-    if (!selectedChapterId) {
-      setCurrentBookComponentContent(null)
-      localStorage.removeItem(`${bookId}-selected-chapter`)
-    } else {
-      localStorage.setItem(`${bookId}-selected-chapter`, selectedChapterId)
-    }
-  }, [selectedChapterId])
 
   // WEBSOCKET SECTION START
   useWebSocket(
@@ -942,8 +964,6 @@ const ProducerPage = () => {
     return <StyledSpin spinning />
   }
 
-  const [editorLoading, setEditorLoading] = useState(false)
-
   useEffect(() => {
     if (applicationParametersLoading || loading || bookComponentLoading) {
       setEditorLoading(true)
@@ -979,14 +999,11 @@ const ProducerPage = () => {
       chaptersActionInProgress={chaptersActionInProgress}
       customPrompts={customPrompts}
       customPromptsOn={customPromptsOn}
+      editorKey={key}
       editorLoading={editorLoading}
       editorRef={editorRef}
       freeTextPromptsOn={freeTextPromptsOn}
-      isReadOnly={
-        !selectedChapterId ||
-        (editorMode && editorMode === 'preview') ||
-        !canModify
-      }
+      isReadOnly={isReadOnly}
       kbOn={bookQueryData?.getBook.bookSettings.knowledgeBaseOn}
       metadataModalOpen={metadataModalOpen}
       onAddChapter={onAddChapter}
