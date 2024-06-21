@@ -18,7 +18,7 @@ import {
 } from '@coko/client'
 
 import { CURRENT_USER } from '@coko/client/dist/helpers/currentUserQuery'
-import { isAdmin } from './helpers/permissions'
+import { isAdmin, hasEditAccess } from './helpers/permissions'
 import Header from './ui/common/Header'
 
 import UserInviteModal from './ui/invite/UserInviteModal'
@@ -215,6 +215,7 @@ const SiteHeader = () => {
   const isExporterPage = currentPath.includes('/exporter')
   const isAiAssistantPage = currentPath.includes('/ai-pdf')
   const isKnowledgeBasePage = currentPath.includes('/knowledge-base')
+  const canEdit = currentUser && hasEditAccess(getBookId(), currentUser)
 
   return currentUser ? (
     <>
@@ -235,6 +236,7 @@ const SiteHeader = () => {
         onLogout={logout}
         onSettings={triggerSettingsModal}
         showAiAssistantLink={
+          canEdit &&
           isAIEnabled?.config &&
           bookQueryData?.getBook.bookSettings.aiPdfDesignerOn &&
           !isAiAssistantPage &&
@@ -246,13 +248,14 @@ const SiteHeader = () => {
         showDashboard={currentPath !== '/dashboard'}
         showInvite={isProducerPage}
         showKnowledgeBaseLink={
+          canEdit &&
           isAIEnabled?.config &&
           bookQueryData?.getBook.bookSettings.knowledgeBaseOn &&
           !isKnowledgeBasePage &&
           !isExporterPage
         }
         showPreview={isProducerPage}
-        showSettings={isProducerPage && isAIEnabled?.config}
+        showSettings={isProducerPage && canEdit && isAIEnabled?.config}
         userDisplayName={currentUser.displayName}
       />
       {contextHolder}
