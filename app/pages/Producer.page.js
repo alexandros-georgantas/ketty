@@ -749,6 +749,7 @@ const ProducerPage = () => {
     } else {
       const { data } = await ragSearch({
         variables: {
+          bookId,
           input: formattedInput,
           system: waxAiToolRagSystem,
         },
