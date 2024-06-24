@@ -220,14 +220,7 @@ const SiteHeader = () => {
   return currentUser ? (
     <>
       <Header
-        bookId={
-          isProducerPage ||
-          isExporterPage ||
-          isAiAssistantPage ||
-          isKnowledgeBasePage
-            ? getBookId()
-            : undefined
-        }
+        bookId={getBookId()}
         brandLabel="Lulu"
         brandLogoURL="/ketida.png"
         canAccessAdminPage={isAdmin(currentUser)}
@@ -239,8 +232,7 @@ const SiteHeader = () => {
           canEdit &&
           isAIEnabled?.config &&
           bookQueryData?.getBook.bookSettings.aiPdfDesignerOn &&
-          !isAiAssistantPage &&
-          !isExporterPage
+          isProducerPage
         }
         showBackToBook={
           isExporterPage || isAiAssistantPage || isKnowledgeBasePage
@@ -251,8 +243,7 @@ const SiteHeader = () => {
           canEdit &&
           isAIEnabled?.config &&
           bookQueryData?.getBook.bookSettings.knowledgeBaseOn &&
-          !isKnowledgeBasePage &&
-          !isExporterPage
+          isProducerPage
         }
         showPreview={isProducerPage}
         showSettings={isProducerPage && canEdit && isAIEnabled?.config}
