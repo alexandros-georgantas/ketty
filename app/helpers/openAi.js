@@ -12,7 +12,6 @@
 const waxAiToolResponseShape = {
   content:
     'An html string containing your natural language response, questions and feedback. Use the nodes you need to make it look good',
-  text: `If there is text you can generate that user can use and it's content is not the same provided in the 'content' property(tab): An html string containing the text that user will paste or replace. Otherwise omit it.`,
   citations:
     '[An array of strings containing citations if needed, otherwise omit it.]',
   links: '[An array of strings containing links if needed, otherwise omit it.]',
