@@ -12,12 +12,13 @@ import {
   PageLayout as Page,
   RequireAuth,
   grid,
+  th,
   useCurrentUser,
   ProviderConnectionPage,
 } from '@coko/client'
 
 import { CURRENT_USER } from '@coko/client/dist/helpers/currentUserQuery'
-import { isAdmin } from './helpers/permissions'
+import { isAdmin, hasEditAccess } from './helpers/permissions'
 import Header from './ui/common/Header'
 
 import UserInviteModal from './ui/invite/UserInviteModal'
@@ -38,7 +39,10 @@ import {
   VerifyEmailPage,
   AiPDFDesignerPage,
   AdminPage,
+  CreateBook,
+  KnowledgeBasePage,
 } from './pages'
+
 import { GET_BOOK_SETTINGS, APPLICATION_PARAMETERS } from './graphql'
 import { CssAssistantProvider } from './ui/AiPDFDesigner/hooks/CssAssistantContext'
 
@@ -55,6 +59,16 @@ const GlobalStyle = createGlobalStyle`
 
       > div.ant-spin-container {
         height: 100%;
+      }
+    }
+
+    * {
+      &:focus {
+        outline: none;
+      }
+
+      &:focus-visible:not(#ai-overlay input) {
+        outline: 2px solid ${th('colorOutline')};
       }
     }
   }
@@ -200,15 +214,13 @@ const SiteHeader = () => {
   const isProducerPage = currentPath.includes('/producer')
   const isExporterPage = currentPath.includes('/exporter')
   const isAiAssistantPage = currentPath.includes('/ai-pdf')
+  const isKnowledgeBasePage = currentPath.includes('/knowledge-base')
+  const canEdit = currentUser && hasEditAccess(getBookId(), currentUser)
 
   return currentUser ? (
     <>
       <Header
-        bookId={
-          isProducerPage || isExporterPage || isAiAssistantPage
-            ? getBookId()
-            : undefined
-        }
+        bookId={getBookId()}
         brandLabel="Lulu"
         brandLogoURL="/ketida.png"
         canAccessAdminPage={isAdmin(currentUser)}
@@ -217,16 +229,24 @@ const SiteHeader = () => {
         onLogout={logout}
         onSettings={triggerSettingsModal}
         showAiAssistantLink={
+          canEdit &&
           isAIEnabled?.config &&
           bookQueryData?.getBook.bookSettings.aiPdfDesignerOn &&
-          !isAiAssistantPage &&
-          !isExporterPage
+          isProducerPage
         }
-        showBackToBook={isExporterPage || isAiAssistantPage}
+        showBackToBook={
+          isExporterPage || isAiAssistantPage || isKnowledgeBasePage
+        }
         showDashboard={currentPath !== '/dashboard'}
         showInvite={isProducerPage}
+        showKnowledgeBaseLink={
+          canEdit &&
+          isAIEnabled?.config &&
+          bookQueryData?.getBook.bookSettings.knowledgeBaseOn &&
+          isProducerPage
+        }
         showPreview={isProducerPage}
-        showSettings={isProducerPage && isAIEnabled?.config}
+        showSettings={isProducerPage && canEdit && isAIEnabled?.config}
         userDisplayName={currentUser.displayName}
       />
       {contextHolder}
@@ -308,6 +328,15 @@ const routes = (
               />
               <Route
                 exact
+                path="/create-book"
+                render={() => (
+                  <Authenticated>
+                    <CreateBook />
+                  </Authenticated>
+                )}
+              />
+              <Route
+                exact
                 path="/books/:bookId/rename"
                 render={() => (
                   <Authenticated>
@@ -345,6 +374,12 @@ const routes = (
                   <CssAssistantProvider>
                     <AiPDFDesignerPage />
                   </CssAssistantProvider>
+                </Authenticated>
+              </Route>
+
+              <Route exact path="/books/:bookId/knowledge-base">
+                <Authenticated>
+                  <KnowledgeBasePage />
                 </Authenticated>
               </Route>
 
