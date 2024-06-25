@@ -71,6 +71,10 @@ const FilesHeading = styled.div`
   padding: ${grid(1)} ${grid(7)};
   text-transform: uppercase;
   white-space: nowrap;
+
+  > :last-child {
+    margin-inline-start: auto;
+  }
 `
 
 const StyledUpload = styled(Upload)`
@@ -318,7 +322,6 @@ const FilesList = props => {
         >
           <span>Select all</span>
         </Checkbox>
-        {/* <StyledButton onClick={handleFileChange}>Browse Files</StyledButton> */}
 
         <StyledUploadButton
           accept={filesToAccept}
@@ -339,9 +342,7 @@ const FilesList = props => {
             Delete
           </StyledButton>
         </Actions>
-        <p style={{ marginInlineStart: 'auto' }}>
-          Selected: {`${selectedFiles.length} / ${docs.length}`}
-        </p>
+        <p>Selected: {`${selectedFiles.length} / ${docs.length}`}</p>
       </FilesHeading>
 
       <StyledUpload
@@ -350,7 +351,9 @@ const FilesList = props => {
         multiple
       >
         {noFilesNotUploads && (
-          <NoFiles>Upload your first document to the knowledge base</NoFiles>
+          <NoFiles>
+            Drop and upload your documents to the knowledge base
+          </NoFiles>
         )}
         <FilesToUploadMap
           fileBeingUploaded={fileBeingUploaded}
