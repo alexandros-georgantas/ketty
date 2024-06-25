@@ -18,12 +18,14 @@ const RAG_SEARCH = gql`
     $history: [OpenAiMessage]
     $embeddingOptions: EmbeddingOptions
     $system: SystemMessage
+    $bookId: String!
   ) {
     ragSearch(
       input: $input
       history: $history
       embeddingOptions: $embeddingOptions
       system: $system
+      bookId: $bookId
     )
   }
 `
