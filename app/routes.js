@@ -43,7 +43,11 @@ import {
   KnowledgeBasePage,
 } from './pages'
 
-import { GET_BOOK_SETTINGS, APPLICATION_PARAMETERS } from './graphql'
+import {
+  GET_BOOK_SETTINGS,
+  GET_ENTIRE_BOOK,
+  APPLICATION_PARAMETERS,
+} from './graphql'
 import { CssAssistantProvider } from './ui/AiPDFDesigner/hooks/CssAssistantContext'
 
 const LayoutWrapper = styled.div`
@@ -139,6 +143,15 @@ const SiteHeader = () => {
       skip: !getBookId(),
     },
   )
+
+  const { data: bookTitleData } = useQuery(GET_ENTIRE_BOOK, {
+    fetchPolicy: 'network-only',
+    nextFetchPolicy: 'network-only',
+    variables: {
+      id: getBookId(),
+    },
+    skip: !getBookId(),
+  })
 
   const { data: applicationParametersData } = useQuery(APPLICATION_PARAMETERS, {
     fetchPolicy: 'network-only',
@@ -247,6 +260,7 @@ const SiteHeader = () => {
         }
         showPreview={isProducerPage}
         showSettings={isProducerPage && canEdit && isAIEnabled?.config}
+        title={bookTitleData?.getBook?.title}
         userDisplayName={currentUser.displayName}
       />
       {contextHolder}
@@ -356,6 +370,24 @@ const routes = (
               <Route
                 exact
                 path="/books/:bookId/producer"
+                render={() => (
+                  <Authenticated>
+                    <ProducerPage />
+                  </Authenticated>
+                )}
+              />
+              <Route
+                exact
+                path="/books/:bookId/settings"
+                render={() => (
+                  <Authenticated>
+                    <ProducerPage />
+                  </Authenticated>
+                )}
+              />
+              <Route
+                exact
+                path="/books/:bookId/metadata"
                 render={() => (
                   <Authenticated>
                     <ProducerPage />
