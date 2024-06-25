@@ -148,7 +148,7 @@ const InitBook = props => {
               <Stack>
                 <h2>Write from scratch</h2>
                 <p>
-                  Start your book with a blank slate using the build-in Editor.
+                  Start your book with a blank slate using the built-in Editor.
                 </p>
                 <StyledButton
                   disabled={loadingCreateBook || loadingImportBook}
